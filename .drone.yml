@@ -56,17 +56,6 @@ pipeline:
       branch: [master]
       event: [tag]
 
-  tag:
-    image: quintoandar/drone-github-tag
-    commands:
-      - PLUGIN_VERSION=$(cat ./.version) /bin/entrypoint.sh
-    secrets:
-      - source: github_access_token
-        target: github_token
-    when:
-      branch: [master]
-      event: [push]
-
   release:
     image: plugins/github-release
     pull: true
