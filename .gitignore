@@ -105,10 +105,7 @@ ENV/
 .pytest_cache/
 
 # PyCharm's Workspace
-.idea/workspace.xml
-.idea/tasks.xml
-.idea/usage.statistics.xml
-.idea/dictionaries/
+.idea/
 
 # Auto Generated: SHOULD NOT BE VERSIONED
 .version

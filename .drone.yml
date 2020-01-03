@@ -87,7 +87,7 @@ pipeline:
           -Dsonar.projectName=Butterfree \
           -Dsonar.projectKey=${DRONE_REPO_NAME} \
           -Dsonar.projectBaseDir=. \
-          -Dsonar.sources=./quintoandar_butterfree \
+          -Dsonar.sources=./butterfree \
           -Dsonar.sourceEncoding=UTF-8 \
           -Dsonar.analysis.mode=preview \
           -Dsonar.github.pullRequest=${DRONE_PULL_REQUEST} \
@@ -112,7 +112,7 @@ pipeline:
           -Dsonar.projectName=Butterfree \
           -Dsonar.projectKey=${DRONE_REPO_NAME} \
           -Dsonar.projectBaseDir=. \
-          -Dsonar.sources=./quintoandar_butterfree \
+          -Dsonar.sources=./butterfree \
           -Dsonar.python.coverage.reportPath=coverage.xml \
           -Dsonar.sourceEncoding=UTF-8 \
           -Dsonar.tests=./tests \
