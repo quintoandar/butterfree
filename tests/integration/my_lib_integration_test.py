@@ -1,5 +1,6 @@
 from quintoandar_butterfree.my_lib import DummyClass
 
+
 class TestDummyClass:
     def test_dummy_method(self):
         # given
