@@ -127,9 +127,9 @@ pipeline:
 
   notify:
     image: plugins/slack
-    webhook: https://hooks.slack.com/services/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
     channel: data-products-reports
+    secrets: [ slack_webhook ]
     when:
-      event: push
+      event: [ push ]
       branch: [ forno, master ]
-status: [ success, failure ]
+      status: [ success, failure ]
