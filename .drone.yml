@@ -1,0 +1,146 @@
+clone:
+  git:
+    image: plugins/git
+
+pipeline:
+  unit-tests-python3.7: &push
+    image: python:3.7
+    commands:
+      - make requirements
+      - make requirements-test
+      - make unit-tests
+    group: tests37
+    when:
+      event: push
+
+  integration-tests-python3.7:
+    <<: *push
+    commands:
+      - make requirements
+      - make requirements-test
+      - make integration-tests
+    group: tests37
+
+  style-check:
+    <<: *push
+    commands:
+      - make requirements-lint
+      - make style-check
+    group: tests37
+    when:
+      event: push
+
+  check-flake8:
+    <<: *push
+    commands:
+      - make requirements-lint
+      - make check-flake8
+    group: tests37
+    when:
+      event: push
+
+  version:
+    image: python:3.7
+    commands:
+      - git clone https://github.com/quintoandar/python-package-server.git --quiet
+      - make -s check-version
+    when:
+      event: [pull_request, push, tag]
+      branch: master
+
+  package:
+    image: python:3.7
+    commands:
+      - make package
+    when:
+      branch: [master]
+      event: [tag]
+
+  tag:
+    image: quintoandar/drone-github-tag
+    commands:
+      - PLUGIN_VERSION=$(cat ./.version) /bin/entrypoint.sh
+    secrets:
+      - source: github_access_token
+        target: github_token
+    when:
+      branch: [master]
+      event: [push]
+
+  release:
+    image: plugins/github-release
+    pull: true
+    files: dist/*
+    title: .version
+    secrets:
+      - source: github_access_token
+        target: github_token
+    when:
+      branch: [master]
+      event: [tag]
+
+  publish:
+    image: python:3.7
+    commands:
+      - make publish
+    secrets:
+      - source: github_access_token
+        target: github_token
+    when:
+      branch: [master]
+      event: [tag]
+
+  sonar-preview:
+    image: newtmitch/sonar-scanner
+    commands:
+      - |-
+        sonar-scanner \
+          -Dsonar.projectName=Butterfree \
+          -Dsonar.projectKey=${DRONE_REPO_NAME} \
+          -Dsonar.projectBaseDir=. \
+          -Dsonar.sources=./quintoandar_butterfree \
+          -Dsonar.sourceEncoding=UTF-8 \
+          -Dsonar.analysis.mode=preview \
+          -Dsonar.github.pullRequest=${DRONE_PULL_REQUEST} \
+          -Dsonar.github.repository=${DRONE_REPO_OWNER}/${DRONE_REPO_NAME} \
+          -Dsonar.github.oauth=$${GITHUB_ACCESS_TOKEN} \
+          -Dsonar.host.url=https://sonar.quintoandar.com.br \
+          -Dsonar.login=user \
+          -Dsonar.password=$${SONAR_PASSWORD}
+    secrets: [ sonar_password, github_access_token ]
+    when:
+      event: pull_request
+      branch: [ master ]
+
+  ###
+  ### PRODUCTION
+  ###
+  sonar-report:
+    image: newtmitch/sonar-scanner
+    commands:
+      - |-
+        sonar-scanner \
+          -Dsonar.projectName=Butterfree \
+          -Dsonar.projectKey=${DRONE_REPO_NAME} \
+          -Dsonar.projectBaseDir=. \
+          -Dsonar.sources=./quintoandar_butterfree \
+          -Dsonar.python.coverage.reportPath=coverage.xml \
+          -Dsonar.sourceEncoding=UTF-8 \
+          -Dsonar.tests=./tests \
+          -Dsonar.host.url=https://sonar.quintoandar.com.br \
+          -Dsonar.projectKey=${DRONE_REPO_NAME} \
+          -Dsonar.login=user \
+          -Dsonar.password=$${SONAR_PASSWORD}
+    secrets: [ sonar_password, github_access_token ]
+    when:
+      event: push
+      branch: [ master ]
+
+  notify:
+    image: plugins/slack
+    webhook: https://hooks.slack.com/services/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
+    channel: data-products-reports
+    when:
+      event: push
+      branch: [ forno, master ]
+status: [ success, failure ]
