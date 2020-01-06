@@ -1,4 +1,4 @@
-from quintoandar_butterfree.my_lib import DummyClass
+from butterfree.my_lib import DummyClass
 
 
 class TestDummyClass:
