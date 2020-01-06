@@ -3,6 +3,7 @@ environment:
 	@pyenv install -s 3.7.2
 	@pyenv virtualenv 3.7.2 butterfree
 	@pyenv local butterfree
+	@PYTHONPATH=. python -m pip install --upgrade pip
 
 .PHONY: requirements-test
 requirements-test:
