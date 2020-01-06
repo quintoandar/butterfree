@@ -5,7 +5,7 @@ _This library is part of the QuintoAndar-specific libraries_
 This repository contains ETL scripts defining the feature sets
 
 ```python
-from quintoandar_butterfree import my_lib
+from butterfree import my_lib
 
 def foo(arg):
     return my_lib.awesome_function(arg)  # change me
@@ -30,10 +30,10 @@ Or after listing `quintoandar-butterfree` in your
 pip install -r requirements.txt --extra-index-url https://quintoandar.github.io/python-package-server/
 ```
 
-This will expose `my_lib` under `quintoandar_butterfree` module:
+This will expose `my_lib` under `butterfree` module:
 
 ```python
-from quintoandar_butterfree import my_lib
+from butterfree import my_lib
 
 def foo():
     bar = my_lib.cool_method()

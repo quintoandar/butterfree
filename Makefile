@@ -26,7 +26,7 @@ dev-requirements:
 
 .PHONY: tests
 tests:
-	@python -m pytest -n=auto --cov-config=.coveragerc --cov=quintoandar_butterfree --cov-report term --cov-report html:htmlcov --cov-report xml:coverage.xml tests
+	@python -m pytest -n=auto --cov-config=.coveragerc --cov=butterfree --cov-report term --cov-report html:htmlcov --cov-report xml:coverage.xml tests
 	@python -m coverage xml -i
 
 .PHONY: unit-tests
@@ -35,7 +35,7 @@ unit-tests:
 	@echo "Unit Tests"
 	@echo "=========="
 	@echo ""
-	@python -m pytest -n auto --cov-config=.coveragerc --cov-report term --cov-report html:unit-tests-cov --cov=quintoandar_butterfree --cov-fail-under=75 tests/unit
+	@python -m pytest -n auto --cov-config=.coveragerc --cov-report term --cov-report html:unit-tests-cov --cov=butterfree --cov-fail-under=75 tests/unit
 
 
 .PHONY: integration-tests
@@ -44,7 +44,7 @@ integration-tests:
 	@echo "Integration Tests"
 	@echo "================="
 	@echo ""
-	@python -m pytest -n auto --cov-config=.coveragerc --cov-report term --cov-report xml:integration-tests-cov.xml --cov=quintoandar_butterfree --cov-fail-under=60 tests/integration
+	@python -m pytest -n auto --cov-config=.coveragerc --cov-report term --cov-report xml:integration-tests-cov.xml --cov=butterfree --cov-fail-under=60 tests/integration
 
 .PHONY: style-check
 style-check:
@@ -81,10 +81,12 @@ black:
 .PHONY: clean
 clean:
 	@find ./ -type d -name 'htmlcov' -exec rm -rf {} +;
-	@find ./ -type d -name 'coverage.xml' -exec rm -rf {} +;
+	@find ./ -type d -name '.pytest_cache' -exec rm -rf {} +;
 	@find ./ -type f -name 'coverage-badge.svg' -exec rm -f {} \;
+	@find ./ -type f -name 'coverage.xml' -exec rm -f {} \;
 	@find ./ -type f -name '.coverage' -exec rm -f {} \;
 	@find ./ -name '*.pyc' -exec rm -f {} \;
+	@find ./ -name '*.pyo' -exec rm -f {} \;
 	@find ./ -name '*~' -exec rm -f {} \;
 
 .PHONY: version
