@@ -135,6 +135,7 @@ make integration-test
 Style check is available through make too:
 ```bash
 make style-check
+make quality-check
 ```
 
 You can run unit tests, integration tests and style check in a single batch:
@@ -144,17 +145,21 @@ make tests
 
 ### Code Style, PEP8 & Formatting
 
-TL;DR: Just run `make black` before you commit.
-Check if everything is fine with `make flake8`.
+TL;DR: Just run `make apply-style` before you commit.
+Check if everything is fine with `make checks`.
 
-This project follows the [Black Code Style](https://github.com/ambv/black)
-which follows PEP8 and unifies style across the project's codebase.
+This project follows:
+- [PEP8](https://www.python.org/dev/peps/pep-0008/) for code style.
+- [PEP257](https://www.python.org/dev/peps/pep-0257/) with Google's docsting
+style ([example](https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html#example-google)).
+using some nice tooling to unifies style across the project's codebase and
+improve quality.
 
 No need to worry about manually reviewing your style and imports,
-just run black from the project root with:
+`black` and `isort` will automatically fix most of style inconsistency:
 
 ```bash
-make black
+make apply-style
 ```
 
 Additionally [Flake 8](http://flake8.pycqa.org/en/latest/) is used to
@@ -183,4 +188,4 @@ and will be ready to consume.
 
 Any contributions are welcome! Feel free to open Pull Requests and
 posting them to [our
-**#python** slack channel](https://quintoandar.slack.com/messages/squad-mlops/).
+**#squad-mlops** slack channel](https://quintoandar.slack.com/messages/squad-mlops/).

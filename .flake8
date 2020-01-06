@@ -1,4 +1,15 @@
 [flake8]
-max_line_length = 88
-ignore = W503, E203
+docstring-convention = google
+max-line-length = 88
+max-complexity = 12
+ignore = W503, E203, D203, D401
 exclude = dist/*,build/*,.pytest_cache/*,.git/*
+per-file-ignores =
+    # We will not check for docstrings or the use of asserts in tests
+    tests/*:D,S101
+    setup.py:D,S101
+
+[isort]
+line_length = 88
+multi_line_output=3
+indent='    '
