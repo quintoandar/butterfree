@@ -30,11 +30,11 @@ pipeline:
     when:
       event: push
 
-  check-flake8:
+  quality-check:
     <<: *push
     commands:
       - make requirements-lint
-      - make check-flake8
+      - make quality-check
     group: tests37
     when:
       event: push
