@@ -3,10 +3,7 @@ environment:
 	@pyenv install -s 3.7.2
 	@pyenv virtualenv 3.7.2 butterfree
 	@pyenv local butterfree
-
-.PHONY: requirements
-requirements:
-	@PYTHONPATH=. python -m pip install -U -r requirements.txt -r requirements.dev.txt --extra-index-url https://quintoandar.github.io/python-package-server/
+	@PYTHONPATH=. python -m pip install --upgrade pip
 
 .PHONY: requirements-test
 requirements-test:
@@ -16,13 +13,16 @@ requirements-test:
 requirements-lint:
 	@PYTHONPATH=. python -m pip install -r requirements.lint.txt
 
+.PHONY: dev-requirements
+dev-requirements:
+	@PYTHONPATH=. python -m pip install -U -r requirements.dev.txt
+
 .PHONY: minimum-requirements
 minimum-requirements:
 	@PYTHONPATH=. python -m pip install -U -r requirements.txt --extra-index-url https://quintoandar.github.io/python-package-server/
 
-.PHONY: dev-requirements
-dev-requirements:
-	@PYTHONPATH=. python -m pip install -U -r requirements.dev.txt --extra-index-url https://quintoandar.github.io/python-package-server/
+.PHONY: requirements
+requirements: requirements-test requirements-lint dev-requirements minimum-requirements
 
 .PHONY: tests
 tests:
@@ -55,8 +55,8 @@ style-check:
 	@python -m black --check -t py36 --exclude="build/|buck-out/|dist/|_build/|pip/|\.pip/|\.git/|\.hg/|\.mypy_cache/|\.tox/|\.venv/" . && echo "\n\nSuccess" || echo "\n\nFailure\n\nRun \"make black\" to apply style formatting to your code"
 	@echo ""
 
-.PHONY: check-flake8
-check-flake8:
+.PHONY: quality-check
+quality-check:
 	@echo ""
 	@echo "Flake 8"
 	@echo "======="
@@ -65,18 +65,12 @@ check-flake8:
 	@echo ""
 
 .PHONY: checks
-checks:
-	@echo ""
-	@echo "Code Style & Flake 8"
-	@echo "--------------------"
-	@echo ""
-	@make style-check
-	@make check-flake8
-	@echo ""
+checks: style-check quality-check
 
-.PHONY: black
-black:
+.PHONY: apply-style
+apply-style:
 	@python -m black -t py36 --exclude="build/|buck-out/|dist/|_build/|pip/|\.pip/|\.git/|\.hg/|\.mypy_cache/|\.tox/|\.venv/" .
+	@python -m isort -rc butterfree/ tests/
 
 .PHONY: clean
 clean:
