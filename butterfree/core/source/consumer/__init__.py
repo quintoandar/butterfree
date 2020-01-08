@@ -1,1 +1,1 @@
-"""Holds data consumers for multi data sources"""
+"""Holds data consumers for multi data sources."""

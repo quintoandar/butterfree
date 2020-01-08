@@ -1,1 +1,1 @@
-"""Holds connection clients"""
+"""Holds connection clients."""
