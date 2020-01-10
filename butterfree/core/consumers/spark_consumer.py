@@ -1,13 +1,12 @@
 from pyspark.sql.functions import col, lit
 
+from butterfree.core.consumers.consumer import Consumer
 
-class SparkConsumer:
+
+class SparkConsumer(Consumer):
     """
     Gets data from a Databrick Metastore through Spark and returns it as a Spark
     DataFrame.
-    :param conn_config: A dict with the config values of the connection. It must
-    contain the key `db`.
-    :type conn_config: dict
     :param spark_client: A client to handle the Spark connection
     :type spark_client: SparkClient
     """
@@ -15,17 +14,18 @@ class SparkConsumer:
     def __init__(self, spark_client):
         self.spark_client = spark_client
 
-    def get_table_names_and_sizes(self, db):
+    def consume(self, options):
         """
-        Gets the table names and sizes in the given database.
-        :return: A Spark DataFrame with cols: table_name and size
+        Uses the proper function to fecth data.
+        :param options: Consumer options to read the data
+        :return: A DataFrame with the desired data
         """
-        query = "show tables in {db}".format(db=db)
-        df = (
-            self.spark_client.get_records(query)
-            .select(col("tableName").alias("table_name"))
-            .withColumn("size", lit(0))
-        )
+        if all(key in options.keys() for key in ("query", "db")):
+            df = self.get_data_from_query(options["query"], options["db"])
+        elif all(key in options.keys() for key in ("db", "table_name")):
+            df = self.get_table_schema(options["db"], options["table_name"])
+        else:
+            raise ValueError()
 
         return df
 
@@ -46,7 +46,7 @@ class SparkConsumer:
         return df
 
     def get_data_from_table(self, db, table_name):
-        query = "show tables in {db}.{table}".format(db=db, table=table_name)
+        query = "select * from {db}.{table}".format(db=db, table=table_name)
         df = self.spark_client.get_records(query)
 
         return df
