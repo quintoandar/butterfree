@@ -23,7 +23,7 @@ class SparkConsumer(Consumer):
         if all(key in options.keys() for key in ("query", "db")):
             df = self.get_data_from_query(options["query"], options["db"])
         elif all(key in options.keys() for key in ("db", "table_name")):
-            df = self.get_table_schema(options["db"], options["table_name"])
+            df = self.get_data_from_table(options["db"], options["table_name"])
         else:
             raise ValueError()
 

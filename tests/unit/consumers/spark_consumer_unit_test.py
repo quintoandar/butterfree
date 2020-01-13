@@ -35,7 +35,7 @@ def test_spark_consumer_get_table_schema():
     spark_consumer = SparkConsumer(spark_client)
 
     options = {"db": "a", "table_name": "b"}
-    df = spark_consumer.consume(options)
+    df = spark_consumer.get_table_schema(options)
 
     assert all([a == b for a, b in zip(df.columns, ["col_name", "col_type"])])
 
