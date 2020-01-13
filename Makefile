@@ -38,7 +38,7 @@ drone-install:
 .PHONY: tests
 ## run all unit and integration tests with coverage report
 tests:
-	@python -m pytest -n=auto --cov-config=.coveragerc --cov=butterfree --cov-report term --cov-report html:htmlcov --cov-report xml:coverage.xml tests
+	@python -m pytest -W ignore::DeprecationWarning -n=auto --cov-config=.coveragerc --cov=butterfree --cov-report term --cov-report html:htmlcov --cov-report xml:coverage.xml tests
 	@python -m coverage xml -i
 
 .PHONY: unit-tests
@@ -48,7 +48,7 @@ unit-tests:
 	@echo "Unit Tests"
 	@echo "=========="
 	@echo ""
-	@python -m pytest -n auto --cov-config=.coveragerc --cov-report term --cov-report html:unit-tests-cov --cov=butterfree --cov-fail-under=75 tests/unit
+	@python -m pytest -W ignore::DeprecationWarning -n auto --cov-config=.coveragerc --cov-report term --cov-report html:unit-tests-cov --cov=butterfree --cov-fail-under=75 tests/unit
 
 
 .PHONY: integration-tests
@@ -58,7 +58,7 @@ integration-tests:
 	@echo "Integration Tests"
 	@echo "================="
 	@echo ""
-	@python -m pytest -n auto --cov-config=.coveragerc --cov-report term --cov-report xml:integration-tests-cov.xml --cov=butterfree --cov-fail-under=60 tests/integration
+	@python -m pytest -W ignore::DeprecationWarning -n auto --cov-config=.coveragerc --cov-report term --cov-report xml:integration-tests-cov.xml --cov=butterfree --cov-fail-under=60 tests/integration
 
 .PHONY: style-check
 ## run code style checks with black
