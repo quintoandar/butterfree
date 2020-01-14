@@ -27,8 +27,7 @@ requirements: requirements-test requirements-lint dev-requirements minimum-requi
 .PHONY: drone-install
 drone-install:
 	@pip install --upgrade pip
-	@mkdir -p pip
-	@python -m pip install -U -r requirements.test.txt -r requirements.lint.txt -r requirements.txt -t ./pip/deps --cache-dir ./pip/cache
+	@python -m pip install -U -r requirements.test.txt -r requirements.lint.txt -r requirements.dev.txt -r requirements.txt -t ./pip/deps --cache-dir ./pip/cache
 
 .PHONY: tests
 tests:
