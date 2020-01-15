@@ -1,7 +1,7 @@
 .PHONY: environment
 environment:
-	@pyenv install -s 3.7.2
-	@pyenv virtualenv 3.7.2 butterfree
+	@pyenv install -s 3.6.8
+	@pyenv virtualenv 3.6.8 butterfree
 	@pyenv local butterfree
 	@PYTHONPATH=. python -m pip install --upgrade pip
 
@@ -23,6 +23,11 @@ minimum-requirements:
 
 .PHONY: requirements
 requirements: requirements-test requirements-lint dev-requirements minimum-requirements
+
+.PHONY: drone-install
+drone-install:
+	@pip install --upgrade pip
+	@python -m pip install -U -r requirements.test.txt -r requirements.lint.txt -r requirements.dev.txt -r requirements.txt -t ./pip/deps --cache-dir ./pip/cache
 
 .PHONY: tests
 tests:
@@ -78,7 +83,7 @@ clean:
 	@find ./ -type d -name '.pytest_cache' -exec rm -rf {} +;
 	@find ./ -type f -name 'coverage-badge.svg' -exec rm -f {} \;
 	@find ./ -type f -name 'coverage.xml' -exec rm -f {} \;
-	@find ./ -type f -name '.coverage' -exec rm -f {} \;
+	@find ./ -type f -name '.coverage*' -exec rm -f {} \;
 	@find ./ -name '*.pyc' -exec rm -f {} \;
 	@find ./ -name '*.pyo' -exec rm -f {} \;
 	@find ./ -name '*~' -exec rm -f {} \;
