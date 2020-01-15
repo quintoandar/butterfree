@@ -14,13 +14,13 @@ pipeline:
     when:
       event: push
 
-  integration-tests-python3.7:
-    <<: *push
-    commands:
-      - make requirements
-      - make requirements-test
-      - make integration-tests
-    group: tests37
+#  integration-tests-python3.7:
+#    <<: *push
+#    commands:
+#      - make requirements
+#      - make requirements-test
+#      - make integration-tests
+#    group: tests37
 
   style-check:
     <<: *push
