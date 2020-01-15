@@ -1,3 +1,5 @@
+"""Holds functions for managing the running environment."""
+
 import os
 
 import git
@@ -31,16 +33,18 @@ def _sanitize_spec_entry(entry):
     return mapping.replace(" ", "[", 1) + "]"
 
 
-def get_environment_specification() -> dict:
+def get_environment_specification(filename: str = None) -> dict:
+    """Gets environment specification from a default file."""
     spec_filepath = None
     search_path = __file__
+    filename = filename or _ENVIRONMENT_SPECIFICATION_FILENAME
     while not spec_filepath:
         search_path = os.path.dirname(search_path)
         try:
             spec_filepath = next(
                 entry.path
                 for entry in os.scandir(search_path)
-                if entry.is_file() and entry.name == _ENVIRONMENT_SPECIFICATION_FILENAME
+                if entry.is_file() and entry.name == filename
             )
         except StopIteration:
             if _is_project_root(search_path):
@@ -59,48 +63,56 @@ specification = get_environment_specification()
 
 
 def get_current_environment() -> str:
-    """
-    :return: the value of the "ENVIRONMENT" environment variable. It is expected to
-        assume one of these values: "dev", "forno", "staging" or "prod"; where "dev"
-        is the default
+    """Gets current environment tag.
+
+     It is expected to assume one of these values: "dev", "forno", "staging" or "prod".
+     "dev" is the default.
+
+    :return: the value of the "ENVIRONMENT" environment variable.
     """
     return get_variable("ENVIRONMENT", DEVELOPMENT)
 
 
 def is_development() -> bool:
-    """
-    :return: boolean value indicating whether the running environment is a
-    development ("dev") environment or not
+    """Checks whether the running environment tag refers to a development env or not.
+
+    :return: boolean value.
     """
     return get_current_environment() == DEVELOPMENT
 
 
 def is_homolog() -> bool:
-    """
-    :return: boolean value indicating whether the running environment is an
-    homologation ("forno") environment or not
+    """Checks whether the running environment is an homologation env or not.
+
+    :return: boolean value.
     """
     return get_current_environment() == HOMOLOG
 
 
 def is_staging() -> bool:
-    """
-    :return: boolean value indicating whether the running environment is a
-    staging ("staging") environment or not
+    """Checks whether the running environment is a staging env or not.
+
+    :return: boolean value.
     """
     return get_current_environment() == STAGING
 
 
 def is_production() -> bool:
-    """
-    :return: boolean value indicating whether the running environment is a
-    production ("prod") environment or not
+    """Checks whether the running environment is a production env or not.
+
+    :return: boolean value indicating
     """
     return get_current_environment() == PRODUCTION
 
 
 class UnspecifiedVariableError(RuntimeError):
+    """Environment variables not set error."""
+
     def __init__(self, variable_name: str):
+        """Initialize error object for a single env variable.
+
+        :param variable_name: env variable name.
+        """
         super().__init__(
             f'Variable "{variable_name}" is not listed in the environment'
             f' specification\nUpdate the "{_ENVIRONMENT_SPECIFICATION_FILENAME}" file'
@@ -109,15 +121,16 @@ class UnspecifiedVariableError(RuntimeError):
 
 
 def get_variable(variable_name: str, default_value: str = None) -> str:
-    """
-    Gets an environment variable from it's explicitly declared value in the running
-    environment or from the default value declared in the environment.yaml specification
-     or from the :param default_value:
+    """Gets an environment variable.
+
+    The variable comes from it's explicitly declared value in the running environment or
+    from the default value declared in the environment.yaml specification or from the
+    :param default_value:.
 
     :param variable_name: environment variable name
     :param default_value: default value to use in case no value is set in the
         environment nor in the environment.yaml specification file
-    :return: The variable's string value
+    :return: the variable's string value
     """
     try:
         spec_default = specification[variable_name]
@@ -127,15 +140,16 @@ def get_variable(variable_name: str, default_value: str = None) -> str:
 
 
 def describe_variable(variable_name: str, *, bash_formatting: bool = True) -> str:
-    """
-    Describes an environment variable stating it's name, current value and origin,
-    where the origin may be the running environment or the specification default
+    """Describes an environment variable.
+
+    The description will state the variable's name, current value and origin, where the
+    origin may be the running environment or the specification default.
 
     :param variable_name: environment variable name
-    :param bash_formatting:
-        boolean indicating whether or not to use bash formatting markups
-    :return: A string describing the requested environment variable
-        in human-readable format
+    :param bash_formatting: boolean indicating whether or not to use bash formatting
+        markups.
+    :return: a string describing the requested environment variable in human-readable
+        format.
     """
     set_bold = "\033[1m" if bash_formatting else ""
     unset_bold = "\033[0m" if bash_formatting else ""
@@ -160,13 +174,12 @@ def describe_variable(variable_name: str, *, bash_formatting: bool = True) -> st
 
 
 def describe_environment(*, bash_formatting: bool = True) -> str:
-    """
-    Describes the current running environment
+    """Describes the current running environment.
 
-    :param bash_formatting:
-        boolean indicating whether or not to use bash formatting markups
-    :return: a multiline string describing the current running environment
-        in human-readable format
+    :param bash_formatting: boolean indicating whether or not to use bash formatting
+        markups.
+    :return: a multiline string describing the current running environment in
+        human-readable format.
     """
     set_bold = "\033[1m" if bash_formatting else ""
     unset_bold = "\033[0m" if bash_formatting else ""

@@ -1,4 +1,6 @@
-from butterfree.core.db.configs.abstract_config import AbstractWriteConfig
+"""This module holds database configurations to be used by clients."""
+
+
 from butterfree.core.db.configs.cassandra_config import CassandraWriteConfig
 
-__all__ = ["AbstractWriteConfig", "CassandraWriteConfig"]
+__all__ = ["CassandraWriteConfig"]

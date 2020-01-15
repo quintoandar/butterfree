@@ -59,5 +59,5 @@ class OnlineFeatureStoreLoader:
         self.spark_client.write_dataframe(
             dataframe,
             format=self.db_config.format_,
-            options={**self.db_config.options, "table": name},
+            options=self.db_config.get_options(table=name),
         )

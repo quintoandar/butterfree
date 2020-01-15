@@ -1,3 +1,5 @@
+import re
+
 import pytest
 
 from butterfree.core.configs import environment
@@ -55,7 +57,9 @@ def test_get_variable_out_of_spec_fails(monkeypatch):
         del environment.specification[not_specified_variable]
 
     # then
-    with pytest.raises(RuntimeError):
+    with pytest.raises(
+        environment.UnspecifiedVariableError, match="not listed in the environment"
+    ):
         environment.get_variable(not_specified_variable, "anything")
 
 
@@ -323,3 +327,53 @@ def test_get_environment_specificatio_error(mocker):
     # then
     with pytest.raises(RuntimeError, match="not found"):
         _ = environment.get_environment_specification()
+
+
+def test_describe_variable(monkeypatch):
+    # when
+    description = environment.describe_variable("ENVIRONMENT")
+
+    # then
+    assert (
+        re.fullmatch(
+            r".*ENVIRONMENT.*dev.*set by the default value from the.*specification.*",
+            description,
+        )
+        is not None
+    )
+
+
+def test_describe_variable_by_environment(monkeypatch):
+    # given
+    monkeypatch.setenv("ENVIRONMENT", "LUL")
+
+    # when
+    description = environment.describe_variable("ENVIRONMENT")
+
+    # then
+    assert (
+        re.fullmatch(
+            r".*ENVIRONMENT.*LUL.*set by the running environment.*", description
+        )
+        is not None
+    )
+
+
+def test_describe_environment(mocker):
+    # given
+    mocker.patch.dict(
+        environment.specification, {"ENVIRONMENT": "test"},
+    )
+
+    # when
+    description = environment.describe_environment()
+
+    # then
+    assert (
+        re.match(
+            r"\n.*Environment Variables\n.*\n.*ENVIRONMENT.*test.*set"
+            r" by the default value from the.*specification\)\n",
+            description,
+        )
+        is not None
+    )

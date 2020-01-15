@@ -65,7 +65,7 @@ class TestOnlineFeatureStoreLoader:
             loader.db_config.format_
             == spark_client.write_dataframe.call_args[1]["format"]
         )
-        assert {
-            **loader.db_config.options,
-            "table": "test",
-        } == spark_client.write_dataframe.call_args[1]["options"]
+        assert (
+            loader.db_config.get_options(table="test")
+            == spark_client.write_dataframe.call_args[1]["options"]
+        )
