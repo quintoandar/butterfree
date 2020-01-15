@@ -1,7 +1,8 @@
-import pytest
 from unittest.mock import Mock
-from pyspark.sql import session
+
+import pytest
 from pyspark import SparkContext
+from pyspark.sql import session
 
 
 @pytest.fixture()

@@ -1,17 +1,26 @@
-from butterfree.core.source import Source
+"""FileSource entity."""
+
+from butterfree.core.source.source import Source
 
 
 class FileSource(Source):
-    """
-    Source responsible for get data from files
-    """
+    """Source responsible for get data from files."""
 
     def __init__(self, id, client, consume_options=None, transformations=None):
+        """Instantiate FileSource with the required parameters.
+
+        :param id: unique string id for register the source as a view on the metastore
+        :param client: client object from butterfree.core.client module
+        :param consume_options: dict with the necessary configuration to be used in
+        order for the data to be consumed.
+        :param transformations: list os methods that will be applied over the dataframe
+        after the raw data is extracted
+        """
         super().__init__(id, client, consume_options, transformations)
 
     def get_data_from_file(self, path, format, format_options=None):
-        """
-        Get data from a file and returns a Spark dataframe.
+        """Get data from a file and returns a Spark dataframe.
+
         :param path: file location
         :param format: can be one of the keys: json, parquet, orc, or csv
         :param format_options: additional options required by some formats
@@ -28,8 +37,15 @@ class FileSource(Source):
         return self.client.load(spark_df_reader, **kwargs)
 
     def consume(self):
+        """Extract data from a file source using the  defined consume_options.
+
+        The method expects that the data will be consumed from a file source so the
+        consume_options need to have set path and format keys, format_options is
+        optional.
+        :return: Spark dataframe
+        """
         if not isinstance(self.consume_options, dict):
-            raise ValueError("onsume_options needs to be a dict")
+            raise ValueError("consume_options needs to be a dict")
         if (
             "path" not in self.consume_options.keys()
             or "format" not in self.consume_options.keys()

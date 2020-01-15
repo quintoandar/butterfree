@@ -1,6 +1,7 @@
+from functools import reduce
+
 import pytest
 from pyspark.sql.functions import expr
-from functools import reduce
 
 from butterfree.core.source import FileSource
 
@@ -17,8 +18,8 @@ class TestSource:
     @pytest.mark.parametrize(
         "with_transformations",
         [
-            [{"transformer": add_value_transformer, "args": ("col2", 1000)},],
-            [{"transformer": subtract_value_transformer, "args": ("col2", 1000)},],
+            [{"transformer": add_value_transformer, "args": ("col2", 1000)}],
+            [{"transformer": subtract_value_transformer, "args": ("col2", 1000)}],
             [
                 {"transformer": subtract_value_transformer, "args": ("col2", 1000)},
                 {"transformer": add_value_transformer, "args": ("col2", 1000)},

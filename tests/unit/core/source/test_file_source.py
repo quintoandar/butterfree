@@ -31,7 +31,7 @@ class TestFileSource:
 
     @pytest.mark.parametrize(
         "path, format, format_options",
-        [("path/to/file.parquet", None, None), (None, "json", None),],
+        [("path/to/file.parquet", None, None), (None, "json", None)],
     )
     def test_get_data_from_file_invalid_params(
         self, path, format, format_options, spark_client
