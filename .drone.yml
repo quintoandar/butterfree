@@ -4,7 +4,8 @@ clone:
 
 pipeline:
   unit-tests-python3.7: &push
-    image: python:3.7
+    image: quintoandar/pyspark:0.1
+    pull: true
     commands:
       - make requirements
       - make requirements-test
@@ -13,13 +14,13 @@ pipeline:
     when:
       event: push
 
-  integration-tests-python3.7:
-    <<: *push
-    commands:
-      - make requirements
-      - make requirements-test
-      - make integration-tests
-    group: tests37
+#  integration-tests-python3.7:
+#    <<: *push
+#    commands:
+#      - make requirements
+#      - make requirements-test
+#      - make integration-tests
+#    group: tests37
 
   style-check:
     <<: *push

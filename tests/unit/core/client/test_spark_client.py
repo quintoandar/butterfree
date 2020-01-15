@@ -14,13 +14,12 @@ class TestSparkClient:
         get_conn2 = spark_client.conn
 
         # assert
-        # singleton behaviour
-        assert start_conn == None
+        assert start_conn is None
         assert get_conn1 == get_conn2
 
     @pytest.mark.parametrize(
         "kwargs",
-        [{"path": "path/to/file"}, {"path": "path/to/file", "header": True}, {},],
+        [{"path": "path/to/file"}, {"path": "path/to/file", "header": True}, {}],
     )
     def test_load(self, target_df, spark_df_reader, kwargs):
         # arrange
