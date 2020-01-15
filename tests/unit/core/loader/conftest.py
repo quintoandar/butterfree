@@ -2,6 +2,8 @@ from pyspark import SparkContext
 from pyspark.sql import session
 from pytest import fixture
 
+from butterfree.core.db.configs import CassandraWriteConfig
+
 
 def base_spark():
     sc = SparkContext.getOrCreate()
@@ -20,3 +22,18 @@ def feature_set_dataframe():
         {"id": 1, "ts": 2, "feature": 120},
     ]
     return spark.read.json(sc.parallelize(data, 1))
+
+
+@fixture
+def latest():
+    sc, spark = base_spark()
+    data = [
+        {"id": 2, "ts": 0, "feature": 200},
+        {"id": 1, "ts": 2, "feature": 120},
+    ]
+    return spark.read.json(sc.parallelize(data, 1))
+
+
+@fixture
+def cassandra_config():
+    return CassandraWriteConfig(keyspace="test")
