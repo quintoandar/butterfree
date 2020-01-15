@@ -1,19 +1,22 @@
-from pyspark.sql import SparkSession, DataFrameReader
+"""SparkClient entity."""
+
+from pyspark.sql import DataFrameReader, SparkSession
 
 
 class SparkClient:
-    """
-    Handle Spark session connection, get query results and reads data from external
-    systems.
+    """Handle Spark session connection.
+
+    Get query results with SQL and reads data from external systems.
     """
 
     def __init__(self):
+        """Instantiate SparkClient with empty session."""
         self._session = None
 
     @property
     def conn(self):
-        """
-        Gets or creates an SparkSession
+        """Gets or creates an SparkSession.
+
         :return: SparkSession
         """
         if not self._session:
@@ -22,9 +25,9 @@ class SparkClient:
 
     @staticmethod
     def load(spark_df_reader, **kwargs):
-        """
-        Call the load method of a Spark dataframe reader. This action will write the
-        dataframe to the desired location.
+        """Call the load method of a Spark dataframe reader.
+
+        This action will write the dataframe to the desired location.
         :param spark_df_reader: pyspark.sql.DataFrameReader object
         :param kwargs: kwargs to be used in the load method
         :return: None
@@ -36,8 +39,8 @@ class SparkClient:
         return spark_df_reader.load(**kwargs)
 
     def get_records(self, query):
-        """
-        Get records from a query executed over the Spark metastore.
+        """Get records from a query executed over the Spark metastore.
+
         :param query: string with the query to be executed
         :return: Spark dataframe
         """
