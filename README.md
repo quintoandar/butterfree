@@ -58,6 +58,8 @@ never to bother again activating the correct venv.
 
 ## Getting started
 
+Run `make help` for more information on ready to use scripts.
+
 #### 1. Clone the project:
 
 ```bash
