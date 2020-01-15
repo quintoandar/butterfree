@@ -34,7 +34,7 @@ class CassandraWriteConfig(AbstractWriteConfig):
     @keyspace.setter
     def keyspace(self, value):
         value = value or environment.get_variable("CASSANDRA_KEYSPACE")
-        if value is None:
+        if not value:
             raise ValueError("Config 'keyspace' cannot be empty.")
         self.__keyspace = value
 
