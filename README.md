@@ -44,7 +44,7 @@ def foo():
 At the bare minimum you'll need the following for your development
 environment:
 
-1. [Python 3.7.2](http://www.python.org/)
+1. [Python 3.6.8](http://www.python.org/)
 
 
 It is strongly recommended to also install and use [pyenv](https://github.com/pyenv/pyenv):
@@ -57,6 +57,8 @@ in will be bound to the `my-project-venv` virtual environment and then you will 
 never to bother again activating the correct venv.
 
 ## Getting started
+
+Run `make help` for more information on ready to use scripts.
 
 #### 1. Clone the project:
 
@@ -73,7 +75,7 @@ make environment
 
 If you need to configure your development environment in your IDE, notice
 pyenv will store your python under
-`~/.pyenv/versions/3.7.2 butterfree/bin/python`.
+`~/.pyenv/versions/3.6.8 butterfree/bin/python`.
 
 ##### Errors
 

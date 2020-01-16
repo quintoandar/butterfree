@@ -3,44 +3,37 @@ clone:
     image: plugins/git
 
 pipeline:
-  unit-tests-python3.7: &push
-    image: python:3.7
+  install: &install
+    image: rappdw/docker-java-python
     commands:
-      - make requirements
-      - make requirements-test
-      - make unit-tests
-    group: tests37
-    when:
-      event: push
-
-  integration-tests-python3.7:
-    <<: *push
-    commands:
-      - make requirements
-      - make requirements-test
-      - make integration-tests
-    group: tests37
+      - make drone-install
 
   style-check:
-    <<: *push
+    <<: *install
     commands:
-      - make requirements-lint
-      - make style-check
-    group: tests37
+      - PYTHONPATH=./pip/deps make style-check
+    group: tests
     when:
       event: push
 
   quality-check:
-    <<: *push
+    <<: *install
     commands:
-      - make requirements-lint
-      - make quality-check
-    group: tests37
+      - PYTHONPATH=./pip/deps make quality-check
+    group: tests
+    when:
+      event: push
+
+  tests-python3.6:
+    <<: *install
+    commands:
+      - PYTHONPATH=./pip/deps make tests
+    group: tests
     when:
       event: push
 
   version:
-    image: python:3.7
+    image: python:3.6
     commands:
       - git clone https://github.com/quintoandar/python-package-server.git --quiet
       - make -s check-version
@@ -49,7 +42,7 @@ pipeline:
       branch: master
 
   package:
-    image: python:3.7
+    image: python:3.6
     commands:
       - make package
     when:
@@ -69,7 +62,7 @@ pipeline:
       event: [tag]
 
   publish:
-    image: python:3.7
+    image: python:3.6
     commands:
       - make publish
     secrets:
