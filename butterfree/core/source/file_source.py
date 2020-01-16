@@ -23,7 +23,8 @@ class FileSource(Source):
 
         :param path: file location
         :param format: can be one of the keys: json, parquet, orc, or csv
-        :param format_options: additional options required by some formats
+        :param format_options: additional options required by some formats. Check docs:
+        https://spark.apache.org/docs/latest/sql-data-sources-load-save-functions.html#manually-specifying-options
         :return: Spark dataframe
         """
         if not path or not format:
@@ -31,10 +32,8 @@ class FileSource(Source):
 
         if not format_options:
             format_options = {}
-
-        spark_df_reader = self.client.conn.read.format(format)
-        kwargs = dict({"path": path}, **format_options)
-        return self.client.load(spark_df_reader, **kwargs)
+        options = dict({"path": path}, **format_options)
+        return self.client.load(format, options)
 
     def consume(self):
         """Extract data from a file source using the  defined consume_options.
