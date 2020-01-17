@@ -1,6 +1,6 @@
 """SparkClient entity."""
 
-from pyspark.sql import DataFrameReader, SparkSession
+from pyspark.sql import SparkSession
 
 
 class SparkClient:
@@ -24,7 +24,7 @@ class SparkClient:
         return self._session
 
     def load(self, format, options):
-        """Use the SparkSession.read interface to load data into a dataframe"
+        """Use the SparkSession.read interface to load data into a dataframe.
 
         :param format: string with the format to be used by the DataframeReader
         :param options: options to setup the DataframeReader, specific for each format
