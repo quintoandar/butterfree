@@ -8,21 +8,36 @@ from butterfree.core.loader.historical_feature_store import HistoricalFeatureSto
 
 
 class TestHistoricalLoader:
-    def test_historical_loader(self, target_df):
+    def test_load(self, feature_set_dataframe, mocker):
+        # given
+        spark_client = mocker.stub("spark_client")
+        spark_client.write_table = mocker.stub("write_dataframe")
+        loader = HistoricalFeatureStoreLoader(spark_client)
+        table_name = "test"
+        # when
+        loader.load(dataframe=feature_set_dataframe, name=table_name)
 
-        path = "path"
-        entity = "house"
-        format = "parquet"
-        partition_column = "ts"
-
-        mock_write = Mock()
-        mock_df = Mock()
-        mock_df.write = mock_write
-
-        HistoricalFeatureStoreLoader.loader(
-            path, entity, format, partition_column, mock_df)
-        mock_write.saveAsTable.assert_called_with(
-            mode="overwrite", format=format, partitionBy=partition_column, name="dataframe_temp")
+        # then
+        spark_client.write_table.assert_called_once()
+        assert sorted(feature_set_dataframe.collect()) == sorted(
+            spark_client.write_table.call_args[1]["dataframe"].collect()
+        )
+        assert (
+                loader.DEFAULT_FORMAT
+                == spark_client.write_table.call_args[1]["format_"]
+        )
+        assert (
+                loader.DEFAULT_MODE
+                == spark_client.write_table.call_args[1]["mode"]
+        )
+        assert (
+                loader.DEFAULT_PARTITION_BY
+                == spark_client.write_table.call_args[1]["partition_by"]
+        )
+        assert (
+                table_name
+                == spark_client.write_table.call_args[1]["name"]
+        )
 
     def test_verify_without_column_ts(self, target_df_wrong):
         with pytest.raises(ValueError):

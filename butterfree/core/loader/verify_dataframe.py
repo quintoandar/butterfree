@@ -1,5 +1,5 @@
 from pyspark.sql import DataFrame
-from parameter_validation import parameter_validation
+from parameters_validation import parameter_validation
 
 
 @parameter_validation
