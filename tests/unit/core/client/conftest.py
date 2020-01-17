@@ -2,7 +2,7 @@ from unittest.mock import Mock
 
 import pytest
 from pyspark import SparkContext
-from pyspark.sql import DataFrameReader, session
+from pyspark.sql import session
 
 
 @pytest.fixture()
@@ -22,10 +22,9 @@ def target_df(sc, spark):
 
 
 @pytest.fixture()
-def spark_df_reader():
-    return Mock(spec=DataFrameReader)
-
-
-@pytest.fixture()
-def mocked_spark(spark):
-    return Mock(spec=spark)
+def mocked_spark_load():
+    mock = Mock()
+    mock.read = mock
+    mock.format.return_value = mock
+    mock.options.return_value = mock
+    return mock

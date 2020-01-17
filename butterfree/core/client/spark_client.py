@@ -23,25 +23,15 @@ class SparkClient:
             self._session = SparkSession.builder.getOrCreate()
         return self._session
 
-    @staticmethod
-    def load(spark_df_reader, **kwargs):
-        """Call the load method of a Spark dataframe reader.
+    def load(self, format, options):
+        """Use the SparkSession.read interface to load data into a dataframe"
 
-        This action will write the dataframe to the desired location.
-        :param spark_df_reader: pyspark.sql.DataFrameReader object
-        :param kwargs: kwargs to be used in the load method
+        :param format: string with the format to be used by the DataframeReader
+        :param options: options to setup the DataframeReader, specific for each format
         :return: None
         """
-        if not isinstance(spark_df_reader, DataFrameReader):
-            raise ValueError(
-                "spark_df_reader needs to be a instance of pyspark.sql.DataFrameReader"
-            )
-        return spark_df_reader.load(**kwargs)
-
-    def get_records(self, query):
-        """Get records from a query executed over the Spark metastore.
-
-        :param query: string with the query to be executed
-        :return: Spark dataframe
-        """
-        return self.conn.sql(query)
+        if not isinstance(format, str):
+            raise ValueError("format need to be a string with the desired read format")
+        if not isinstance(options, dict):
+            raise ValueError("options need to be a dict with the setup configurations")
+        return self.conn.read.format(format).options(options).load()

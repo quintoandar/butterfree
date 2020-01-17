@@ -18,36 +18,34 @@ class TestSparkClient:
         assert get_conn1 == get_conn2
 
     @pytest.mark.parametrize(
-        "kwargs",
-        [{"path": "path/to/file"}, {"path": "path/to/file", "header": True}, {}],
+        "format, options",
+        [
+            ("parquet", {"path": "path/to/file"}),
+            ("csv", {"path": "path/to/file", "header": True}),
+        ],
     )
-    def test_load(self, target_df, spark_df_reader, kwargs):
+    def test_load(self, format, options, target_df, mocked_spark_load):
         # arrange
         spark_client = SparkClient()
-        spark_df_reader.load.return_value = target_df
+        mocked_spark_load.load.return_value = target_df
+        spark_client._session = mocked_spark_load
 
         # act
-        result_df = spark_client.load(spark_df_reader, **kwargs)
+        result_df = spark_client.load(format, options)
 
         # assert
-        target_df = result_df
+        mocked_spark_load.format.assert_called_once_with(format)
+        mocked_spark_load.options.assert_called_once_with(options)
+        assert target_df == result_df
 
-    def test_load_invalid_params(self):
+    @pytest.mark.parametrize(
+        "format, options",
+        [(None, {"path": "path/to/file"}), ("csv", "not a valid options")],
+    )
+    def test_load_invalid_params(self, format, options):
         # arrange
         spark_client = SparkClient()
 
         # act and assert
         with pytest.raises(ValueError):
-            assert spark_client.load(spark_df_reader="not a spark df reader")
-
-    def test_get_records(self, target_df, mocked_spark):
-        # arrange
-        spark_client = SparkClient()
-        spark_client._session = mocked_spark
-        mocked_spark.sql.return_value = target_df
-
-        # act
-        result_df = spark_client.get_records("select * from my_table")
-
-        # assert
-        target_df = result_df
+            assert spark_client.load(format, options)
