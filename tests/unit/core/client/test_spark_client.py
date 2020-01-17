@@ -35,7 +35,7 @@ class TestSparkClient:
 
         # assert
         mocked_spark_load.format.assert_called_once_with(format)
-        mocked_spark_load.options.assert_called_once_with(options)
+        mocked_spark_load.options.assert_called_once_with(**options)
         assert target_df == result_df
 
     @pytest.mark.parametrize(

@@ -31,7 +31,7 @@ class SparkClient:
         :return: None
         """
         if not isinstance(format, str):
-            raise ValueError("format need to be a string with the desired read format")
+            raise ValueError("format needs to be a string with the desired read format")
         if not isinstance(options, dict):
-            raise ValueError("options need to be a dict with the setup configurations")
-        return self.conn.read.format(format).options(options).load()
+            raise ValueError("options needs to be a dict with the setup configurations")
+        return self.conn.read.format(format).options(**options).load()
