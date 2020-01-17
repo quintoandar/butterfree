@@ -34,4 +34,4 @@ class SparkClient:
             raise ValueError("format need to be a string with the desired read format")
         if not isinstance(options, dict):
             raise ValueError("options need to be a dict with the setup configurations")
-        return self.conn.read.format(format).options(options).load()
+        return self.conn.read.format(format).options(**options).load()
