@@ -35,5 +35,17 @@ def latest():
 
 
 @fixture
+def feature_set_without_ts():
+    sc, spark = base_spark()
+    data = [
+        {"id": 1, "feature": 100},
+        {"id": 2, "feature": 200},
+        {"id": 1, "feature": 110},
+        {"id": 1, "feature": 120},
+    ]
+    return spark.read.json(sc.parallelize(data, 1))
+
+
+@fixture
 def cassandra_config():
     return CassandraWriteConfig(keyspace="test")
