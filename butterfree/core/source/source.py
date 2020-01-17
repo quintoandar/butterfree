@@ -8,20 +8,17 @@ class Source(ABC):
     """Abstract base class for Sources."""
 
     @abstractmethod
-    def __init__(self, id, client, consume_options, transformations):
+    def __init__(self, id, client):
         """Instantiate Source with the required parameters.
 
         :param id: unique string id for register the source as a view on the metastore
         :param client: client object from butterfree.core.client module
-        :param consume_options: dict with the necessary configuration to be used in
-        order for the data to be consumed.
         :param transformations: list os methods that will be applied over the dataframe
         after the raw data is extracted
         """
         self.id = id
         self.client = client
-        self.consume_options = consume_options
-        self.transformations = transformations if transformations else []
+        self.transformations = []
 
     def with_(self, transformer, *args, **kwargs):
         """Define a new transformation for the Source.
@@ -31,16 +28,15 @@ class Source(ABC):
         Spark dataframe
         :param args: args for the method
         :param kwargs: kwargs for the method
-        :return:
+        :return: new Source object with new parameters
         """
-        new_transformation = [
-            {"transformer": transformer, "args": args, "kwargs": kwargs}
-        ]
-        new_parameters = dict(
-            (key, val + new_transformation) if key == "transformations" else (key, val)
-            for key, val in self.__dict__.items()
-        )
-        return self.__class__(**new_parameters)
+        new_transformation = {
+            "transformer": transformer,
+            "args": args if args else {},
+            "kwargs": kwargs if kwargs else {},
+        }
+        self.transformations.append(new_transformation)
+        return self
 
     def _apply_transformations(self, df):
         """Apply all the transformations defined over a passed Spark dataframe.
@@ -58,7 +54,10 @@ class Source(ABC):
 
     @abstractmethod
     def consume(self):
-        """Extract data from source using the consume_options defined in the build."""
+        """Extract data from source using the consume_options defined in the build.
+
+        :return: Spark dataframe
+        """
 
     def build(self):
         """Register the source in the Spark metastore.
@@ -67,4 +66,4 @@ class Source(ABC):
         the defined Source, using the consume method
         :return: None
         """
-        self.consume().createOrReplaceTempView(self.id)
+        self._apply_transformations(self.consume()).createOrReplaceTempView(self.id)

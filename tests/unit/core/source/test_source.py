@@ -1,5 +1,3 @@
-from functools import reduce
-
 import pytest
 from pyspark.sql.functions import expr
 
@@ -16,51 +14,114 @@ def subtract_value_transformer(df, column, value):
 
 class TestSource:
     @pytest.mark.parametrize(
-        "with_transformations",
+        "transformations",
         [
-            [{"transformer": add_value_transformer, "args": ("col2", 1000)}],
-            [{"transformer": subtract_value_transformer, "args": ("col2", 1000)}],
             [
-                {"transformer": subtract_value_transformer, "args": ("col2", 1000)},
-                {"transformer": add_value_transformer, "args": ("col2", 1000)},
+                {
+                    "transformer": add_value_transformer,
+                    "args": ("col1", 1000),
+                    "kwargs": {},
+                }
+            ],
+            [
+                {
+                    "transformer": subtract_value_transformer,
+                    "args": ("col1", 1000),
+                    "kwargs": {},
+                }
+            ],
+            [
+                {
+                    "transformer": subtract_value_transformer,
+                    "args": ("col1", 1000),
+                    "kwargs": {},
+                },
+                {
+                    "transformer": add_value_transformer,
+                    "args": ("col1", 1000),
+                    "kwargs": {},
+                },
             ],
         ],
     )
-    def test_with_(self, spark_client, target_df, with_transformations):
+    def test_with_(self, transformations, spark_client):
         # arrange
-        print("with_transformations:", with_transformations)
-        spark_client.load.return_value = target_df
-        file_source = FileSource(id="test", client=spark_client)
+        file_source = FileSource("test", spark_client, "path/to/file", "format")
 
         # act
-        result_file_source = reduce(  # apply transformations using with_ method
-            lambda result_file_source, with_transformation: result_file_source.with_(
-                with_transformation["transformer"], *with_transformation["args"]
-            ),
-            with_transformations,
-            file_source,
-        )
-        print("result_file_source transformations:", result_file_source.transformations)
-        result_df = result_file_source._apply_transformations(target_df)
-
-        target_result_df = reduce(  # apply transformations manually
-            lambda df, with_transformation: with_transformation["transformer"](
-                df, *with_transformation["args"]
-            ),
-            with_transformations,
-            target_df,
-        )
+        for transformation in transformations:
+            file_source.with_(
+                transformation["transformer"],
+                *transformation["args"],
+                **transformation["kwargs"]
+            )
 
         # assert
-        assert target_result_df.collect() == result_df.collect()
+        print("file_source.transformations : ", file_source.transformations)
+        print("transformations : ", transformations)
+        assert file_source.transformations == transformations
+
+    @pytest.mark.parametrize(
+        "input_data, transformations, transformed_data",
+        [
+            (
+                [{"col1": 100}],
+                [
+                    {
+                        "transformer": add_value_transformer,
+                        "args": ("col1", 1000),
+                        "kwargs": {},
+                    }
+                ],
+                [{"col1": 1100}],
+            ),
+            (
+                [{"col1": 100}],
+                [
+                    {
+                        "transformer": subtract_value_transformer,
+                        "args": ("col1", 1000),
+                        "kwargs": {},
+                    }
+                ],
+                [{"col1": -900}],
+            ),
+            (
+                [{"col1": 100}],
+                [
+                    {
+                        "transformer": subtract_value_transformer,
+                        "args": ("col1", 1000),
+                        "kwargs": {},
+                    },
+                    {
+                        "transformer": add_value_transformer,
+                        "args": ("col1", 1000),
+                        "kwargs": {},
+                    },
+                ],
+                [{"col1": 100}],
+            ),
+        ],
+    )
+    def test__apply_transformations(
+        self, input_data, transformations, transformed_data, sc, spark, spark_client,
+    ):
+        # arrange
+        file_source = FileSource("test", spark_client, "path/to/file", "format")
+        file_source.transformations = transformations
+        input_df = spark.read.json(sc.parallelize(input_data, 1))
+        target_df = spark.read.json(sc.parallelize(transformed_data, 1))
+
+        # act
+        result_df = file_source._apply_transformations(input_df)
+
+        # assert
+        assert target_df.collect() == result_df.collect()
 
     def test_build(self, target_df, spark_client, spark):
         # arrange
-        file_source = FileSource(
-            id="test",
-            client=spark_client,
-            consume_options={"path": "path/to/file.json", "format": "json"},
-        )
+        file_source = FileSource("test", spark_client, "path/to/file", "format")
         spark_client.load.return_value = target_df
 
         # act
