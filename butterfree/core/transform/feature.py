@@ -62,4 +62,7 @@ class Feature(FeatureComponent):
                 return dataframe.withColumnRenamed(self.name[0], self.alias[0])
             return dataframe
         for transformation in self.transformations:
+            if self.alias[0]:
+                dataframe = transformation.transform(dataframe)
+                return dataframe.withColumnRenamed(self.name[0], self.alias[0])
             return transformation.transform(dataframe)

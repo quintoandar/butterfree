@@ -10,7 +10,7 @@ class FeatureComponent(ABC):
 
     def add(self, component) -> None:
         """Add a component to the desired pipeline."""
-        pass
+        raise NotImplementedError()
 
     @abstractmethod
     def transform(self, dataframe: DataFrame):
