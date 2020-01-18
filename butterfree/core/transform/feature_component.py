@@ -9,6 +9,7 @@ class FeatureComponent(ABC):
     """Defines an abstract FeatureComponent."""
 
     def add(self, component) -> None:
+        """Add a component to the desired pipeline."""
         pass
 
     @abstractmethod
