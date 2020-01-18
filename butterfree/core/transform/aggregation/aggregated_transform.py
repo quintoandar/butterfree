@@ -50,7 +50,9 @@ class Aggregation(FeatureComponent):
         for aggregation in self._aggregations[0]:
             for window_type, window_lenght in self._windows[0].items():
                 name = self._get_alias(self._parent.alias[0])
-                feature_name = f"{name}__{aggregation}_over_{str(window_lenght)}_{window_type}"
+                feature_name = (
+                    f"{name}__{aggregation}_over_{str(window_lenght)}_{window_type}"
+                )
                 w = (
                     Window()
                     .partitionBy(F.col(f"{self._partition}"))

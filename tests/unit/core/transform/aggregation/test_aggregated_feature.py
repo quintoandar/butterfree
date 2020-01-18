@@ -1,6 +1,7 @@
+import pytest
+
 from butterfree.core.transform import Feature
 from butterfree.core.transform.aggregation.aggregated_transform import Aggregation
-import pytest
 
 
 class TestAggregatedFeatureTransform:
@@ -50,7 +51,9 @@ class TestAggregatedFeatureTransform:
 
         test_feature.add(
             Aggregation(
-                aggregations=["avg", "std"], partition="id", windows={"days": 7, "weeks": 2}
+                aggregations=["avg", "std"],
+                partition="id",
+                windows={"days": 7, "weeks": 2},
             )
         )
 
@@ -86,8 +89,9 @@ class TestAggregatedFeatureTransform:
 
             test_feature.add(
                 Aggregation(
-                    aggregations=["median"], partition="id",
-                    windows={"days": 7, "weeks": 2}
+                    aggregations=["median"],
+                    partition="id",
+                    windows={"days": 7, "weeks": 2},
                 )
             )
 
