@@ -8,6 +8,9 @@ from pyspark.sql import DataFrame
 class FeatureComponent(ABC):
     """Defines an abstract FeatureComponent."""
 
+    def add(self, component) -> None:
+        pass
+
     @abstractmethod
     def transform(self, dataframe: DataFrame):
         """Base transform method.
