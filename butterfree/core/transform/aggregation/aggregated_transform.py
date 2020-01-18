@@ -1,3 +1,5 @@
+"""Aggregated Transform entity."""
+
 from typing import Dict, List
 
 from parameters_validation import non_blank
@@ -10,6 +12,14 @@ from butterfree.core.transform.feature_component import FeatureComponent
 
 
 class Aggregation(FeatureComponent):
+    """Defines an Aggregation.
+
+    Attributes:
+        aggregations: list containing the desired aggregations.
+        windows: time windows.
+        partition: partition definition.
+        time_column: time column definition.
+    """
     def __init__(
         self,
         aggregations: non_blank(List[str]),
@@ -25,6 +35,7 @@ class Aggregation(FeatureComponent):
 
     @property
     def parent(self):
+        """Returns the component parent."""
         return self._parent
 
     @parent.setter
@@ -47,6 +58,14 @@ class Aggregation(FeatureComponent):
             raise ValueError()
 
     def transform(self, dataframe: DataFrame):
+        """Performs a transformation to the feature pipeline.
+
+        Args:
+            dataframe: base dataframe.
+
+        Returns:
+            dataframe: transformed dataframe.
+        """
         for aggregation in self._aggregations[0]:
             for window_type, window_lenght in self._windows[0].items():
                 name = self._get_alias(self._parent.alias[0])
