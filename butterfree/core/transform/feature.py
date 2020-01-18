@@ -1,6 +1,6 @@
 """Feature entity."""
 
-from typing import Tuple, Union
+from typing import List, Tuple, Union
 
 from parameters_validation import non_blank
 from pyspark.sql import DataFrame
@@ -17,7 +17,6 @@ class Feature(FeatureComponent):
         origin: feature source.
         data_type: feature type.
         description: brief explanation regarding the feature.
-        transformations: transformations that will be applied to the feature.
     """
 
     def __init__(
@@ -28,14 +27,13 @@ class Feature(FeatureComponent):
         origin: Union[str, Tuple[str]],
         data_type: str = None,
         description: non_blank(str),
-        transformations: FeatureComponent = None,
     ):
-        self._name = (name,)
-        self._alias = (alias,)
-        self._origin = (origin,)
-        self._description = (description,)
-        self._data_type = (data_type,)
-        self._transformations = (transformations,)
+        self.name = (name,)
+        self.alias = (alias,)
+        self.origin = (origin,)
+        self.description = (description,)
+        self.data_type = (data_type,)
+        self.transformations: List[FeatureComponent] = []
 
     def add(self, component: FeatureComponent):
         """Adds new component to the feature pipeline.
@@ -46,7 +44,7 @@ class Feature(FeatureComponent):
         Returns:
             component.parent: component from parent class.
         """
-        self._children.append(component)
+        self.transformations.append(component)
         component.parent = self
         return self
 
@@ -59,9 +57,9 @@ class Feature(FeatureComponent):
         Returns:
             dataframe: transformed dataframe.
         """
-        if not self._transformations[0]:
-            if self._alias[0]:
-                return dataframe.withColumnRenamed(self._name[0], self._alias[0])
+        if not self.transformations:
+            if self.alias[0]:
+                return dataframe.withColumnRenamed(self.name[0], self.alias[0])
             return dataframe
-        for transformation in self._transformations:
-            transformation.transform(dataframe)
+        for transformation in self.transformations:
+            return transformation.transform(dataframe)
