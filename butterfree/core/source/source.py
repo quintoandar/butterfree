@@ -7,7 +7,6 @@ from functools import reduce
 class Source(ABC):
     """Abstract base class for Sources."""
 
-    @abstractmethod
     def __init__(self, id, client):
         """Instantiate Source with the required parameters.
 
@@ -32,7 +31,7 @@ class Source(ABC):
         """
         new_transformation = {
             "transformer": transformer,
-            "args": args if args else {},
+            "args": args if args else (),
             "kwargs": kwargs if kwargs else {},
         }
         self.transformations.append(new_transformation)
