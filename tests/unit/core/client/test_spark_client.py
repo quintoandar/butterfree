@@ -74,4 +74,4 @@ class TestSparkClient:
 
         # act and assert
         with pytest.raises(ValueError):
-            assert spark_client.read_table(database, table)
+            spark_client.read_table(database, table)
