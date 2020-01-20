@@ -2,7 +2,6 @@
 
 from typing import List, Tuple, Union
 
-from parameters_validation import non_blank
 from pyspark.sql import DataFrame
 
 from butterfree.core.transform.transform_component import TransformComponent
@@ -14,25 +13,19 @@ class Feature:
     Attributes:
         name: feature name.
         alias: new feature name, if necessary.
-        origin: feature source.
-        data_type: feature type.
         description: brief explanation regarding the feature.
     """
 
     def __init__(
         self,
         *,
-        name: non_blank(str),
+        name: str,
         alias: str = None,
-        origin: Union[str, Tuple[str]],
-        data_type: str = None,
-        description: non_blank(str),
+        description: str,
     ):
-        self.name = (name,)
-        self.alias = (alias,)
-        self.origin = (origin,)
-        self.description = (description,)
-        self.data_type = (data_type,)
+        self.name = name
+        self.alias = alias
+        self.description = description
         self.transformations: List[TransformComponent] = []
 
     def add(self, component: TransformComponent):
@@ -59,10 +52,7 @@ class Feature:
         """
         if not self.transformations:
             return dataframe.withColumnRenamed(
-                self.name[0], self.alias[0] if self.alias[0] else self.name[0]
+                self.name, self.alias if self.alias else self.name
             )
         for transformation in self.transformations:
-            dataframe = transformation.transform(dataframe)
-            return dataframe.withColumnRenamed(
-                self.name[0], self.alias[0] if self.alias[0] else self.name[0]
-            )
+            return transformation.transform(dataframe)
