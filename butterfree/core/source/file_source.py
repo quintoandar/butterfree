@@ -21,16 +21,15 @@ class FileSource(Source):
             raise ValueError("path must be a string with the file location")
         if not isinstance(format, str):
             raise ValueError("format must be a string with the file type")
-        if not format_options:
-            format_options = {}
         self.path = path
         self.format = format
-        self.format_options = format_options
+        self.options = dict(
+            {"path": self.path}, **format_options if format_options else {}
+        )
 
     def consume(self):
         """Extract data from a file source.
 
         :return: Spark dataframe
         """
-        options = dict({"path": self.path}, **self.format_options)
-        return self.client.load(self.format, options)
+        return self.client.load(self.format, self.options)
