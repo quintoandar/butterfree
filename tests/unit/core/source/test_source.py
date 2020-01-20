@@ -57,8 +57,6 @@ class TestSource:
             )
 
         # assert
-        print("file_source.transformations : ", file_source.transformations)
-        print("transformations : ", transformations)
         assert file_source.transformations == transformations
 
     @pytest.mark.parametrize(
