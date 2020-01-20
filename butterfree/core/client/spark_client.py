@@ -1,6 +1,6 @@
 """SparkClient entity."""
 
-from pyspark.sql import SparkSession
+from pyspark.sql import DataFrame, SparkSession
 
 
 class SparkClient:
@@ -52,3 +52,11 @@ class SparkClient:
                 "table needs to be a string with the name of the registered table"
             )
         return self.conn.read.table("{}.{}".format(database, table))
+
+    def sql(self, query: str) -> DataFrame:
+        """Run a query using spark.
+
+        :param query: Spark SQL query.
+        :return dataframe: Spark DataFrame with the query result.
+        """
+        return self.conn.sql(query)
