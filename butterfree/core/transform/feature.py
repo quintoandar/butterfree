@@ -57,7 +57,6 @@ class Feature:
         Returns:
             dataframe: transformed dataframe.
         """
-
         if not self.transformations:
             return dataframe.withColumnRenamed(
                 self.name[0], self.alias[0] if self.alias[0] else self.name[0]

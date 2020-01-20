@@ -13,6 +13,7 @@ class TransformComponent(ABC):
 
     @property
     def parent(self):
+        """Returns the component parent."""
         return self._parent
 
     @parent.setter
