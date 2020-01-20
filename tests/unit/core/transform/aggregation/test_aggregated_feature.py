@@ -7,9 +7,7 @@ from butterfree.core.transform.aggregation.aggregated_transform import Aggregati
 class TestAggregatedFeatureTransform:
     def test_feature_transform_no_alias(self, feature_set_dataframe):
         test_feature = Feature(
-            name="feature",
-            origin="mocked data",
-            description="unit test feature with no alias",
+            name="feature", description="unit test feature with no alias",
         )
 
         test_feature.add(
@@ -45,7 +43,6 @@ class TestAggregatedFeatureTransform:
         test_feature = Feature(
             name="feature",
             alias="new_feature",
-            origin="mocked data",
             description="unit test feature with no alias",
         )
 
@@ -65,7 +62,7 @@ class TestAggregatedFeatureTransform:
                 for a, b in zip(
                     df.columns,
                     [
-                        "new_feature",
+                        "feature",
                         "id",
                         "ts",
                         "timestamp",
@@ -83,7 +80,6 @@ class TestAggregatedFeatureTransform:
             test_feature = Feature(
                 name="feature",
                 alias="new_feature",
-                origin="mocked data",
                 description="unit test feature with no alias",
             )
 
