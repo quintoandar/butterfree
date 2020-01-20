@@ -24,28 +24,28 @@ class TestSparkClient:
             ("csv", {"path": "path/to/file", "header": True}),
         ],
     )
-    def test_load(self, format, options, target_df, mocked_spark_load):
+    def test_read(self, format, options, target_df, mocked_spark_read):
         # arrange
         spark_client = SparkClient()
-        mocked_spark_load.load.return_value = target_df
-        spark_client._session = mocked_spark_load
+        mocked_spark_read.load.return_value = target_df
+        spark_client._session = mocked_spark_read
 
         # act
-        result_df = spark_client.load(format, options)
+        result_df = spark_client.read(format, options)
 
         # assert
-        mocked_spark_load.format.assert_called_once_with(format)
-        mocked_spark_load.options.assert_called_once_with(**options)
+        mocked_spark_read.format.assert_called_once_with(format)
+        mocked_spark_read.options.assert_called_once_with(**options)
         assert target_df == result_df
 
     @pytest.mark.parametrize(
         "format, options",
         [(None, {"path": "path/to/file"}), ("csv", "not a valid options")],
     )
-    def test_load_invalid_params(self, format, options):
+    def test_read_invalid_params(self, format, options):
         # arrange
         spark_client = SparkClient()
 
         # act and assert
         with pytest.raises(ValueError):
-            assert spark_client.load(format, options)
+            assert spark_client.read(format, options)

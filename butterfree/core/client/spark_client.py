@@ -23,7 +23,7 @@ class SparkClient:
             self._session = SparkSession.builder.getOrCreate()
         return self._session
 
-    def load(self, format, options):
+    def read(self, format, options):
         """Use the SparkSession.read interface to load data into a dataframe.
 
         :param format: string with the format to be used by the DataframeReader
