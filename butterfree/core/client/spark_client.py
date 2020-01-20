@@ -1,6 +1,6 @@
 """SparkClient entity."""
 
-from pyspark.sql import SparkSession
+from pyspark.sql import DataFrame, SparkSession
 
 
 class SparkClient:
@@ -77,6 +77,7 @@ class SparkClient:
         """
         if not isinstance(name, str):
             raise ValueError("name needs to be a string")
+
         dataframe.write.saveAsTable(
             mode=mode, format=format_, partitionBy=partition_by, name=name, **options
         )
