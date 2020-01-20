@@ -53,7 +53,7 @@ class TestSource:
             file_source.with_(
                 transformation["transformer"],
                 *transformation["args"],
-                **transformation["kwargs"]
+                **transformation["kwargs"],
             )
 
         # assert
