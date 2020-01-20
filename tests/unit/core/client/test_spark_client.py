@@ -49,3 +49,29 @@ class TestSparkClient:
         # act and assert
         with pytest.raises(ValueError):
             assert spark_client.read(format, options)
+
+    def test_read_table(self, target_df, mocked_spark_read):
+        # arrange
+        database = "default"
+        table = "test_table"
+        spark_client = SparkClient()
+        mocked_spark_read.table.return_value = target_df
+        spark_client._session = mocked_spark_read
+
+        # act
+        result_df = spark_client.read_table(database, table)
+
+        # assert
+        mocked_spark_read.table.assert_called_once_with("{}.{}".format(database, table))
+        assert target_df == result_df
+
+    @pytest.mark.parametrize(
+        "database, table", [(None, "table"), ("database", None), ("database", 123)],
+    )
+    def test_read_table_invalid_params(self, database, table):
+        # arrange
+        spark_client = SparkClient()
+
+        # act and assert
+        with pytest.raises(ValueError):
+            assert spark_client.read_table(database, table)
