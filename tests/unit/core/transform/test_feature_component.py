@@ -3,17 +3,23 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from butterfree.core.transform.feature_component import FeatureComponent
+from butterfree.core.transform.transform_component import TransformComponent
 
 
-class TestFeatureComponent(TestCase):
+class TestTransformComponent(TestCase):
     def test_cannot_instantiate(self):
         with pytest.raises(TypeError):
-            FeatureComponent()
+            TransformComponent()
 
-    @patch.multiple(FeatureComponent, __abstractmethods__=set())
-    def test_add_method(self):
-        with pytest.raises(NotImplementedError):
-            feature_component = FeatureComponent()
-            component = Mock()
-            feature_component.add(component)
+    @patch.multiple(TransformComponent, __abstractmethods__=set())
+    def test_parent(self):
+        with pytest.raises(TypeError):
+            feature_component = TransformComponent()
+            feature_component.parent()
+
+    @patch.multiple(TransformComponent, __abstractmethods__=set())
+    def test_transform(self):
+        dataframe = Mock()
+        transform_component = TransformComponent()
+        transform_component.transform(dataframe)
+        assert transform_component.transform(dataframe) is None
