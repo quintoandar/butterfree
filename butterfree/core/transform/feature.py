@@ -1,6 +1,6 @@
 """Feature entity."""
 
-from typing import List, Tuple, Union
+from typing import List
 
 from pyspark.sql import DataFrame
 
@@ -17,11 +17,7 @@ class Feature:
     """
 
     def __init__(
-        self,
-        *,
-        name: str,
-        alias: str = None,
-        description: str,
+        self, *, name: str, alias: str = None, description: str,
     ):
         self.name = name
         self.alias = alias
