@@ -34,7 +34,7 @@ class HistoricalFeatureStoreLoader:
         s3_path = os.path.join(self.HISTORICAL_FEATURE_STORE_S3_PATH, name)
         dataframe = verify_column_ts(dataframe)
 
-        self.spark_client.write_table(
+        self.spark_client.write(
             dataframe=dataframe,
             name=name,
             format_=self.DEFAULT_FORMAT,

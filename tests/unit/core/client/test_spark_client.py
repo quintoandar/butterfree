@@ -110,4 +110,4 @@ class TestSparkClient:
         name = None
 
         with pytest.raises(ValueError):
-            assert SparkClient.write_table(dataframe=df_writer, name=name)
+            assert SparkClient.write(dataframe=df_writer, name=name)
