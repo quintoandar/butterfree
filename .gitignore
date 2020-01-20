@@ -112,3 +112,8 @@ ENV/
 .package_name
 .repository_url
 *cov/
+
+# VSCode Workspace
+.vscode
+init
+spark-warehouse/
