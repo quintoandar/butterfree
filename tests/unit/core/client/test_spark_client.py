@@ -1,5 +1,6 @@
 import pytest
 from pyspark.sql import DataFrame
+from pyspark.sql import DataFrameWriter
 
 from butterfree.core.client import SparkClient
 
@@ -91,3 +92,20 @@ class TestSparkClient:
         # act and assert
         with pytest.raises(ValueError):
             spark_client.read_table(database, table)
+
+    def test_write_table(self, target_df, mocker):
+        # given
+        write = SparkClient()
+        table_name = "test_write"
+        # when
+        test = write.write_table(dataframe=target_df, name=table_name, mode="overwrite")
+
+        # then
+        assert isinstance(test, DataFrameWriter)
+
+    def test_write_table_with_invalid_params(self):
+        df_writer = "not a spark df writer"
+        name = "test"
+
+        with pytest.raises(ValueError):
+            assert SparkClient.write_table(dataframe=df_writer, name=name)
