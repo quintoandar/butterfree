@@ -17,7 +17,7 @@ class Feature:
     """
 
     def __init__(
-        self, *, name: str, alias: str = None, description: str,
+        self, name: str, description: str, alias: str = None,
     ):
         self.name = name
         self.alias = alias
