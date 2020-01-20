@@ -16,9 +16,13 @@ class TableSource(Source):
         """
         super().__init__(id, spark_client)
         if not isinstance(database, str):
-            raise ValueError("path must be a string with the file location")
+            raise ValueError(
+                "database needs to be a string with the name of the metastore schema"
+            )
         if not isinstance(table, str):
-            raise ValueError("format must be a string with the file type")
+            raise ValueError(
+                "table needs to be a string with the name of the registered table"
+            )
         self.database = database
         self.table = table
 

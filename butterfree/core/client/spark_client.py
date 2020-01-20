@@ -49,6 +49,6 @@ class SparkClient:
             )
         if not isinstance(table, str):
             raise ValueError(
-                "table needs be a string with the name of the registered table"
+                "table needs to be a string with the name of the registered table"
             )
         return self.conn.read.table("{}.{}".format(database, table))
