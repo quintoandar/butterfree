@@ -5,12 +5,19 @@ from abc import ABC, abstractmethod
 from pyspark.sql import DataFrame
 
 
-class FeatureComponent(ABC):
-    """Defines an abstract FeatureComponent."""
+class TransformComponent(ABC):
+    """Defines an abstract TransformComponent."""
 
-    def add(self, component) -> None:
-        """Add a component to the desired pipeline."""
-        raise NotImplementedError()
+    def __init__(self):
+        self._parent = None
+
+    @property
+    def parent(self):
+        return self._parent
+
+    @parent.setter
+    def parent(self, parent):
+        self._parent = parent
 
     @abstractmethod
     def transform(self, dataframe: DataFrame):
