@@ -122,7 +122,7 @@ class TestSource:
     def test_build(self, target_df, spark_client, spark):
         # arrange
         file_source = FileSource("test", spark_client, "path/to/file", "format")
-        spark_client.load.return_value = target_df
+        spark_client.read.return_value = target_df
 
         # act
         file_source.build()

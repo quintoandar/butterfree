@@ -32,4 +32,4 @@ class FileSource(Source):
 
         :return: Spark dataframe
         """
-        return self.client.load(self.format, self.options)
+        return self.client.read(self.format, self.options)

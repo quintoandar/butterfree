@@ -26,7 +26,7 @@ class TestFileSource:
     )
     def test_consume(self, path, format, format_options, spark_client, target_df):
         # arrange
-        spark_client.load.return_value = target_df
+        spark_client.read.return_value = target_df
         file_source = FileSource("test", spark_client, path, format, format_options)
 
         # act
@@ -34,5 +34,5 @@ class TestFileSource:
         options = dict({"path": path}, **format_options if format_options else {})
 
         # assert
-        spark_client.load.assert_called_once_with(format, options)
+        spark_client.read.assert_called_once_with(format, options)
         assert target_df.collect() == output_df.collect()
