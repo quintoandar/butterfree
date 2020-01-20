@@ -25,19 +25,6 @@ class WindowType(Enum):
         Returns:
             time in seconds.
         """
-        if window_type in ["seconds"]:
-            return WindowType.SECONDS.value * window_lenght
-        elif window_type in ["minutes"]:
-            return WindowType.MINUTES.value * window_lenght
-        elif window_type in ["hours"]:
-            return WindowType.HOURS.value * window_lenght
-        elif window_type in ["days"]:
-            return WindowType.DAYS.value * window_lenght
-        elif window_type in ["weeks"]:
-            return WindowType.WEEKS.value * window_lenght
-        elif window_type in ["months"]:
-            return WindowType.MONTHS.value * window_lenght
-        elif window_type in ["years"]:
-            return WindowType.YEARS.value * window_lenght
-        else:
-            raise ValueError()
+        for name, type in WindowType.__members__.items():
+            if str(window_type).upper() == name:
+                return type.value * window_lenght
