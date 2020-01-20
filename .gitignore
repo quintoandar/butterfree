@@ -114,6 +114,6 @@ ENV/
 *cov/
 
 # VSCode Workspace
-.vscode
-init
 spark-warehouse/
+/.vscode/
+/init/
