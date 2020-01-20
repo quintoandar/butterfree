@@ -1,11 +1,11 @@
-"""Holds verify dataframe's informations to write in Loader."""
+"""Check dataframe's informations to write in Loader."""
 from pyspark.sql.dataframe import DataFrame
 
 from butterfree.core.constant.columns import TIMESTAMP_COLUMN
 
 
 def verify_column_ts(dataframe: DataFrame):
-    """Verify dataframe's columns.
+    """Check dataframe's columns.
 
     Args:
         dataframe: spark dataframe containing data from a feature set.

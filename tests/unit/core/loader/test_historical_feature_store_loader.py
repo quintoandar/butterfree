@@ -10,11 +10,13 @@ class TestHistoricalLoader:
         spark_client.write_table = mocker.stub("write_dataframe")
         loader = HistoricalFeatureStoreLoader(spark_client)
         table_name = "test"
+
         # when
         loader.load(dataframe=feature_set_dataframe, name=table_name)
 
         # then
         spark_client.write_table.assert_called_once()
+
         assert sorted(feature_set_dataframe.collect()) == sorted(
             spark_client.write_table.call_args[1]["dataframe"].collect()
         )

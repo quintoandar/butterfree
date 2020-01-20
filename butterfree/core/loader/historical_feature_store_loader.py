@@ -25,7 +25,7 @@ class HistoricalFeatureStoreLoader:
         self.spark_client = spark_client
 
     def load(self, dataframe, name):
-        """Loads the latest data from a feature set into the Historical Feature Store.
+        """Loads the data from a feature set into the Historical Feature Store.
 
         Args:
             dataframe: spark dataframe containing data from a feature set.
