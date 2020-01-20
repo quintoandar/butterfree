@@ -5,10 +5,10 @@ from typing import List, Tuple, Union
 from parameters_validation import non_blank
 from pyspark.sql import DataFrame
 
-from butterfree.core.transform.feature_component import FeatureComponent
+from butterfree.core.transform.transform_component import TransformComponent
 
 
-class Feature(FeatureComponent):
+class Feature:
     """Defines a Feature.
 
     Attributes:
@@ -33,9 +33,9 @@ class Feature(FeatureComponent):
         self.origin = (origin,)
         self.description = (description,)
         self.data_type = (data_type,)
-        self.transformations: List[FeatureComponent] = []
+        self.transformations: List[TransformComponent] = []
 
-    def add(self, component: FeatureComponent):
+    def add(self, component: TransformComponent):
         """Adds new component to the feature pipeline.
 
         Args:
@@ -57,12 +57,13 @@ class Feature(FeatureComponent):
         Returns:
             dataframe: transformed dataframe.
         """
+
         if not self.transformations:
-            if self.alias[0]:
-                return dataframe.withColumnRenamed(self.name[0], self.alias[0])
-            return dataframe
+            return dataframe.withColumnRenamed(
+                self.name[0], self.alias[0] if self.alias[0] else self.name[0]
+            )
         for transformation in self.transformations:
-            if self.alias[0]:
-                dataframe = transformation.transform(dataframe)
-                return dataframe.withColumnRenamed(self.name[0], self.alias[0])
-            return transformation.transform(dataframe)
+            dataframe = transformation.transform(dataframe)
+            return dataframe.withColumnRenamed(
+                self.name[0], self.alias[0] if self.alias[0] else self.name[0]
+            )
