@@ -1,6 +1,7 @@
 import os
 from pyspark.sql import DataFrame
 
+from butterfree.core.loader.verify_dataframe import verify_column_ts
 from butterfree.core.client.spark_client import SparkClient
 from butterfree.core.configs import environment
 
@@ -17,6 +18,8 @@ class HistoricalFeatureStoreLoader:
     def load(self, dataframe, name):
         s3_path = os.path.join(self.HISTORICAL_FEATURE_STORE_S3_PATH, name)
         # dataframe = self.create_partitions(dataframe)
+        dataframe = verify_column_ts(dataframe)
+
         self.spark_client.write_table(
             dataframe=dataframe,
             name=name,

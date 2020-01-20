@@ -1,10 +1,10 @@
-from pyspark.sql import DataFrame
-from parameters_validation import parameter_validation
+from pyspark.sql.dataframe import DataFrame
+
+from butterfree.core.constant.columns import TIMESTAMP_COLUMN
 
 
-@parameter_validation
 def verify_column_ts(dataframe: DataFrame):
-  if "ts" not in dataframe.columns:
-    raise ValueError('DataFrame must have a ts column')
+    if TIMESTAMP_COLUMN not in dataframe.columns:
+        raise ValueError("DataFrame must have a 'ts' column.")
 
-  return dataframe
+    return dataframe
