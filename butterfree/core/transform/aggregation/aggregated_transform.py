@@ -8,10 +8,10 @@ from pyspark.sql import functions as F
 from pyspark.sql.window import Window
 
 from butterfree.core.transform.aggregation.window_mapping import WindowType
-from butterfree.core.transform.feature_component import FeatureComponent
+from butterfree.core.transform.transform_component import TransformComponent
 
 
-class Aggregation(FeatureComponent):
+class Aggregation(TransformComponent):
     """Defines an Aggregation.
 
     Attributes:
@@ -20,6 +20,7 @@ class Aggregation(FeatureComponent):
         partition: partition definition.
         time_column: time column definition.
     """
+
     def __init__(
         self,
         aggregations: non_blank(List[str]),
@@ -27,26 +28,18 @@ class Aggregation(FeatureComponent):
         partition: non_blank(str) = None,
         time_column: str = None,
     ):
-        self._aggregations = (aggregations,)
-        self._windows = (windows,)
+        super().__init__()
+        self._aggregations = aggregations
+        self._windows = windows
         self._partition = partition
         self._parent = None
         self._time_column = time_column or "timestamp"
 
-    @property
-    def parent(self):
-        """Returns the component parent."""
-        return self._parent
-
-    @parent.setter
-    def parent(self, parent):
-        self._parent = parent
-
     def _get_alias(self, alias):
         if alias is not None:
-            return self._parent.alias[0]
+            return self._parent.alias
         else:
-            return self._parent.name[0]
+            return self._parent.name
 
     @staticmethod
     def _get_agg_method(aggregation, feature_name, w):
@@ -66,9 +59,9 @@ class Aggregation(FeatureComponent):
         Returns:
             dataframe: transformed dataframe.
         """
-        for aggregation in self._aggregations[0]:
-            for window_type, window_lenght in self._windows[0].items():
-                name = self._get_alias(self._parent.alias[0])
+        for aggregation in self._aggregations:
+            for window_type, window_lenght in self._windows.items():
+                name = self._get_alias(self._parent.alias)
                 feature_name = (
                     f"{name}__{aggregation}_over_{str(window_lenght)}_{window_type}"
                 )
@@ -83,7 +76,7 @@ class Aggregation(FeatureComponent):
 
                 dataframe = dataframe.select(F.col("*")).withColumn(
                     feature_name,
-                    self._get_agg_method(aggregation, f"{self._parent.name[0]}", w),
+                    self._get_agg_method(aggregation, f"{self._parent.name}", w),
                 )
 
         return dataframe
