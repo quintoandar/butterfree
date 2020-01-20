@@ -16,10 +16,3 @@ class TestTransformComponent(TestCase):
         with pytest.raises(TypeError):
             feature_component = TransformComponent()
             feature_component.parent()
-
-    @patch.multiple(TransformComponent, __abstractmethods__=set())
-    def test_transform(self):
-        dataframe = Mock()
-        transform_component = TransformComponent()
-        transform_component.transform(dataframe)
-        assert transform_component.transform(dataframe) is None

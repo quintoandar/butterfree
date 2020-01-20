@@ -15,7 +15,7 @@ class TestFeatureTransform:
         assert test_feature.name == "feature"
         assert test_feature.alias == "new_feature"
         assert test_feature.description == "unit test feature with alias"
-        assert len(test_feature.transformations) == 0
+        assert not test_feature.transformations
 
     def test_args_with_transformation(self):
 
@@ -30,7 +30,7 @@ class TestFeatureTransform:
         assert test_feature.name == "feature"
         assert test_feature.alias == "new_feature"
         assert test_feature.description == "unit test feature with alias"
-        assert len(test_feature.transformations) > 0
+        assert test_feature.transformations
 
     def test_feature_transform_no_alias(self, feature_set_dataframe):
 
