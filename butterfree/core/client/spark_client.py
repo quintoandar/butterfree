@@ -85,4 +85,3 @@ class SparkClient:
         dataframe.write.saveAsTable(
             mode=mode, format=format_, partitionBy=partition_by, name=name, **options
         )
-        return dataframe.write
