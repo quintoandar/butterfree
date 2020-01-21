@@ -18,9 +18,7 @@ class TestSourceSelector:
         source_id = "a_source"
         source = mocker.stub(source_id)
         source.build = mocker.stub("build")
-        source.build.side_effect = partial(
-            create_temp_view, target_df, source_id
-        )
+        source.build.side_effect = partial(create_temp_view, target_df, source_id)
 
         # when
         source_selector = SourceSelector(
