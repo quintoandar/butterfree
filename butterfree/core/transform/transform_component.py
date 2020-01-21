@@ -20,6 +20,12 @@ class TransformComponent(ABC):
     def parent(self, parent):
         self._parent = parent
 
+    def _get_alias(self, alias):
+        if alias is not None:
+            return self._parent.alias
+        else:
+            return self._parent.name
+
     @abstractmethod
     def transform(self, dataframe: DataFrame):
         """Base transform method.
