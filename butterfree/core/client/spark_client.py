@@ -1,6 +1,6 @@
 """SparkClient entity."""
 
-from pyspark.sql import DataFrame, SparkSession
+from pyspark.sql import SparkSession
 
 
 class SparkClient:
@@ -65,7 +65,7 @@ class SparkClient:
     def write_table(
         dataframe, name, format_=None, mode=None, partition_by=None, **options
     ):
-        """Receive a spark DataFrame and transform to DataFrameWriter.
+        """Receive a spark DataFrame and write it as a table.
 
         Args:
             dataframe: spark dataframe containing data from a feature set.
@@ -74,14 +74,9 @@ class SparkClient:
             mode: specified function mode when data already exists
             partition_by: names of partitioning columns
             options: all other string options
-
-        Returns:
-            dataframe.write: a spark DataFrameWriter.
         """
-        if not isinstance(dataframe, DataFrame):
-            raise ValueError(
-                "dataframe needs to be a instance of pyspark.sql.DataFrame"
-            )
+        if not isinstance(name, str):
+            raise ValueError("name needs to be a string")
         dataframe.write.saveAsTable(
             mode=mode, format=format_, partitionBy=partition_by, name=name, **options
         )
