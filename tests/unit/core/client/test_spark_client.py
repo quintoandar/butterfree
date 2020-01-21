@@ -1,9 +1,6 @@
 from unittest.mock import Mock
 
 import pytest
-
-from unittest.mock import Mock
-
 from pyspark.sql import DataFrame
 
 from butterfree.core.client import SparkClient
