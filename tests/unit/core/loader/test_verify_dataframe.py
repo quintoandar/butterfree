@@ -1,13 +1,17 @@
 import pytest
 
-from butterfree.core.loader.verify_dataframe import verify_column_ts
+from butterfree.core.loader.verify_dataframe import VerifyDataframe
 
 
 class TestVerifyDataframe:
     def test_verify_without_column_ts(self, feature_set_without_ts):
-        with pytest.raises(ValueError):
-            assert verify_column_ts(feature_set_without_ts)
+        check = VerifyDataframe(feature_set_without_ts)
 
-    def test_verify_column_ts(self, feature_set_dataframe):
-        df = verify_column_ts(feature_set_dataframe)
-        assert feature_set_dataframe == df
+        with pytest.raises(ValueError):
+            assert check.verify_column_ts()
+
+    def test_verify_empty(self, feature_set_nullable):
+        check = VerifyDataframe(feature_set_nullable)
+
+        with pytest.raises(ValueError):
+            assert check.verify_df_is_empty()

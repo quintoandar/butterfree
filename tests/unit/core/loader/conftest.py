@@ -1,5 +1,6 @@
 from pyspark import SparkContext
 from pyspark.sql import session
+from pyspark.sql.types import StringType, StructField, StructType
 from pytest import fixture
 
 from butterfree.core.db.configs import CassandraWriteConfig
@@ -44,6 +45,16 @@ def feature_set_without_ts():
         {"id": 1, "feature": 120},
     ]
     return spark.read.json(sc.parallelize(data, 1))
+
+
+@fixture
+def feature_set_nullable():
+    sc, spark = base_spark()
+
+    field = [StructField("field1", StringType(), True)]
+    schema = StructType(field)
+
+    return spark.createDataFrame(sc.emptyRDD(), schema)
 
 
 @fixture

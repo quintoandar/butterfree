@@ -4,16 +4,27 @@ from pyspark.sql.dataframe import DataFrame
 from butterfree.core.constant.columns import TIMESTAMP_COLUMN
 
 
-def verify_column_ts(dataframe: DataFrame):
-    """Check dataframe's columns.
+class VerifyDataframe:
+    """Validate dataframe before to save.
 
-    Args:
-        dataframe: spark dataframe containing data from a feature set.
-
-    Returns:
+    Attributes:
         dataframe: spark dataframe containing data from a feature set.
     """
-    if TIMESTAMP_COLUMN not in dataframe.columns:
-        raise ValueError("DataFrame must have a 'ts' column.")
 
-    return dataframe
+    def __init__(self, dataframe: DataFrame):
+        self.dataframe = dataframe
+
+    def checks(self):
+        """Call validate functions."""
+        self.verify_column_ts()
+        self.verify_df_is_empty()
+
+    def verify_column_ts(self):
+        """Check dataframe's columns."""
+        if TIMESTAMP_COLUMN not in self.dataframe.columns:
+            raise ValueError(f"DataFrame must have a '{TIMESTAMP_COLUMN}' column.")
+
+    def verify_df_is_empty(self):
+        """Check if the dataframe is empty."""
+        if self.dataframe.rdd.isEmpty():
+            raise ValueError("DataFrame can't be empty.")

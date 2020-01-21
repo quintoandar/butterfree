@@ -4,7 +4,7 @@ import os
 
 from butterfree.core.client.spark_client import SparkClient
 from butterfree.core.configs import environment
-from butterfree.core.loader.verify_dataframe import verify_column_ts
+from butterfree.core.loader.verify_dataframe import VerifyDataframe
 
 
 class HistoricalFeatureStoreLoader:
@@ -32,9 +32,11 @@ class HistoricalFeatureStoreLoader:
             name: feature set name.
         """
         s3_path = os.path.join(self.HISTORICAL_FEATURE_STORE_S3_PATH, name)
-        dataframe = verify_column_ts(dataframe)
 
-        self.spark_client.write(
+        validate_dataframe = VerifyDataframe(dataframe)
+        validate_dataframe.checks()
+
+        self.spark_client.write_table(
             dataframe=dataframe,
             name=name,
             format_=self.DEFAULT_FORMAT,
