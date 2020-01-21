@@ -60,3 +60,24 @@ class SparkClient:
         :return dataframe: Spark DataFrame with the query result.
         """
         return self.conn.sql(query)
+
+    @staticmethod
+    def write_table(
+        dataframe, name, format_=None, mode=None, partition_by=None, **options
+    ):
+        """Receive a spark DataFrame and write it as a table.
+
+        Args:
+            dataframe: spark dataframe containing data from a feature set.
+            name: specified table name.
+            format_: string with the format used to save
+            mode: specified function mode when data already exists
+            partition_by: names of partitioning columns
+            options: all other string options
+        """
+        if not isinstance(name, str):
+            raise ValueError("name needs to be a string")
+
+        dataframe.write.saveAsTable(
+            mode=mode, format=format_, partitionBy=partition_by, name=name, **options
+        )

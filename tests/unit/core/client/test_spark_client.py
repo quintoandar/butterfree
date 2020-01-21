@@ -1,3 +1,5 @@
+from unittest.mock import Mock
+
 import pytest
 from pyspark.sql import DataFrame
 
@@ -91,3 +93,21 @@ class TestSparkClient:
         # act and assert
         with pytest.raises(ValueError):
             spark_client.read_table(database, table)
+
+    def test_write_table(self):
+        mock = Mock()
+        mock_dataframe = mock
+        mock_write_table = mock
+        mock_dataframe.write = mock_write_table
+
+        SparkClient.write_table(mock_dataframe, "test")
+        mock_write_table.saveAsTable.assert_called_with(
+            mode=None, format=None, partitionBy=None, name="test"
+        )
+
+    def test_write_table_with_invalid_params(self):
+        df_writer = "not a spark df writer"
+        name = None
+
+        with pytest.raises(ValueError):
+            assert SparkClient.write_table(dataframe=df_writer, name=name)
