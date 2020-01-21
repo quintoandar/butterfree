@@ -1,10 +1,11 @@
 """Holds the SourceSelector class."""
 
-from typing import Any, List
+from typing import List
 
 from pyspark.sql import DataFrame
 
 from butterfree.core.client import SparkClient
+from butterfree.core.source import Source
 
 
 class SourceSelector:
@@ -14,13 +15,12 @@ class SourceSelector:
     A feature set should be built from a single dataframe, which is a composition of
     multiple sources.
 
-    TODO sources: List[Any] -> sources: List[Source]
     TODO refactor query into multiple query components
     TODO make it harder to do query injection
     """
 
     def __init__(
-        self, spark_client: SparkClient, sources: List[Any], query: str
+        self, spark_client: SparkClient, sources: List[Source], query: str
     ) -> None:
         """Initialize a SourceSelector.
 
