@@ -7,11 +7,10 @@ from pyspark.sql import DataFrame
 from pyspark.sql import functions as F
 from pyspark.sql.window import Window
 
-from butterfree.core.transform.aggregation.window_mapping import WindowType
 from butterfree.core.transform.transform_component import TransformComponent
 
 
-class Aggregation(TransformComponent):
+class AggregatedTransform(TransformComponent):
     """Defines an Aggregation.
 
     Attributes:
@@ -29,26 +28,85 @@ class Aggregation(TransformComponent):
         time_column: str = None,
     ):
         super().__init__()
-        self._aggregations = aggregations
-        self._windows = windows
-        self._partition = partition
-        self._parent = None
-        self._time_column = time_column or "timestamp"
+        self.aggregations = aggregations
+        self.windows = windows
+        self.partition = partition
+        self.parent = None
+        self.time_column = time_column or "timestamp"
 
-    def _get_alias(self, alias):
-        if alias is not None:
-            return self._parent.alias
-        else:
-            return self._parent.name
+    __ALLOWED_AGGREGATIONS = {"avg": F.avg, "std": F.stddev_pop}
+    __ALLOWED_WINDOWS = {
+        "seconds": 1,
+        "minutes": 60,
+        "hours": 3600,
+        "days": 86400,
+        "weeks": 604800,
+        "months": 2419200,
+        "years": 29030400,
+    }
 
-    @staticmethod
-    def _get_agg_method(aggregation, feature_name, w):
-        if aggregation in ["avg"]:
-            return F.avg(feature_name).over(w)
-        elif aggregation in ["std"]:
-            return F.stddev_pop(feature_name).over(w)
-        else:
-            raise ValueError()
+    @property
+    def aggregations(self):
+        """Returns the aggregations."""
+        return self._aggregations
+
+    @aggregations.setter
+    def aggregations(self, value: List[str]):
+        self._aggregations = []
+        if not value:
+            raise IndexError("Aggregations must not be empty.")
+        for agg in value:
+            try:
+                self._aggregations.append(
+                    list(self.__ALLOWED_AGGREGATIONS.keys())[
+                        list(self.__ALLOWED_AGGREGATIONS.values()).index(
+                            self.__ALLOWED_AGGREGATIONS[agg]
+                        )
+                    ]
+                )
+            except KeyError as e:
+                e.message = (
+                    f"{agg} is not supported. These are the allowed "
+                    f"aggregations that you can use: "
+                    f"{self.allowed_aggregations}"
+                )
+                raise KeyError(e.message)
+
+    @property
+    def allowed_aggregations(self):
+        return list(self.__ALLOWED_AGGREGATIONS.keys())
+
+    @property
+    def windows(self):
+        return self._windows
+
+    @windows.setter
+    def windows(self, windows: Dict):
+        self._windows = {}
+        if not windows:
+            raise KeyError("Windows must not be empty.")
+        for window_type, window_lenght in windows.items():
+            try:
+                self._windows.update(
+                    {
+                        list(self.__ALLOWED_WINDOWS.keys())[
+                            list(self.__ALLOWED_WINDOWS.values()).index(
+                                self.__ALLOWED_WINDOWS[window_type]
+                            )
+                        ]: window_lenght
+                    }
+                )
+            except KeyError as e:
+                e.message = (
+                    f"{window_type} is not supported. These are the allowed "
+                    f"time windows that you can use: "
+                    f"{self.allowed_windows}"
+                )
+                raise KeyError(e.message)
+
+    @property
+    def allowed_windows(self):
+        return list(self.__ALLOWED_WINDOWS.keys())
 
     def transform(self, dataframe: DataFrame):
         """Performs a transformation to the feature pipeline.
@@ -60,23 +118,25 @@ class Aggregation(TransformComponent):
             dataframe: transformed dataframe.
         """
         for aggregation in self._aggregations:
-            for window_type, window_lenght in self._windows.items():
+            for window_type, window_lenght in self.windows.items():
                 name = self._get_alias(self._parent.alias)
                 feature_name = (
                     f"{name}__{aggregation}_over_{str(window_lenght)}_{window_type}"
                 )
                 w = (
                     Window()
-                    .partitionBy(F.col(f"{self._partition}"))
-                    .orderBy(F.col(f"{self._time_column}").cast("long"))
+                    .partitionBy(F.col(f"{self.partition}"))
+                    .orderBy(F.col(f"{self.time_column}").cast("long"))
                     .rangeBetween(
-                        -(WindowType.convert_to_seconds(window_type, window_lenght)), 0
+                        -(self.__ALLOWED_WINDOWS[window_type] * window_lenght), 0
                     )
                 )
 
                 dataframe = dataframe.select(F.col("*")).withColumn(
                     feature_name,
-                    self._get_agg_method(aggregation, f"{self._parent.name}", w),
+                    self.__ALLOWED_AGGREGATIONS[aggregation](
+                        f"{self._parent.name}"
+                    ).over(w),
                 )
 
         return dataframe
