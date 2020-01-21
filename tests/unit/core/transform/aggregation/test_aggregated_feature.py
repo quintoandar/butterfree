@@ -1,7 +1,9 @@
 import pytest
 
 from butterfree.core.transform import Feature
-from butterfree.core.transform.aggregation.aggregated_transform import Aggregation
+from butterfree.core.transform.aggregation.aggregated_transform import (
+    AggregatedTransform
+)
 
 
 class TestAggregatedFeatureTransform:
@@ -11,7 +13,7 @@ class TestAggregatedFeatureTransform:
         )
 
         test_feature.add(
-            Aggregation(
+            AggregatedTransform(
                 aggregations=["avg", "std"],
                 partition="id",
                 windows={"days": 7, "weeks": 2},
@@ -47,7 +49,7 @@ class TestAggregatedFeatureTransform:
         )
 
         test_feature.add(
-            Aggregation(
+            AggregatedTransform(
                 aggregations=["avg", "std"],
                 partition="id",
                 windows={"days": 7, "weeks": 2},
@@ -75,20 +77,84 @@ class TestAggregatedFeatureTransform:
             ]
         )
 
-    def test_undefined_aggregation(self, feature_set_dataframe):
-        with pytest.raises(ValueError):
-            test_feature = Feature(
-                name="feature",
-                alias="new_feature",
-                description="unit test feature with no alias",
-            )
-
+    def test_unsupported_aggregation(self, feature_set_dataframe):
+        test_feature = Feature(
+            name="feature",
+            alias="new_feature",
+            description="unit test feature with no alias",
+        )
+        with pytest.raises(KeyError):
             test_feature.add(
-                Aggregation(
+                AggregatedTransform(
                     aggregations=["median"],
                     partition="id",
                     windows={"days": 7, "weeks": 2},
                 )
             )
-
             test_feature.transform(feature_set_dataframe)
+
+    def test_blank_aggregation(self, feature_set_dataframe):
+        test_feature = Feature(
+            name="feature",
+            alias="new_feature",
+            description="unit test feature with no alias",
+        )
+        with pytest.raises(IndexError, match="Aggregations must not be empty."):
+            test_feature.add(
+                AggregatedTransform(
+                    aggregations=[], partition="id", windows={"days": 7, "weeks": 2},
+                )
+            )
+            test_feature.transform(feature_set_dataframe)
+
+    def test_unsupported_window(self, feature_set_dataframe):
+        test_feature = Feature(
+            name="feature",
+            alias="new_feature",
+            description="unit test feature with no alias",
+        )
+        with pytest.raises(KeyError):
+            test_feature.add(
+                AggregatedTransform(
+                    aggregations=["avg", "std"],
+                    partition="id",
+                    windows={"daily": 7, "weeks": 2},
+                )
+            )
+            test_feature.transform(feature_set_dataframe)
+
+    def test_blank_window(self, feature_set_dataframe):
+        test_feature = Feature(
+            name="feature",
+            alias="new_feature",
+            description="unit test feature with no alias",
+        )
+        with pytest.raises(KeyError, match="Windows must not be empty."):
+            test_feature.add(
+                AggregatedTransform(
+                    aggregations=["avg", "std"], partition="id", windows={},
+                )
+            )
+            test_feature.transform(feature_set_dataframe)
+
+    def test_feature_transform_output(self, feature_set_dataframe):
+        test_feature = Feature(
+            name="feature", description="unit test feature with no alias",
+        )
+
+        test_feature.add(
+            AggregatedTransform(
+                aggregations=["avg", "std"], partition="id", windows={"minutes": 15},
+            )
+        )
+
+        df = test_feature.transform(feature_set_dataframe)
+
+        assert df.collect()[0]["feature__avg_over_15_minutes"] == 200
+        assert df.collect()[1]["feature__avg_over_15_minutes"] == 250
+        assert df.collect()[2]["feature__avg_over_15_minutes"] == 350
+        assert df.collect()[3]["feature__avg_over_15_minutes"] == 500
+        assert df.collect()[0]["feature__std_over_15_minutes"] == 0
+        assert df.collect()[1]["feature__std_over_15_minutes"] == 50
+        assert df.collect()[2]["feature__std_over_15_minutes"] == 50
+        assert df.collect()[3]["feature__std_over_15_minutes"] == 0
