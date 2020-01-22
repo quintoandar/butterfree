@@ -24,6 +24,7 @@ def target_df(sc, spark):
 @pytest.fixture()
 def mocked_spark_read():
     mock = Mock()
+    mock.readStream = mock
     mock.read = mock
     mock.format.return_value = mock
     mock.options.return_value = mock

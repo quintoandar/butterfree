@@ -6,7 +6,15 @@ from butterfree.core.source.source import Source
 class KafkaSource(Source):
     """Source responsible for get data from a Kafka topic."""
 
-    def __init__(self, id, spark_client, connection_string, topic, topic_options=None):
+    def __init__(
+        self,
+        id,
+        spark_client,
+        connection_string,
+        topic,
+        topic_options=None,
+        stream=True,
+    ):
         """Instantiate KafkaSource with the required parameters.
 
         :param id: unique string id for register the source as a view on the metastore
@@ -16,6 +24,7 @@ class KafkaSource(Source):
         :param topic: string with the Kafka topic name to subscribe.
         :param topic_options: additional options for consuming from topic. See docs:
         https://spark.apache.org/docs/latest/structured-streaming-kafka-integration.html.
+        :param stream: flag to indicate the reading mode: stream or batch
         """
         super().__init__(id, spark_client)
         if not isinstance(connection_string, str):
@@ -33,6 +42,7 @@ class KafkaSource(Source):
             },
             **topic_options if topic_options else {}
         )
+        self.stream = stream
 
     def consume(self):
         """Extract data from a kafka topic.
@@ -40,7 +50,7 @@ class KafkaSource(Source):
         :return: Spark dataframe
         """
         raw_stream_df = self.client.read(
-            format="kafka", options=self.options, stream=True
+            format="kafka", options=self.options, stream=self.stream
         )
 
         # cast key and value columns from binary to string
