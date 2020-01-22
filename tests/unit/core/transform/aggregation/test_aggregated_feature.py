@@ -16,7 +16,7 @@ class TestAggregatedFeatureTransform:
             AggregatedTransform(
                 aggregations=["avg", "std"],
                 partition="id",
-                windows={"days": 7, "weeks": 2},
+                windows={"days": [7], "weeks": [2]},
             )
         )
 
@@ -52,7 +52,7 @@ class TestAggregatedFeatureTransform:
             AggregatedTransform(
                 aggregations=["avg", "std"],
                 partition="id",
-                windows={"days": 7, "weeks": 2},
+                windows={"days": [7], "weeks": [2]},
             )
         )
 
@@ -88,7 +88,7 @@ class TestAggregatedFeatureTransform:
                 AggregatedTransform(
                     aggregations=["median"],
                     partition="id",
-                    windows={"days": 7, "weeks": 2},
+                    windows={"days": [7], "weeks": [2]},
                 )
             )
             test_feature.transform(feature_set_dataframe)
@@ -99,10 +99,10 @@ class TestAggregatedFeatureTransform:
             alias="new_feature",
             description="unit test feature with no alias",
         )
-        with pytest.raises(IndexError, match="Aggregations must not be empty."):
+        with pytest.raises(ValueError, match="Aggregations must not be empty."):
             test_feature.add(
                 AggregatedTransform(
-                    aggregations=[], partition="id", windows={"days": 7, "weeks": 2},
+                    aggregations=[], partition="id", windows={"days": [7], "weeks": [2]},
                 )
             )
             test_feature.transform(feature_set_dataframe)
@@ -118,7 +118,7 @@ class TestAggregatedFeatureTransform:
                 AggregatedTransform(
                     aggregations=["avg", "std"],
                     partition="id",
-                    windows={"daily": 7, "weeks": 2},
+                    windows={"daily": [7], "weeks": [2]},
                 )
             )
             test_feature.transform(feature_set_dataframe)
@@ -144,7 +144,7 @@ class TestAggregatedFeatureTransform:
 
         test_feature.add(
             AggregatedTransform(
-                aggregations=["avg", "std"], partition="id", windows={"minutes": 15},
+                aggregations=["avg", "std"], partition="id", windows={"minutes": [15]},
             )
         )
 
