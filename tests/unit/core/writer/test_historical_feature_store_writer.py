@@ -44,3 +44,32 @@ class TestHistoricalFeatureStoreWriter:
 
         with pytest.raises(ValueError):
             assert writer.write(dataframe=feature_set_without_ts, name=table_name)
+
+    def test_validate(self, feature_set_dataframe, mocker):
+        # given
+        spark_client = mocker.stub("spark_client")
+        spark_client.read = mocker.stub("read")
+        mock_path = mocker.stub("path")
+
+        format_ = "parquet"
+        writer = HistoricalFeatureStoreWriter(spark_client)
+
+        # when
+        writer.validate(feature_set_dataframe, format_, mock_path)
+
+        # then
+        spark_client.read.assert_called_once()
+
+    @pytest.mark.parametrize(
+        "format_, path", [(None, "path/table"), ("parquet", None), (1, 123)],
+    )
+    def test_validate_invalid_params(self, feature_set_dataframe, format_, path, mocker):
+        # given
+        spark_client = mocker.stub("spark_client")
+        spark_client.read = mocker.stub("read")
+
+        writer = HistoricalFeatureStoreWriter(spark_client)
+
+        # then
+        with pytest.raises(ValueError):
+            writer.validate(feature_set_dataframe, format_, path)
