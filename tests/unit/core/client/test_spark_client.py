@@ -1,6 +1,13 @@
+from unittest.mock import Mock
+
 import pytest
+from pyspark.sql import DataFrame
 
 from butterfree.core.client import SparkClient
+
+
+def create_temp_view(dataframe: DataFrame, name):
+    dataframe.createOrReplaceTempView(name)
 
 
 class TestSparkClient:
@@ -51,6 +58,17 @@ class TestSparkClient:
         with pytest.raises(ValueError):
             assert spark_client.read(format, options)
 
+    def test_sql(self, target_df):
+        # arrange
+        spark_client = SparkClient()
+        create_temp_view(target_df, "test")
+
+        # act
+        result_df = spark_client.sql("select * from test")
+
+        # assert
+        assert result_df.collect() == target_df.collect()
+
     def test_read_table(self, target_df, mocked_spark_read):
         # arrange
         database = "default"
@@ -76,3 +94,21 @@ class TestSparkClient:
         # act and assert
         with pytest.raises(ValueError):
             spark_client.read_table(database, table)
+
+    def test_write_table(self):
+        mock = Mock()
+        mock_dataframe = mock
+        mock_write_table = mock
+        mock_dataframe.write = mock_write_table
+
+        SparkClient.write_table(mock_dataframe, "test")
+        mock_write_table.saveAsTable.assert_called_with(
+            mode=None, format=None, partitionBy=None, name="test"
+        )
+
+    def test_write_table_with_invalid_params(self):
+        df_writer = "not a spark df writer"
+        name = None
+
+        with pytest.raises(ValueError):
+            assert SparkClient.write_table(dataframe=df_writer, name=name)
