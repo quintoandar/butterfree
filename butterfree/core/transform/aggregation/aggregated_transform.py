@@ -65,19 +65,21 @@ class AggregatedTransform(TransformComponent):
                     ]
                 )
             except KeyError as e:
-                e.message = (
+                e.args = (
                     f"{agg} is not supported. These are the allowed "
                     f"aggregations that you can use: "
                     f"{self.allowed_aggregations}"
                 )
-                raise KeyError(e.message)
+                raise KeyError(e.args)
 
     @property
     def allowed_aggregations(self):
+        """Returns list of allowed aggregations."""
         return list(self.__ALLOWED_AGGREGATIONS.keys())
 
     @property
     def windows(self):
+        """Returns the windows."""
         return self._windows
 
     @windows.setter
@@ -97,15 +99,16 @@ class AggregatedTransform(TransformComponent):
                     }
                 )
             except KeyError as e:
-                e.message = (
+                e.args = (
                     f"{window_type} is not supported. These are the allowed "
                     f"time windows that you can use: "
                     f"{self.allowed_windows}"
                 )
-                raise KeyError(e.message)
+                raise KeyError(e.args)
 
     @property
     def allowed_windows(self):
+        """Returns list of allowed windows."""
         return list(self.__ALLOWED_WINDOWS.keys())
 
     def transform(self, dataframe: DataFrame):
