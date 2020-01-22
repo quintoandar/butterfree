@@ -5,4 +5,4 @@ from butterfree.core.source.source import Source
 from butterfree.core.source.source_selector import SourceSelector
 from butterfree.core.source.table_source import TableSource
 
-__all__ = ["FileSource", "Source", "SourceSelector", "TableSource"]
+__all__ = ["FileSource", "KafkaSource", "Source", "SourceSelector", "TableSource"]
