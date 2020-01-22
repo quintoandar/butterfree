@@ -196,21 +196,21 @@ class TestAggregatedFeatureTransform:
             )
         )
 
-        df = test_feature.transform(feature_set_dataframe)
+        df = test_feature.transform(feature_set_dataframe).collect()
 
-        assert df.collect()[0]["feature__avg_over_2_minutes"] == 200
-        assert df.collect()[1]["feature__avg_over_2_minutes"] == 300
-        assert df.collect()[2]["feature__avg_over_2_minutes"] == 400
-        assert df.collect()[3]["feature__avg_over_2_minutes"] == 500
-        assert df.collect()[0]["feature__std_over_2_minutes"] == 0
-        assert df.collect()[1]["feature__std_over_2_minutes"] == 0
-        assert df.collect()[2]["feature__std_over_2_minutes"] == 0
-        assert df.collect()[3]["feature__std_over_2_minutes"] == 0
-        assert df.collect()[0]["feature__avg_over_15_minutes"] == 200
-        assert df.collect()[1]["feature__avg_over_15_minutes"] == 250
-        assert df.collect()[2]["feature__avg_over_15_minutes"] == 350
-        assert df.collect()[3]["feature__avg_over_15_minutes"] == 500
-        assert df.collect()[0]["feature__std_over_15_minutes"] == 0
-        assert df.collect()[1]["feature__std_over_15_minutes"] == 50
-        assert df.collect()[2]["feature__std_over_15_minutes"] == 50
-        assert df.collect()[3]["feature__std_over_15_minutes"] == 0
+        assert df[0]["feature__avg_over_2_minutes"] == 200
+        assert df[1]["feature__avg_over_2_minutes"] == 300
+        assert df[2]["feature__avg_over_2_minutes"] == 400
+        assert df[3]["feature__avg_over_2_minutes"] == 500
+        assert df[0]["feature__std_over_2_minutes"] == 0
+        assert df[1]["feature__std_over_2_minutes"] == 0
+        assert df[2]["feature__std_over_2_minutes"] == 0
+        assert df[3]["feature__std_over_2_minutes"] == 0
+        assert df[0]["feature__avg_over_15_minutes"] == 200
+        assert df[1]["feature__avg_over_15_minutes"] == 250
+        assert df[2]["feature__avg_over_15_minutes"] == 350
+        assert df[3]["feature__avg_over_15_minutes"] == 500
+        assert df[0]["feature__std_over_15_minutes"] == 0
+        assert df[1]["feature__std_over_15_minutes"] == 50
+        assert df[2]["feature__std_over_15_minutes"] == 50
+        assert df[3]["feature__std_over_15_minutes"] == 0
