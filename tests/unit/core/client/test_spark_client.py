@@ -95,6 +95,29 @@ class TestSparkClient:
         with pytest.raises(ValueError):
             spark_client.read_table(database, table)
 
+    @pytest.mark.parametrize(
+        "format", [("parquet"), ("csv")],
+    )
+    def test_write_dataframe(self, format):
+        mock = Mock()
+        mock_dataframe = mock
+        mock_write_table = mock
+        mock_dataframe.write = mock_write_table
+
+        SparkClient.write_dataframe(mock_dataframe, format)
+        mock_write_table.save.assert_called_with(format=format)
+
+    @pytest.mark.parametrize(
+        "format", [(None), (1)],
+    )
+    def test_write_dataframe_invalid_params(self, target_df, format):
+        # arrange
+        spark_client = SparkClient()
+
+        # act and assert
+        with pytest.raises(ValueError):
+            assert spark_client.write_dataframe(dataframe=target_df, format_=format)
+
     def test_write_table(self):
         mock = Mock()
         mock_dataframe = mock

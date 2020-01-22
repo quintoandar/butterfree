@@ -63,6 +63,20 @@ class SparkClient:
         return self.conn.sql(query)
 
     @staticmethod
+    def write_dataframe(dataframe, format_, **options):
+        """Receive a spark DataFrame and write it.
+
+        Args:
+            dataframe: spark dataframe containing data from a feature set.
+            format_: string with the format used to save
+            options: all other string options
+        """
+        if not isinstance(format_, str):
+            raise ValueError("format needs to be a string with the desired read format")
+
+        dataframe.write.save(format=format_, **options)
+
+    @staticmethod
     def write_table(
         dataframe, name, format_=None, mode=None, partition_by=None, **options
     ):
@@ -72,7 +86,10 @@ class SparkClient:
             dataframe: spark dataframe containing data from a feature set.
             name: specified table name.
             format_: string with the format used to save
-            mode: specified function mode when data already exists
+            mode: specified function mode when data already exists,
+                mode can be "error", "append", "overwrite" and "ignore".
+                For more informations:
+                https://spark.apache.org/docs/2.3.0/sql-programming-guide.html#save-modes
             partition_by: names of partitioning columns
             options: all other string options
         """

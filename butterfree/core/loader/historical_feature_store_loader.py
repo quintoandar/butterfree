@@ -2,7 +2,7 @@
 
 import os
 
-from butterfree.core.client.spark_client import SparkClient
+from butterfree.core.client import SparkClient
 from butterfree.core.configs import environment
 from butterfree.core.loader.verify_dataframe import VerifyDataframe
 
