@@ -10,8 +10,8 @@ class TestVerifyDataframe:
         with pytest.raises(ValueError):
             assert check.verify_column_ts()
 
-    def test_verify_empty(self, feature_set_nullable):
-        check = VerifyDataframe(feature_set_nullable)
+    def test_verify_empty(self, feature_set_empty):
+        check = VerifyDataframe(feature_set_empty)
 
         with pytest.raises(ValueError):
             assert check.verify_df_is_empty()
