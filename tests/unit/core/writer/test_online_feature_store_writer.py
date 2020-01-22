@@ -1,18 +1,18 @@
 import pytest
 
-from butterfree.core.loader import OnlineFeatureStoreLoader
+from butterfree.core.writer import OnlineFeatureStoreWriter
 
 
-class TestOnlineFeatureStoreLoader:
+class TestOnlineFeatureStoreWriter:
     def test_filter_latest(
         self, feature_set_dataframe, latest, cassandra_config, mocker
     ):
         # with
         spark_client = mocker.stub("spark_client")
-        loader = OnlineFeatureStoreLoader(spark_client, cassandra_config)
+        writer = OnlineFeatureStoreWriter(spark_client, cassandra_config)
 
         # when
-        filtered = loader.filter_latest(feature_set_dataframe, id_columns=["id"])
+        filtered = writer.filter_latest(feature_set_dataframe, id_columns=["id"])
 
         # then
         assert sorted(latest.collect()) == sorted(filtered.collect())
@@ -22,11 +22,11 @@ class TestOnlineFeatureStoreLoader:
     ):
         # with
         spark_client = mocker.stub("spark_client")
-        loader = OnlineFeatureStoreLoader(spark_client, cassandra_config)
+        writer = OnlineFeatureStoreWriter(spark_client, cassandra_config)
 
         # then
         with pytest.raises(KeyError, match="must have a 'ts' column"):
-            _ = loader.filter_latest(
+            _ = writer.filter_latest(
                 feature_set_dataframe.drop("ts"), id_columns=["id"]
             )
 
@@ -35,26 +35,26 @@ class TestOnlineFeatureStoreLoader:
     ):
         # with
         spark_client = mocker.stub("spark_client")
-        loader = OnlineFeatureStoreLoader(spark_client, cassandra_config)
+        writer = OnlineFeatureStoreWriter(spark_client, cassandra_config)
 
         # then
         with pytest.raises(ValueError, match="must provide the unique identifiers"):
-            _ = loader.filter_latest(feature_set_dataframe, id_columns=[])
+            _ = writer.filter_latest(feature_set_dataframe, id_columns=[])
 
         # then
         with pytest.raises(KeyError, match="not found"):
-            _ = loader.filter_latest(
+            _ = writer.filter_latest(
                 feature_set_dataframe.drop("id"), id_columns=["id"]
             )
 
-    def test_load(self, feature_set_dataframe, latest, cassandra_config, mocker):
+    def test_write(self, feature_set_dataframe, latest, cassandra_config, mocker):
         # with
         spark_client = mocker.stub("spark_client")
         spark_client.write_dataframe = mocker.stub("write_dataframe")
-        loader = OnlineFeatureStoreLoader(spark_client, cassandra_config)
+        writer = OnlineFeatureStoreWriter(spark_client, cassandra_config)
 
         # when
-        loader.load(feature_set_dataframe, id_columns=["id"], name="test")
+        writer.write(feature_set_dataframe, id_columns=["id"], name="test")
 
         # then
         spark_client.write_dataframe.assert_called_once()
@@ -65,10 +65,10 @@ class TestOnlineFeatureStoreLoader:
             loader.db_config.mode == spark_client.write_dataframe.call_args[1]["mode"]
         )
         assert (
-            loader.db_config.format_
+            writer.db_config.format_
             == spark_client.write_dataframe.call_args[1]["format"]
         )
         assert (
-            loader.db_config.get_options(table="test")
+            writer.db_config.get_options(table="test")
             == spark_client.write_dataframe.call_args[1]["options"]
         )

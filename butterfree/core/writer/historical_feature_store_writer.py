@@ -1,13 +1,13 @@
-"""Holds the Historical Feature Store loader class."""
+"""Holds the Historical Feature Store writer class."""
 
 import os
 
 from butterfree.core.client import SparkClient
 from butterfree.core.configs import environment
-from butterfree.core.loader.verify_dataframe import VerifyDataframe
+from butterfree.core.writer.verify_dataframe import VerifyDataframe
 
 
-class HistoricalFeatureStoreLoader:
+class HistoricalFeatureStoreWriter:
     """Enable writing feature sets into the Historical Feature Store.
 
     Attributes:
@@ -25,7 +25,7 @@ class HistoricalFeatureStoreLoader:
     def __init__(self, spark_client: SparkClient):
         self.spark_client = spark_client
 
-    def load(self, dataframe, name):
+    def write(self, dataframe, name):
         """Loads the data from a feature set into the Historical Feature Store.
 
         Args:

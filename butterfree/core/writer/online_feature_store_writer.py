@@ -1,4 +1,4 @@
-"""Holds the Online Feature Store loader class."""
+"""Holds the Online Feature Store writer class."""
 
 from typing import Any, List
 
@@ -10,7 +10,7 @@ from butterfree.core.constant.columns import TIMESTAMP_COLUMN
 from butterfree.core.db.configs import CassandraWriteConfig
 
 
-class OnlineFeatureStoreLoader:
+class OnlineFeatureStoreWriter:
     """Enable writing feature sets into the Online Feature Store.
 
     Attributes:
@@ -48,7 +48,7 @@ class OnlineFeatureStoreLoader:
             .drop("rn")
         )
 
-    def load(self, dataframe: DataFrame, name: str, id_columns: List[Any]):
+    def write(self, dataframe: DataFrame, name: str, id_columns: List[Any]):
         """Loads the latest data from a feature set into the Online Feature Store.
 
         Args:

@@ -1,6 +1,6 @@
 import pytest
 
-from butterfree.core.loader.verify_dataframe import VerifyDataframe
+from butterfree.core.writer.verify_dataframe import VerifyDataframe
 
 
 class TestVerifyDataframe:
