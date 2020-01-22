@@ -1,5 +1,3 @@
-from unittest.mock import Mock
-
 import pytest
 from pyspark.sql import DataFrame
 
@@ -98,14 +96,9 @@ class TestSparkClient:
     @pytest.mark.parametrize(
         "format", [("parquet"), ("csv")],
     )
-    def test_write_dataframe(self, format):
-        mock = Mock()
-        mock_dataframe = mock
-        mock_write_table = mock
-        mock_dataframe.write = mock_write_table
-
-        SparkClient.write_dataframe(mock_dataframe, format)
-        mock_write_table.save.assert_called_with(format=format)
+    def test_write_dataframe(self, format, mocked_spark_write):
+        SparkClient.write_dataframe(mocked_spark_write, format)
+        mocked_spark_write.save.assert_called_with(format=format)
 
     @pytest.mark.parametrize(
         "format", [(None), (1)],
@@ -118,14 +111,9 @@ class TestSparkClient:
         with pytest.raises(ValueError):
             assert spark_client.write_dataframe(dataframe=target_df, format_=format)
 
-    def test_write_table(self):
-        mock = Mock()
-        mock_dataframe = mock
-        mock_write_table = mock
-        mock_dataframe.write = mock_write_table
-
-        SparkClient.write_table(mock_dataframe, "test")
-        mock_write_table.saveAsTable.assert_called_with(
+    def test_write_table(self, mocked_spark_write):
+        SparkClient.write_table(mocked_spark_write, "test")
+        mocked_spark_write.saveAsTable.assert_called_with(
             mode=None, format=None, partitionBy=None, name="test"
         )
 

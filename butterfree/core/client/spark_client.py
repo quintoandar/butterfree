@@ -68,11 +68,11 @@ class SparkClient:
 
         Args:
             dataframe: spark dataframe containing data from a feature set.
-            format_: string with the format used to save
-            options: all other string options
+            format_: string with the format used to save.
+            options: all other string options.
         """
         if not isinstance(format_, str):
-            raise ValueError("format needs to be a string with the desired read format")
+            raise ValueError("format needs to be a string")
 
         dataframe.write.save(format=format_, **options)
 
@@ -85,13 +85,13 @@ class SparkClient:
         Args:
             dataframe: spark dataframe containing data from a feature set.
             name: specified table name.
-            format_: string with the format used to save
+            format_: string with the format used to save.
             mode: specified function mode when data already exists,
                 mode can be "error", "append", "overwrite" and "ignore".
                 For more informations:
-                https://spark.apache.org/docs/2.3.0/sql-programming-guide.html#save-modes
-            partition_by: names of partitioning columns
-            options: all other string options
+                [here](https://spark.apache.org/docs/2.3.0/sql-programming-guide.html#save-modes).
+            partition_by: names of partitioning columns.
+            options: all other string options.
         """
         if not isinstance(name, str):
             raise ValueError("name needs to be a string")
