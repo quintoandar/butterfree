@@ -4,8 +4,8 @@ from butterfree.core.configs import environment
 from butterfree.core.db.configs.abstract_config import AbstractWriteConfig
 
 
-class CassandraWriteConfig(AbstractWriteConfig):
-    """Write configuration with spark for Cassandra databases.
+class CassandraConfig(AbstractWriteConfig):
+    """Configuration with spark for Cassandra databases.
 
     References can be found
     [here](https://docs.databricks.com/data/data-sources/cassandra.html).
@@ -139,12 +139,12 @@ class CassandraWriteConfig(AbstractWriteConfig):
         self.__host = value
 
     def get_options(self, table: str) -> dict:
-        """Get write options.
+        """Get options.
 
-        Options will be a dictionary with the write configuration for spark to
+        Options will be a dictionary with the write and read configuration for spark to
         cassandra.
 
-        :param table: table name to write data into Cassandra DB.
+        :param table: table name into Cassandra DB.
         :return: password to connect to Cassandra DB.
         """
         return {

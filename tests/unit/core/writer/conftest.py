@@ -3,7 +3,7 @@ from pyspark.sql import session
 from pyspark.sql.types import StringType, StructField, StructType
 from pytest import fixture
 
-from butterfree.core.db.configs import CassandraWriteConfig
+from butterfree.core.db.configs import CassandraConfig
 
 
 def base_spark():
@@ -59,4 +59,4 @@ def feature_set_empty():
 
 @fixture
 def cassandra_config():
-    return CassandraWriteConfig(keyspace="test")
+    return CassandraConfig(keyspace="test")

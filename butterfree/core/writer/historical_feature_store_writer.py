@@ -67,7 +67,7 @@ class HistoricalFeatureStoreWriter:
             )
 
         feature_store = self.spark_client.read(
-            format=format, options={"path", path}
+            format=format, options={"path": path}
         ).count()
         feature_set = dataframe.count()
 

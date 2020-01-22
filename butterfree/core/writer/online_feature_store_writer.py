@@ -7,7 +7,7 @@ from pyspark.sql.functions import col, row_number
 
 from butterfree.core.client import SparkClient
 from butterfree.core.constant.columns import TIMESTAMP_COLUMN
-from butterfree.core.db.configs import CassandraWriteConfig
+from butterfree.core.db.configs import CassandraConfig
 
 
 class OnlineFeatureStoreWriter:
@@ -20,7 +20,7 @@ class OnlineFeatureStoreWriter:
 
     def __init__(self, spark_client: SparkClient, db_config=None):
         self.spark_client = spark_client
-        self.db_config = db_config or CassandraWriteConfig()
+        self.db_config = db_config or CassandraConfig()
 
     @staticmethod
     def filter_latest(dataframe: DataFrame, id_columns: List[Any]):
@@ -65,12 +65,7 @@ class OnlineFeatureStoreWriter:
         )
 
     def validate(
-        self,
-        dataframe,
-        id_columns: List[Any],
-        format: str,
-        table_name: str,
-        keyspace: str,
+        self, dataframe, id_columns: List[Any], format: str, table_name: str,
     ):
         """Validate to load the feature set into Writer.
 
@@ -79,7 +74,6 @@ class OnlineFeatureStoreWriter:
             id_columns: unique identifier column set for this feature set.
             format: string with the file format.
             table_name: table name into Cassandra DB.
-            keyspace: keyspace name into Cassandra DB.
 
         Returns:
             False: fail validation.
@@ -87,20 +81,17 @@ class OnlineFeatureStoreWriter:
         """
         if not isinstance(format, str):
             raise ValueError("format needs to be a string with the desired read format")
+
         if not isinstance(table_name, str):
             raise ValueError(
                 "table_name needs to be a string with the local of the registered table"
-            )
-        if not isinstance(keyspace, str):
-            raise ValueError(
-                "keyspace needs to be a string with the local of the registered table"
             )
 
         dataframe = self.filter_latest(dataframe=dataframe, id_columns=id_columns)
         feature_set = dataframe.count()
 
         feature_store = self.spark_client.read(
-            format=format, options={"table": table_name, "keyspace": keyspace}
+            format=format, options=self.db_config.get_options(table=table_name)
         ).count()
 
         if feature_store != feature_set:

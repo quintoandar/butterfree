@@ -1,6 +1,6 @@
 from pytest import fixture
 
-from butterfree.core.db.configs import CassandraWriteConfig
+from butterfree.core.db.configs import CassandraConfig
 
 
 @fixture
@@ -10,4 +10,4 @@ def cassandra_config(monkeypatch):
     monkeypatch.setenv("CASSANDRA_PASSWORD", "test")
     monkeypatch.setenv("CASSANDRA_USERNAME", "test")
 
-    return CassandraWriteConfig()
+    return CassandraConfig()
