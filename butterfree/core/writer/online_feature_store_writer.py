@@ -63,3 +63,46 @@ class OnlineFeatureStoreWriter:
             format=self.db_config.format_,
             options=self.db_config.get_options(table=name),
         )
+
+    def validate(
+        self,
+        dataframe,
+        id_columns: List[Any],
+        format: str,
+        table_name: str,
+        keyspace: str,
+    ):
+        """Validate to load the feature set into Writer.
+
+        Args:
+            dataframe: spark dataframe containing data from a feature set.
+            id_columns: unique identifier column set for this feature set.
+            format: string with the file format.
+            table_name: table name into Cassandra DB.
+            keyspace: keyspace name into Cassandra DB.
+
+        Returns:
+            False: fail validation.
+            True: success validation.
+        """
+        if not isinstance(format, str):
+            raise ValueError("format needs to be a string with the desired read format")
+        if not isinstance(table_name, str):
+            raise ValueError(
+                "table_name needs to be a string with the local of the registered table"
+            )
+        if not isinstance(keyspace, str):
+            raise ValueError(
+                "keyspace needs to be a string with the local of the registered table"
+            )
+
+        dataframe = self.filter_latest(dataframe=dataframe, id_columns=id_columns)
+        feature_set = dataframe.count()
+
+        feature_store = self.spark_client.read(
+            format=format, options={"table": table_name, "keyspace": keyspace}
+        ).count()
+
+        if feature_store != feature_set:
+            return False
+        return True

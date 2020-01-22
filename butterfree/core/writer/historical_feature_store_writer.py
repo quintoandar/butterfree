@@ -50,26 +50,27 @@ class HistoricalFeatureStoreWriter:
     def validate(self, dataframe, format: str, path: str):
         """Validate to load the feature set into Writer.
 
-         Args:
-             dataframe: spark dataframe containing data from a feature set.
-             name: feature set name.
-         Returns:
-             False: fail validation.
-             True: success validation.
-         """
+        Args:
+            dataframe: spark dataframe containing data from a feature set.
+            format: string with the file format
+            path: local where feature set was saved.
+
+        Returns:
+            False: fail validation.
+            True: success validation.
+        """
         if not isinstance(format, str):
-            raise ValueError(
-                "format needs to be a string with the desired read format"
-            )
+            raise ValueError("format needs to be a string with the desired read format")
         if not isinstance(path, str):
             raise ValueError(
                 "path needs to be a string with the local of the registered table"
             )
 
-        feature_store = self.spark_client.read(format=format, options={"path", path}).count()
+        feature_store = self.spark_client.read(
+            format=format, options={"path", path}
+        ).count()
         feature_set = dataframe.count()
 
         if feature_store != feature_set:
             return False
         return True
-

@@ -72,3 +72,56 @@ class TestOnlineFeatureStoreWriter:
             writer.db_config.get_options(table="test")
             == spark_client.write_dataframe.call_args[1]["options"]
         )
+
+    def test_validate(self, feature_set_dataframe, cassandra_config, mocker):
+        # given
+        spark_client = mocker.stub("spark_client")
+        spark_client.read = mocker.stub("read")
+
+        format_ = "org.apache.spark.sql.cassandra"
+        id_columns = ["id"]
+        table_name = "name"
+        keyspace = "space"
+
+        writer = OnlineFeatureStoreWriter(spark_client, cassandra_config)
+
+        # when
+        writer.validate(
+            feature_set_dataframe, id_columns, format_, table_name, keyspace
+        )
+
+        # then
+        spark_client.read.assert_called_once()
+
+    @pytest.mark.parametrize(
+        "format_, table_name, keyspace",
+        [
+            (None, "table", "space"),
+            ("org.apache.spark.sql.cassandra", None, "space"),
+            (1, 123, 3),
+        ],
+    )
+    def test_validate_invalid_params(
+        self,
+        feature_set_dataframe,
+        cassandra_config,
+        format_,
+        table_name,
+        keyspace,
+        mocker,
+    ):
+        # given
+        spark_client = mocker.stub("spark_client")
+        spark_client.read = mocker.stub("read")
+
+        writer = OnlineFeatureStoreWriter(spark_client, cassandra_config)
+
+        # then
+        with pytest.raises(ValueError):
+            writer.validate(
+                feature_set_dataframe,
+                id_columns=["id"],
+                format=format_,
+                table_name=table_name,
+                keyspace=keyspace,
+            )

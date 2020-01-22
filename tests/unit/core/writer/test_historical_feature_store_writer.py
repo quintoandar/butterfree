@@ -49,13 +49,13 @@ class TestHistoricalFeatureStoreWriter:
         # given
         spark_client = mocker.stub("spark_client")
         spark_client.read = mocker.stub("read")
-        mock_path = mocker.stub("path")
 
         format_ = "parquet"
+        path = "local/feature-set"
         writer = HistoricalFeatureStoreWriter(spark_client)
 
         # when
-        writer.validate(feature_set_dataframe, format_, mock_path)
+        writer.validate(feature_set_dataframe, format_, path)
 
         # then
         spark_client.read.assert_called_once()
@@ -63,7 +63,9 @@ class TestHistoricalFeatureStoreWriter:
     @pytest.mark.parametrize(
         "format_, path", [(None, "path/table"), ("parquet", None), (1, 123)],
     )
-    def test_validate_invalid_params(self, feature_set_dataframe, format_, path, mocker):
+    def test_validate_invalid_params(
+        self, feature_set_dataframe, format_, path, mocker
+    ):
         # given
         spark_client = mocker.stub("spark_client")
         spark_client.read = mocker.stub("read")
