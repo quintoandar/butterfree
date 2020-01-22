@@ -102,7 +102,9 @@ class TestAggregatedFeatureTransform:
         with pytest.raises(ValueError, match="Aggregations must not be empty."):
             test_feature.add(
                 AggregatedTransform(
-                    aggregations=[], partition="id", windows={"days": [7], "weeks": [2]},
+                    aggregations=[],
+                    partition="id",
+                    windows={"days": [7], "weeks": [2]},
                 )
             )
             test_feature.transform(feature_set_dataframe)
@@ -137,6 +139,50 @@ class TestAggregatedFeatureTransform:
             )
             test_feature.transform(feature_set_dataframe)
 
+    def test_int_window(self, feature_set_dataframe):
+        test_feature = Feature(
+            name="feature",
+            alias="new_feature",
+            description="unit test feature with no alias",
+        )
+        with pytest.raises(KeyError, match="Windows must be a list."):
+            test_feature.add(
+                AggregatedTransform(
+                    aggregations=["avg", "std"], partition="id", windows={"weeks": 2},
+                )
+            )
+            test_feature.transform(feature_set_dataframe)
+
+    def test_empty_window(self, feature_set_dataframe):
+        test_feature = Feature(
+            name="feature",
+            alias="new_feature",
+            description="unit test feature with no alias",
+        )
+        with pytest.raises(KeyError, match="Windows must have one item at least."):
+            test_feature.add(
+                AggregatedTransform(
+                    aggregations=["avg", "std"], partition="id", windows={"weeks": []},
+                )
+            )
+            test_feature.transform(feature_set_dataframe)
+
+    def test_negative_window(self, feature_set_dataframe):
+        test_feature = Feature(
+            name="feature",
+            alias="new_feature",
+            description="unit test feature with no alias",
+        )
+        with pytest.raises(KeyError):
+            test_feature.add(
+                AggregatedTransform(
+                    aggregations=["avg", "std"],
+                    partition="id",
+                    windows={"weeks": [-2]},
+                )
+            )
+            test_feature.transform(feature_set_dataframe)
+
     def test_feature_transform_output(self, feature_set_dataframe):
         test_feature = Feature(
             name="feature", description="unit test feature with no alias",
@@ -144,12 +190,22 @@ class TestAggregatedFeatureTransform:
 
         test_feature.add(
             AggregatedTransform(
-                aggregations=["avg", "std"], partition="id", windows={"minutes": [15]},
+                aggregations=["avg", "std"],
+                partition="id",
+                windows={"minutes": [2, 15]},
             )
         )
 
         df = test_feature.transform(feature_set_dataframe)
 
+        assert df.collect()[0]["feature__avg_over_2_minutes"] == 200
+        assert df.collect()[1]["feature__avg_over_2_minutes"] == 300
+        assert df.collect()[2]["feature__avg_over_2_minutes"] == 400
+        assert df.collect()[3]["feature__avg_over_2_minutes"] == 500
+        assert df.collect()[0]["feature__std_over_2_minutes"] == 0
+        assert df.collect()[1]["feature__std_over_2_minutes"] == 0
+        assert df.collect()[2]["feature__std_over_2_minutes"] == 0
+        assert df.collect()[3]["feature__std_over_2_minutes"] == 0
         assert df.collect()[0]["feature__avg_over_15_minutes"] == 200
         assert df.collect()[1]["feature__avg_over_15_minutes"] == 250
         assert df.collect()[2]["feature__avg_over_15_minutes"] == 350
