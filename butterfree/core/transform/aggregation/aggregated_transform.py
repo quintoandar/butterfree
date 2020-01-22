@@ -4,7 +4,7 @@ from typing import Dict, List
 
 from parameters_validation import non_blank
 from pyspark.sql import DataFrame
-from pyspark.sql import functions as F
+from pyspark.sql import functions as Functions
 from pyspark.sql.window import Window
 
 from butterfree.core.transform.transform_component import TransformComponent
@@ -34,7 +34,7 @@ class AggregatedTransform(TransformComponent):
         self.parent = None
         self.time_column = time_column or "timestamp"
 
-    __ALLOWED_AGGREGATIONS = {"avg": F.avg, "std": F.stddev_pop}
+    __ALLOWED_AGGREGATIONS = {"avg": Functions.avg, "std": Functions.stddev_pop}
     __ALLOWED_WINDOWS = {
         "seconds": 1,
         "minutes": 60,
@@ -88,9 +88,9 @@ class AggregatedTransform(TransformComponent):
                     f"{self.allowed_windows}"
                 )
             if not isinstance(window_sizes, List):
-                raise KeyError(f"window sizes must be a list.")
+                raise KeyError(f"Windows must be a list.")
             if len(window_sizes) == 0:
-                raise KeyError(f"window sizes must have one item at least.")
+                raise KeyError(f"Windows must have one item at least.")
             if not all(window_size >= 0 for window_size in window_sizes):
                 raise KeyError(f"{window_sizes} have negative element.")
         self._windows = windows
@@ -104,8 +104,8 @@ class AggregatedTransform(TransformComponent):
     def _window_definition(partition: str, time_column: str, window_span: int):
         w = (
             Window()
-            .partitionBy(F.col(partition))
-            .orderBy(F.col(time_column).cast("long"))
+            .partitionBy(Functions.col(partition))
+            .orderBy(Functions.col(time_column).cast("long"))
             .rangeBetween(-window_span, 0)
         )
 
@@ -133,7 +133,7 @@ class AggregatedTransform(TransformComponent):
                         window_span=self.__ALLOWED_WINDOWS[window_unit] * window_size,
                     )
 
-                    dataframe = dataframe.select(F.col("*")).withColumn(
+                    dataframe = dataframe.select(Functions.col("*")).withColumn(
                         feature_name,
                         self.__ALLOWED_AGGREGATIONS[aggregation](
                             f"{self._parent.name}"
