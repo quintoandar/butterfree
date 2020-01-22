@@ -1,8 +1,6 @@
 import pytest
 
-from butterfree.core.loader.historical_feature_store_loader import (
-    HistoricalFeatureStoreLoader
-)
+from butterfree.core.loader import HistoricalFeatureStoreLoader
 
 
 class TestHistoricalFeatureStoreLoader:
