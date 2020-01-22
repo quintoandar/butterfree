@@ -48,7 +48,7 @@ def feature_set_without_ts():
 
 
 @fixture
-def feature_set_nullable():
+def feature_set_empty():
     sc, spark = base_spark()
 
     field = [StructField("field1", StringType(), True)]

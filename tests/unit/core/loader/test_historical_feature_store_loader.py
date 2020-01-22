@@ -29,7 +29,7 @@ class TestHistoricalFeatureStoreLoader:
         assert table_name == spark_client.write_table.call_args[1]["name"]
 
     def test_load_with_df_invalid(
-        self, feature_set_nullable, feature_set_without_ts, mocker
+        self, feature_set_empty, feature_set_without_ts, mocker
     ):
         # given
         spark_client = mocker.stub("spark_client")
@@ -40,5 +40,7 @@ class TestHistoricalFeatureStoreLoader:
 
         # then
         with pytest.raises(ValueError):
-            assert loader.load(dataframe=feature_set_nullable, name=table_name)
+            assert loader.load(dataframe=feature_set_empty, name=table_name)
+
+        with pytest.raises(ValueError):
             assert loader.load(dataframe=feature_set_without_ts, name=table_name)
