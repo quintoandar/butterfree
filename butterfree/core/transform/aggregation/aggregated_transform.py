@@ -23,7 +23,7 @@ class AggregatedTransform(TransformComponent):
     def __init__(
         self,
         aggregations: non_blank(List[str]),
-        windows: non_blank(Dict),
+        windows: non_blank(Dict[str, List[int]]),
         partition: non_blank(str) = None,
         time_column: str = None,
     ):
@@ -52,25 +52,18 @@ class AggregatedTransform(TransformComponent):
 
     @aggregations.setter
     def aggregations(self, value: List[str]):
-        self._aggregations = []
+        aggregations = []
         if not value:
-            raise IndexError("Aggregations must not be empty.")
+            raise ValueError("Aggregations must not be empty.")
         for agg in value:
-            try:
-                self._aggregations.append(
-                    list(self.__ALLOWED_AGGREGATIONS.keys())[
-                        list(self.__ALLOWED_AGGREGATIONS.values()).index(
-                            self.__ALLOWED_AGGREGATIONS[agg]
-                        )
-                    ]
-                )
-            except KeyError as e:
-                e.args = (
+            if agg not in self.allowed_aggregations:
+                raise KeyError(
                     f"{agg} is not supported. These are the allowed "
                     f"aggregations that you can use: "
                     f"{self.allowed_aggregations}"
                 )
-                raise KeyError(e.args)
+            aggregations.append(agg)
+        self._aggregations = aggregations
 
     @property
     def allowed_aggregations(self):
@@ -83,33 +76,40 @@ class AggregatedTransform(TransformComponent):
         return self._windows
 
     @windows.setter
-    def windows(self, windows: Dict):
-        self._windows = {}
+    def windows(self, windows: Dict[str, List[int]]):
         if not windows:
             raise KeyError("Windows must not be empty.")
-        for window_type, window_lenght in windows.items():
-            try:
-                self._windows.update(
-                    {
-                        list(self.__ALLOWED_WINDOWS.keys())[
-                            list(self.__ALLOWED_WINDOWS.values()).index(
-                                self.__ALLOWED_WINDOWS[window_type]
-                            )
-                        ]: window_lenght
-                    }
-                )
-            except KeyError as e:
-                e.args = (
-                    f"{window_type} is not supported. These are the allowed "
+
+        for window_unit, window_sizes in windows.items():
+            if window_unit not in self.allowed_windows:
+                raise KeyError(
+                    f"{window_unit} is not supported. These are the allowed "
                     f"time windows that you can use: "
                     f"{self.allowed_windows}"
                 )
-                raise KeyError(e.args)
+            if not isinstance(window_sizes, List):
+                raise KeyError(f"window sizes must be a list.")
+            if len(window_sizes) == 0:
+                raise KeyError(f"window sizes must have one item at least.")
+            if not all(window_size >= 0 for window_size in window_sizes):
+                raise KeyError(f"{window_sizes} have negative element.")
+        self._windows = windows
 
     @property
     def allowed_windows(self):
         """Returns list of allowed windows."""
         return list(self.__ALLOWED_WINDOWS.keys())
+
+    @staticmethod
+    def _window_definition(partition: str, time_column: str, window_span: int):
+        w = (
+            Window()
+            .partitionBy(F.col(partition))
+            .orderBy(F.col(time_column).cast("long"))
+            .rangeBetween(-window_span, 0)
+        )
+
+        return w
 
     def transform(self, dataframe: DataFrame):
         """Performs a transformation to the feature pipeline.
@@ -121,25 +121,23 @@ class AggregatedTransform(TransformComponent):
             dataframe: transformed dataframe.
         """
         for aggregation in self._aggregations:
-            for window_type, window_lenght in self.windows.items():
-                name = self._get_alias(self._parent.alias)
-                feature_name = (
-                    f"{name}__{aggregation}_over_{str(window_lenght)}_{window_type}"
-                )
-                w = (
-                    Window()
-                    .partitionBy(F.col(f"{self.partition}"))
-                    .orderBy(F.col(f"{self.time_column}").cast("long"))
-                    .rangeBetween(
-                        -(self.__ALLOWED_WINDOWS[window_type] * window_lenght), 0
+            for window_unit, window_sizes in self._windows.items():
+                for window_size in window_sizes:
+                    name = self._get_alias(self._parent.alias)
+                    feature_name = (
+                        f"{name}__{aggregation}_over_{str(window_size)}_{window_unit}"
                     )
-                )
+                    w = self._window_definition(
+                        partition=f"{self.partition}",
+                        time_column=f"{self.time_column}",
+                        window_span=self.__ALLOWED_WINDOWS[window_unit] * window_size,
+                    )
 
-                dataframe = dataframe.select(F.col("*")).withColumn(
-                    feature_name,
-                    self.__ALLOWED_AGGREGATIONS[aggregation](
-                        f"{self._parent.name}"
-                    ).over(w),
-                )
+                    dataframe = dataframe.select(F.col("*")).withColumn(
+                        feature_name,
+                        self.__ALLOWED_AGGREGATIONS[aggregation](
+                            f"{self._parent.name}"
+                        ).over(w),
+                    )
 
         return dataframe
