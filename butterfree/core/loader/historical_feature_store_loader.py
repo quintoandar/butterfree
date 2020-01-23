@@ -17,7 +17,7 @@ class HistoricalFeatureStoreLoader:
     HISTORICAL_FEATURE_STORE_S3_PATH = (
         f"s3a://{environment.get_variable('FEATURE_STORE_S3_BUCKET')}/historical/"
     )
-    DEFAULT_DATABASE = ""
+    DEFAULT_DATABASE = "feature_store"
     DEFAULT_FORMAT = "parquet"
     DEFAULT_MODE = "overwrite"
     DEFAULT_PARTITION_BY = ["partition__year", "partition__month", "partition__day"]
