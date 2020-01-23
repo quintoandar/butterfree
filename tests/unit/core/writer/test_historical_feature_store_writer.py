@@ -37,6 +37,7 @@ class TestHistoricalFeatureStoreWriter:
 
         writer = HistoricalFeatureStoreWriter(spark_client)
         table_name = "test"
+        df_writer = "not a spark df writer"
 
         # then
         with pytest.raises(ValueError):
@@ -44,6 +45,9 @@ class TestHistoricalFeatureStoreWriter:
 
         with pytest.raises(ValueError):
             assert writer.write(dataframe=feature_set_without_ts, name=table_name)
+
+        with pytest.raises(ValueError):
+            assert writer.write(dataframe=df_writer, name=table_name)
 
     def test_validate(self, feature_set_dataframe, mocker):
         # given

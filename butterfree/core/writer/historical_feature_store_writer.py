@@ -4,7 +4,7 @@ import os
 
 from butterfree.core.client import SparkClient
 from butterfree.core.configs import environment
-from butterfree.core.writer.verify_dataframe import VerifyDataframe
+from butterfree.core.dataframe.verify_dataframe import VerifyDataframe
 
 
 class HistoricalFeatureStoreWriter:

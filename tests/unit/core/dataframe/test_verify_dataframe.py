@@ -1,6 +1,6 @@
 import pytest
 
-from butterfree.core.writer.verify_dataframe import VerifyDataframe
+from butterfree.core.dataframe import VerifyDataframe
 
 
 class TestVerifyDataframe:
@@ -15,3 +15,10 @@ class TestVerifyDataframe:
 
         with pytest.raises(ValueError):
             assert check.verify_df_is_empty()
+
+    def test_verify_not_spark_df(self):
+        df_writer = "not a spark df writer"
+        check = VerifyDataframe(df_writer)
+
+        with pytest.raises(ValueError):
+            assert check.verify_df_is_spark_df()
