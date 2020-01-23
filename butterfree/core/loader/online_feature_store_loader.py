@@ -58,7 +58,8 @@ class OnlineFeatureStoreLoader:
         """
         dataframe = self.filter_latest(dataframe=dataframe, id_columns=id_columns)
         self.spark_client.write_dataframe(
-            dataframe,
+            dataframe=dataframe,
+            mode=self.db_config.mode,
             format=self.db_config.format_,
             options=self.db_config.get_options(table=name),
         )

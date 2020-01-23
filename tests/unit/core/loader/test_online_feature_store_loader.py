@@ -59,7 +59,10 @@ class TestOnlineFeatureStoreLoader:
         # then
         spark_client.write_dataframe.assert_called_once()
         assert sorted(latest.collect()) == sorted(
-            spark_client.write_dataframe.call_args[0][0].collect()
+            spark_client.write_dataframe.call_args[1]["dataframe"].collect()
+        )
+        assert (
+            loader.db_config.mode == spark_client.write_dataframe.call_args[1]["mode"]
         )
         assert (
             loader.db_config.format_
