@@ -6,7 +6,7 @@ from butterfree.core.transform.aggregation.aggregated_transform import (
 )
 
 
-class TestAggregatedFeatureTransform:
+class TestAggregatedTransform:
     def test_feature_transform_no_alias(self, feature_set_dataframe):
         test_feature = Feature(
             name="feature", description="unit test feature with no alias",
