@@ -3,8 +3,7 @@
 from typing import Dict, List
 
 from parameters_validation import non_blank
-from pyspark.sql import DataFrame
-from pyspark.sql import functions as Functions
+from pyspark.sql import DataFrame, functions
 from pyspark.sql.window import Window
 
 from butterfree.core.transform.transform_component import TransformComponent
@@ -34,7 +33,7 @@ class AggregatedTransform(TransformComponent):
         self.parent = None
         self.time_column = time_column or "timestamp"
 
-    __ALLOWED_AGGREGATIONS = {"avg": Functions.avg, "std": Functions.stddev_pop}
+    __ALLOWED_AGGREGATIONS = {"avg": functions.avg, "std": functions.stddev_pop}
     __ALLOWED_WINDOWS = {
         "seconds": 1,
         "minutes": 60,
@@ -104,8 +103,8 @@ class AggregatedTransform(TransformComponent):
     def _window_definition(partition: str, time_column: str, window_span: int):
         w = (
             Window()
-            .partitionBy(Functions.col(partition))
-            .orderBy(Functions.col(time_column).cast("long"))
+            .partitionBy(functions.col(partition))
+            .orderBy(functions.col(time_column).cast("long"))
             .rangeBetween(-window_span, 0)
         )
 
@@ -133,7 +132,7 @@ class AggregatedTransform(TransformComponent):
                         window_span=self.__ALLOWED_WINDOWS[window_unit] * window_size,
                     )
 
-                    dataframe = dataframe.select(Functions.col("*")).withColumn(
+                    dataframe = dataframe.select(functions.col("*")).withColumn(
                         feature_name,
                         self.__ALLOWED_AGGREGATIONS[aggregation](
                             f"{self._parent.name}"
