@@ -23,18 +23,19 @@ class SparkClient:
             self._session = SparkSession.builder.getOrCreate()
         return self._session
 
-    def read(self, format, options):
+    def read(self, format, options, stream=False):
         """Use the SparkSession.read interface to load data into a dataframe.
 
         :param format: string with the format to be used by the DataframeReader
         :param options: options to setup the DataframeReader, specific for each format
-        :return: None
+        :return: Spark dataframe
         """
         if not isinstance(format, str):
             raise ValueError("format needs to be a string with the desired read format")
         if not isinstance(options, dict):
             raise ValueError("options needs to be a dict with the setup configurations")
-        return self.conn.read.format(format).options(**options).load()
+        df_reader = self.conn.readStream if stream else self.conn.read
+        return df_reader.format(format).options(**options).load()
 
     def read_table(self, database, table):
         """Use the SparkSession.read interface to load a metastore table to a dataframe.
