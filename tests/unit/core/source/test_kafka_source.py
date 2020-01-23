@@ -49,7 +49,7 @@ class TestKafkaSource:
         output_df = kafka_source.consume()
         options = dict(
             {"kafka.bootstrap.servers": connection_string, "subscribe": topic},
-            **topic_options if topic_options else {}
+            **topic_options if topic_options else {},
         )
 
         # assert

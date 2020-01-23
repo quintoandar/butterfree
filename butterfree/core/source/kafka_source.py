@@ -40,7 +40,7 @@ class KafkaSource(Source):
                 "kafka.bootstrap.servers": self.connection_string,
                 "subscribe": self.topic,
             },
-            **topic_options if topic_options else {}
+            **topic_options if topic_options else {},
         )
         self.stream = stream
 
