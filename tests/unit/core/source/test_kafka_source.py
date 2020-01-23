@@ -24,6 +24,14 @@ class TestKafkaSource:
     def test_consume(
         self, connection_string, topic, topic_options, stream, spark_client, spark, sc,
     ):
+        """Test for consume method in KafkaSource class.
+
+        The test consists in check the correct use of the read method used inside
+        consume. From a kafka format, there are some columns received from the client
+        that are in binary. The raw_data and target_data defined in the method are
+        used to assert if the consume method is casting the data types correctly,
+        besides check if method is been called with the correct args.
+        """
         # arrange
         raw_data = [
             {"key": 10101111, "value": 10101111}
