@@ -2,12 +2,12 @@
 
 import os
 
-from butterfree.core.client import SparkClient
 from butterfree.core.configs import environment
 from butterfree.core.dataframe.verify_dataframe import VerifyDataframe
+from butterfree.core.writer.writer import Writer
 
 
-class HistoricalFeatureStoreWriter:
+class HistoricalFeatureStoreWriter(Writer):
     """Enable writing feature sets into the Historical Feature Store.
 
     Attributes:
@@ -22,8 +22,8 @@ class HistoricalFeatureStoreWriter:
     DEFAULT_MODE = "overwrite"
     DEFAULT_PARTITION_BY = ["partition__year", "partition__month", "partition__day"]
 
-    def __init__(self, spark_client: SparkClient):
-        self.spark_client = spark_client
+    def __init__(self, spark_client):
+        super().__init__(spark_client)
 
     def write(self, dataframe, name):
         """Loads the data from a feature set into the Historical Feature Store.

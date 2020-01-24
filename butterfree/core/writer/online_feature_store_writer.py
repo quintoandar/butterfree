@@ -5,12 +5,12 @@ from typing import Any, List
 from pyspark.sql import DataFrame, Window
 from pyspark.sql.functions import col, row_number
 
-from butterfree.core.client import SparkClient
 from butterfree.core.constant.columns import TIMESTAMP_COLUMN
 from butterfree.core.db.configs import CassandraConfig
+from butterfree.core.writer.writer import Writer
 
 
-class OnlineFeatureStoreWriter:
+class OnlineFeatureStoreWriter(Writer):
     """Enable writing feature sets into the Online Feature Store.
 
     Attributes:
@@ -18,8 +18,8 @@ class OnlineFeatureStoreWriter:
         db_config:
     """
 
-    def __init__(self, spark_client: SparkClient, db_config=None):
-        self.spark_client = spark_client
+    def __init__(self, spark_client, db_config=None):
+        super().__init__(spark_client)
         self.db_config = db_config or CassandraConfig()
 
     @staticmethod
