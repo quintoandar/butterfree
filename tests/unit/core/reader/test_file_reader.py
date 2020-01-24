@@ -1,16 +1,16 @@
 import pytest
 
-from butterfree.core.source import FileSource
+from butterfree.core.reader import FileReader
 
 
-class TestFileSource:
+class TestFileReader:
     @pytest.mark.parametrize(
         "path, format", [(None, "parquet"), ("path/to/file.json", 123), (123, None,)],
     )
     def test_init_invalid_params(self, path, format, spark_client):
         # act and assert
         with pytest.raises(ValueError):
-            FileSource("id", spark_client, path, format)
+            FileReader("id", spark_client, path, format)
 
     @pytest.mark.parametrize(
         "path, format, format_options",
@@ -27,10 +27,10 @@ class TestFileSource:
     def test_consume(self, path, format, format_options, spark_client, target_df):
         # arrange
         spark_client.read.return_value = target_df
-        file_source = FileSource("test", spark_client, path, format, format_options)
+        file_reader = FileReader("test", spark_client, path, format, format_options)
 
         # act
-        output_df = file_source.consume()
+        output_df = file_reader.consume()
         options = dict({"path": path}, **format_options if format_options else {})
 
         # assert
