@@ -29,3 +29,11 @@ def mocked_spark_read():
     mock.format.return_value = mock
     mock.options.return_value = mock
     return mock
+
+
+@pytest.fixture()
+def mocked_spark_write():
+    mock = Mock()
+    mock.dataframe = mock
+    mock.write = mock
+    return mock
