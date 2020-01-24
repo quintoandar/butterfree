@@ -1,15 +1,15 @@
-"""FileSource entity."""
+"""FileReader entity."""
 
-from butterfree.core.source.source import Source
+from butterfree.core.reader.reader import Reader
 
 
-class FileSource(Source):
-    """Source responsible for get data from files."""
+class FileReader(Reader):
+    """Reader responsible for get data from files."""
 
     def __init__(self, id, spark_client, path, format, format_options=None):
-        """Instantiate FileSource with the required parameters.
+        """Instantiate FileReader with the required parameters.
 
-        :param id: unique string id for register the source as a view on the metastore
+        :param id: unique string id for register the reader as a view on the metastore
         :param spark_client: spark_client object client module
         :param path: file location
         :param format: can be one of the keys: json, parquet, orc, or csv
@@ -28,7 +28,7 @@ class FileSource(Source):
         )
 
     def consume(self):
-        """Extract data from a file source.
+        """Extract data from a file reader.
 
         :return: Spark dataframe
         """

@@ -3,28 +3,28 @@ from functools import partial
 from pyspark.sql import DataFrame
 
 from butterfree.core.client import SparkClient
-from butterfree.core.source import SourceSelector
+from butterfree.core.reader import Source
 
 
 def create_temp_view(dataframe: DataFrame, name):
     dataframe.createOrReplaceTempView(name)
 
 
-class TestSourceSelector:
+class TestSource:
     def test_construct(self, mocker, target_df):
         # given
         spark_client = SparkClient()
 
-        source_id = "a_source"
-        source = mocker.stub(source_id)
-        source.build = mocker.stub("build")
-        source.build.side_effect = partial(create_temp_view, target_df, source_id)
+        reader_id = "a_source"
+        reader = mocker.stub(reader_id)
+        reader.build = mocker.stub("build")
+        reader.build.side_effect = partial(create_temp_view, target_df, reader_id)
 
         # when
-        source_selector = SourceSelector(
+        source_selector = Source(
             spark_client=spark_client,
-            sources=[source],
-            query=f"select * from {source_id}",  # noqa
+            readers=[reader],
+            query=f"select * from {reader_id}",  # noqa
         )
 
         result_df = source_selector.construct()
