@@ -114,10 +114,15 @@ class TestSparkClient:
             )
 
     @pytest.mark.parametrize(
-        "format, mode, database, table_name",
-        [("parquet", "append", "", "test"), ("csv", "overwrite", "house", "real")],
+        "format, mode, database, table_name, path",
+        [
+            ("parquet", "append", "", "test", "local/path"),
+            ("csv", "overwrite", "house", "real", "s3://path"),
+        ],
     )
-    def test_write_table(self, format, mode, database, table_name, mocked_spark_write):
+    def test_write_table(
+        self, format, mode, database, table_name, path, mocked_spark_write
+    ):
         # given
         name = "{}.{}".format(database, table_name)
 
@@ -128,20 +133,26 @@ class TestSparkClient:
             table_name=table_name,
             format_=format,
             mode=mode,
+            path=path,
         )
 
         # then
         mocked_spark_write.saveAsTable.assert_called_with(
-            mode=mode, format=format, partitionBy=None, name=name
+            mode=mode, format=format, partitionBy=None, name=name, path=path
         )
 
     @pytest.mark.parametrize(
-        "database, table_name", [(None, "test"), ("house", None)],
+        "database, table_name, path",
+        [
+            (None, "test", "local/path"),
+            ("house", None, "s3://local/path"),
+            ("user", "temp", None),
+        ],
     )
-    def test_write_table_with_invalid_params(self, database, table_name):
+    def test_write_table_with_invalid_params(self, database, table_name, path):
         df_writer = "not a spark df writer"
 
         with pytest.raises(ValueError):
             assert SparkClient.write_table(
-                dataframe=df_writer, database=database, table_name=table_name
+                dataframe=df_writer, database=database, table_name=table_name, path=path
             )

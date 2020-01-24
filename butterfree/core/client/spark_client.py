@@ -87,6 +87,7 @@ class SparkClient:
         dataframe,
         database,
         table_name,
+        path,
         format_=None,
         mode=None,
         partition_by=None,
@@ -98,6 +99,7 @@ class SparkClient:
             dataframe: spark dataframe containing data from a feature set.
             database: specified database name.
             table_name: specified table name.
+            path: string with the local to save the table.
             format_: string with the format used to save.
             mode: specified function mode when data already exists,
                 mode can be "error", "append", "overwrite" and "ignore".
@@ -110,9 +112,16 @@ class SparkClient:
             raise ValueError("database needs to be a string")
         if not isinstance(table_name, str):
             raise ValueError("table_name needs to be a string")
+        if not isinstance(path, str):
+            raise ValueError("path needs to be a string of the local to save")
 
         name = "{}.{}".format(database, table_name)
 
         dataframe.write.saveAsTable(
-            mode=mode, format=format_, partitionBy=partition_by, name=name, **options
+            mode=mode,
+            format=format_,
+            partitionBy=partition_by,
+            name=name,
+            path=path,
+            **options,
         )
