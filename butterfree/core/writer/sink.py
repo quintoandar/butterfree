@@ -1,23 +1,41 @@
+"""Holds the Sink  class."""
 from typing import List
+
+from pyspark.sql.dataframe import DataFrame
 
 from butterfree.core.transform import FeatureSet
 from butterfree.core.writer.writer import Writer
 
 
 class Sink:
-    def __init__(
-        self,
-        writers: List[Writer],
-    ):
+    """Run the Writers and validate actions them.
+
+    Attributes:
+        feature_set: ...
+        writers: list of writers to run.
+    """
+
+    def __init__(self, feature_set: FeatureSet, writers: List[Writer]):
         self.writers = writers
+        self.feature_set = feature_set
 
-    def validate(self, feature_set: FeatureSet):
+    def validate(self, dataframe: DataFrame):
+        """Validate to load the feature set into Writers.
+
+        Args:
+            dataframe: ...
+        """
         for writer in self.writers:
-            writer.validate(feature_set=feature_set)
+            writer.validate(dataframe)
 
-    def flush(self, feature_set: FeatureSet):
-        if self.validate(feature_set):
-            for writer in self.writers:
-                writer.write(feature_set=feature_set)
-        else:
+    def flush(self, dataframe: DataFrame):
+        """Loads the data from a feature set into the Feature Store.
+
+        Args:
+            dataframe: ...
+        """
+        for writer in self.writers:
+            writer.write(dataframe=dataframe, feature_set=self.feature_set)
+
+        if not self.validate(dataframe):
             raise ValueError("Dataframe is invalid.")
