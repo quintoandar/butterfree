@@ -30,7 +30,6 @@ class AggregatedTransform(TransformComponent):
         self.aggregations = aggregations
         self.windows = windows
         self.partition = partition
-        self.parent = None
         self.time_column = time_column or "timestamp"
 
     __ALLOWED_AGGREGATIONS = {"avg": functions.avg, "std": functions.stddev_pop}
@@ -112,7 +111,7 @@ class AggregatedTransform(TransformComponent):
 
     def _get_feature_name(self, aggregation, window_unit, window_size):
         return (
-            f"{self.parent.name}__{aggregation}_over_{str(window_size)}_{window_unit}"
+            f"{self._parent.name}__{aggregation}_over_{str(window_size)}_{window_unit}"
         )
 
     @property
