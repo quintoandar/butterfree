@@ -1,5 +1,6 @@
 import pytest
 
+# from butterfree.core.transform import FeatureSet
 from butterfree.core.writer import HistoricalFeatureStoreWriter
 
 
@@ -8,9 +9,10 @@ class TestHistoricalFeatureStoreWriter:
         # given
         spark_client = mocker.stub("spark_client")
         spark_client.write_table = mocker.stub("write_table")
+        feature_set = mocker.stub("feature_set")
         writer = HistoricalFeatureStoreWriter(spark_client)
 
-        feature_set = {"name": "test"}
+        feature_set.name = "test"
 
         # when
         writer.write(feature_set=feature_set, dataframe=feature_set_dataframe)
@@ -21,15 +23,15 @@ class TestHistoricalFeatureStoreWriter:
         assert sorted(feature_set_dataframe.collect()) == sorted(
             spark_client.write_table.call_args[1]["dataframe"].collect()
         )
-        assert writer.DEFAULT_FORMAT == spark_client.write_table.call_args[1]["format_"]
-        assert writer.DEFAULT_MODE == spark_client.write_table.call_args[1]["mode"]
         assert (
-            writer.DEFAULT_PARTITION_BY
+            writer.db_config.format_ == spark_client.write_table.call_args[1]["format_"]
+        )
+        assert writer.db_config.mode == spark_client.write_table.call_args[1]["mode"]
+        assert (
+            writer.db_config.partition_by
             == spark_client.write_table.call_args[1]["partition_by"]
         )
-        assert (
-            feature_set["name"] == spark_client.write_table.call_args[1]["table_name"]
-        )
+        assert feature_set.name == spark_client.write_table.call_args[1]["table_name"]
 
     def test_write_with_df_invalid(
         self, feature_set_empty, feature_set_without_ts, mocker
@@ -37,9 +39,10 @@ class TestHistoricalFeatureStoreWriter:
         # given
         spark_client = mocker.stub("spark_client")
         spark_client.write_table = mocker.stub("write_table")
+        feature_set = mocker.stub("feature set")
 
         writer = HistoricalFeatureStoreWriter(spark_client)
-        feature_set = {"name": "test"}
+        feature_set.name = "test"
         df_writer = "not a spark df writer"
 
         # then
@@ -58,8 +61,8 @@ class TestHistoricalFeatureStoreWriter:
         # given
         spark_client = mocker.stub("spark_client")
         spark_client.read = mocker.stub("read")
-
-        feature_set = {"format": "parquet", "path": "local/feature-set"}
+        feature_set = mocker.stub("feature_set")
+        feature_set.name = "test"
 
         writer = HistoricalFeatureStoreWriter(spark_client)
 
@@ -78,10 +81,13 @@ class TestHistoricalFeatureStoreWriter:
         # given
         spark_client = mocker.stub("spark_client")
         spark_client.read = mocker.stub("read")
+        feature_set = mocker.stub("feature_set")
+        feature_set.name = "test"
+        db_config = mocker.stub("db_config")
+        db_config.format_ = format
+        db_config.path = path
 
-        writer = HistoricalFeatureStoreWriter(spark_client)
-
-        feature_set = {"format": format_, "path": path}
+        writer = HistoricalFeatureStoreWriter(spark_client, db_config)
 
         # then
         with pytest.raises(ValueError):

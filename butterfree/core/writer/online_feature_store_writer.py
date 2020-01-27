@@ -7,6 +7,7 @@ from pyspark.sql.functions import col, row_number
 
 from butterfree.core.constant.columns import TIMESTAMP_COLUMN
 from butterfree.core.db.configs import CassandraConfig
+from butterfree.core.transform import FeatureSet
 from butterfree.core.writer.writer import Writer
 
 
@@ -48,7 +49,7 @@ class OnlineFeatureStoreWriter(Writer):
             .drop("rn")
         )
 
-    def write(self, feature_set, dataframe):
+    def write(self, feature_set: FeatureSet, dataframe):
         """Loads the latest data from a feature set into the Online Feature Store.
 
         Args:
@@ -56,16 +57,16 @@ class OnlineFeatureStoreWriter(Writer):
             dataframe: spark dataframe containing data from a feature set.
         """
         dataframe = self.filter_latest(
-            dataframe=dataframe, id_columns=feature_set["key_columns"]
+            dataframe=dataframe, id_columns=feature_set.key_columns
         )
         self.spark_client.write_dataframe(
             dataframe=dataframe,
             mode=self.db_config.mode,
             format=self.db_config.format_,
-            options=self.db_config.get_options(table=feature_set["name"]),
+            options=self.db_config.get_options(table=feature_set.name),
         )
 
-    def validate(self, feature_set, dataframe):
+    def validate(self, feature_set: FeatureSet, dataframe):
         """Validate to load the feature set into Writer.
 
         Args:
@@ -76,22 +77,22 @@ class OnlineFeatureStoreWriter(Writer):
             False: fail validation.
             True: success validation.
         """
-        if not isinstance(feature_set["format"], str):
+        if not isinstance(self.db_config.format_, str):
             raise ValueError("format needs to be a string with the desired read format")
 
-        if not isinstance(feature_set["name"], str):
+        if not isinstance(feature_set.name, str):
             raise ValueError(
                 "table_name needs to be a string with the local of the registered table"
             )
 
         dataframe = self.filter_latest(
-            dataframe=dataframe, id_columns=feature_set["key_columns"]
+            dataframe=dataframe, id_columns=feature_set.key_columns
         )
         dataframe = dataframe.count()
 
         feature_store = self.spark_client.read(
-            format=feature_set["format"],
-            options=self.db_config.get_options(table=feature_set["name"]),
+            format=self.db_config.format_,
+            options=self.db_config.get_options(table=feature_set.name),
         ).count()
 
         return True if feature_store == dataframe else False
