@@ -19,12 +19,7 @@ class TestCustomTransform:
         )
 
         test_feature.add(
-            CustomTransform(
-                transformer=divide,
-                name=test_feature.name,
-                column1="feature1",
-                column2="feature2",
-            )
+            CustomTransform(transformer=divide, column1="feature1", column2="feature2",)
         )
 
         df = test_feature.transform(feature_set_dataframe)
@@ -45,12 +40,7 @@ class TestCustomTransform:
         )
 
         test_feature.add(
-            CustomTransform(
-                transformer=divide,
-                name=test_feature.name,
-                column1="feature1",
-                column2="feature2",
-            )
+            CustomTransform(transformer=divide, column1="feature1", column2="feature2",)
         )
 
         df = test_feature.transform(feature_set_dataframe)
