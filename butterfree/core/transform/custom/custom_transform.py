@@ -17,7 +17,7 @@ class CustomTransform(TransformComponent):
     def __init__(self, transformer: Callable, **kwargs):
         super().__init__()
         self.transformer = transformer
-        self.kwargs = kwargs
+        self.transformer__kwargs = kwargs
 
     @property
     def transformer(self):
@@ -42,6 +42,6 @@ class CustomTransform(TransformComponent):
         dataframe = self.transformer(
             dataframe,
             self._parent.alias if self._parent.alias else self._parent.name,
-            **self.kwargs,
+            **self.transformer__kwargs,
         )
         return dataframe
