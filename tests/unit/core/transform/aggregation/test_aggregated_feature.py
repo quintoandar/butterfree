@@ -16,7 +16,7 @@ class TestAggregatedFeatureTransform:
             AggregatedTransform(
                 aggregations=["avg", "std"],
                 partition="id",
-                windows={"days": [7], "weeks": [2]},
+                windows=["7 days", "2 weeks"],
             )
         )
 
@@ -52,7 +52,7 @@ class TestAggregatedFeatureTransform:
             AggregatedTransform(
                 aggregations=["avg", "std"],
                 partition="id",
-                windows={"days": [7], "weeks": [2]},
+                windows=["7 days", "2 weeks"],
             )
         )
 
@@ -159,10 +159,10 @@ class TestAggregatedFeatureTransform:
             alias="new_feature",
             description="unit test feature with no alias",
         )
-        with pytest.raises(KeyError, match="Windows must have one item at least."):
+        with pytest.raises(KeyError, match="Windows must not be empty."):
             test_feature.add(
                 AggregatedTransform(
-                    aggregations=["avg", "std"], partition="id", windows={"weeks": []},
+                    aggregations=["avg", "std"], partition="id", windows=[],
                 )
             )
             test_feature.transform(feature_set_dataframe)
@@ -192,7 +192,7 @@ class TestAggregatedFeatureTransform:
             AggregatedTransform(
                 aggregations=["avg", "std"],
                 partition="id",
-                windows={"minutes": [2, 15]},
+                windows=["2 minutes", "15 minutes"],
             )
         )
 
