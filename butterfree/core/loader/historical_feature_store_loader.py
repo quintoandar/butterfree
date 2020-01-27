@@ -2,7 +2,7 @@
 
 import os
 
-from butterfree.core.client.spark_client import SparkClient
+from butterfree.core.client import SparkClient
 from butterfree.core.configs import environment
 from butterfree.core.loader.verify_dataframe import VerifyDataframe
 
@@ -17,6 +17,7 @@ class HistoricalFeatureStoreLoader:
     HISTORICAL_FEATURE_STORE_S3_PATH = (
         f"s3a://{environment.get_variable('FEATURE_STORE_S3_BUCKET')}/historical/"
     )
+    DEFAULT_DATABASE = "feature_store"
     DEFAULT_FORMAT = "parquet"
     DEFAULT_MODE = "overwrite"
     DEFAULT_PARTITION_BY = ["partition__year", "partition__month", "partition__day"]
@@ -38,7 +39,8 @@ class HistoricalFeatureStoreLoader:
 
         self.spark_client.write_table(
             dataframe=dataframe,
-            name=name,
+            database=self.DEFAULT_DATABASE,
+            table_name=name,
             format_=self.DEFAULT_FORMAT,
             mode=self.DEFAULT_MODE,
             partition_by=self.DEFAULT_PARTITION_BY,

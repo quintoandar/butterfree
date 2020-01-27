@@ -1,15 +1,15 @@
 """TableSource entity."""
 
-from butterfree.core.source.source import Source
+from butterfree.core.reader.reader import Reader
 
 
-class TableSource(Source):
-    """Source responsible for get data from tables registered in the metastore."""
+class TableReader(Reader):
+    """Reader responsible for get data from tables registered in the metastore."""
 
     def __init__(self, id, spark_client, database, table):
-        """Instantiate TableSource with the required parameters.
+        """Instantiate TableReader with the required parameters.
 
-        :param id: unique string id for register the source as a view on the metastore
+        :param id: unique string id for register the reader as a view on the metastore
         :param spark_client: spark_client object client module
         :param database: string with the name of the metastore schema
         :param table: string with the name of the table
@@ -27,7 +27,7 @@ class TableSource(Source):
         self.table = table
 
     def consume(self):
-        """Extract data from a table source.
+        """Extract data from a table reader.
 
         :return: Spark dataframe
         """

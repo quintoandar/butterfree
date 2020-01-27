@@ -1,10 +1,10 @@
 """KafkaSource entity."""
 
-from butterfree.core.source.source import Source
+from butterfree.core.reader.reader import Reader
 
 
-class KafkaSource(Source):
-    """Source responsible for get data from a Kafka topic."""
+class KafkaReader(Reader):
+    """Reader responsible for get data from a Kafka topic."""
 
     def __init__(
         self,
@@ -15,9 +15,9 @@ class KafkaSource(Source):
         topic_options=None,
         stream=True,
     ):
-        """Instantiate KafkaSource with the required parameters.
+        """Instantiate KafkaReader with the required parameters.
 
-        :param id: unique string id for register the source as a view on the metastore
+        :param id: unique string id for register the reader as a view on the metastore
         :param spark_client: spark_client object client module
         :param connection_string: string with hosts and ports to connect. In the format:
         host1:port,host2:port,...,host:port
