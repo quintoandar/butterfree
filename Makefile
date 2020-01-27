@@ -67,8 +67,7 @@ style-check:
 	@echo "Code Style"
 	@echo "=========="
 	@echo ""
-	@python -m black --check -t py36 --exclude="build/|buck-out/|dist/|_build/|pip/|\.pip/|\.git/|\.hg/|\.mypy_cache/|\.tox/|\.venv/" . && echo "\n\nSuccess" || echo "\n\nFailure\n\nRun \"make black\" to apply style formatting to your code"
-	@echo ""
+	@python -m black --check -t py36 --exclude="build/|buck-out/|dist/|_build/|pip/|\.pip/|\.git/|\.hg/|\.mypy_cache/|\.tox/|\.venv/" . && echo "\n\nSuccess" || (echo "\n\nFailure\n\nRun \"make black\" to apply style formatting to your code"; exit 1)
 
 .PHONY: quality-check
 ## run code quality checks with flake8
@@ -95,6 +94,7 @@ apply-style:
 clean:
 	@find ./ -type d -name 'htmlcov' -exec rm -rf {} +;
 	@find ./ -type d -name '.pytest_cache' -exec rm -rf {} +;
+	@find ./ -type d -name 'spark-warehouse' -exec rm -rf {} +;
 	@find ./ -type f -name 'coverage-badge.svg' -exec rm -f {} \;
 	@find ./ -type f -name 'coverage.xml' -exec rm -f {} \;
 	@find ./ -type f -name '.coverage*' -exec rm -f {} \;
