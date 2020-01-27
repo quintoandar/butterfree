@@ -2,7 +2,7 @@ import pytest
 
 from butterfree.core.transform import Feature
 from butterfree.core.transform.aggregation.aggregated_transform import (
-    AggregatedTransform
+    AggregatedTransform,
 )
 
 

@@ -68,7 +68,6 @@ style-check:
 	@echo "=========="
 	@echo ""
 	@python -m black --check -t py36 --exclude="build/|buck-out/|dist/|_build/|pip/|\.pip/|\.git/|\.hg/|\.mypy_cache/|\.tox/|\.venv/" . && echo "\n\nSuccess" || (echo "\n\nFailure\n\nRun \"make black\" to apply style formatting to your code"; exit 1)
-	@echo ""
 
 .PHONY: quality-check
 ## run code quality checks with flake8
