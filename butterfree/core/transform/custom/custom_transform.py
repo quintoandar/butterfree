@@ -39,8 +39,9 @@ class CustomTransform(TransformComponent):
         Returns:
             dataframe: transformed dataframe.
         """
-        dataframe = self.transformer(dataframe, **self.kwargs)
-        return dataframe.withColumnRenamed(
-            self._parent.name,
+        dataframe = self.transformer(
+            dataframe,
             self._parent.alias if self._parent.alias else self._parent.name,
+            **self.kwargs,
         )
+        return dataframe
