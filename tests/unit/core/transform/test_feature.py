@@ -14,7 +14,7 @@ class TestFeature:
 
         assert test_feature.name == "feature"
         assert test_feature.from_column == "origin"
-        assert test_feature.description == "unit test feature without transformation"
+        assert test_feature.description == "unit test"
         assert not test_feature.transformation
 
     def test_args_with_transformation(self):
@@ -27,7 +27,7 @@ class TestFeature:
         )
         assert test_feature.name == "feature"
         assert test_feature.from_column == "origin"
-        assert test_feature.description == "unit test feature with transformation"
+        assert test_feature.description == "unit test"
         assert test_feature.transformation
 
     def test_feature_transform_no_from_column(self, feature_set_dataframe):
