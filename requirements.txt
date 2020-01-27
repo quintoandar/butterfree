@@ -1,2 +1,3 @@
 pyspark==2.4.4
 parameters-validation==1.1.5
+dataclasses==0.6
