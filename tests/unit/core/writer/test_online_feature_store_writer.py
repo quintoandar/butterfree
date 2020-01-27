@@ -53,8 +53,10 @@ class TestOnlineFeatureStoreWriter:
         spark_client.write_dataframe = mocker.stub("write_dataframe")
         writer = OnlineFeatureStoreWriter(spark_client, cassandra_config)
 
+        feature_set = {"key_columns": ["id"], "name": "test"}
+
         # when
-        writer.write(feature_set_dataframe, id_columns=["id"], name="test")
+        writer.write(feature_set, feature_set_dataframe)
 
         # then
         spark_client.write_dataframe.assert_called_once()
@@ -78,14 +80,16 @@ class TestOnlineFeatureStoreWriter:
         spark_client = mocker.stub("spark_client")
         spark_client.read = mocker.stub("read")
 
-        format_ = "org.apache.spark.sql.cassandra"
-        id_columns = ["id"]
-        table_name = "name"
+        feature_set = {
+            "format": "org.apache.spark.sql.cassandra",
+            "key_columns": ["id"],
+            "name": "name",
+        }
 
         writer = OnlineFeatureStoreWriter(spark_client, cassandra_config)
 
         # when
-        writer.validate(feature_set_dataframe, id_columns, format_, table_name)
+        writer.validate(feature_set, feature_set_dataframe)
 
         # then
         spark_client.read.assert_called_once()
@@ -101,13 +105,10 @@ class TestOnlineFeatureStoreWriter:
         spark_client = mocker.stub("spark_client")
         spark_client.read = mocker.stub("read")
 
+        feature_set = {"format": format_, "key_columns": ["id"], "name": table_name}
+
         writer = OnlineFeatureStoreWriter(spark_client, cassandra_config)
 
         # then
         with pytest.raises(ValueError):
-            writer.validate(
-                feature_set_dataframe,
-                id_columns=["id"],
-                format=format_,
-                table_name=table_name,
-            )
+            writer.validate(feature_set, feature_set_dataframe)

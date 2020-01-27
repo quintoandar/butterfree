@@ -9,10 +9,11 @@ class TestHistoricalFeatureStoreWriter:
         spark_client = mocker.stub("spark_client")
         spark_client.write_table = mocker.stub("write_table")
         writer = HistoricalFeatureStoreWriter(spark_client)
-        table_name = "test"
+
+        feature_set = {"name": "test"}
 
         # when
-        writer.write(dataframe=feature_set_dataframe, name=table_name)
+        writer.write(feature_set=feature_set, dataframe=feature_set_dataframe)
 
         # then
         spark_client.write_table.assert_called_once()
@@ -26,7 +27,9 @@ class TestHistoricalFeatureStoreWriter:
             writer.DEFAULT_PARTITION_BY
             == spark_client.write_table.call_args[1]["partition_by"]
         )
-        assert table_name == spark_client.write_table.call_args[1]["table_name"]
+        assert (
+            feature_set["name"] == spark_client.write_table.call_args[1]["table_name"]
+        )
 
     def test_write_with_df_invalid(
         self, feature_set_empty, feature_set_without_ts, mocker
@@ -36,30 +39,32 @@ class TestHistoricalFeatureStoreWriter:
         spark_client.write_table = mocker.stub("write_table")
 
         writer = HistoricalFeatureStoreWriter(spark_client)
-        table_name = "test"
+        feature_set = {"name": "test"}
         df_writer = "not a spark df writer"
 
         # then
         with pytest.raises(ValueError):
-            assert writer.write(dataframe=feature_set_empty, name=table_name)
+            assert writer.write(feature_set=feature_set, dataframe=feature_set_empty)
 
         with pytest.raises(ValueError):
-            assert writer.write(dataframe=feature_set_without_ts, name=table_name)
+            assert writer.write(
+                feature_set=feature_set, dataframe=feature_set_without_ts
+            )
 
         with pytest.raises(ValueError):
-            assert writer.write(dataframe=df_writer, name=table_name)
+            assert writer.write(feature_set=feature_set, dataframe=df_writer)
 
     def test_validate(self, feature_set_dataframe, mocker):
         # given
         spark_client = mocker.stub("spark_client")
         spark_client.read = mocker.stub("read")
 
-        format_ = "parquet"
-        path = "local/feature-set"
+        feature_set = {"format": "parquet", "path": "local/feature-set"}
+
         writer = HistoricalFeatureStoreWriter(spark_client)
 
         # when
-        writer.validate(feature_set_dataframe, format_, path)
+        writer.validate(feature_set, feature_set_dataframe)
 
         # then
         spark_client.read.assert_called_once()
@@ -76,6 +81,8 @@ class TestHistoricalFeatureStoreWriter:
 
         writer = HistoricalFeatureStoreWriter(spark_client)
 
+        feature_set = {"format": format_, "path": path}
+
         # then
         with pytest.raises(ValueError):
-            writer.validate(feature_set_dataframe, format_, path)
+            writer.validate(feature_set, feature_set_dataframe)

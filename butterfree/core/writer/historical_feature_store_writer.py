@@ -25,14 +25,16 @@ class HistoricalFeatureStoreWriter(Writer):
     def __init__(self, spark_client):
         super().__init__(spark_client)
 
-    def write(self, dataframe, name):
+    def write(self, feature_set, dataframe):
         """Loads the data from a feature set into the Historical Feature Store.
 
         Args:
+            feature_set: object processed with feature_set informations.
             dataframe: spark dataframe containing data from a feature set.
-            name: feature set name.
         """
-        s3_path = os.path.join(self.HISTORICAL_FEATURE_STORE_S3_PATH, name)
+        s3_path = os.path.join(
+            self.HISTORICAL_FEATURE_STORE_S3_PATH, feature_set["name"]
+        )
 
         validate_dataframe = VerifyDataframe(dataframe)
         validate_dataframe.checks()
@@ -40,14 +42,14 @@ class HistoricalFeatureStoreWriter(Writer):
         self.spark_client.write_table(
             dataframe=dataframe,
             database=self.DEFAULT_DATABASE,
-            table_name=name,
+            table_name=feature_set["name"],
             format_=self.DEFAULT_FORMAT,
             mode=self.DEFAULT_MODE,
             partition_by=self.DEFAULT_PARTITION_BY,
             path=s3_path,
         )
 
-    def validate(self, dataframe, format: str, path: str):
+    def validate(self, feature_set, dataframe):
         """Validate to load the feature set into Writer.
 
         Args:
@@ -59,18 +61,16 @@ class HistoricalFeatureStoreWriter(Writer):
             False: fail validation.
             True: success validation.
         """
-        if not isinstance(format, str):
+        if not isinstance(feature_set["format"], str):
             raise ValueError("format needs to be a string with the desired read format")
-        if not isinstance(path, str):
+        if not isinstance(feature_set["path"], str):
             raise ValueError(
                 "path needs to be a string with the local of the registered table"
             )
 
         feature_store = self.spark_client.read(
-            format=format, options={"path": path}
+            format=feature_set["format"], options={"path": feature_set["path"]}
         ).count()
-        feature_set = dataframe.count()
+        dataframe = dataframe.count()
 
-        if feature_store != feature_set:
-            return False
-        return True
+        return True if feature_store == dataframe else False
