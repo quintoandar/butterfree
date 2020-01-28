@@ -1,7 +1,7 @@
 """FeatureSet entity."""
 
 from functools import reduce
-from operator import add
+from itertools import chain
 from typing import List
 
 from pyspark.sql.dataframe import DataFrame
@@ -126,7 +126,7 @@ class FeatureSet:
         :return: flat list with all the feature columns
         """
         features_columns = [feature.get_output_columns() for feature in self.features]
-        return reduce(add, features_columns)  # flatten
+        return list(chain.from_iterable(features_columns))  # flatten
 
     @property
     def key_columns(self) -> List[str]:
