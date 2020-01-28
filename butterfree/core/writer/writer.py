@@ -16,7 +16,9 @@ class Writer(ABC):
 
     @abstractmethod
     def write(self, feature_set: FeatureSet, dataframe: DataFrame):
-        """Loads the data from a feature set into the Historical Feature Store.
+        """Loads the data from a feature set into the Feature Store.
+
+        Feature Store could be Online or Historical.
 
         Args:
             feature_set: object processed with feature_set informations.
@@ -25,7 +27,7 @@ class Writer(ABC):
 
     @abstractmethod
     def validate(self, feature_set: FeatureSet, dataframe: DataFrame):
-        """Validate to load the feature set into Writer.
+        """Calculate dataframe rows to validate data into Feature Store.
 
         Args:
             feature_set: object processed with feature_set informations.

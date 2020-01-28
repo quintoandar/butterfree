@@ -40,9 +40,7 @@ class TestS3Config:
 
     def test_path(self, s3_config):
         # expecting
-        default = (
-            f"s3a://{environment.get_variable('FEATURE_STORE_S3_BUCKET')}/historical/"
-        )
+        default = f"s3a://{environment.get_variable('FEATURE_STORE_S3_BUCKET')}"
         assert s3_config.path == default
 
     def test_path_custom(self, s3_config):

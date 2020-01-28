@@ -26,6 +26,15 @@ def feature_set_dataframe():
 
 
 @fixture
+def feature_set_count_dataframe():
+    sc, spark = base_spark()
+    data = [
+        {"row": 4},
+    ]
+    return spark.read.json(sc.parallelize(data, 1))
+
+
+@fixture
 def latest():
     sc, spark = base_spark()
     data = [

@@ -2,6 +2,8 @@
 
 import os
 
+from pyspark.sql.dataframe import DataFrame
+
 from butterfree.core.dataframe.verify_dataframe import VerifyDataframe
 from butterfree.core.db.configs import S3Config
 from butterfree.core.transform import FeatureSet
@@ -19,14 +21,16 @@ class HistoricalFeatureStoreWriter(Writer):
         super().__init__(spark_client)
         self.db_config = db_config or S3Config()
 
-    def write(self, feature_set: FeatureSet, dataframe):
+    def write(self, feature_set: FeatureSet, dataframe: DataFrame):
         """Loads the data from a feature set into the Historical Feature Store.
 
         Args:
             feature_set: object processed with feature_set informations.
             dataframe: spark dataframe containing data from a feature set.
         """
-        s3_path = os.path.join(self.db_config.path, feature_set.name)
+        s3_path = os.path.join(
+            self.db_config.path, "historical", feature_set.entity, feature_set.name
+        )
 
         validate_dataframe = VerifyDataframe(dataframe)
         validate_dataframe.checks()
@@ -41,30 +45,23 @@ class HistoricalFeatureStoreWriter(Writer):
             path=s3_path,
         )
 
-    def validate(self, feature_set: FeatureSet, dataframe):
-        """Validate to load the feature set into Writer.
+    def validate(self, feature_set: FeatureSet, dataframe: DataFrame):
+        """Calculate dataframe rows to validate data into Feature Store.
 
         Args:
+            feature_set: object processed with feature_set informations.
             dataframe: spark dataframe containing data from a feature set.
-            format: string with the file format.
-            path: local where feature set was saved.
 
         Returns:
             False: fail validation.
             True: success validation.
         """
-        if not isinstance(self.db_config.format_, str):
-            raise ValueError("format needs to be a string with the desired read format")
-        if not isinstance(self.db_config.path, str):
-            raise ValueError(
-                "path needs to be a string with the local of the registered table"
-            )
+        table_name = "{}.{}".format(self.db_config.database, feature_set.name)
+        query_format_string = "SELECT COUNT(1) as row FROM {}"
+        query_count = query_format_string.format(table_name)
 
-        s3_path = os.path.join(self.db_config.path, feature_set.name)
+        feature_store = self.spark_client.sql(query=query_count).collect().pop()["row"]
 
-        feature_store = self.spark_client.read(
-            format=self.db_config.format_, options={"path": s3_path}
-        ).count()
         dataframe = dataframe.count()
 
         return True if feature_store == dataframe else False

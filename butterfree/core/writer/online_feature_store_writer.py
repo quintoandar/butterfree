@@ -67,7 +67,7 @@ class OnlineFeatureStoreWriter(Writer):
         )
 
     def validate(self, feature_set: FeatureSet, dataframe):
-        """Validate to load the feature set into Writer.
+        """Calculate dataframe rows to validate data into Feature Store.
 
         Args:
             feature_set: object processed with feature_set informations.

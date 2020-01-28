@@ -93,9 +93,7 @@ class S3Config(AbstractWriteConfig):
         :param value: used to set attribute "path".
         """
         self.__path = (
-            value
-            or f"s3a://{environment.get_variable('FEATURE_STORE_S3_BUCKET')}"
-            f"/historical/"
+            value or f"s3a://{environment.get_variable('FEATURE_STORE_S3_BUCKET')}"
         )
 
     @property
