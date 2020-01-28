@@ -178,7 +178,7 @@ class FeatureSet:
         """Use all the features to build the feature set dataframe.
 
         :param input_df: input dataframe to be transformed by the features.
-        :return: Spark dataframe
+        :return: Spark dataframe with just the feature columns
         """
         if not isinstance(input_df, DataFrame):
             raise ValueError("source_df must be a dataframe")
