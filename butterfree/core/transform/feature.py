@@ -60,5 +60,4 @@ class Feature:
             return dataframe.withColumnRenamed(
                 self.from_column, self.name if self.from_column else self.name
             )
-        else:
-            return self.transformation.transform(dataframe)
+        return self.transformation.transform(dataframe)
