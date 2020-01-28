@@ -7,8 +7,6 @@ from butterfree.core.transform.aggregation.aggregated_transform import (
 
 
 class TestAggregatedTransform:
-    def test_feature_transform_no_alias(self, feature_set_dataframe):
-class TestAggregatedTransform:
     def test_feature_transform(self, feature_set_dataframe):
         test_feature = Feature(
             name="feature",
@@ -17,7 +15,7 @@ class TestAggregatedTransform:
                 aggregations=["avg", "std"],
                 partition="id",
                 windows=["7 days", "2 weeks"],
-            )
+            ),
         )
 
         df = test_feature.transform(feature_set_dataframe)
@@ -49,7 +47,7 @@ class TestAggregatedTransform:
                 aggregations=["avg", "std"],
                 partition="id",
                 windows=["7 days", "2 weeks"],
-            )
+            ),
         )
 
         df_columns = test_feature.get_output_columns()
@@ -77,7 +75,7 @@ class TestAggregatedTransform:
                 transformation=AggregatedTransform(
                     aggregations=["median"],
                     partition="id",
-                    windows={"days": [7], "weeks": [2]},
+                    windows=["7 days", "2 weeks"],
                 ),
             )
 
@@ -87,21 +85,19 @@ class TestAggregatedTransform:
                 name="feature",
                 description="unit test",
                 transformation=AggregatedTransform(
-                    aggregations=[],
-                    partition="id",
-                    windows={"days": [7], "weeks": [2]},
+                    aggregations=[], partition="id", windows=["7 days", "2 weeks"],
                 ),
             )
 
     def test_unsupported_window(self, feature_set_dataframe):
-        with pytest.raises(ValueError, match="Aggregations must not be empty."):
+        with pytest.raises(KeyError):
             Feature(
                 name="feature",
                 description="unit test",
                 transformation=AggregatedTransform(
-                    aggregations=[],
+                    aggregations=["avg", "std"],
                     partition="id",
-                    windows={"daily": [7], "weeks": [2]},
+                    windows=["7 daily", "2 weeks"],
                 ),
             )
 
@@ -111,7 +107,7 @@ class TestAggregatedTransform:
                 name="feature",
                 description="unit test",
                 transformation=AggregatedTransform(
-                    aggregations=["avg", "std"], partition="id", windows={},
+                    aggregations=["avg", "std"], partition="id", windows=[],
                 ),
             )
 
@@ -121,17 +117,7 @@ class TestAggregatedTransform:
                 name="feature",
                 description="unit test",
                 transformation=AggregatedTransform(
-                    aggregations=["avg", "std"], partition="id", windows={"weeks": 2},
-                ),
-            )
-
-    def test_empty_window(self, feature_set_dataframe):
-        with pytest.raises(KeyError, match="Windows must have one item at least."):
-            Feature(
-                name="feature",
-                description="unit test",
-                transformation=AggregatedTransform(
-                    aggregations=["avg", "std"], partition="id", windows={"weeks": []},
+                    aggregations=["avg", "std"], partition="id", windows={"2 weeks"},
                 ),
             )
 
@@ -141,9 +127,7 @@ class TestAggregatedTransform:
                 name="feature",
                 description="unit test",
                 transformation=AggregatedTransform(
-                    aggregations=["avg", "std"],
-                    partition="id",
-                    windows={"weeks": [-2]},
+                    aggregations=["avg", "std"], partition="id", windows=["-2 weeks"],
                 ),
             )
 
@@ -155,7 +139,7 @@ class TestAggregatedTransform:
                 aggregations=["avg", "std"],
                 partition="id",
                 windows=["2 minutes", "15 minutes"],
-            )
+            ),
         )
 
         df = test_feature.transform(feature_set_dataframe).collect()
