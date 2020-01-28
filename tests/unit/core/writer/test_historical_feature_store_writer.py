@@ -1,4 +1,5 @@
 import pytest
+from tests.unit.core.writer.conftest import feature_set_empty, feature_set_without_ts
 
 from butterfree.core.writer import HistoricalFeatureStoreWriter
 
@@ -8,11 +9,14 @@ class TestHistoricalFeatureStoreWriter:
         # given
         spark_client = mocker.stub("spark_client")
         spark_client.write_table = mocker.stub("write_table")
+        feature_set = mocker.stub("feature_set")
         writer = HistoricalFeatureStoreWriter(spark_client)
-        table_name = "test"
+
+        feature_set.entity = "house"
+        feature_set.name = "test"
 
         # when
-        writer.write(dataframe=feature_set_dataframe, name=table_name)
+        writer.write(feature_set=feature_set, dataframe=feature_set_dataframe)
 
         # then
         spark_client.write_table.assert_called_once()
@@ -20,62 +24,70 @@ class TestHistoricalFeatureStoreWriter:
         assert sorted(feature_set_dataframe.collect()) == sorted(
             spark_client.write_table.call_args[1]["dataframe"].collect()
         )
-        assert writer.DEFAULT_FORMAT == spark_client.write_table.call_args[1]["format_"]
-        assert writer.DEFAULT_MODE == spark_client.write_table.call_args[1]["mode"]
         assert (
-            writer.DEFAULT_PARTITION_BY
+            writer.db_config.format_ == spark_client.write_table.call_args[1]["format_"]
+        )
+        assert writer.db_config.mode == spark_client.write_table.call_args[1]["mode"]
+        assert (
+            writer.db_config.partition_by
             == spark_client.write_table.call_args[1]["partition_by"]
         )
-        assert table_name == spark_client.write_table.call_args[1]["table_name"]
+        assert feature_set.name == spark_client.write_table.call_args[1]["table_name"]
 
-    def test_write_with_df_invalid(
-        self, feature_set_empty, feature_set_without_ts, mocker
-    ):
+    @pytest.mark.parametrize(
+        "dataframe",
+        [feature_set_empty, feature_set_without_ts, "not a spark df writer"],
+    )
+    def test_write_with_df_invalid(self, dataframe, mocker):
         # given
         spark_client = mocker.stub("spark_client")
         spark_client.write_table = mocker.stub("write_table")
+        feature_set = mocker.stub("feature set")
+        feature_set.entity = "house"
+        feature_set.name = "test"
 
         writer = HistoricalFeatureStoreWriter(spark_client)
-        table_name = "test"
-        df_writer = "not a spark df writer"
 
         # then
         with pytest.raises(ValueError):
-            assert writer.write(dataframe=feature_set_empty, name=table_name)
+            assert writer.write(feature_set=feature_set, dataframe=dataframe)
 
-        with pytest.raises(ValueError):
-            assert writer.write(dataframe=feature_set_without_ts, name=table_name)
-
-        with pytest.raises(ValueError):
-            assert writer.write(dataframe=df_writer, name=table_name)
-
-    def test_validate(self, feature_set_dataframe, mocker):
+    def test_validate(self, feature_set_dataframe, feature_set_count_dataframe, mocker):
         # given
         spark_client = mocker.stub("spark_client")
-        spark_client.read = mocker.stub("read")
+        spark_client.sql = mocker.stub("sql")
+        spark_client.sql.return_value = feature_set_count_dataframe
+        feature_set = mocker.stub("feature_set")
+        feature_set.name = "test"
+        query = "SELECT COUNT(1) as row FROM feature_store.test"
 
-        format_ = "parquet"
-        path = "local/feature-set"
         writer = HistoricalFeatureStoreWriter(spark_client)
 
         # when
-        writer.validate(feature_set_dataframe, format_, path)
+        result = writer.validate(feature_set, feature_set_dataframe)
 
         # then
-        spark_client.read.assert_called_once()
+        spark_client.sql.assert_called_once()
 
-    @pytest.mark.parametrize(
-        "format_, path", [(None, "path/table"), ("parquet", None), (1, 123)],
-    )
-    def test_validate_invalid_params(
-        self, feature_set_dataframe, format_, path, mocker
+        assert query == spark_client.sql.call_args[1]["query"]
+        assert result is True
+
+    def test_validate_false(
+        self, feature_set_dataframe, feature_set_count_dataframe, mocker
     ):
         # given
         spark_client = mocker.stub("spark_client")
-        spark_client.read = mocker.stub("read")
+        spark_client.sql = mocker.stub("sql")
+        spark_client.sql.return_value = feature_set_count_dataframe.withColumn(
+            "row", feature_set_count_dataframe.row + 1
+        )
+        feature_set = mocker.stub("feature_set")
+        feature_set.name = "test"
 
         writer = HistoricalFeatureStoreWriter(spark_client)
 
+        # when
+        result = writer.validate(feature_set, feature_set_dataframe)
+
         # then
-        with pytest.raises(ValueError):
-            writer.validate(feature_set_dataframe, format_, path)
+        assert result is False

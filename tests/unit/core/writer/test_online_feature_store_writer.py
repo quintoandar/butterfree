@@ -51,10 +51,14 @@ class TestOnlineFeatureStoreWriter:
         # with
         spark_client = mocker.stub("spark_client")
         spark_client.write_dataframe = mocker.stub("write_dataframe")
+        feature_set = mocker.stub("feature_set")
+        feature_set.name = "test"
+        feature_set.key_columns = ["id"]
+
         writer = OnlineFeatureStoreWriter(spark_client, cassandra_config)
 
         # when
-        writer.write(feature_set_dataframe, id_columns=["id"], name="test")
+        writer.write(feature_set, feature_set_dataframe)
 
         # then
         spark_client.write_dataframe.assert_called_once()
@@ -77,15 +81,14 @@ class TestOnlineFeatureStoreWriter:
         # given
         spark_client = mocker.stub("spark_client")
         spark_client.read = mocker.stub("read")
-
-        format_ = "org.apache.spark.sql.cassandra"
-        id_columns = ["id"]
-        table_name = "name"
+        feature_set = mocker.stub("feature_set")
+        feature_set.name = "test"
+        feature_set.key_columns = ["id"]
 
         writer = OnlineFeatureStoreWriter(spark_client, cassandra_config)
 
         # when
-        writer.validate(feature_set_dataframe, id_columns, format_, table_name)
+        writer.validate(feature_set, feature_set_dataframe)
 
         # then
         spark_client.read.assert_called_once()
@@ -95,19 +98,20 @@ class TestOnlineFeatureStoreWriter:
         [(None, "table"), ("org.apache.spark.sql.cassandra", None), (1, 123)],
     )
     def test_validate_invalid_params(
-        self, feature_set_dataframe, cassandra_config, format_, table_name, mocker,
+        self, feature_set_dataframe, format_, table_name, mocker,
     ):
         # given
         spark_client = mocker.stub("spark_client")
         spark_client.read = mocker.stub("read")
+        feature_set = mocker.stub("feature_set")
+        feature_set.name = table_name
+        feature_set.key_columns = ["id"]
 
-        writer = OnlineFeatureStoreWriter(spark_client, cassandra_config)
+        db_config = mocker.stub("db_config")
+        db_config.format_ = format_
+
+        writer = OnlineFeatureStoreWriter(spark_client, db_config)
 
         # then
         with pytest.raises(ValueError):
-            writer.validate(
-                feature_set_dataframe,
-                id_columns=["id"],
-                format=format_,
-                table_name=table_name,
-            )
+            writer.validate(feature_set, feature_set_dataframe)

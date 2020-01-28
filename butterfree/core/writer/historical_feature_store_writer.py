@@ -2,75 +2,68 @@
 
 import os
 
-from butterfree.core.client import SparkClient
-from butterfree.core.configs import environment
+from pyspark.sql.dataframe import DataFrame
+
 from butterfree.core.dataframe.verify_dataframe import VerifyDataframe
+from butterfree.core.db.configs import S3Config
+from butterfree.core.transform import FeatureSet
+from butterfree.core.writer.writer import Writer
 
 
-class HistoricalFeatureStoreWriter:
+class HistoricalFeatureStoreWriter(Writer):
     """Enable writing feature sets into the Historical Feature Store.
 
     Attributes:
         spark_client: client for spark connections with external services.
+        db_config: configuration with spark for databases or AWS S3 (default).
+            For more information access the class in 'butterfree.core.db.configs'.
     """
 
-    HISTORICAL_FEATURE_STORE_S3_PATH = (
-        f"s3a://{environment.get_variable('FEATURE_STORE_S3_BUCKET')}/historical/"
-    )
-    DEFAULT_DATABASE = "feature_store"
-    DEFAULT_FORMAT = "parquet"
-    DEFAULT_MODE = "overwrite"
-    DEFAULT_PARTITION_BY = ["partition__year", "partition__month", "partition__day"]
+    def __init__(self, spark_client, db_config=None):
+        super().__init__(spark_client)
+        self.db_config = db_config or S3Config()
 
-    def __init__(self, spark_client: SparkClient):
-        self.spark_client = spark_client
-
-    def write(self, dataframe, name):
+    def write(self, feature_set: FeatureSet, dataframe: DataFrame):
         """Loads the data from a feature set into the Historical Feature Store.
 
         Args:
+            feature_set: object processed with feature_set informations.
             dataframe: spark dataframe containing data from a feature set.
-            name: feature set name.
         """
-        s3_path = os.path.join(self.HISTORICAL_FEATURE_STORE_S3_PATH, name)
+        s3_path = os.path.join(
+            self.db_config.path, "historical", feature_set.entity, feature_set.name
+        )
 
         validate_dataframe = VerifyDataframe(dataframe)
         validate_dataframe.checks()
 
         self.spark_client.write_table(
             dataframe=dataframe,
-            database=self.DEFAULT_DATABASE,
-            table_name=name,
-            format_=self.DEFAULT_FORMAT,
-            mode=self.DEFAULT_MODE,
-            partition_by=self.DEFAULT_PARTITION_BY,
+            database=self.db_config.database,
+            table_name=feature_set.name,
+            format_=self.db_config.format_,
+            mode=self.db_config.mode,
+            partition_by=self.db_config.partition_by,
             path=s3_path,
         )
 
-    def validate(self, dataframe, format: str, path: str):
-        """Validate to load the feature set into Writer.
+    def validate(self, feature_set: FeatureSet, dataframe: DataFrame):
+        """Calculate dataframe rows to validate data into Feature Store.
 
         Args:
+            feature_set: object processed with feature_set informations.
             dataframe: spark dataframe containing data from a feature set.
-            format: string with the file format
-            path: local where feature set was saved.
 
         Returns:
             False: fail validation.
             True: success validation.
         """
-        if not isinstance(format, str):
-            raise ValueError("format needs to be a string with the desired read format")
-        if not isinstance(path, str):
-            raise ValueError(
-                "path needs to be a string with the local of the registered table"
-            )
+        table_name = "{}.{}".format(self.db_config.database, feature_set.name)
+        query_format_string = "SELECT COUNT(1) as row FROM {}"
+        query_count = query_format_string.format(table_name)
 
-        feature_store = self.spark_client.read(
-            format=format, options={"path": path}
-        ).count()
-        feature_set = dataframe.count()
+        feature_store = self.spark_client.sql(query=query_count).collect().pop()["row"]
 
-        if feature_store != feature_set:
-            return False
-        return True
+        dataframe = dataframe.count()
+
+        return True if feature_store == dataframe else False

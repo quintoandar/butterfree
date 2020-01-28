@@ -5,21 +5,23 @@ from typing import Any, List
 from pyspark.sql import DataFrame, Window
 from pyspark.sql.functions import col, row_number
 
-from butterfree.core.client import SparkClient
 from butterfree.core.constant.columns import TIMESTAMP_COLUMN
 from butterfree.core.db.configs import CassandraConfig
+from butterfree.core.transform import FeatureSet
+from butterfree.core.writer.writer import Writer
 
 
-class OnlineFeatureStoreWriter:
+class OnlineFeatureStoreWriter(Writer):
     """Enable writing feature sets into the Online Feature Store.
 
     Attributes:
         spark_client: client for spark connections with external services.
-        db_config:
+        db_config: configuration with spark for databases or Cassandra DB (default).
+            For more information access the class in 'butterfree.core.db.configs'.
     """
 
-    def __init__(self, spark_client: SparkClient, db_config=None):
-        self.spark_client = spark_client
+    def __init__(self, spark_client, db_config=None):
+        super().__init__(spark_client)
         self.db_config = db_config or CassandraConfig()
 
     @staticmethod
@@ -48,52 +50,50 @@ class OnlineFeatureStoreWriter:
             .drop("rn")
         )
 
-    def write(self, dataframe: DataFrame, name: str, id_columns: List[Any]):
+    def write(self, feature_set: FeatureSet, dataframe):
         """Loads the latest data from a feature set into the Online Feature Store.
 
         Args:
+            feature_set: object processed with feature_set informations.
             dataframe: spark dataframe containing data from a feature set.
-            name: feature set name.
-            id_columns: unique identifier column set for this feature set.
         """
-        dataframe = self.filter_latest(dataframe=dataframe, id_columns=id_columns)
+        dataframe = self.filter_latest(
+            dataframe=dataframe, id_columns=feature_set.key_columns
+        )
         self.spark_client.write_dataframe(
             dataframe=dataframe,
             mode=self.db_config.mode,
             format=self.db_config.format_,
-            options=self.db_config.get_options(table=name),
+            options=self.db_config.get_options(table=feature_set.name),
         )
 
-    def validate(
-        self, dataframe, id_columns: List[Any], format: str, table_name: str,
-    ):
-        """Validate to load the feature set into Writer.
+    def validate(self, feature_set: FeatureSet, dataframe):
+        """Calculate dataframe rows to validate data into Feature Store.
 
         Args:
+            feature_set: object processed with feature_set informations.
             dataframe: spark dataframe containing data from a feature set.
-            id_columns: unique identifier column set for this feature set.
-            format: string with the file format.
-            table_name: table name into Cassandra DB.
 
         Returns:
             False: fail validation.
             True: success validation.
         """
-        if not isinstance(format, str):
+        if not isinstance(self.db_config.format_, str):
             raise ValueError("format needs to be a string with the desired read format")
 
-        if not isinstance(table_name, str):
+        if not isinstance(feature_set.name, str):
             raise ValueError(
                 "table_name needs to be a string with the local of the registered table"
             )
 
-        dataframe = self.filter_latest(dataframe=dataframe, id_columns=id_columns)
-        feature_set = dataframe.count()
+        dataframe = self.filter_latest(
+            dataframe=dataframe, id_columns=feature_set.key_columns
+        )
+        dataframe = dataframe.count()
 
         feature_store = self.spark_client.read(
-            format=format, options=self.db_config.get_options(table=table_name)
+            format=self.db_config.format_,
+            options=self.db_config.get_options(table=feature_set.name),
         ).count()
 
-        if feature_store != feature_set:
-            return False
-        return True
+        return True if feature_store == dataframe else False
