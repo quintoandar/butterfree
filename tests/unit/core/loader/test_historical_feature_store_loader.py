@@ -26,7 +26,7 @@ class TestHistoricalFeatureStoreLoader:
             loader.DEFAULT_PARTITION_BY
             == spark_client.write_table.call_args[1]["partition_by"]
         )
-        assert table_name == spark_client.write_table.call_args[1]["name"]
+        assert table_name == spark_client.write_table.call_args[1]["table_name"]
 
     def test_load_with_df_invalid(
         self, feature_set_empty, feature_set_without_ts, mocker

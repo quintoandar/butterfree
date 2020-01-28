@@ -1,9 +1,9 @@
 import pytest
 
-from butterfree.core.source import KafkaSource
+from butterfree.core.reader import KafkaReader
 
 
-class TestKafkaSource:
+class TestKafkaReader:
     @pytest.mark.parametrize(
         "connection_string, topic",
         [(None, "topic"), ("host1:port,host2:port", 123), (123, None)],
@@ -11,7 +11,7 @@ class TestKafkaSource:
     def test_init_invalid_params(self, connection_string, topic, spark_client):
         # act and assert
         with pytest.raises(ValueError):
-            KafkaSource("id", spark_client, connection_string, topic)
+            KafkaReader("id", spark_client, connection_string, topic)
 
     @pytest.mark.parametrize(
         "connection_string, topic, topic_options, stream",
@@ -24,7 +24,7 @@ class TestKafkaSource:
     def test_consume(
         self, connection_string, topic, topic_options, stream, spark_client, spark, sc,
     ):
-        """Test for consume method in KafkaSource class.
+        """Test for consume method in KafkaReader class.
 
         The test consists in check the correct use of the read method used inside
         consume. From a kafka format, there are some columns received from the client
@@ -41,12 +41,12 @@ class TestKafkaSource:
         target_df = spark.read.json(sc.parallelize(target_data, 1))
 
         spark_client.read.return_value = raw_stream_df
-        kafka_source = KafkaSource(
+        kafka_reader = KafkaReader(
             "test", spark_client, connection_string, topic, topic_options, stream
         )
 
         # act
-        output_df = kafka_source.consume()
+        output_df = kafka_reader.consume()
         options = dict(
             {"kafka.bootstrap.servers": connection_string, "subscribe": topic},
             **topic_options if topic_options else {},
@@ -54,6 +54,6 @@ class TestKafkaSource:
 
         # assert
         spark_client.read.assert_called_once_with(
-            format="kafka", options=options, stream=kafka_source.stream
+            format="kafka", options=options, stream=kafka_reader.stream
         )
         assert target_df.collect() == output_df.collect()

@@ -2,10 +2,12 @@ import pytest
 
 from butterfree.core.transform import Feature
 from butterfree.core.transform.aggregation.aggregated_transform import (
-    AggregatedTransform
+    AggregatedTransform,
 )
 
 
+class TestAggregatedTransform:
+    def test_feature_transform_no_alias(self, feature_set_dataframe):
 class TestAggregatedTransform:
     def test_feature_transform(self, feature_set_dataframe):
         test_feature = Feature(
@@ -14,8 +16,8 @@ class TestAggregatedTransform:
             transformation=AggregatedTransform(
                 aggregations=["avg", "std"],
                 partition="id",
-                windows={"days": [7], "weeks": [2]},
-            ),
+                windows=["7 days", "2 weeks"],
+            )
         )
 
         df = test_feature.transform(feature_set_dataframe)
@@ -46,8 +48,8 @@ class TestAggregatedTransform:
             transformation=AggregatedTransform(
                 aggregations=["avg", "std"],
                 partition="id",
-                windows={"days": [7], "weeks": [2]},
-            ),
+                windows=["7 days", "2 weeks"],
+            )
         )
 
         df_columns = test_feature.get_output_columns()
@@ -152,8 +154,8 @@ class TestAggregatedTransform:
             transformation=AggregatedTransform(
                 aggregations=["avg", "std"],
                 partition="id",
-                windows={"minutes": [2, 15]},
-            ),
+                windows=["2 minutes", "15 minutes"],
+            )
         )
 
         df = test_feature.transform(feature_set_dataframe).collect()
