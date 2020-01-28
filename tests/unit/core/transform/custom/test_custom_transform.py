@@ -12,14 +12,14 @@ def divide(df, name, column1, column2):
 
 
 class TestCustomTransform:
-    def test_feature_transform_no_alias(self, feature_set_dataframe):
+    def test_feature_transform(self, feature_set_dataframe):
 
         test_feature = Feature(
-            name="feature", description="unit test feature with no alias",
-        )
-
-        test_feature.add(
-            CustomTransform(transformer=divide, column1="feature1", column2="feature2",)
+            name="feature",
+            description="unit test",
+            transformation=CustomTransform(
+                transformer=divide, column1="feature1", column2="feature2",
+            ),
         )
 
         df = test_feature.transform(feature_set_dataframe)
@@ -31,35 +31,41 @@ class TestCustomTransform:
             ]
         )
 
-    def test_feature_transform_with_alias(self, feature_set_dataframe):
+    def test_output_columns(self, feature_set_dataframe):
 
         test_feature = Feature(
             name="feature",
-            alias="new_feature",
-            description="unit test feature with no alias",
+            description="unit test",
+            transformation=CustomTransform(
+                transformer=divide, column1="feature1", column2="feature2",
+            ),
         )
 
-        test_feature.add(
-            CustomTransform(transformer=divide, column1="feature1", column2="feature2",)
+        df_columns = test_feature.get_output_columns()
+
+        assert isinstance(df_columns, list)
+        assert df_columns == ["feature"]
+
+    def test_custom_transform_output(self, feature_set_dataframe):
+        test_feature = Feature(
+            name="feature",
+            description="unit test",
+            transformation=CustomTransform(
+                transformer=divide, column1="feature1", column2="feature2",
+            ),
         )
 
-        df = test_feature.transform(feature_set_dataframe)
+        df = test_feature.transform(feature_set_dataframe).collect()
 
-        assert all(
-            [
-                a == b
-                for a, b in zip(
-                    df.columns, ["feature1", "feature2", "id", "new_feature"],
-                )
-            ]
-        )
+        assert df[0]["feature"] == 1
+        assert df[1]["feature"] == 1
+        assert df[2]["feature"] == 1
+        assert df[3]["feature"] == 1
 
     def test_blank_transformer(self, feature_set_dataframe):
-        test_feature = Feature(
-            name="feature",
-            alias="new_feature",
-            description="unit test feature with no alias",
-        )
         with pytest.raises(ValueError):
-            test_feature.add(CustomTransform(transformer=[],))
-            test_feature.transform(feature_set_dataframe)
+            Feature(
+                name="feature",
+                description="unit test",
+                transformation=CustomTransform(transformer=[]),
+            )
