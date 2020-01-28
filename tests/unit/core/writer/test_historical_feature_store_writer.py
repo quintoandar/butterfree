@@ -1,12 +1,7 @@
 import pytest
-from pyspark.sql.dataframe import DataFrame
 from tests.unit.core.writer.conftest import feature_set_empty, feature_set_without_ts
 
 from butterfree.core.writer import HistoricalFeatureStoreWriter
-
-
-def create_temp_view(dataframe: DataFrame, name):
-    dataframe.createOrReplaceTempView(name)
 
 
 class TestHistoricalFeatureStoreWriter:

@@ -16,7 +16,8 @@ class OnlineFeatureStoreWriter(Writer):
 
     Attributes:
         spark_client: client for spark connections with external services.
-        db_config:
+        db_config: configuration with spark for databases or Cassandra DB (default).
+            For more information access the class in 'butterfree.core.db.configs'.
     """
 
     def __init__(self, spark_client, db_config=None):

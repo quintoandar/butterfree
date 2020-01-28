@@ -15,6 +15,8 @@ class HistoricalFeatureStoreWriter(Writer):
 
     Attributes:
         spark_client: client for spark connections with external services.
+        db_config: configuration with spark for databases or AWS S3 (default).
+            For more information access the class in 'butterfree.core.db.configs'.
     """
 
     def __init__(self, spark_client, db_config=None):
