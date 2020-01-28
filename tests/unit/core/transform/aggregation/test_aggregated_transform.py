@@ -7,17 +7,15 @@ from butterfree.core.transform.aggregation.aggregated_transform import (
 
 
 class TestAggregatedTransform:
-    def test_feature_transform_no_alias(self, feature_set_dataframe):
+    def test_feature_transform(self, feature_set_dataframe):
         test_feature = Feature(
-            name="feature", description="unit test feature with no alias",
-        )
-
-        test_feature.add(
-            AggregatedTransform(
+            name="feature",
+            description="unit test",
+            transformation=AggregatedTransform(
                 aggregations=["avg", "std"],
                 partition="id",
                 windows=["7 days", "2 weeks"],
-            )
+            ),
         )
 
         df = test_feature.transform(feature_set_dataframe)
@@ -41,159 +39,107 @@ class TestAggregatedTransform:
             ]
         )
 
-    def test_feature_transform_with_alias(self, feature_set_dataframe):
+    def test_output_columns(self):
         test_feature = Feature(
             name="feature",
-            alias="new_feature",
-            description="unit test feature with no alias",
-        )
-
-        test_feature.add(
-            AggregatedTransform(
+            description="unit test",
+            transformation=AggregatedTransform(
                 aggregations=["avg", "std"],
                 partition="id",
                 windows=["7 days", "2 weeks"],
-            )
+            ),
         )
 
-        df = test_feature.transform(feature_set_dataframe)
+        df_columns = test_feature.get_output_columns()
 
         assert all(
             [
                 a == b
                 for a, b in zip(
-                    df.columns,
+                    df_columns,
                     [
-                        "feature",
-                        "id",
-                        "ts",
-                        "timestamp",
-                        "new_feature__avg_over_7_days",
-                        "new_feature__avg_over_2_weeks",
-                        "new_feature__std_over_7_days",
-                        "new_feature__std_over_2_weeks",
+                        "feature__avg_over_7_days",
+                        "feature__avg_over_2_weeks",
+                        "feature__std_over_7_days",
+                        "feature__std_over_2_weeks",
                     ],
                 )
             ]
         )
 
     def test_unsupported_aggregation(self, feature_set_dataframe):
-        test_feature = Feature(
-            name="feature",
-            alias="new_feature",
-            description="unit test feature with no alias",
-        )
         with pytest.raises(KeyError):
-            test_feature.add(
-                AggregatedTransform(
+            Feature(
+                name="feature",
+                description="unit test",
+                transformation=AggregatedTransform(
                     aggregations=["median"],
                     partition="id",
-                    windows={"days": [7], "weeks": [2]},
-                )
+                    windows=["7 days", "2 weeks"],
+                ),
             )
-            test_feature.transform(feature_set_dataframe)
 
     def test_blank_aggregation(self, feature_set_dataframe):
-        test_feature = Feature(
-            name="feature",
-            alias="new_feature",
-            description="unit test feature with no alias",
-        )
         with pytest.raises(ValueError, match="Aggregations must not be empty."):
-            test_feature.add(
-                AggregatedTransform(
-                    aggregations=[],
-                    partition="id",
-                    windows={"days": [7], "weeks": [2]},
-                )
+            Feature(
+                name="feature",
+                description="unit test",
+                transformation=AggregatedTransform(
+                    aggregations=[], partition="id", windows=["7 days", "2 weeks"],
+                ),
             )
-            test_feature.transform(feature_set_dataframe)
 
     def test_unsupported_window(self, feature_set_dataframe):
-        test_feature = Feature(
-            name="feature",
-            alias="new_feature",
-            description="unit test feature with no alias",
-        )
         with pytest.raises(KeyError):
-            test_feature.add(
-                AggregatedTransform(
+            Feature(
+                name="feature",
+                description="unit test",
+                transformation=AggregatedTransform(
                     aggregations=["avg", "std"],
                     partition="id",
-                    windows={"daily": [7], "weeks": [2]},
-                )
+                    windows=["7 daily", "2 weeks"],
+                ),
             )
-            test_feature.transform(feature_set_dataframe)
 
     def test_blank_window(self, feature_set_dataframe):
-        test_feature = Feature(
-            name="feature",
-            alias="new_feature",
-            description="unit test feature with no alias",
-        )
         with pytest.raises(KeyError, match="Windows must not be empty."):
-            test_feature.add(
-                AggregatedTransform(
-                    aggregations=["avg", "std"], partition="id", windows={},
-                )
+            Feature(
+                name="feature",
+                description="unit test",
+                transformation=AggregatedTransform(
+                    aggregations=["avg", "std"], partition="id", windows=[],
+                ),
             )
-            test_feature.transform(feature_set_dataframe)
 
     def test_int_window(self, feature_set_dataframe):
-        test_feature = Feature(
-            name="feature",
-            alias="new_feature",
-            description="unit test feature with no alias",
-        )
         with pytest.raises(KeyError, match="Windows must be a list."):
-            test_feature.add(
-                AggregatedTransform(
-                    aggregations=["avg", "std"], partition="id", windows={"weeks": 2},
-                )
+            Feature(
+                name="feature",
+                description="unit test",
+                transformation=AggregatedTransform(
+                    aggregations=["avg", "std"], partition="id", windows={"2 weeks"},
+                ),
             )
-            test_feature.transform(feature_set_dataframe)
-
-    def test_empty_window(self, feature_set_dataframe):
-        test_feature = Feature(
-            name="feature",
-            alias="new_feature",
-            description="unit test feature with no alias",
-        )
-        with pytest.raises(KeyError, match="Windows must not be empty."):
-            test_feature.add(
-                AggregatedTransform(
-                    aggregations=["avg", "std"], partition="id", windows=[],
-                )
-            )
-            test_feature.transform(feature_set_dataframe)
 
     def test_negative_window(self, feature_set_dataframe):
-        test_feature = Feature(
-            name="feature",
-            alias="new_feature",
-            description="unit test feature with no alias",
-        )
         with pytest.raises(KeyError):
-            test_feature.add(
-                AggregatedTransform(
-                    aggregations=["avg", "std"],
-                    partition="id",
-                    windows={"weeks": [-2]},
-                )
+            Feature(
+                name="feature",
+                description="unit test",
+                transformation=AggregatedTransform(
+                    aggregations=["avg", "std"], partition="id", windows=["-2 weeks"],
+                ),
             )
-            test_feature.transform(feature_set_dataframe)
 
     def test_feature_transform_output(self, feature_set_dataframe):
         test_feature = Feature(
-            name="feature", description="unit test feature with no alias",
-        )
-
-        test_feature.add(
-            AggregatedTransform(
+            name="feature",
+            description="unit test",
+            transformation=AggregatedTransform(
                 aggregations=["avg", "std"],
                 partition="id",
                 windows=["2 minutes", "15 minutes"],
-            )
+            ),
         )
 
         df = test_feature.transform(feature_set_dataframe).collect()
