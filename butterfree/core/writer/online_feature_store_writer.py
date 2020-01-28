@@ -1,4 +1,4 @@
-"""Holds the Online Feature Store loader class."""
+"""Holds the Online Feature Store writer class."""
 
 from typing import Any, List
 
@@ -7,10 +7,10 @@ from pyspark.sql.functions import col, row_number
 
 from butterfree.core.client import SparkClient
 from butterfree.core.constant.columns import TIMESTAMP_COLUMN
-from butterfree.core.db.configs import CassandraWriteConfig
+from butterfree.core.db.configs import CassandraConfig
 
 
-class OnlineFeatureStoreLoader:
+class OnlineFeatureStoreWriter:
     """Enable writing feature sets into the Online Feature Store.
 
     Attributes:
@@ -20,7 +20,7 @@ class OnlineFeatureStoreLoader:
 
     def __init__(self, spark_client: SparkClient, db_config=None):
         self.spark_client = spark_client
-        self.db_config = db_config or CassandraWriteConfig()
+        self.db_config = db_config or CassandraConfig()
 
     @staticmethod
     def filter_latest(dataframe: DataFrame, id_columns: List[Any]):
@@ -48,7 +48,7 @@ class OnlineFeatureStoreLoader:
             .drop("rn")
         )
 
-    def load(self, dataframe: DataFrame, name: str, id_columns: List[Any]):
+    def write(self, dataframe: DataFrame, name: str, id_columns: List[Any]):
         """Loads the latest data from a feature set into the Online Feature Store.
 
         Args:
@@ -63,3 +63,37 @@ class OnlineFeatureStoreLoader:
             format=self.db_config.format_,
             options=self.db_config.get_options(table=name),
         )
+
+    def validate(
+        self, dataframe, id_columns: List[Any], format: str, table_name: str,
+    ):
+        """Validate to load the feature set into Writer.
+
+        Args:
+            dataframe: spark dataframe containing data from a feature set.
+            id_columns: unique identifier column set for this feature set.
+            format: string with the file format.
+            table_name: table name into Cassandra DB.
+
+        Returns:
+            False: fail validation.
+            True: success validation.
+        """
+        if not isinstance(format, str):
+            raise ValueError("format needs to be a string with the desired read format")
+
+        if not isinstance(table_name, str):
+            raise ValueError(
+                "table_name needs to be a string with the local of the registered table"
+            )
+
+        dataframe = self.filter_latest(dataframe=dataframe, id_columns=id_columns)
+        feature_set = dataframe.count()
+
+        feature_store = self.spark_client.read(
+            format=format, options=self.db_config.get_options(table=table_name)
+        ).count()
+
+        if feature_store != feature_set:
+            return False
+        return True

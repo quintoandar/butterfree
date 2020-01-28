@@ -1,13 +1,13 @@
-"""Holds the Historical Feature Store loader class."""
+"""Holds the Historical Feature Store writer class."""
 
 import os
 
 from butterfree.core.client import SparkClient
 from butterfree.core.configs import environment
-from butterfree.core.loader.verify_dataframe import VerifyDataframe
+from butterfree.core.dataframe.verify_dataframe import VerifyDataframe
 
 
-class HistoricalFeatureStoreLoader:
+class HistoricalFeatureStoreWriter:
     """Enable writing feature sets into the Historical Feature Store.
 
     Attributes:
@@ -25,7 +25,7 @@ class HistoricalFeatureStoreLoader:
     def __init__(self, spark_client: SparkClient):
         self.spark_client = spark_client
 
-    def load(self, dataframe, name):
+    def write(self, dataframe, name):
         """Loads the data from a feature set into the Historical Feature Store.
 
         Args:
@@ -46,3 +46,31 @@ class HistoricalFeatureStoreLoader:
             partition_by=self.DEFAULT_PARTITION_BY,
             path=s3_path,
         )
+
+    def validate(self, dataframe, format: str, path: str):
+        """Validate to load the feature set into Writer.
+
+        Args:
+            dataframe: spark dataframe containing data from a feature set.
+            format: string with the file format
+            path: local where feature set was saved.
+
+        Returns:
+            False: fail validation.
+            True: success validation.
+        """
+        if not isinstance(format, str):
+            raise ValueError("format needs to be a string with the desired read format")
+        if not isinstance(path, str):
+            raise ValueError(
+                "path needs to be a string with the local of the registered table"
+            )
+
+        feature_store = self.spark_client.read(
+            format=format, options={"path": path}
+        ).count()
+        feature_set = dataframe.count()
+
+        if feature_store != feature_set:
+            return False
+        return True
