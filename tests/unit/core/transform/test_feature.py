@@ -7,9 +7,7 @@ class TestFeature:
     def test_args_without_transformation(self):
 
         test_feature = Feature(
-            name="feature",
-            from_column="origin",
-            description="unit test",
+            name="feature", from_column="origin", description="unit test",
         )
 
         assert test_feature.name == "feature"
@@ -43,9 +41,7 @@ class TestFeature:
     def test_feature_transform_with_from_column(self, feature_set_dataframe):
 
         test_feature = Feature(
-            name="new_feature",
-            from_column="feature",
-            description="unit test",
+            name="new_feature", from_column="feature", description="unit test",
         )
         df = test_feature.transform(feature_set_dataframe)
 
@@ -58,9 +54,7 @@ class TestFeature:
         some_transformation.transform.return_value = feature_set_dataframe
 
         test_feature = Feature(
-            name="feature",
-            description="unit test",
-            transformation=some_transformation,
+            name="feature", description="unit test", transformation=some_transformation,
         )
 
         df = test_feature.transform(feature_set_dataframe)
@@ -87,9 +81,7 @@ class TestFeature:
     def test_feature_get_output_columns_without_transformations(self):
 
         test_feature = Feature(
-            name="feature",
-            from_column="origin",
-            description="unit test",
+            name="feature", from_column="origin", description="unit test",
         )
 
         assert test_feature.get_output_columns() == [test_feature.name]
