@@ -1,8 +1,10 @@
 """Feature entity."""
 
 from pyspark.sql import DataFrame
+from pyspark.sql.functions import col
 
-from butterfree.core.transform.transform_component import TransformComponent
+from butterfree.core.constant.data_type import DataType
+from butterfree.core.transform.transformations import TransformComponent
 
 
 class Feature:
@@ -19,6 +21,7 @@ class Feature:
         self,
         name: str,
         description: str,
+        dtype: DataType = None,
         from_column: str = None,
         transformation: TransformComponent = None,
     ):
@@ -26,6 +29,7 @@ class Feature:
         self.from_column = from_column
         self.description = description
         self.transformation = transformation
+        self.dtype = dtype
 
     @property
     def transformation(self):
@@ -56,8 +60,13 @@ class Feature:
         Returns:
             dataframe: transformed dataframe.
         """
-        if self.transformation is None:
-            return dataframe.withColumnRenamed(
-                self.from_column, self.name if self.from_column else self.name
+        if self.transformation:
+            return self.transformation.transform(dataframe)
+
+        if self.from_column:
+            dataframe = dataframe.withColumnRenamed(self.from_column, self.name)
+        if self.dtype:
+            dataframe = dataframe.withColumn(
+                self.name, col(self.name).cast(self.dtype.value)
             )
-        return self.transformation.transform(dataframe)
+        return dataframe
