@@ -22,12 +22,10 @@ class TestSource:
 
         # when
         source_selector = Source(
-            spark_client=spark_client,
-            readers=[reader],
-            query=f"select * from {reader_id}",  # noqa
+            readers=[reader], query=f"select * from {reader_id}",  # noqa
         )
 
-        result_df = source_selector.construct()
+        result_df = source_selector.construct(spark_client)
 
         assert result_df.collect() == target_df.collect()
 
@@ -42,11 +40,9 @@ class TestSource:
 
         # when
         source_selector = Source(
-            spark_client=spark_client,
-            readers=[reader],
-            query=f"select * from {reader_id}",  # noqa
+            readers=[reader], query=f"select * from {reader_id}",  # noqa
         )
 
-        result_df = source_selector.construct()
+        result_df = source_selector.construct(spark_client)
 
         assert result_df.is_cached
