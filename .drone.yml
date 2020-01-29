@@ -46,22 +46,21 @@ pipeline:
     commands:
       - make package
     when:
+      event: [push, tag]
       branch: [master, forno]
-      event: [tag]
 
   prepare-release-python3-prod:
     image: alpine:3.10
     commands:
       - find . -wholename "./dist/quintoandar_butterfree-*-py3-none-any.whl" -exec cp '{}' ./dist/quintoandar_butterfree-latest-py3-none-any.whl \;
     when:
-      event: [ push, tag ]
+      event: [push, tag]
       branch: master
 
   prepare-release-python3-forno:
     image: alpine:3.10
     commands:
       - find . -wholename "./dist/quintoandar_butterfree-*-py3-none-any.whl" -exec mv '{}' ./dist/quintoandar_butterfree-forno-py3-none-any.whl \;
-      - echo $(ls dist/*.whl)
     when:
       event: push
       branch: forno
@@ -76,7 +75,7 @@ pipeline:
     acl: bucket-owner-full-control
     cache_control: no-cache
     when:
-      event: [ push, tag ]
+      event: [push, tag]
       branch: master
 
   export-releases-to-s3-forno:
@@ -89,7 +88,7 @@ pipeline:
     acl: bucket-owner-full-control
     cache_control: no-cache
     when:
-      event: [ push, tag ]
+      event: [push, tag]
       branch: forno
 
   release:
