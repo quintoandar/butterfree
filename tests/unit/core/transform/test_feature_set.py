@@ -235,7 +235,6 @@ class TestFeatureSet:
         sc, spark = base_spark
 
         input_df = spark.read.json(sc.parallelize(input_data, 1))
-        target_df = spark.read.json(sc.parallelize(target_data, 1))
 
         feature_set = FeatureSet(
             "name",
@@ -248,7 +247,6 @@ class TestFeatureSet:
 
         # act
         result_df = feature_set.construct(input_df)
-        col_names = result_df.schema.names
 
         # assert
         assert result_df.is_cached
