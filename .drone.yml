@@ -53,6 +53,7 @@ pipeline:
     image: alpine:3.10
     commands:
       - find . -wholename "./dist/quintoandar_butterfree-*-py3-none-any.whl" -exec mv '{}' ./dist/quintoandar_butterfree-forno-py3-none-any.whl \;
+      - echo $(ls dist/*.whl)
     when:
       event: push
       branch: forno
