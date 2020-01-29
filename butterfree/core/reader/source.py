@@ -38,9 +38,15 @@ class Source:
         This method will assemble multiple sources, by building each one and querying
         data using a Spark SQL query.
 
+        After that, there's the caching of the dataframe, however since cache() in
+        Spark is lazy, an action is triggered in order to force persistence.
+
         :return: Spark DataFrame with the query result against all sources.
         """
         for reader in self.readers:
             reader.build()  # create temporary views for each reader
 
-        return self.client.sql(self.query)
+        dataframe = self.client.sql(self.query)
+        dataframe.cache().count()
+
+        return dataframe

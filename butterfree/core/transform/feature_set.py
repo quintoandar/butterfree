@@ -177,13 +177,20 @@ class FeatureSet:
     def construct(self, input_df: DataFrame) -> DataFrame:
         """Use all the features to build the feature set dataframe.
 
+        After that, there's the caching of the dataframe, however since cache() in
+        Spark is lazy, an action is triggered in order to force persistence.
+
         :param input_df: input dataframe to be transformed by the features.
         :return: Spark dataframe with just the feature columns
         """
         if not isinstance(input_df, DataFrame):
             raise ValueError("source_df must be a dataframe")
-        return reduce(
+        dataframe = reduce(
             lambda result_df, feature: feature.transform(result_df),
             self.features,
             input_df,
         ).select(*self.feature_set_columns)
+
+        dataframe.cache().count()
+
+        return dataframe

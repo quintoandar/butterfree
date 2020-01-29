@@ -43,16 +43,13 @@ FEATURE_ID = Feature(
     "id", "description", from_column="id", transformation=TransformId()
 )
 
-
 FEATURE_TS = Feature(
     "ts", "description", from_column="ts", transformation=TransformTs()
 )
 
-
 FEATURE_ADD100 = Feature(
     "add", "description", from_column="value", transformation=TransformAdd100()
 )
-
 
 FEATURE_SUB100 = Feature(
     "sub", "description", from_column="value", transformation=TransformSub100()
@@ -163,12 +160,15 @@ class TestFeatureSet:
             ),
             (
                 [{"id": "1", "ts": 0, "value": 100}],  # input data
-                [FEATURE_ID, FEATURE_TS, FEATURE_ADD100, FEATURE_SUB100],  # features
+                [FEATURE_ID, FEATURE_TS, FEATURE_ADD100, FEATURE_SUB100],
+                # features
                 [{"id": 1, "ts": "0", "add": 200, "sub": 0}],  # target_Data
             ),
             (
-                [{"id": "1", "ts": 0, "value": 100, "unused_column": 0}],  # input data
-                [FEATURE_ID, FEATURE_TS, FEATURE_ADD100, FEATURE_SUB100],  # features
+                [{"id": "1", "ts": 0, "value": 100, "unused_column": 0}],
+                # input data
+                [FEATURE_ID, FEATURE_TS, FEATURE_ADD100, FEATURE_SUB100],
+                # features
                 [{"id": 1, "ts": "0", "add": 200, "sub": 0}],  # target_Data
             ),
         ],
@@ -219,3 +219,34 @@ class TestFeatureSet:
         # act and assert
         with pytest.raises(ValueError):
             feature_set.construct("not a df")
+
+    @pytest.mark.parametrize(
+        "input_data, features, target_data",
+        [
+            (
+                [{"id": "1", "ts": 0, "value": 100}],  # input data
+                [FEATURE_ID, FEATURE_TS, FEATURE_ADD100],  # features
+                [{"id": 1, "ts": "0", "add": 200}],  # target_Data
+            ),
+        ],
+    )
+    def test_is_cached(self, input_data, features, target_data, base_spark):
+        # arrange
+        sc, spark = base_spark
+
+        input_df = spark.read.json(sc.parallelize(input_data, 1))
+
+        feature_set = FeatureSet(
+            "name",
+            "entity",
+            "description",
+            features,
+            key_columns=["id"],
+            timestamp_column="ts",
+        )
+
+        # act
+        result_df = feature_set.construct(input_df)
+
+        # assert
+        assert result_df.is_cached
