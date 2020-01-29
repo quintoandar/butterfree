@@ -81,7 +81,7 @@ pipeline:
   export-releases-to-s3-forno:
     image: plugins/s3
     pull: true
-    bucket: artifacts.s3.forno.data.quintoandar.com.br
+    bucket: 5a-artifacts
     source: dist/*.whl
     target: butterfree/
     strip_prefix: dist/
