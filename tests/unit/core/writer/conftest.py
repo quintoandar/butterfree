@@ -3,7 +3,7 @@ from pyspark.sql import session
 from pyspark.sql.types import StringType, StructField, StructType
 from pytest import fixture
 
-from butterfree.core.db.configs import CassandraWriteConfig
+from butterfree.core.db.configs import CassandraConfig
 
 
 def base_spark():
@@ -21,6 +21,15 @@ def feature_set_dataframe():
         {"id": 2, "ts": 0, "feature": 200},
         {"id": 1, "ts": 1, "feature": 110},
         {"id": 1, "ts": 2, "feature": 120},
+    ]
+    return spark.read.json(sc.parallelize(data, 1))
+
+
+@fixture
+def feature_set_count_dataframe():
+    sc, spark = base_spark()
+    data = [
+        {"row": 4},
     ]
     return spark.read.json(sc.parallelize(data, 1))
 
@@ -59,4 +68,4 @@ def feature_set_empty():
 
 @fixture
 def cassandra_config():
-    return CassandraWriteConfig(keyspace="test")
+    return CassandraConfig(keyspace="test")
