@@ -6,7 +6,7 @@ from typing import List
 
 from pyspark.sql.dataframe import DataFrame
 
-from butterfree.core.transform import Feature
+from butterfree.core.transform.feature import Feature, KeyFeature, TimestampFeature
 
 
 class FeatureSet:
@@ -17,9 +17,9 @@ class FeatureSet:
         name: str,
         entity: str,
         description: str,
+        keys: List[KeyFeature],
+        timestamp: TimestampFeature,
         features: List[Feature],
-        key_columns: List[str],
-        timestamp_column: str,
     ):
         """Initialize FeatureSet with specific configuration.
 
@@ -27,15 +27,13 @@ class FeatureSet:
         :param entity: business context tag for the feature set
         :param description: details about the feature set purpose
         :param features: features to compose the feature set
-        :param key_columns: column names to be defined as keys.
-        :param timestamp_column: column name to be defined as timestamp.
         """
         self.name = name
         self.entity = entity
         self.description = description
         self.features = features
-        self.key_columns = key_columns
-        self.timestamp_column = timestamp_column
+        self.keys = keys
+        self.timestamp = timestamp
 
     @property
     def name(self) -> str:
