@@ -1,14 +1,8 @@
-from pyspark.sql import DataFrame
-
 from butterfree.core.feature_set_pipeline import FeatureSetPipeline
-from butterfree.core.loader.online_feature_store_loader import OnlineFeatureStoreLoader
-from butterfree.core.source.table_source import TableSource
+from butterfree.core.reader import FileReader, KafkaReader, TableReader
 from butterfree.core.transform.aggregation import AggregatedTransform
 from butterfree.core.transform.feature import Feature
-
-
-def create_temp_view(dataframe: DataFrame, name):
-    dataframe.createOrReplaceTempView(name)
+from butterfree.core.writer import OnlineFeatureStoreWriter, HistoricalFeatureStoreWriter
 
 
 class TestFeatureSetPipeline:
@@ -18,28 +12,31 @@ class TestFeatureSetPipeline:
             name="feature set",
             entity="entity",
             description="This is a feature set.",
-            readers=[TableSource],
+            key_columns=["id"],
+            timestamp_column="ts",
+            readers=[TableReader, FileReader, KafkaReader],
             query="select * from source",
             features=[
                 Feature(name="user_id", description="The user's Main ID or device ID",),
                 Feature(
                     name="listing_page_viewed__rent_per_month",
                     description="Average of the rent per month of listings viewed",
-                ).add(
-                    AggregatedTransform(
+                    transformation=AggregatedTransform(
                         aggregations=["avg", "std"],
                         partition="user_id",
-                        windows={"days": [7], "weeks": [2]},
-                    )
+                        windows=["7 days", "2 weeks"],
+                    ),
                 ),
             ],
-            writers=[OnlineFeatureStoreLoader],
+            writers=[OnlineFeatureStoreWriter, HistoricalFeatureStoreWriter],
         )
 
         assert pipeline.name == "feature set"
         assert pipeline.entity == "entity"
         assert pipeline.description == "This is a feature set."
-        assert pipeline.readers == [TableSource]
+        assert len(pipeline.key_columns) == 1
+        assert pipeline.timestamp_column == "ts"
+        assert len(pipeline.readers) == 3
         assert pipeline.query == "select * from source"
         assert len(pipeline.features) == 2
-        assert pipeline.writers == [OnlineFeatureStoreLoader]
+        assert len(pipeline.writers) == 2
