@@ -7,14 +7,12 @@ class TestSink:
     def test_validate(self, feature_set_dataframe, mocker):
         # given
         spark_client = mocker.stub("spark_client")
-        writer = HistoricalFeatureStoreWriter
+        writer = HistoricalFeatureStoreWriter(spark_client)
         writer.validate = mocker.stub("validate")
         feature_set = mocker.stub("feature_set")
 
         # when
-        sink = Sink(
-            feature_set=feature_set, writers=[writer], spark_client=spark_client
-        )
+        sink = Sink(feature_set=feature_set, writers=[writer])
         sink.validate(dataframe=feature_set_dataframe)
 
         # then
@@ -23,15 +21,13 @@ class TestSink:
     def test_validate_false(self, feature_set_dataframe, mocker):
         # given
         spark_client = mocker.stub("spark_client")
-        writer = HistoricalFeatureStoreWriter
+        writer = HistoricalFeatureStoreWriter(spark_client)
         writer.validate = mocker.stub("validate")
         writer.validate.return_value = False
         feature_set = mocker.stub("feature_set")
 
         # when
-        sink = Sink(
-            feature_set=feature_set, writers=[writer], spark_client=spark_client
-        )
+        sink = Sink(feature_set=feature_set, writers=[writer])
 
         # then
         with pytest.raises(ValueError):
@@ -40,16 +36,14 @@ class TestSink:
     def test_flush(self, feature_set_dataframe, mocker):
         # given
         spark_client = mocker.stub("spark_client")
-        writer = HistoricalFeatureStoreWriter
+        writer = HistoricalFeatureStoreWriter(spark_client)
         writer.write = mocker.stub("write")
         feature_set = mocker.stub("feature_set")
         feature_set.entity = "house"
         feature_set.name = "test"
 
         # when
-        sink = Sink(
-            feature_set=feature_set, writers=[writer], spark_client=spark_client
-        )
+        sink = Sink(feature_set=feature_set, writers=[writer])
         sink.flush(dataframe=feature_set_dataframe)
 
         # then
@@ -58,17 +52,14 @@ class TestSink:
     def test_flush_with_invalid_df(self, feature_sets, mocker):
         # given
         spark_client = mocker.stub("spark_client")
-        writer = HistoricalFeatureStoreWriter
+        writer = HistoricalFeatureStoreWriter(spark_client)
         feature_set = mocker.stub("feature_set")
         feature_set.entity = "house"
         feature_set.name = "test"
 
         # when
-        sink = Sink(
-            feature_set=feature_set, writers=[writer], spark_client=spark_client
-        )
+        sink = Sink(feature_set=feature_set, writers=[writer])
 
         # then
         with pytest.raises(ValueError):
             sink.flush(dataframe=feature_sets)
-
