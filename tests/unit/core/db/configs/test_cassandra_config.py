@@ -1,7 +1,7 @@
 import pytest
 
 
-class TestCassandraWriteConfig:
+class TestCassandraConfig:
     def test_mode(self, cassandra_config):
         # expecting
         default = "append"
