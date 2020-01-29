@@ -7,7 +7,7 @@ from functools import reduce
 class Reader(ABC):
     """Abstract base class for Readers."""
 
-    def __init__(self, id, client):
+    def __init__(self, id):
         """Instantiate Reader with the required parameters.
 
         :param id: unique string id for register the reader as a view on the metastore
@@ -16,7 +16,6 @@ class Reader(ABC):
         after the raw data is extracted
         """
         self.id = id
-        self.client = client
         self.transformations = []
 
     def with_(self, transformer, *args, **kwargs):
@@ -52,17 +51,19 @@ class Reader(ABC):
         )
 
     @abstractmethod
-    def consume(self):
+    def consume(self, client):
         """Extract data from reader using the consume_options defined in the build.
 
         :return: Spark dataframe
         """
 
-    def build(self):
+    def build(self, client):
         """Register the reader in the Spark metastore.
 
         Create a temporary view in Spark metastore referencing the data extracted from
         the defined Reader, using the consume method
         :return: None
         """
-        self._apply_transformations(self.consume()).createOrReplaceTempView(self.id)
+        self._apply_transformations(self.consume(client)).createOrReplaceTempView(
+            self.id
+        )
