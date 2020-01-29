@@ -81,14 +81,14 @@ class TestFeatureSet:
         ],
     )
     def test_cannot_instantiate(
-            self,
-            name,
-            entity,
-            description,
-            key_columns,
-            timestamp_column,
-            feature_columns,
-            mocked_feature,
+        self,
+        name,
+        entity,
+        description,
+        key_columns,
+        timestamp_column,
+        feature_columns,
+        mocked_feature,
     ):
         # arrange
         mocked_feature.get_output_columns.return_value = feature_columns
@@ -149,27 +149,27 @@ class TestFeatureSet:
         "input_data, features, target_data",
         [
             (
-                    [{"id": "1", "ts": 0, "value": 100}],  # input data
-                    [FEATURE_ID, FEATURE_TS, FEATURE_ADD100],  # features
-                    [{"id": 1, "ts": "0", "add": 200}],  # target_Data
+                [{"id": "1", "ts": 0, "value": 100}],  # input data
+                [FEATURE_ID, FEATURE_TS, FEATURE_ADD100],  # features
+                [{"id": 1, "ts": "0", "add": 200}],  # target_Data
             ),
             (
-                    [{"id": "1", "ts": 0, "value": 100}],  # input data
-                    [FEATURE_ID, FEATURE_TS, FEATURE_SUB100],  # features
-                    [{"id": 1, "ts": "0", "sub": 0}],  # target_Data
+                [{"id": "1", "ts": 0, "value": 100}],  # input data
+                [FEATURE_ID, FEATURE_TS, FEATURE_SUB100],  # features
+                [{"id": 1, "ts": "0", "sub": 0}],  # target_Data
             ),
             (
-                    [{"id": "1", "ts": 0, "value": 100}],  # input data
-                    [FEATURE_ID, FEATURE_TS, FEATURE_ADD100, FEATURE_SUB100],
-                    # features
-                    [{"id": 1, "ts": "0", "add": 200, "sub": 0}],  # target_Data
+                [{"id": "1", "ts": 0, "value": 100}],  # input data
+                [FEATURE_ID, FEATURE_TS, FEATURE_ADD100, FEATURE_SUB100],
+                # features
+                [{"id": 1, "ts": "0", "add": 200, "sub": 0}],  # target_Data
             ),
             (
-                    [{"id": "1", "ts": 0, "value": 100, "unused_column": 0}],
-                    # input data
-                    [FEATURE_ID, FEATURE_TS, FEATURE_ADD100, FEATURE_SUB100],
-                    # features
-                    [{"id": 1, "ts": "0", "add": 200, "sub": 0}],  # target_Data
+                [{"id": "1", "ts": 0, "value": 100, "unused_column": 0}],
+                # input data
+                [FEATURE_ID, FEATURE_TS, FEATURE_ADD100, FEATURE_SUB100],
+                # features
+                [{"id": 1, "ts": "0", "add": 200, "sub": 0}],  # target_Data
             ),
         ],
     )
@@ -198,8 +198,8 @@ class TestFeatureSet:
         print("target_df:", target_df.select(col_names).collect())
         print("result_df:", result_df.select(col_names).collect())
         assert (
-                target_df.select(col_names).collect()
-                == result_df.select(col_names).collect()
+            target_df.select(col_names).collect()
+            == result_df.select(col_names).collect()
         )
 
     def test_construct_invalid_params(self, mocked_feature):
@@ -224,9 +224,9 @@ class TestFeatureSet:
         "input_data, features, target_data",
         [
             (
-                    [{"id": "1", "ts": 0, "value": 100}],  # input data
-                    [FEATURE_ID, FEATURE_TS, FEATURE_ADD100],  # features
-                    [{"id": 1, "ts": "0", "add": 200}],  # target_Data
+                [{"id": "1", "ts": 0, "value": 100}],  # input data
+                [FEATURE_ID, FEATURE_TS, FEATURE_ADD100],  # features
+                [{"id": 1, "ts": "0", "add": 200}],  # target_Data
             ),
         ],
     )
