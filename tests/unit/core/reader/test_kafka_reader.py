@@ -8,10 +8,10 @@ class TestKafkaReader:
         "connection_string, topic",
         [(None, "topic"), ("host1:port,host2:port", 123), (123, None)],
     )
-    def test_init_invalid_params(self, connection_string, topic, spark_client):
+    def test_init_invalid_params(self, connection_string, topic):
         # act and assert
         with pytest.raises(ValueError):
-            KafkaReader("id", spark_client, connection_string, topic)
+            KafkaReader("id", connection_string, topic)
 
     @pytest.mark.parametrize(
         "connection_string, topic, topic_options, stream",
@@ -42,11 +42,11 @@ class TestKafkaReader:
 
         spark_client.read.return_value = raw_stream_df
         kafka_reader = KafkaReader(
-            "test", spark_client, connection_string, topic, topic_options, stream
+            "test", connection_string, topic, topic_options, stream
         )
 
         # act
-        output_df = kafka_reader.consume()
+        output_df = kafka_reader.consume(spark_client)
         options = dict(
             {"kafka.bootstrap.servers": connection_string, "subscribe": topic},
             **topic_options if topic_options else {},
