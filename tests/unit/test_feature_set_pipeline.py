@@ -8,6 +8,7 @@ from butterfree.core.transform.aggregation import AggregatedTransform
 from butterfree.core.writer import (
     HistoricalFeatureStoreWriter,
     OnlineFeatureStoreWriter,
+    Sink,
     Writer,
 )
 
@@ -56,8 +57,7 @@ class TestFeatureSetPipeline:
                 key_columns=["user_id"],
                 timestamp_column="ts",
             ),
-            sink=Mock(
-                spark_client=SparkClient(),
+            sink=Sink(
                 writers=[
                     HistoricalFeatureStoreWriter(spark_client=SparkClient()),
                     OnlineFeatureStoreWriter(spark_client=SparkClient()),
@@ -82,7 +82,6 @@ class TestFeatureSetPipeline:
         assert all(
             isinstance(feature, Feature) for feature in pipeline.feature_set.features
         )
-        assert isinstance(pipeline.sink.spark_client, SparkClient)
         assert len(pipeline.sink.writers) == 2
         assert all(isinstance(writer, Writer) for writer in pipeline.sink.writers)
 
@@ -114,7 +113,6 @@ class TestFeatureSetPipeline:
                 timestamp_column="ts",
             ),
             sink=Mock(
-                spark_client=SparkClient(),
                 writers=[HistoricalFeatureStoreWriter(spark_client=SparkClient())],
             ),
         )
