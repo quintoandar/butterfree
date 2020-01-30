@@ -22,8 +22,8 @@ class TestSink:
         feature_set = mocker.stub("feature_set")
 
         # when
-        sink = Sink(feature_set=feature_set, writers=writer)
-        sink.validate(dataframe=feature_set_dataframe)
+        sink = Sink(writers=writer)
+        sink.validate(dataframe=feature_set_dataframe, feature_set=feature_set)
 
         # then
         for w in writer:
@@ -44,11 +44,11 @@ class TestSink:
         feature_set = mocker.stub("feature_set")
 
         # when
-        sink = Sink(feature_set=feature_set, writers=writer)
+        sink = Sink(writers=writer)
 
         # then
         with pytest.raises(RuntimeError):
-            sink.validate(dataframe=feature_set_dataframe)
+            sink.validate(dataframe=feature_set_dataframe, feature_set=feature_set)
 
     def test_flush(self, feature_set_dataframe, mocker):
         # given
@@ -66,8 +66,8 @@ class TestSink:
         feature_set.name = "test"
 
         # when
-        sink = Sink(feature_set=feature_set, writers=writer)
-        sink.flush(dataframe=feature_set_dataframe)
+        sink = Sink(writers=writer)
+        sink.flush(dataframe=feature_set_dataframe, feature_set=feature_set)
 
         # then
         for w in writer:
@@ -85,19 +85,16 @@ class TestSink:
         feature_set.name = "test"
 
         # when
-        sink = Sink(feature_set=feature_set, writers=writer)
+        sink = Sink(writers=writer)
 
         # then
         with pytest.raises(ValueError):
-            sink.flush(dataframe=feature_sets)
+            sink.flush(dataframe=feature_sets, feature_set=feature_set)
 
-    def test_flush_with_writers_list_empty(self, mocker):
+    def test_flush_with_writers_list_empty(self):
         # given
         writer = []
-        feature_set = mocker.stub("feature_set")
-        feature_set.entity = "house"
-        feature_set.name = "test"
 
         # then
         with pytest.raises(ValueError):
-            Sink(feature_set=feature_set, writers=writer)
+            Sink(writers=writer)
