@@ -18,21 +18,11 @@ from butterfree.core.writer import (
 class TestFeatureSetPipeline:
     def test_feature_set_args(self):
         pipeline = FeatureSetPipeline(
+            spark_client=SparkClient(),
             source=Source(
-                spark_client=SparkClient(),
                 readers=[
-                    TableReader(
-                        id="source_a",
-                        spark_client=SparkClient(),
-                        database="db",
-                        table="table",
-                    ),
-                    FileReader(
-                        id="source_b",
-                        spark_client=SparkClient(),
-                        path="path",
-                        format="parquet",
-                    ),
+                    TableReader(id="source_a", database="db", table="table",),
+                    FileReader(id="source_b", path="path", format="parquet",),
                 ],
                 query="select a.*, b.specific_feature "
                 "from source_a left join source_b on a.id=b.id",
@@ -61,13 +51,13 @@ class TestFeatureSetPipeline:
             ),
             sink=Sink(
                 writers=[
-                    HistoricalFeatureStoreWriter(spark_client=SparkClient()),
-                    OnlineFeatureStoreWriter(spark_client=SparkClient()),
+                    HistoricalFeatureStoreWriter(db_config=None),
+                    OnlineFeatureStoreWriter(db_config=None),
                 ],
             ),
         )
 
-        assert isinstance(pipeline.source.client, SparkClient)
+        assert isinstance(pipeline.spark_client, SparkClient)
         assert len(pipeline.source.readers) == 2
         assert all(isinstance(reader, Reader) for reader in pipeline.source.readers)
         assert isinstance(pipeline.source.query, str)
@@ -89,17 +79,10 @@ class TestFeatureSetPipeline:
 
     def test_run(self):
         test_pipeline = FeatureSetPipeline(
+            spark_client=SparkClient(),
             source=Mock(
                 spec=Source,
-                spark_client=SparkClient(),
-                readers=[
-                    TableReader(
-                        id="source_a",
-                        spark_client=SparkClient(),
-                        database="db",
-                        table="table",
-                    ),
-                ],
+                readers=[TableReader(id="source_a", database="db", table="table",)],
                 query="select * from source_a",
             ),
             feature_set=Mock(
@@ -117,8 +100,7 @@ class TestFeatureSetPipeline:
                 timestamp_column="ts",
             ),
             sink=Mock(
-                spec=Sink,
-                writers=[HistoricalFeatureStoreWriter(spark_client=SparkClient())],
+                spec=Sink, writers=[HistoricalFeatureStoreWriter(db_config=None)],
             ),
         )
         test_pipeline.run()
@@ -131,15 +113,11 @@ class TestFeatureSetPipeline:
     def test_source_raise(self):
         with pytest.raises(ValueError, match="source must be a Source instance"):
             FeatureSetPipeline(
+                spark_client=SparkClient(),
                 source=Mock(
                     spark_client=SparkClient(),
                     readers=[
-                        TableReader(
-                            id="source_a",
-                            spark_client=SparkClient(),
-                            database="db",
-                            table="table",
-                        ),
+                        TableReader(id="source_a", database="db", table="table",),
                     ],
                     query="select * from source_a",
                 ),
@@ -159,8 +137,7 @@ class TestFeatureSetPipeline:
                     timestamp_column="ts",
                 ),
                 sink=Mock(
-                    spec=Sink,
-                    writers=[HistoricalFeatureStoreWriter(spark_client=SparkClient())],
+                    spec=Sink, writers=[HistoricalFeatureStoreWriter(db_config=None)],
                 ),
             )
 
@@ -169,16 +146,11 @@ class TestFeatureSetPipeline:
             ValueError, match="feature_set must be a FeatureSet instance"
         ):
             FeatureSetPipeline(
+                spark_client=SparkClient(),
                 source=Mock(
                     spec=Source,
-                    spark_client=SparkClient(),
                     readers=[
-                        TableReader(
-                            id="source_a",
-                            spark_client=SparkClient(),
-                            database="db",
-                            table="table",
-                        ),
+                        TableReader(id="source_a", database="db", table="table",),
                     ],
                     query="select * from source_a",
                 ),
@@ -197,24 +169,18 @@ class TestFeatureSetPipeline:
                     timestamp_column="ts",
                 ),
                 sink=Mock(
-                    spec=Sink,
-                    writers=[HistoricalFeatureStoreWriter(spark_client=SparkClient())],
+                    spec=Sink, writers=[HistoricalFeatureStoreWriter(db_config=None)],
                 ),
             )
 
     def test_sink_raise(self):
         with pytest.raises(ValueError, match="sink must be a Sink instance"):
             FeatureSetPipeline(
+                spark_client=SparkClient(),
                 source=Mock(
                     spec=Source,
-                    spark_client=SparkClient(),
                     readers=[
-                        TableReader(
-                            id="source_a",
-                            spark_client=SparkClient(),
-                            database="db",
-                            table="table",
-                        ),
+                        TableReader(id="source_a", database="db", table="table",),
                     ],
                     query="select * from source_a",
                 ),
@@ -233,7 +199,5 @@ class TestFeatureSetPipeline:
                     key_columns=["user_id"],
                     timestamp_column="ts",
                 ),
-                sink=Mock(
-                    writers=[HistoricalFeatureStoreWriter(spark_client=SparkClient())],
-                ),
+                sink=Mock(writers=[HistoricalFeatureStoreWriter(db_config=None)],),
             )
