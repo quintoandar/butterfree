@@ -4,6 +4,7 @@ from typing import List
 
 from pyspark.sql.dataframe import DataFrame
 
+from butterfree.core.client import SparkClient
 from butterfree.core.transform import FeatureSet
 from butterfree.core.writer.writer import Writer
 
@@ -21,18 +22,26 @@ class Sink:
         else:
             self.writers = writers
 
-    def validate(self, feature_set: FeatureSet, dataframe: DataFrame):
+    def validate(
+        self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient
+    ):
         """Validate the data loaded by the defined Writers.
 
         Args:
             dataframe: spark dataframe containing data from a feature set.
             feature_set: object processed with feature_set informations.
+            spark_client: client used to run a query.
         """
         Validation = namedtuple("Validation", ["writer", "result"])
 
         validations = [
             Validation(
-                writer, writer.validate(feature_set=feature_set, dataframe=dataframe),
+                writer,
+                writer.validate(
+                    feature_set=feature_set,
+                    dataframe=dataframe,
+                    spark_client=spark_client,
+                ),
             )
             for writer in self.writers
         ]
@@ -43,12 +52,17 @@ class Sink:
                 "The following validations returned error: {}".format(failures)
             )
 
-    def flush(self, feature_set: FeatureSet, dataframe: DataFrame):
+    def flush(
+        self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient
+    ):
         """Trigger all the defined Writers into the Feature Store.
 
         Args:
             dataframe: spark dataframe containing data from a feature set.
             feature_set: object processed with feature_set informations.
+            spark_client: client used to run a query.
         """
         for writer in self.writers:
-            writer.write(feature_set=feature_set, dataframe=dataframe)
+            writer.write(
+                feature_set=feature_set, dataframe=dataframe, spark_client=spark_client
+            )
