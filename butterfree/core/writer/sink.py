@@ -26,10 +26,10 @@ class Sink:
         Args:
             dataframe: spark dataframe containing data from a feature set.
         """
-        Validation = namedtuple("Validation", ["writer", "result"])
+        validation = namedtuple("validation", ["writer", "result"])
 
         validations = [
-            Validation(
+            validation(
                 writer,
                 writer.validate(feature_set=self.feature_set, dataframe=dataframe),
             )
