@@ -128,7 +128,7 @@ class TestFeatureSetPipeline:
         assert test_pipeline.sink.flush.assert_called_once
         assert test_pipeline.sink.validate.assert_called_once
 
-    def test_source(self):
+    def test_source_raise(self):
         with pytest.raises(ValueError, match="source must be a Source instance"):
             FeatureSetPipeline(
                 source=Mock(
@@ -164,7 +164,7 @@ class TestFeatureSetPipeline:
                 ),
             )
 
-    def test_feature_set(self):
+    def test_feature_set_raise(self):
         with pytest.raises(
             ValueError, match="feature_set must be a FeatureSet instance"
         ):
@@ -202,7 +202,7 @@ class TestFeatureSetPipeline:
                 ),
             )
 
-    def test_sink(self):
+    def test_sink_raise(self):
         with pytest.raises(ValueError, match="sink must be a Sink instance"):
             FeatureSetPipeline(
                 source=Mock(
