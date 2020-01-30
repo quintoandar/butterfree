@@ -9,7 +9,11 @@ from butterfree.core.transform import FeatureSet
 
 
 class Writer(ABC):
-    """Abstract base class for Writers."""
+    """Abstract base class for Writers.
+
+    Args:
+        spark_client: client for spark connections with external services.
+    """
 
     def __init__(self, spark_client: SparkClient):
         self.spark_client = spark_client
