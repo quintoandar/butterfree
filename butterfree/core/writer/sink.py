@@ -1,4 +1,5 @@
 """Holds the Sink class."""
+from collections import namedtuple
 from typing import List
 
 from pyspark.sql.dataframe import DataFrame
@@ -8,7 +9,7 @@ from butterfree.core.writer.writer import Writer
 
 
 class Sink:
-    """Run the Writers and validate actions them.
+    """Run the Writers and validate process checks on the loaded data.
 
     Attributes:
         feature_set: object processed with feature_set informations.
@@ -20,23 +21,29 @@ class Sink:
         self.feature_set = feature_set
 
     def validate(self, dataframe: DataFrame):
-        """Validate to load the feature set into Writers.
+        """Validate the data loaded by the defined Writers.
 
         Args:
-            feature_set: object processed with feature_set informations.
             dataframe: spark dataframe containing data from a feature set.
         """
-        check = []
-        for writer in self.writers:
-            verify = writer.validate(feature_set=self.feature_set, dataframe=dataframe)
-            check.append([writer, verify])
+        Validation = namedtuple("Validation", ["writer", "result"])
 
-        for writer, validate_result in check:
-            if validate_result is False:
-                raise ValueError("The {} load process was failed.".format(writer))
+        validations = [
+            Validation(
+                writer,
+                writer.validate(feature_set=self.feature_set, dataframe=dataframe),
+            )
+            for writer in self.writers
+        ]
+        failures = [validation for validation in validations if not validation[1]]
+
+        if failures:
+            raise RuntimeError(
+                "The following validations returned error: {}".format(failures)
+            )
 
     def flush(self, dataframe: DataFrame):
-        """Loads the data from a feature set into the Feature Store.
+        """Trigger all the defined Writers into the Feature Store.
 
         Args:
             dataframe: spark dataframe containing data from a feature set.
