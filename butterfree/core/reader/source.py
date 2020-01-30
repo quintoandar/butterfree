@@ -41,7 +41,7 @@ class Source:
         :return: Spark DataFrame with the query result against all sources.
         """
         for reader in self.readers:
-            reader.build()  # create temporary views for each reader
+            reader.build(spark_client)  # create temporary views for each reader
 
         dataframe = spark_client.sql(self.query)
         dataframe.cache().count()
