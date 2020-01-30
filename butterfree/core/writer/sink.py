@@ -17,7 +17,10 @@ class Sink:
     """
 
     def __init__(self, feature_set: FeatureSet, writers: List[Writer]):
-        self.writers = writers
+        if not writers:
+            raise ValueError("The writers list can't be empty.")
+        else:
+            self.writers = writers
         self.feature_set = feature_set
 
     def validate(self, dataframe: DataFrame):
@@ -26,16 +29,16 @@ class Sink:
         Args:
             dataframe: spark dataframe containing data from a feature set.
         """
-        validation = namedtuple("validation", ["writer", "result"])
+        Validation = namedtuple("Validation", ["writer", "result"])
 
         validations = [
-            validation(
+            Validation(
                 writer,
                 writer.validate(feature_set=self.feature_set, dataframe=dataframe),
             )
             for writer in self.writers
         ]
-        failures = [validation for validation in validations if not validation[1]]
+        failures = [validation for validation in validations if not validation.result]
 
         if failures:
             raise RuntimeError(

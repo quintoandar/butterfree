@@ -26,7 +26,8 @@ class TestSink:
         sink.validate(dataframe=feature_set_dataframe)
 
         # then
-        w.validate.assert_called_once()
+        for w in writer:
+            w.validate.assert_called_once()
 
     def test_validate_false(self, feature_set_dataframe, mocker):
         # given
@@ -69,7 +70,8 @@ class TestSink:
         sink.flush(dataframe=feature_set_dataframe)
 
         # then
-        w.write.assert_called_once()
+        for w in writer:
+            w.write.assert_called_once()
 
     def test_flush_with_invalid_df(self, feature_sets, mocker):
         # given
@@ -88,3 +90,14 @@ class TestSink:
         # then
         with pytest.raises(ValueError):
             sink.flush(dataframe=feature_sets)
+
+    def test_flush_with_writers_list_empty(self, mocker):
+        # given
+        writer = []
+        feature_set = mocker.stub("feature_set")
+        feature_set.entity = "house"
+        feature_set.name = "test"
+
+        # then
+        with pytest.raises(ValueError):
+            Sink(feature_set=feature_set, writers=writer)
