@@ -3,7 +3,7 @@ from unittest.mock import patch
 
 import pytest
 
-from butterfree.core.transform.transform_component import TransformComponent
+from butterfree.core.transform.transformations import TransformComponent
 
 
 class TestTransformComponent(TestCase):

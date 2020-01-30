@@ -1,6 +1,7 @@
 from unittest.mock import Mock
 
-from butterfree.core.transform import Feature
+from butterfree.core.constant.data_type import DataType
+from butterfree.core.transform.features import Feature
 
 
 class TestFeature:
@@ -13,7 +14,6 @@ class TestFeature:
         assert test_feature.name == "feature"
         assert test_feature.from_column == "origin"
         assert test_feature.description == "unit test"
-        assert not test_feature.transformation
 
     def test_args_with_transformation(self):
 
@@ -46,6 +46,15 @@ class TestFeature:
         df = test_feature.transform(feature_set_dataframe)
 
         assert all([a == b for a, b in zip(df.columns, ["new_feature", "id", "ts"])])
+
+    def test_feature_transform_with_dtype(self, feature_set_dataframe):
+
+        test_feature = Feature(
+            name="feature", description="unit test", dtype=DataType.TIMESTAMP
+        )
+        df = test_feature.transform(feature_set_dataframe)
+
+        assert dict(df.dtypes).get("feature") == "timestamp"
 
     def test_feature_transform_with_transformation_no_from_column(
         self, feature_set_dataframe

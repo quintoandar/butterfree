@@ -6,7 +6,9 @@ from parameters_validation import non_blank
 from pyspark.sql import DataFrame, functions
 from pyspark.sql.window import Window
 
-from butterfree.core.transform.transform_component import TransformComponent
+from butterfree.core.transform.transformations.transform_component import (
+    TransformComponent,
+)
 
 
 class AggregatedTransform(TransformComponent):
@@ -160,11 +162,16 @@ class AggregatedTransform(TransformComponent):
                         window_size=int(window.split()[0]),
                     ),
                 )
-                dataframe = dataframe.select(functions.col("*")).withColumn(
+                dataframe = dataframe.withColumn(
                     feature_name,
                     self.__ALLOWED_AGGREGATIONS[aggregation](
                         f"{self._parent.name}"
                     ).over(w),
                 )
+                if self._parent.dtype:
+                    dataframe = dataframe.withColumn(
+                        feature_name,
+                        functions.col(feature_name).cast(self._parent.dtype),
+                    )
 
         return dataframe

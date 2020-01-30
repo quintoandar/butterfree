@@ -4,10 +4,9 @@ from pyspark import SparkContext
 from pyspark.sql import session
 from pytest import fixture
 
-from butterfree.core.transform import Feature
+from butterfree.core.transform.features import Feature, KeyFeature, TimestampFeature
 
 
-@fixture
 def base_spark():
     sc = SparkContext.getOrCreate()
     spark = session.SparkSession(sc)
@@ -15,16 +14,90 @@ def base_spark():
     return sc, spark
 
 
-@fixture
-def feature_set_dataframe(base_spark):
-    sc, spark = base_spark
+def make_dataframe():
+    sc, spark = base_spark()
     data = [
-        {"id": 1, "ts": 0, "feature": 100},
-        {"id": 2, "ts": 1, "feature": 200},
+        {
+            "id": 1,
+            "ts": "2016-04-11 11:31:11",
+            "feature1": 200,
+            "feature2": 200,
+            "nonfeature": 0,
+        },
+        {
+            "id": 1,
+            "ts": "2016-04-11 11:44:12",
+            "feature1": 300,
+            "feature2": 300,
+            "nonfeature": 0,
+        },
+        {
+            "id": 1,
+            "ts": "2016-04-11 11:46:24",
+            "feature1": 400,
+            "feature2": 400,
+            "nonfeature": 0,
+        },
+        {
+            "id": 1,
+            "ts": "2016-04-11 12:03:21",
+            "feature1": 500,
+            "feature2": 500,
+            "nonfeature": 0,
+        },
     ]
-    return spark.read.json(sc.parallelize(data, 1))
+    df = spark.read.json(sc.parallelize(data, 1))
+    df = df.withColumn("timestamp", df.ts.cast("timestamp"))
+
+    return df
+
+
+def make_fs():
+    df = make_dataframe()
+    return (
+        df.withColumn("add", df.feature1 + df.feature2)
+        .withColumn("divide", df.feature1 / df.feature2)
+        .select("id", "timestamp", "add", "divide")
+    )
 
 
 @fixture
-def mocked_feature():
-    return Mock(spec=Feature)
+def dataframe():
+    return make_dataframe()
+
+
+@fixture
+def feature_set_dataframe():
+    return make_fs()
+
+
+@fixture
+def feature_add():
+    fadd = Mock(spec=Feature)
+    fadd.get_output_columns = Mock(return_value=["add"])
+    fadd.transform = Mock(return_value=make_fs())
+    return fadd
+
+
+@fixture
+def feature_divide():
+    fdivide = Mock(spec=Feature)
+    fdivide.get_output_columns = Mock(return_value=["divide"])
+    fdivide.transform = Mock(return_value=make_fs())
+    return fdivide
+
+
+@fixture
+def key_id():
+    kid = Mock(spec=KeyFeature)
+    kid.get_output_columns = Mock(return_value=["id"])
+    kid.transform = Mock(return_value=make_fs())
+    return kid
+
+
+@fixture
+def timestamp_c():
+    timestamp_c = Mock(spec=TimestampFeature)
+    timestamp_c.get_output_columns = Mock(return_value=["timestamp"])
+    timestamp_c.transform = Mock(return_value=make_fs())
+    return timestamp_c

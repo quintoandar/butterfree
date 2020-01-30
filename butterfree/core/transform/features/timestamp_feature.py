@@ -1,5 +1,5 @@
 from butterfree.core.constant.data_type import DataType
-from butterfree.core.transform.feature.feature import Feature
+from butterfree.core.transform.features.feature import Feature
 from butterfree.core.transform.transformations import TransformComponent
 
 

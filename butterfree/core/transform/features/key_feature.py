@@ -1,4 +1,5 @@
-from butterfree.core.transform.feature.feature import Feature
+from butterfree.core.constant.data_type import DataType
+from butterfree.core.transform.features.feature import Feature
 from butterfree.core.transform.transformations import TransformComponent
 
 
@@ -7,12 +8,14 @@ class KeyFeature(Feature):
         self,
         name: str,
         description: str,
+        dtype: DataType = None,
         from_column: str = None,
         transformation: TransformComponent = None,
     ):
         super(KeyFeature, self).__init__(
             name=name,
             description=description,
+            dtype=dtype,
             from_column=from_column,
             transformation=transformation,
         )
