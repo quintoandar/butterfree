@@ -91,12 +91,9 @@ class TestSink:
         with pytest.raises(ValueError):
             sink.flush(dataframe=feature_sets, feature_set=feature_set)
 
-    def test_flush_with_writers_list_empty(self, mocker):
+    def test_flush_with_writers_list_empty(self):
         # given
         writer = []
-        feature_set = mocker.stub("feature_set")
-        feature_set.entity = "house"
-        feature_set.name = "test"
 
         # then
         with pytest.raises(ValueError):
