@@ -15,11 +15,10 @@ class Writer(ABC):
         spark_client: client for spark connections with external services.
     """
 
-    def __init__(self, spark_client: SparkClient):
-        self.spark_client = spark_client
-
     @abstractmethod
-    def write(self, feature_set: FeatureSet, dataframe: DataFrame):
+    def write(
+        self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient
+    ):
         """Loads the data from a feature set into the Feature Store.
 
         Feature Store could be Online or Historical.
@@ -27,15 +26,19 @@ class Writer(ABC):
         Args:
             feature_set: object processed with feature_set informations.
             dataframe: spark dataframe containing data from a feature set.
+            spark_client: client for spark connections with external services.
         """
 
     @abstractmethod
-    def validate(self, feature_set: FeatureSet, dataframe: DataFrame):
+    def validate(
+        self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient
+    ):
         """Calculate dataframe rows to validate data into Feature Store.
 
         Args:
             feature_set: object processed with feature_set informations.
             dataframe: spark dataframe containing data from a feature set.
+            spark_client: client for spark connections with external services.
 
         Returns:
             False: fail validation.
