@@ -1,5 +1,4 @@
 import pytest
-from tests.unit.core.writer.conftest import feature_set_empty, feature_set_without_ts
 
 from butterfree.core.writer import HistoricalFeatureStoreWriter
 
@@ -34,11 +33,7 @@ class TestHistoricalFeatureStoreWriter:
         )
         assert feature_set.name == spark_client.write_table.call_args[1]["table_name"]
 
-    @pytest.mark.parametrize(
-        "dataframe",
-        [feature_set_empty, feature_set_without_ts, "not a spark df writer"],
-    )
-    def test_write_with_df_invalid(self, dataframe, mocker):
+    def test_write_with_df_invalid(self, feature_sets, mocker):
         # given
         spark_client = mocker.stub("spark_client")
         spark_client.write_table = mocker.stub("write_table")
@@ -50,7 +45,7 @@ class TestHistoricalFeatureStoreWriter:
 
         # then
         with pytest.raises(ValueError):
-            assert writer.write(feature_set=feature_set, dataframe=dataframe)
+            writer.write(feature_set=feature_set, dataframe=feature_sets)
 
     def test_validate(self, feature_set_dataframe, feature_set_count_dataframe, mocker):
         # given

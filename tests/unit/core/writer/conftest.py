@@ -57,6 +57,12 @@ def feature_set_without_ts():
 
 
 @fixture
+def feature_set_not_df():
+    data = "not a spark df writer"
+    return data
+
+
+@fixture
 def feature_set_empty():
     sc, spark = base_spark()
 
@@ -69,3 +75,8 @@ def feature_set_empty():
 @fixture
 def cassandra_config():
     return CassandraConfig(keyspace="test")
+
+
+@fixture(params=["feature_set_empty", "feature_set_without_ts", "feature_set_not_df"])
+def feature_sets(request):
+    return request.getfixturevalue(request.param)

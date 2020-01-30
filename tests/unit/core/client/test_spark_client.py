@@ -54,7 +54,7 @@ class TestSparkClient:
 
         # act and assert
         with pytest.raises(ValueError):
-            assert spark_client.read(format, options)
+            spark_client.read(format, options)
 
     def test_sql(self, target_df):
         # arrange
@@ -109,9 +109,7 @@ class TestSparkClient:
 
         # act and assert
         with pytest.raises(ValueError):
-            assert spark_client.write_dataframe(
-                dataframe=target_df, format_=format, mode=mode
-            )
+            spark_client.write_dataframe(dataframe=target_df, format_=format, mode=mode)
 
     @pytest.mark.parametrize(
         "format, mode, database, table_name, path",
@@ -153,6 +151,6 @@ class TestSparkClient:
         df_writer = "not a spark df writer"
 
         with pytest.raises(ValueError):
-            assert SparkClient.write_table(
+            SparkClient.write_table(
                 dataframe=df_writer, database=database, table_name=table_name, path=path
             )
