@@ -10,10 +10,18 @@ from butterfree.core.transform.transformations import TransformComponent
 class Feature:
     """Defines a Feature.
 
+    A Feature is the result of a transformation over one (or more) data columns over
+    an input dataframe. Transformations can be as simple as renaming, casting types,
+    mathematical expressions or complex functions/models.
+
     Attributes:
         name: feature name.
+            Can be use by the transformation to derive multiple output columns.
         description: brief explanation regarding the feature.
+        dtype: data type for the output columns of this feature.
         from_column: original column to build feature.
+            Used when there is transformation or the transformation has no reference
+            about the column to use for.
         transformation: transformation that will be applied to create this feature.
     """
 
@@ -26,10 +34,10 @@ class Feature:
         transformation: TransformComponent = None,
     ):
         self.name = name
-        self.from_column = from_column
         self.description = description
-        self.transformation = transformation
         self.dtype = dtype
+        self.from_column = from_column
+        self.transformation = transformation
 
     @property
     def transformation(self):

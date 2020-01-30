@@ -94,10 +94,18 @@ class FeatureSet:
 
     @property
     def keys(self):
+        """Attribute "keys" getter.
+
+        :return keys: list of KeyFeatures for this feature set.
+        """
         return self.__keys
 
     @keys.setter
     def keys(self, value):
+        """Attribute "keys" setter.
+
+        :param value: used to set attribute "keys".
+        """
         if not isinstance(value, list) or not all(
             isinstance(item, KeyFeature) for item in value
         ):
@@ -111,10 +119,18 @@ class FeatureSet:
 
     @property
     def timestamp(self):
+        """Attribute "timestamp" getter.
+
+        :return keys: TimestampFeature for this feature set.
+        """
         return self.__timestamp
 
     @timestamp.setter
     def timestamp(self, value):
+        """Attribute "timestamp" setter.
+
+        :param value: used to set attribute "timestamp".
+        """
         if not isinstance(value, TimestampFeature):
             raise ValueError("timestamp needs to be a TimestampFeature object.")
 
@@ -153,6 +169,13 @@ class FeatureSet:
 
     @property
     def columns(self):
+        """All data columns within this feature set.
+
+        This references all data columns that will be created by the construct method,
+        given keys, timestamp and features of this feature set.
+
+        :return columns: list of column names built in this feature set.
+        """
         return list(
             itertools.chain(
                 *[
