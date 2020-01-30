@@ -5,6 +5,7 @@ from typing import Any, List
 from pyspark.sql import DataFrame, Window
 from pyspark.sql.functions import col, row_number
 
+from butterfree.core.client import SparkClient
 from butterfree.core.constant.columns import TIMESTAMP_COLUMN
 from butterfree.core.db.configs import CassandraConfig
 from butterfree.core.transform import FeatureSet
@@ -15,13 +16,11 @@ class OnlineFeatureStoreWriter(Writer):
     """Enable writing feature sets into the Online Feature Store.
 
     Attributes:
-        spark_client: client for spark connections with external services.
         db_config: configuration with spark for databases or Cassandra DB (default).
             For more information access the class in 'butterfree.core.db.configs'.
     """
 
-    def __init__(self, spark_client, db_config=None):
-        super().__init__(spark_client)
+    def __init__(self, db_config=None):
         self.db_config = db_config or CassandraConfig()
 
     @staticmethod
@@ -50,29 +49,31 @@ class OnlineFeatureStoreWriter(Writer):
             .drop("rn")
         )
 
-    def write(self, feature_set: FeatureSet, dataframe):
+    def write(self, feature_set: FeatureSet, dataframe, spark_client: SparkClient):
         """Loads the latest data from a feature set into the Online Feature Store.
 
         Args:
             feature_set: object processed with feature_set informations.
             dataframe: spark dataframe containing data from a feature set.
+            spark_client: client for spark connections with external services.
         """
         dataframe = self.filter_latest(
             dataframe=dataframe, id_columns=feature_set.key_columns
         )
-        self.spark_client.write_dataframe(
+        spark_client.write_dataframe(
             dataframe=dataframe,
             mode=self.db_config.mode,
-            format=self.db_config.format_,
+            format_=self.db_config.format_,
             options=self.db_config.get_options(table=feature_set.name),
         )
 
-    def validate(self, feature_set: FeatureSet, dataframe):
+    def validate(self, feature_set: FeatureSet, dataframe, spark_client: SparkClient):
         """Calculate dataframe rows to validate data into Feature Store.
 
         Args:
             feature_set: object processed with feature_set informations.
             dataframe: spark dataframe containing data from a feature set.
+            spark_client: client for spark connections with external services.
 
         Returns:
             False: fail validation.
@@ -91,7 +92,7 @@ class OnlineFeatureStoreWriter(Writer):
         )
         dataframe = dataframe.count()
 
-        feature_store = self.spark_client.read(
+        feature_store = spark_client.read(
             format=self.db_config.format_,
             options=self.db_config.get_options(table=feature_set.name),
         ).count()
