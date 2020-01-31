@@ -30,7 +30,14 @@ class TestCustomTransform:
                 a == b
                 for a, b in zip(
                     df.columns,
-                    ["feature1", "feature2", "id", "origin_ts", TIMESTAMP_COLUMN, "feature"],
+                    [
+                        "feature1",
+                        "feature2",
+                        "id",
+                        "origin_ts",
+                        TIMESTAMP_COLUMN,
+                        "feature",
+                    ],
                 )
             ]
         )

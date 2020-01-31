@@ -49,7 +49,9 @@ class TestFeature:
         assert all(
             [
                 a == b
-                for a, b in zip(sorted(df.columns), sorted(["new_feature", "id", TIMESTAMP_COLUMN]))
+                for a, b in zip(
+                    sorted(df.columns), sorted(["new_feature", "id", TIMESTAMP_COLUMN])
+                )
             ]
         )
 
@@ -75,7 +77,12 @@ class TestFeature:
         df = test_feature.transform(feature_set_dataframe)
 
         assert all(
-            [a == b for a, b in zip(sorted(df.columns), sorted(["feature", "id", TIMESTAMP_COLUMN]))]
+            [
+                a == b
+                for a, b in zip(
+                    sorted(df.columns), sorted(["feature", "id", TIMESTAMP_COLUMN])
+                )
+            ]
         )
 
     def test_feature_transform_with_transformation_and_alias(
@@ -94,7 +101,12 @@ class TestFeature:
         df = test_feature.transform(feature_set_dataframe)
 
         assert all(
-            [a == b for a, b in zip(sorted(df.columns), sorted(["feature", "id", TIMESTAMP_COLUMN]))]
+            [
+                a == b
+                for a, b in zip(
+                    sorted(df.columns), sorted(["feature", "id", TIMESTAMP_COLUMN])
+                )
+            ]
         )
 
     def test_feature_get_output_columns_without_transformations(self):
