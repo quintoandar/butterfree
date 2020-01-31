@@ -1,5 +1,6 @@
 """TimestampFeature entity."""
 
+from butterfree.core.constant.columns import TIMESTAMP_COLUMN
 from butterfree.core.constant.data_type import DataType
 from butterfree.core.transform.features.feature import Feature
 from butterfree.core.transform.transformations import TransformComponent
@@ -31,9 +32,9 @@ class TimestampFeature(Feature):
     def __init__(
         self, from_column: str = None, transformation: TransformComponent = None
     ):
-        description = "Records when any data for this feature set."
+        description = "Time tag for the state of all features."
         super(TimestampFeature, self).__init__(
-            name="timestamp",
+            name=TIMESTAMP_COLUMN,
             description=description,
             from_column=from_column,
             dtype=DataType.TIMESTAMP,

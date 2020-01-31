@@ -1,6 +1,7 @@
 import pytest
 from pyspark.sql import functions as F
 
+from butterfree.core.constant.columns import TIMESTAMP_COLUMN
 from butterfree.core.transform.features import Feature
 from butterfree.core.transform.transformations import CustomTransform
 
@@ -29,7 +30,7 @@ class TestCustomTransform:
                 a == b
                 for a, b in zip(
                     df.columns,
-                    ["feature1", "feature2", "id", "ts", "timestamp", "feature"],
+                    ["feature1", "feature2", "id", "origin_ts", TIMESTAMP_COLUMN, "feature"],
                 )
             ]
         )

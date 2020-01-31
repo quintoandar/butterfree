@@ -4,6 +4,8 @@ from pyspark import SparkContext
 from pyspark.sql import session
 from pytest import fixture
 
+from butterfree.core.constant.columns import TIMESTAMP_COLUMN
+from butterfree.core.constant.data_type import DataType
 from butterfree.core.transform.features import Feature, KeyFeature, TimestampFeature
 
 
@@ -47,7 +49,7 @@ def make_dataframe():
         },
     ]
     df = spark.read.json(sc.parallelize(data, 1))
-    df = df.withColumn("timestamp", df.ts.cast("timestamp"))
+    df = df.withColumn(TIMESTAMP_COLUMN, df.ts.cast(DataType.TIMESTAMP.value))
 
     return df
 
@@ -57,7 +59,7 @@ def make_fs():
     return (
         df.withColumn("add", df.feature1 + df.feature2)
         .withColumn("divide", df.feature1 / df.feature2)
-        .select("id", "timestamp", "add", "divide")
+        .select("id", TIMESTAMP_COLUMN, "add", "divide")
     )
 
 
@@ -98,6 +100,6 @@ def key_id():
 @fixture
 def timestamp_c():
     timestamp_c = Mock(spec=TimestampFeature)
-    timestamp_c.get_output_columns = Mock(return_value=["timestamp"])
+    timestamp_c.get_output_columns = Mock(return_value=[TIMESTAMP_COLUMN])
     timestamp_c.transform = Mock(return_value=make_fs())
     return timestamp_c

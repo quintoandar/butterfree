@@ -1,5 +1,6 @@
 from unittest.mock import Mock
 
+from butterfree.core.constant.columns import TIMESTAMP_COLUMN
 from butterfree.core.constant.data_type import DataType
 from butterfree.core.transform.features import Feature
 
@@ -45,7 +46,12 @@ class TestFeature:
         )
         df = test_feature.transform(feature_set_dataframe)
 
-        assert all([a == b for a, b in zip(df.columns, ["new_feature", "id", "ts"])])
+        assert all(
+            [
+                a == b
+                for a, b in zip(sorted(df.columns), sorted(["new_feature", "id", TIMESTAMP_COLUMN]))
+            ]
+        )
 
     def test_feature_transform_with_dtype(self, feature_set_dataframe):
 
@@ -68,7 +74,9 @@ class TestFeature:
 
         df = test_feature.transform(feature_set_dataframe)
 
-        assert all([a == b for a, b in zip(df.columns, ["feature", "id", "ts"])])
+        assert all(
+            [a == b for a, b in zip(sorted(df.columns), sorted(["feature", "id", TIMESTAMP_COLUMN]))]
+        )
 
     def test_feature_transform_with_transformation_and_alias(
         self, feature_set_dataframe
@@ -85,7 +93,9 @@ class TestFeature:
 
         df = test_feature.transform(feature_set_dataframe)
 
-        assert all([a == b for a, b in zip(df.columns, ["feature", "id", "ts"])])
+        assert all(
+            [a == b for a, b in zip(sorted(df.columns), sorted(["feature", "id", TIMESTAMP_COLUMN]))]
+        )
 
     def test_feature_get_output_columns_without_transformations(self):
 

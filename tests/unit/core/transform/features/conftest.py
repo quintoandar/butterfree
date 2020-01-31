@@ -4,6 +4,7 @@ from pyspark import SparkContext
 from pyspark.sql import session
 from pytest import fixture
 
+from butterfree.core.constant.columns import TIMESTAMP_COLUMN
 from butterfree.core.transform.features import Feature
 
 
@@ -19,8 +20,8 @@ def base_spark():
 def feature_set_dataframe(base_spark):
     sc, spark = base_spark
     data = [
-        {"id": 1, "ts": 0, "feature": 100},
-        {"id": 2, "ts": 1, "feature": 200},
+        {"id": 1, TIMESTAMP_COLUMN: 0, "feature": 100},
+        {"id": 2, TIMESTAMP_COLUMN: 1, "feature": 200},
     ]
     return spark.read.json(sc.parallelize(data, 1))
 

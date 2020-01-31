@@ -1,5 +1,6 @@
 import pytest
 
+from butterfree.core.constant.columns import TIMESTAMP_COLUMN
 from butterfree.core.transform.features import Feature
 from butterfree.core.transform.transformations import AggregatedTransform
 
@@ -27,8 +28,8 @@ class TestAggregatedTransform:
                         "feature1",
                         "feature2",
                         "id",
-                        "ts",
-                        "timestamp",
+                        "origin_ts",
+                        TIMESTAMP_COLUMN,
                         "feature1__avg_over_7_days",
                         "feature1__avg_over_2_weeks",
                         "feature1__std_over_7_days",
