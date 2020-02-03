@@ -1,5 +1,6 @@
 """KafkaSource entity."""
 
+from butterfree.core.client import SparkClient
 from butterfree.core.reader.reader import Reader
 
 
@@ -7,13 +8,7 @@ class KafkaReader(Reader):
     """Reader responsible for get data from a Kafka topic."""
 
     def __init__(
-        self,
-        id,
-        spark_client,
-        connection_string,
-        topic,
-        topic_options=None,
-        stream=True,
+        self, id, connection_string, topic, topic_options=None, stream=True,
     ):
         """Instantiate KafkaReader with the required parameters.
 
@@ -26,7 +21,7 @@ class KafkaReader(Reader):
         https://spark.apache.org/docs/latest/structured-streaming-kafka-integration.html.
         :param stream: flag to indicate the reading mode: stream or batch
         """
-        super().__init__(id, spark_client)
+        super().__init__(id)
         if not isinstance(connection_string, str):
             raise ValueError(
                 "connection_string must be a string with hosts and ports to connect"
@@ -44,12 +39,12 @@ class KafkaReader(Reader):
         )
         self.stream = stream
 
-    def consume(self):
+    def consume(self, client: SparkClient):
         """Extract data from a kafka topic.
 
         :return: Spark dataframe
         """
-        raw_stream_df = self.client.read(
+        raw_stream_df = client.read(
             format="kafka", options=self.options, stream=self.stream
         )
 

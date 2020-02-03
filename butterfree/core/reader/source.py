@@ -19,9 +19,7 @@ class Source:
     TODO make it harder to do query injection
     """
 
-    def __init__(
-        self, spark_client: SparkClient, readers: List[Reader], query: str
-    ) -> None:
+    def __init__(self, readers: List[Reader], query: str) -> None:
         """Initialize a SourceSelector.
 
         :param spark_client: client used to run a query.
@@ -30,9 +28,8 @@ class Source:
         """
         self.readers = readers
         self.query = query
-        self.client = spark_client
 
-    def construct(self) -> DataFrame:
+    def construct(self, client: SparkClient) -> DataFrame:
         """Construct an entry point dataframe for a feature set.
 
         This method will assemble multiple sources, by building each one and querying
@@ -44,9 +41,9 @@ class Source:
         :return: Spark DataFrame with the query result against all sources.
         """
         for reader in self.readers:
-            reader.build()  # create temporary views for each reader
+            reader.build(client)  # create temporary views for each reader
 
-        dataframe = self.client.sql(self.query)
+        dataframe = client.sql(self.query)
         dataframe.cache().count()
 
         return dataframe

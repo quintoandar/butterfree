@@ -8,8 +8,7 @@ class TestOnlineFeatureStoreWriter:
         self, feature_set_dataframe, latest, cassandra_config, mocker
     ):
         # with
-        spark_client = mocker.stub("spark_client")
-        writer = OnlineFeatureStoreWriter(spark_client, cassandra_config)
+        writer = OnlineFeatureStoreWriter(cassandra_config)
 
         # when
         filtered = writer.filter_latest(feature_set_dataframe, id_columns=["id"])
@@ -21,8 +20,7 @@ class TestOnlineFeatureStoreWriter:
         self, feature_set_dataframe, latest, cassandra_config, mocker
     ):
         # with
-        spark_client = mocker.stub("spark_client")
-        writer = OnlineFeatureStoreWriter(spark_client, cassandra_config)
+        writer = OnlineFeatureStoreWriter(cassandra_config)
 
         # then
         with pytest.raises(KeyError, match="must have a 'ts' column"):
@@ -34,8 +32,7 @@ class TestOnlineFeatureStoreWriter:
         self, feature_set_dataframe, latest, cassandra_config, mocker
     ):
         # with
-        spark_client = mocker.stub("spark_client")
-        writer = OnlineFeatureStoreWriter(spark_client, cassandra_config)
+        writer = OnlineFeatureStoreWriter(cassandra_config)
 
         # then
         with pytest.raises(ValueError, match="must provide the unique identifiers"):
@@ -55,10 +52,10 @@ class TestOnlineFeatureStoreWriter:
         feature_set.name = "test"
         feature_set.key_columns = ["id"]
 
-        writer = OnlineFeatureStoreWriter(spark_client, cassandra_config)
+        writer = OnlineFeatureStoreWriter(cassandra_config)
 
         # when
-        writer.write(feature_set, feature_set_dataframe)
+        writer.write(feature_set, feature_set_dataframe, spark_client)
 
         # then
         spark_client.write_dataframe.assert_called_once()
@@ -70,7 +67,7 @@ class TestOnlineFeatureStoreWriter:
         )
         assert (
             writer.db_config.format_
-            == spark_client.write_dataframe.call_args[1]["format"]
+            == spark_client.write_dataframe.call_args[1]["format_"]
         )
         assert (
             writer.db_config.get_options(table="test")
@@ -85,10 +82,10 @@ class TestOnlineFeatureStoreWriter:
         feature_set.name = "test"
         feature_set.key_columns = ["id"]
 
-        writer = OnlineFeatureStoreWriter(spark_client, cassandra_config)
+        writer = OnlineFeatureStoreWriter(cassandra_config)
 
         # when
-        writer.validate(feature_set, feature_set_dataframe)
+        writer.validate(feature_set, feature_set_dataframe, spark_client)
 
         # then
         spark_client.read.assert_called_once()
@@ -110,8 +107,8 @@ class TestOnlineFeatureStoreWriter:
         db_config = mocker.stub("db_config")
         db_config.format_ = format_
 
-        writer = OnlineFeatureStoreWriter(spark_client, db_config)
+        writer = OnlineFeatureStoreWriter(db_config)
 
         # then
         with pytest.raises(ValueError):
-            writer.validate(feature_set, feature_set_dataframe)
+            writer.validate(feature_set, feature_set_dataframe, spark_client)

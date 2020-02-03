@@ -9,13 +9,17 @@ class TestHistoricalFeatureStoreWriter:
         spark_client = mocker.stub("spark_client")
         spark_client.write_table = mocker.stub("write_table")
         feature_set = mocker.stub("feature_set")
-        writer = HistoricalFeatureStoreWriter(spark_client)
+        writer = HistoricalFeatureStoreWriter()
 
         feature_set.entity = "house"
         feature_set.name = "test"
 
         # when
-        writer.write(feature_set=feature_set, dataframe=feature_set_dataframe)
+        writer.write(
+            feature_set=feature_set,
+            dataframe=feature_set_dataframe,
+            spark_client=spark_client,
+        )
 
         # then
         spark_client.write_table.assert_called_once()
@@ -41,11 +45,15 @@ class TestHistoricalFeatureStoreWriter:
         feature_set.entity = "house"
         feature_set.name = "test"
 
-        writer = HistoricalFeatureStoreWriter(spark_client)
+        writer = HistoricalFeatureStoreWriter()
 
         # then
         with pytest.raises(ValueError):
-            writer.write(feature_set=feature_set, dataframe=feature_sets)
+            writer.write(
+                feature_set=feature_set,
+                dataframe=feature_sets,
+                spark_client=spark_client,
+            )
 
     def test_validate(self, feature_set_dataframe, feature_set_count_dataframe, mocker):
         # given
@@ -56,10 +64,10 @@ class TestHistoricalFeatureStoreWriter:
         feature_set.name = "test"
         query = "SELECT COUNT(1) as row FROM feature_store.test"
 
-        writer = HistoricalFeatureStoreWriter(spark_client)
+        writer = HistoricalFeatureStoreWriter()
 
         # when
-        result = writer.validate(feature_set, feature_set_dataframe)
+        result = writer.validate(feature_set, feature_set_dataframe, spark_client)
 
         # then
         spark_client.sql.assert_called_once()
@@ -79,10 +87,10 @@ class TestHistoricalFeatureStoreWriter:
         feature_set = mocker.stub("feature_set")
         feature_set.name = "test"
 
-        writer = HistoricalFeatureStoreWriter(spark_client)
+        writer = HistoricalFeatureStoreWriter()
 
         # when
-        result = writer.validate(feature_set, feature_set_dataframe)
+        result = writer.validate(feature_set, feature_set_dataframe, spark_client)
 
         # then
         assert result is False
