@@ -1,5 +1,6 @@
 import pytest
 
+from butterfree.core.constant.columns import TIMESTAMP_COLUMN
 from butterfree.core.writer import OnlineFeatureStoreWriter
 
 
@@ -23,9 +24,9 @@ class TestOnlineFeatureStoreWriter:
         writer = OnlineFeatureStoreWriter(cassandra_config)
 
         # then
-        with pytest.raises(KeyError, match="must have a 'ts' column"):
+        with pytest.raises(KeyError):
             _ = writer.filter_latest(
-                feature_set_dataframe.drop("ts"), id_columns=["id"]
+                feature_set_dataframe.drop(TIMESTAMP_COLUMN), id_columns=["id"]
             )
 
     def test_filter_latest_without_id_columns(

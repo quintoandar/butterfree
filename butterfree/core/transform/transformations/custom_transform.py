@@ -4,7 +4,9 @@ from typing import Callable
 
 from pyspark.sql import DataFrame
 
-from butterfree.core.transform.transform_component import TransformComponent
+from butterfree.core.transform.transformations.transform_component import (
+    TransformComponent,
+)
 
 
 class CustomTransform(TransformComponent):
@@ -48,6 +50,6 @@ class CustomTransform(TransformComponent):
             dataframe: transformed dataframe.
         """
         dataframe = self.transformer(
-            dataframe, self.output_columns[0], **self.transformer__kwargs,
+            dataframe, self.parent, **self.transformer__kwargs,
         )
         return dataframe
