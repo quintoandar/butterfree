@@ -3,7 +3,7 @@ import os
 from pyspark.sql import DataFrame
 
 from butterfree.core.client import SparkClient
-from butterfree.core.reader import FileReader, KafkaReader, Source, TableReader
+from butterfree.core.reader import FileReader, Source, TableReader
 
 
 def create_temp_view(dataframe: DataFrame, name):
@@ -21,12 +21,7 @@ def create_db_and_table(spark, table_reader_id, table_reader_db, table_reader_ta
 
 class TestSource:
     def test_source(
-        self,
-        target_df_source,
-        target_df_table_reader,
-        kafka_df,
-        spark,
-        spark_client_mock,
+        self, target_df_source, target_df_table_reader, spark,
     ):
         # given
         spark_client = SparkClient()
@@ -48,40 +43,26 @@ class TestSource:
             os.path.dirname(os.path.abspath(__file__)), "data_sample.parquet"
         )
 
-        kafka_reader_id = "c_source"
-        spark_client_mock.read.return_value = kafka_df
-
         # when
-        source_selector = Source(
-            spark_client=spark_client,
+        source = Source(
             readers=[
                 TableReader(
                     id=table_reader_id,
-                    spark_client=spark_client,
                     database=table_reader_db,
                     table=table_reader_table,
                 ),
-                FileReader(
-                    id=file_reader_id,
-                    spark_client=spark_client,
-                    path=data_sample_path,
-                    format="parquet",
-                ),
-                KafkaReader(
-                    kafka_reader_id, spark_client_mock, "host1:port,host2:port", "topic"
-                ),
+                FileReader(id=file_reader_id, path=data_sample_path, format="parquet",),
             ],
-            query=f"select a.*, b.feature2, c.value as feature3 "  # noqa
+            query=f"select a.*, b.feature2 "  # noqa
             f"from {table_reader_id} a "  # noqa
-            f"inner join {file_reader_id} b on a.id = b.id "  # noqa
-            f"inner join {kafka_reader_id} c on a.id = c.key",  # noqa
+            f"inner join {file_reader_id} b on a.id = b.id ",  # noqa
         )
 
-        result_df = source_selector.construct().collect()
+        result_df = source.construct(client=spark_client).collect()
         target_df = target_df_source.collect()
 
+        # then
         for i in range(0, 6):
             assert result_df[i]["id"] == target_df[i]["id"]
             assert result_df[i]["feature1"] == target_df[i]["feature1"]
             assert result_df[i]["feature2"] == target_df[i]["feature2"]
-            assert result_df[i]["feature3"] == target_df[i]["feature3"]
