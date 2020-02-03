@@ -14,12 +14,20 @@ def create_db_and_table(spark, table_reader_id, table_reader_db, table_reader_ta
     spark.sql(f"create database if not exists {table_reader_db}")
     spark.sql(f"use {table_reader_db}")
     spark.sql(
-        f"create table if not exists {table_reader_db}.{table_reader_table} as select * from {table_reader_id}"
+        f"create table if not exists {table_reader_db}.{table_reader_table} "  # noqa
+        f"as select * from {table_reader_id}"  # noqa
     )
 
 
 class TestSource:
-    def test_source(self, target_df_source, target_df_table_reader, kafka_df, spark, spark_client_mock):
+    def test_source(
+        self,
+        target_df_source,
+        target_df_table_reader,
+        kafka_df,
+        spark,
+        spark_client_mock,
+    ):
         # given
         spark_client = SparkClient()
 
@@ -36,7 +44,9 @@ class TestSource:
         )
 
         file_reader_id = "b_source"
-        data_sample_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data_sample.parquet")
+        data_sample_path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)), "data_sample.parquet"
+        )
 
         kafka_reader_id = "c_source"
         spark_client_mock.read.return_value = kafka_df
@@ -61,10 +71,10 @@ class TestSource:
                     kafka_reader_id, spark_client_mock, "host1:port,host2:port", "topic"
                 ),
             ],
-            query=f"select a.*, b.feature2, c.value as feature3 "
-                  f"from {table_reader_id} a "
-                  f"inner join {file_reader_id} b on a.id = b.id "
-                  f"inner join {kafka_reader_id} c on a.id = c.key",
+            query=f"select a.*, b.feature2, c.value as feature3 "  # noqa
+            f"from {table_reader_id} a "  # noqa
+            f"inner join {file_reader_id} b on a.id = b.id "  # noqa
+            f"inner join {kafka_reader_id} c on a.id = c.key",  # noqa
         )
 
         result_df = source_selector.construct().collect()
