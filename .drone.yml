@@ -99,18 +99,6 @@ pipeline:
       event: [push]
       branch: forno
 
-  release:
-    image: plugins/github-release
-    pull: true
-    files: dist/*
-    title: .version
-    secrets:
-      - source: github_access_token
-        target: github_token
-    when:
-      branch: [master]
-      event: [tag]
-
   publish:
     image: python:3.6
     commands:
