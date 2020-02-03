@@ -5,7 +5,7 @@ import os
 from pyspark.sql.dataframe import DataFrame
 
 from butterfree.core.dataframe.verify_dataframe import VerifyDataframe
-from butterfree.core.db.configs import S3Config
+from butterfree.core.db.configs import AbstractWriteConfig, S3Config
 from butterfree.core.transform import FeatureSet
 from butterfree.core.writer.writer import Writer
 
@@ -15,20 +15,24 @@ class HistoricalFeatureStoreWriter(Writer):
 
     Attributes:
         spark_client: client for spark connections with external services.
-        db_config: configuration with spark for databases or AWS S3 (default).
-            For more information access the class in 'butterfree.core.db.configs'.
+        db_config: object with access configuration to storage. More information
+            about the module in 'butterfree.core.db.configs'. Default: S3Config.
+
     """
 
-    def __init__(self, spark_client, db_config=None):
+    def __init__(self, spark_client, db_config: AbstractWriteConfig = None):
         super().__init__(spark_client)
         self.db_config = db_config or S3Config()
 
     def write(self, feature_set: FeatureSet, dataframe: DataFrame):
         """Loads the data from a feature set into the Historical Feature Store.
 
-        Args:
-            feature_set: object processed with feature_set informations.
-            dataframe: spark dataframe containing data from a feature set.
+        Attributes:
+            spark_client: client for spark connections with external services.
+            db_config: object with access configuration to storage. More
+                information about the module in 'butterfree.core.db.configs'.
+                Default: S3Config.
+
         """
         s3_path = os.path.join(
             self.db_config.path, "historical", feature_set.entity, feature_set.name
@@ -47,16 +51,16 @@ class HistoricalFeatureStoreWriter(Writer):
             path=s3_path,
         )
 
-    def validate(self, feature_set: FeatureSet, dataframe: DataFrame):
-        """Calculate dataframe rows to validate data into Feature Store.
+    def validate(self, feature_set: FeatureSet, dataframe: DataFrame) -> bool:
+        """Calculate metrics to validate data into Historical Feature Store.
 
         Args:
-            feature_set: object processed with feature_set informations.
+            feature_set: object containing feature set metadata.
             dataframe: spark dataframe containing data from a feature set.
+            feature_set: FeatureSet:
 
         Returns:
-            False: fail validation.
-            True: success validation.
+            True for success validation, False otherwise
         """
         table_name = "{}.{}".format(self.db_config.database, feature_set.name)
         query_format_string = "SELECT COUNT(1) as row FROM {}"

@@ -34,7 +34,15 @@ def _sanitize_spec_entry(entry):
 
 
 def get_environment_specification(filename: str = None) -> dict:
-    """Gets environment specification from a default file."""
+    """Gets environment specification from a default file.
+
+    Args:
+        filename: name of the file
+
+    Returns:
+        Environment specification
+
+    """
     spec_filepath = None
     search_path = __file__
     filename = filename or _ENVIRONMENT_SPECIFICATION_FILENAME
@@ -65,54 +73,74 @@ specification = get_environment_specification()
 def get_current_environment() -> str:
     """Gets current environment tag.
 
-     It is expected to assume one of these values: "dev", "forno", "staging" or "prod".
-     "dev" is the default.
+    It is expected to assume one of these values: "dev", "forno", "staging" or
+    "prod". The default is "dev".
 
-    :return: the value of the "ENVIRONMENT" environment variable.
+    Returns:
+        the value of the "ENVIRONMENT" environment variable.
+
     """
     return get_variable("ENVIRONMENT", DEVELOPMENT)
 
 
 def is_development() -> bool:
-    """Checks whether the running environment tag refers to a development env or not.
+    """Check if is development environment.
 
-    :return: boolean value.
+    Checks whether the running environment tag refers to a development env or
+        not.
+
+    Returns:
+        True for development environment, False if don't
+
     """
     return get_current_environment() == DEVELOPMENT
 
 
 def is_homolog() -> bool:
-    """Checks whether the running environment is an homologation env or not.
+    """Check if is homolog environment.
 
-    :return: boolean value.
+    Checks whether the running environment tag refers to a homolog env or not.
+
+    Returns:
+        True for homolog environment, False if don't
+
     """
     return get_current_environment() == HOMOLOG
 
 
 def is_staging() -> bool:
-    """Checks whether the running environment is a staging env or not.
+    """Check if is staging environment.
 
-    :return: boolean value.
+    Checks whether the running environment tag refers to a staging env or not.
+
+    Returns:
+        True for staging environment, False if don't
+
     """
     return get_current_environment() == STAGING
 
 
 def is_production() -> bool:
-    """Checks whether the running environment is a production env or not.
+    """Check if is production environment.
 
-    :return: boolean value indicating
+    Checks whether the running environment tag refers to a production env or
+        not.
+
+    Returns:
+        True for production environment, False if don't
+
     """
     return get_current_environment() == PRODUCTION
 
 
 class UnspecifiedVariableError(RuntimeError):
-    """Environment variables not set error."""
+    """Environment variables not set error.
 
+    Attributes:
+        variable_name: environment variable name.
+
+    """
     def __init__(self, variable_name: str):
-        """Initialize error object for a single env variable.
-
-        :param variable_name: env variable name.
-        """
         super().__init__(
             f'Variable "{variable_name}" is not listed in the environment'
             f' specification\nUpdate the "{_ENVIRONMENT_SPECIFICATION_FILENAME}" file'
@@ -123,14 +151,18 @@ class UnspecifiedVariableError(RuntimeError):
 def get_variable(variable_name: str, default_value: str = None) -> str:
     """Gets an environment variable.
 
-    The variable comes from it's explicitly declared value in the running environment or
-    from the default value declared in the environment.yaml specification or from the
-    :param default_value:.
+    The variable comes from it's explicitly declared value in the running
+    environment or from the default value declared in the environment.yaml
+    specification or from the default_value.
 
-    :param variable_name: environment variable name
-    :param default_value: default value to use in case no value is set in the
-        environment nor in the environment.yaml specification file
-    :return: the variable's string value
+    Args:
+        variable_name: environment variable name.
+        default_value: default value to use in case no value is set in the
+            environment nor in the environment.yaml specification file.
+
+    Returns:
+        The variable's string value
+
     """
     try:
         spec_default = specification[variable_name]
@@ -142,14 +174,20 @@ def get_variable(variable_name: str, default_value: str = None) -> str:
 def describe_variable(variable_name: str, *, bash_formatting: bool = True) -> str:
     """Describes an environment variable.
 
-    The description will state the variable's name, current value and origin, where the
-    origin may be the running environment or the specification default.
+    The description will state the variable's name, current value and origin,
+    where the origin may be the running environment or the specification
+    default.
 
-    :param variable_name: environment variable name
-    :param bash_formatting: boolean indicating whether or not to use bash formatting
-        markups.
-    :return: a string describing the requested environment variable in human-readable
-        format.
+    Args:
+        variable_name: environment variable name.
+        bash_formatting: boolean indicating whether or not to use bash
+            formatting markups.
+        *: TODO
+
+    Returns:
+        Description of the requested environment variable in human-readable
+            format.
+
     """
     set_bold = "\033[1m" if bash_formatting else ""
     unset_bold = "\033[0m" if bash_formatting else ""
@@ -176,10 +214,15 @@ def describe_variable(variable_name: str, *, bash_formatting: bool = True) -> st
 def describe_environment(*, bash_formatting: bool = True) -> str:
     """Describes the current running environment.
 
-    :param bash_formatting: boolean indicating whether or not to use bash formatting
-        markups.
-    :return: a multiline string describing the current running environment in
-        human-readable format.
+    Args:
+        bash_formatting: boolean indicating whether or not to use bash
+            formatting markups.
+        *: TODO
+
+    Returns:
+        Descriptions of the current running environment in human-readable
+            format.
+
     """
     set_bold = "\033[1m" if bash_formatting else ""
     unset_bold = "\033[0m" if bash_formatting else ""

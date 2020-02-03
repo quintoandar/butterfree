@@ -9,7 +9,13 @@ from butterfree.core.transform import FeatureSet
 
 
 class Writer(ABC):
-    """Abstract base class for Writers."""
+    """Abstract base class for Writers.
+
+    Attributes:
+        spark_client: client for spark connections with external services.
+        db_config: object with access configuration to storage. More information
+            about the module in 'butterfree.core.db.configs'.
+    """
 
     def __init__(self, spark_client: SparkClient):
         self.spark_client = spark_client
@@ -22,18 +28,18 @@ class Writer(ABC):
 
         Args:
             feature_set: object processed with feature_set informations.
-            dataframe: spark dataframe containing data from a feature set.
+            dataframe: dataframe containing records from a feature set.
         """
 
     @abstractmethod
     def validate(self, feature_set: FeatureSet, dataframe: DataFrame):
-        """Calculate dataframe rows to validate data into Feature Store.
+        """Calculate metrics to validate data into Feature Store.
 
         Args:
-            feature_set: object processed with feature_set informations.
+            feature_set: object containing feature set metadata.
             dataframe: spark dataframe containing data from a feature set.
+            feature_set: FeatureSet:
 
         Returns:
-            False: fail validation.
-            True: success validation.
+            True for success validation, False otherwise
         """

@@ -1,19 +1,23 @@
 """TableSource entity."""
 
+from pyspark.sql import DataFrame
+
+from butterfree.core.client import SparkClient
 from butterfree.core.reader.reader import Reader
 
 
 class TableReader(Reader):
-    """Reader responsible for get data from tables registered in the metastore."""
+    """Responsible for get data from tables registered in the metastore.
 
-    def __init__(self, id, spark_client, database, table):
-        """Instantiate TableReader with the required parameters.
+    Attributes:
+        id: unique string id for register the reader as a view on the metastore
+        spark_client: client for connection to the metastore
+        database: name of the metastore database/schema
+        table: name of the table
 
-        :param id: unique string id for register the reader as a view on the metastore
-        :param spark_client: spark_client object client module
-        :param database: string with the name of the metastore schema
-        :param table: string with the name of the table
-        """
+    """
+
+    def __init__(self, id: str, spark_client: SparkClient, database: str, table: str):
         super().__init__(id, spark_client)
         if not isinstance(database, str):
             raise ValueError(
@@ -26,9 +30,6 @@ class TableReader(Reader):
         self.database = database
         self.table = table
 
-    def consume(self):
-        """Extract data from a table reader.
-
-        :return: Spark dataframe
-        """
+    def consume(self) -> DataFrame:
+        """Extract data from the table."""
         return self.client.read_table(self.database, self.table)

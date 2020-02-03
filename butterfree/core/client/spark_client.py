@@ -1,5 +1,7 @@
 """SparkClient entity."""
 
+from typing import List
+
 from pyspark.sql import DataFrame, SparkSession
 
 
@@ -7,28 +9,41 @@ class SparkClient:
     """Handle Spark session connection.
 
     Get query results with SQL and reads data from external systems.
+
+    Attributes:
+        _session: Spark session
+
     """
 
     def __init__(self):
-        """Instantiate SparkClient with empty session."""
         self._session = None
 
     @property
-    def conn(self):
+    def conn(self) -> SparkSession:
         """Gets or creates an SparkSession.
 
-        :return: SparkSession
+        Returns:
+            Spark session
+
         """
         if not self._session:
             self._session = SparkSession.builder.getOrCreate()
         return self._session
 
-    def read(self, format, options, stream=False):
+    def read(self, format: str, options: dict, stream=False) -> DataFrame:
         """Use the SparkSession.read interface to load data into a dataframe.
 
-        :param format: string with the format to be used by the DataframeReader
-        :param options: options to setup the DataframeReader, specific for each format
-        :return: Spark dataframe
+        Check docs for more information:
+            https://spark.apache.org/docs/latest/sql-data-sources-load-save-functions.html#generic-loadsave-functions
+
+        Args:
+            format: string with the format to be used by the DataframeReader.
+            options: options to setup the DataframeReader.
+            stream:  flag to indicate if data must be read in stream mode.
+
+        Returns:
+            Dataframe
+
         """
         if not isinstance(format, str):
             raise ValueError("format needs to be a string with the desired read format")
@@ -37,12 +52,16 @@ class SparkClient:
         df_reader = self.conn.readStream if stream else self.conn.read
         return df_reader.format(format).options(**options).load()
 
-    def read_table(self, database, table):
-        """Use the SparkSession.read interface to load a metastore table to a dataframe.
+    def read_table(self, database: str, table: str) -> DataFrame:
+        """Use the SparkSession.read interface to read a metastore table.
 
-        :param database: string with the name of the metastore schema
-        :param table: string with the name of the table
-        :return:
+        Args:
+            database: name of the metastore databse/schema
+            table: name of the table in metastore
+
+        Returns:
+            Dataframe
+
         """
         if not isinstance(database, str):
             raise ValueError(
@@ -55,25 +74,29 @@ class SparkClient:
         return self.conn.read.table("{}.{}".format(database, table))
 
     def sql(self, query: str) -> DataFrame:
-        """Run a query using spark.
+        """Run a query using Spark SQL.
 
-        :param query: Spark SQL query.
-        :return dataframe: Spark DataFrame with the query result.
+        Args:
+            query: Spark SQL query.
+
+        Returns:
+            Dataframe
+
         """
         return self.conn.sql(query)
 
     @staticmethod
-    def write_dataframe(dataframe, format_, mode, **options):
+    def write_dataframe(dataframe: DataFrame, format_: str, mode: str, **options):
         """Receive a spark DataFrame and write it.
 
         Args:
-            dataframe: spark dataframe containing data from a feature set.
-            format_: string with the format used to save.
-            mode: specified function mode when data already exists,
-                mode can be "error", "append", "overwrite" and "ignore".
-                For more informations:
+            dataframe: dataframe containing data from a feature set.
+            format_: format used to save the dataframe.
+            mode: writting modem can be "error", "append", "overwrite" or
+                "ignore". For more informations:
                 [here](https://spark.apache.org/docs/2.3.0/sql-programming-guide.html#save-modes).
-            options: all other string options.
+            **options: all other options that can be used in a DataFrameWriter.
+
         """
         if not isinstance(format_, str):
             raise ValueError("format needs to be a string")
@@ -84,16 +107,16 @@ class SparkClient:
 
     @staticmethod
     def write_table(
-        dataframe,
-        database,
-        table_name,
-        path,
-        format_=None,
-        mode=None,
-        partition_by=None,
+        dataframe: DataFrame,
+        database: str,
+        table_name: str,
+        path: str,
+        format_: str = None,
+        mode: str = None,
+        partition_by: List[str] = None,
         **options,
     ):
-        """Receive a spark DataFrame and write it as a table.
+        """Receive a spark DataFrame and write it as a table in metastore.
 
         Args:
             dataframe: spark dataframe containing data from a feature set.
@@ -101,12 +124,12 @@ class SparkClient:
             table_name: specified table name.
             path: string with the local to save the table.
             format_: string with the format used to save.
-            mode: specified function mode when data already exists,
-                mode can be "error", "append", "overwrite" and "ignore".
-                For more informations:
+            mode: writing mode, it can be: "error", "append", "overwrite" or
+                "ignore". More information:
                 [here](https://spark.apache.org/docs/2.3.0/sql-programming-guide.html#save-modes).
             partition_by: names of partitioning columns.
-            options: all other string options.
+            options: all other options that can be used in a DataFrameWriter.
+
         """
         if not isinstance(database, str):
             raise ValueError("database needs to be a string")
