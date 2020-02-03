@@ -46,20 +46,58 @@ pipeline:
     commands:
       - make package
     when:
-      branch: [master]
-      event: [tag]
+      event: [push, tag]
+      branch: [master, forno]
 
-  release:
-    image: plugins/github-release
-    pull: true
-    files: dist/*
-    title: .version
-    secrets:
-      - source: github_access_token
-        target: github_token
+  prepare-release-prod:
+    image: alpine:3.10
+    commands:
+      - find . -wholename "./dist/quintoandar_butterfree-*-py3-none-any.whl" -exec cp '{}' ./dist/quintoandar_butterfree-latest-py3-none-any.whl \;
     when:
-      branch: [master]
       event: [tag]
+      branch: master
+
+  prepare-release-staging:
+    image: alpine:3.10
+    commands:
+      - find . -wholename "./dist/quintoandar_butterfree-*-py3-none-any.whl" -exec mv '{}' ./dist/quintoandar_butterfree-staging-py3-none-any.whl \;
+    when:
+      event: [push]
+      branch: master
+
+  prepare-release-forno:
+    image: alpine:3.10
+    commands:
+      - find . -wholename "./dist/quintoandar_butterfree-*-py3-none-any.whl" -exec mv '{}' ./dist/quintoandar_butterfree-latest-py3-none-any.whl \;
+    when:
+      event: push
+      branch: forno
+
+  export-releases-to-s3-prod:
+    image: plugins/s3
+    pull: true
+    bucket: 5a-artifacts
+    source: dist/*.whl
+    target: butterfree/
+    strip_prefix: dist/
+    acl: bucket-owner-full-control
+    cache_control: no-cache
+    when:
+      event: [push, tag]
+      branch: master
+
+  export-releases-to-s3-forno:
+    image: plugins/s3
+    pull: true
+    bucket: artifacts.s3.forno.data.quintoandar.com.br
+    source: dist/*.whl
+    target: butterfree/
+    strip_prefix: dist/
+    acl: bucket-owner-full-control
+    cache_control: no-cache
+    when:
+      event: [push]
+      branch: forno
 
   publish:
     image: python:3.6
