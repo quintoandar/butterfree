@@ -29,7 +29,7 @@ class Source:
         self.readers = readers
         self.query = query
 
-    def construct(self, spark_client: SparkClient) -> DataFrame:
+    def construct(self, client: SparkClient) -> DataFrame:
         """Construct an entry point dataframe for a feature set.
 
         This method will assemble multiple sources, by building each one and querying
@@ -41,9 +41,9 @@ class Source:
         :return: Spark DataFrame with the query result against all sources.
         """
         for reader in self.readers:
-            reader.build(spark_client)  # create temporary views for each reader
+            reader.build(client)  # create temporary views for each reader
 
-        dataframe = spark_client.sql(self.query)
+        dataframe = client.sql(self.query)
         dataframe.cache().count()
 
         return dataframe
