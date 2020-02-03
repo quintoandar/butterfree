@@ -18,7 +18,6 @@ from butterfree.core.writer import (
 class TestFeatureSetPipeline:
     def test_feature_set_args(self):
         pipeline = FeatureSetPipeline(
-            spark_client=SparkClient(),
             source=Source(
                 readers=[
                     TableReader(id="source_a", database="db", table="table",),
