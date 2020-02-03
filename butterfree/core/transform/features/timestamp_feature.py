@@ -31,7 +31,7 @@ class TimestampFeature(Feature):
 
     def __init__(
         self, from_column: str = None, transformation: TransformComponent = None
-    ):
+    ) -> None:
         description = "Time tag for the state of all features."
         super(TimestampFeature, self).__init__(
             name=TIMESTAMP_COLUMN,

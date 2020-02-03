@@ -9,7 +9,20 @@ from butterfree.core.transform.features import Feature, KeyFeature, TimestampFea
 
 
 class FeatureSet:
-    """Holds metadata about the feature set and constructs the dataframe."""
+    """Holds metadata about the feature set and constructs the dataframe.
+
+    Attributes:
+        name:  name of the feature set.
+        entity: business context tag for the feature set, an entity for which we are
+            creating all these features.
+        description: details about the feature set purpose.
+        keys: list of KeyFeatures for this feature set.
+            Values for keys (may be a composition) should be unique on each moment in
+            time (controlled by the TimestampFeature).
+        timestamp: a TimestampFeature.
+            Should tag a single output column that controls time in this feature set.
+        features: features to compose the feature set.
+    """
 
     def __init__(
         self,
@@ -19,14 +32,7 @@ class FeatureSet:
         keys: List[KeyFeature],
         timestamp: TimestampFeature,
         features: List[Feature],
-    ):
-        """Initialize FeatureSet with specific configuration.
-
-        :param name:  name of the feature set
-        :param entity: business context tag for the feature set
-        :param description: details about the feature set purpose
-        :param features: features to compose the feature set
-        """
+    ) -> None:
         self.name = name
         self.entity = entity
         self.description = description
@@ -38,15 +44,17 @@ class FeatureSet:
     def name(self) -> str:
         """Attribute "name" getter.
 
-        :return name: name of the feature set
+        Returns:
+            Name of the feature set.
         """
         return self.__name
 
     @name.setter
-    def name(self, value: str):
+    def name(self, value: str) -> None:
         """Attribute "name" setter.
 
-        :param value: used to set attribute "name".
+        Args:
+            value: used to set attribute "name".
         """
         if not isinstance(value, str):
             raise ValueError("name must be a string with the feature set label.")
@@ -56,15 +64,18 @@ class FeatureSet:
     def entity(self) -> str:
         """Attribute "entity" getter.
 
-        :return entity: business context tag for the feature set
+        Returns:
+            Business context tag for the feature set, an entity for which we are
+                creating all these features.
         """
         return self.__entity
 
     @entity.setter
-    def entity(self, value: str):
+    def entity(self, value: str) -> None:
         """Attribute "entity" setter.
 
-        :param value: used to set attribute "entity".
+        Args:
+            value: used to set attribute "entity".
         """
         if not isinstance(value, str):
             raise ValueError(
@@ -76,15 +87,17 @@ class FeatureSet:
     def description(self) -> str:
         """Attribute "description" getter.
 
-        :return description: details about the feature set purpose
+        Returns:
+            Details about the feature set purpose
         """
         return self.__description
 
     @description.setter
-    def description(self, value: str):
+    def description(self, value: str) -> None:
         """Attribute "description" setter.
 
-        :param value: used to set attribute "description".
+        Args:
+            value: used to set attribute "description".
         """
         if not isinstance(value, str):
             raise ValueError(
@@ -93,18 +106,20 @@ class FeatureSet:
         self.__description = value
 
     @property
-    def keys(self):
+    def keys(self) -> List[KeyFeature]:
         """Attribute "keys" getter.
 
-        :return keys: list of KeyFeatures for this feature set.
+        Returns:
+            List of KeyFeatures for this feature set.
         """
         return self.__keys
 
     @keys.setter
-    def keys(self, value):
+    def keys(self, value: List[KeyFeature]) -> None:
         """Attribute "keys" setter.
 
-        :param value: used to set attribute "keys".
+        Args:
+            value: used to set attribute "keys".
         """
         if not isinstance(value, list) or not all(
             isinstance(item, KeyFeature) for item in value
@@ -118,18 +133,20 @@ class FeatureSet:
         self.__keys = value
 
     @property
-    def timestamp(self):
+    def timestamp(self) -> TimestampFeature:
         """Attribute "timestamp" getter.
 
-        :return keys: TimestampFeature for this feature set.
+        Returns:
+            TimestampFeature for this feature set.
         """
         return self.__timestamp
 
     @timestamp.setter
-    def timestamp(self, value):
+    def timestamp(self, value: TimestampFeature):
         """Attribute "timestamp" setter.
 
-        :param value: used to set attribute "timestamp".
+        Args:
+            value: used to set attribute "timestamp".
         """
         if not isinstance(value, TimestampFeature):
             raise ValueError("timestamp needs to be a TimestampFeature object.")
@@ -144,7 +161,8 @@ class FeatureSet:
     def features(self) -> List[Feature]:
         """Attribute "features" getter.
 
-        :return features: features to compose the feature set
+        Returns:
+            Features to compose the feature set.
         """
         return self.__features
 
@@ -152,7 +170,8 @@ class FeatureSet:
     def features(self, value: List[Feature]):
         """Attribute "features" setter.
 
-        :param value: used to set attribute "features".
+        Args:
+            value: used to set attribute "features".
         """
         if not isinstance(value, list) or not all(
             isinstance(item, Feature) for item in value
@@ -168,13 +187,14 @@ class FeatureSet:
         self.__features = value
 
     @property
-    def columns(self):
+    def columns(self) -> List[str]:
         """All data columns within this feature set.
 
         This references all data columns that will be created by the construct method,
         given keys, timestamp and features of this feature set.
 
-        :return columns: list of column names built in this feature set.
+        Returns:
+            List of column names built in this feature set.
         """
         return list(
             itertools.chain(
@@ -191,8 +211,11 @@ class FeatureSet:
         After that, there's the caching of the dataframe, however since cache() in
         Spark is lazy, an action is triggered in order to force persistence.
 
-        :param dataframe: input dataframe to be transformed by the features.
-        :return: Spark dataframe with just the feature columns
+        Args:
+            dataframe: input dataframe to be transformed by the features.
+
+        Returns:
+            Spark dataframe with all the feature columns.
         """
         if not isinstance(dataframe, DataFrame):
             raise ValueError("source_df must be a dataframe")

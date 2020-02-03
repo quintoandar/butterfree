@@ -32,7 +32,7 @@ class KeyFeature(Feature):
         dtype: DataType = None,
         from_column: str = None,
         transformation: TransformComponent = None,
-    ):
+    ) -> None:
         super(KeyFeature, self).__init__(
             name=name,
             description=description,
