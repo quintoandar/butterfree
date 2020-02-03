@@ -1,12 +1,13 @@
 """FileReader entity."""
 
+from butterfree.core.client import SparkClient
 from butterfree.core.reader.reader import Reader
 
 
 class FileReader(Reader):
     """Reader responsible for get data from files."""
 
-    def __init__(self, id, spark_client, path, format, format_options=None):
+    def __init__(self, id, path, format, format_options=None):
         """Instantiate FileReader with the required parameters.
 
         :param id: unique string id for register the reader as a view on the metastore
@@ -16,7 +17,7 @@ class FileReader(Reader):
         :param format_options: additional options required by some formats. Check docs:
         https://spark.apache.org/docs/latest/sql-data-sources-load-save-functions.html#manually-specifying-options
         """
-        super().__init__(id, spark_client)
+        super().__init__(id)
         if not isinstance(path, str):
             raise ValueError("path must be a string with the file location")
         if not isinstance(format, str):
@@ -27,9 +28,9 @@ class FileReader(Reader):
             {"path": self.path}, **format_options if format_options else {}
         )
 
-    def consume(self):
+    def consume(self, client: SparkClient):
         """Extract data from a file reader.
 
         :return: Spark dataframe
         """
-        return self.client.read(self.format, self.options)
+        return client.read(self.format, self.options)

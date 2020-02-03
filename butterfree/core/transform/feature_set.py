@@ -1,77 +1,85 @@
 """FeatureSet entity."""
-
+import itertools
 from functools import reduce
-from itertools import chain
 from typing import List
 
 from pyspark.sql.dataframe import DataFrame
 
-from butterfree.core.transform import Feature
+from butterfree.core.transform.features import Feature, KeyFeature, TimestampFeature
 
 
 class FeatureSet:
-    """Holds metadata about the feature set and constructs the dataframe."""
+    """Holds metadata about the feature set and constructs the dataframe.
+
+    Attributes:
+        name:  name of the feature set.
+        entity: business context tag for the feature set, an entity for which we are
+            creating all these features.
+        description: details about the feature set purpose.
+        keys: list of KeyFeatures for this feature set.
+            Values for keys (may be a composition) should be unique on each moment in
+            time (controlled by the TimestampFeature).
+        timestamp: a TimestampFeature.
+            Should tag a single output column that controls time in this feature set.
+        features: features to compose the feature set.
+    """
 
     def __init__(
         self,
         name: str,
         entity: str,
         description: str,
+        keys: List[KeyFeature],
+        timestamp: TimestampFeature,
         features: List[Feature],
-        key_columns: List[str],
-        timestamp_column: str,
-    ):
-        """Initialize FeatureSet with specific configuration.
-
-        :param name:  name of the feature set
-        :param entity: business context tag for the feature set
-        :param description: details about the feature set purpose
-        :param features: features to compose the feature set
-        :param key_columns: column names to be defined as keys.
-        :param timestamp_column: column name to be defined as timestamp.
-        """
+    ) -> None:
         self.name = name
         self.entity = entity
         self.description = description
+        self.keys = keys
+        self.timestamp = timestamp
         self.features = features
-        self.key_columns = key_columns
-        self.timestamp_column = timestamp_column
 
     @property
     def name(self) -> str:
         """Attribute "name" getter.
 
-        :return name: name of the feature set
+        Returns:
+            Name of the feature set.
         """
         return self.__name
 
     @name.setter
-    def name(self, value: str):
+    def name(self, value: str) -> None:
         """Attribute "name" setter.
 
-        :param value: used to set attribute "name".
+        Args:
+            value: used to set attribute "name".
         """
         if not isinstance(value, str):
-            raise ValueError("name must be a string with the feature set label")
+            raise ValueError("name must be a string with the feature set label.")
         self.__name = value
 
     @property
     def entity(self) -> str:
         """Attribute "entity" getter.
 
-        :return entity: business context tag for the feature set
+        Returns:
+            Business context tag for the feature set, an entity for which we are
+                creating all these features.
         """
         return self.__entity
 
     @entity.setter
-    def entity(self, value: str):
+    def entity(self, value: str) -> None:
         """Attribute "entity" setter.
 
-        :param value: used to set attribute "entity".
+        Args:
+            value: used to set attribute "entity".
         """
         if not isinstance(value, str):
             raise ValueError(
-                "entity must be a string tagging the feature set business context"
+                "entity must be a string tagging the feature set business context."
             )
         self.__entity = value
 
@@ -79,27 +87,82 @@ class FeatureSet:
     def description(self) -> str:
         """Attribute "description" getter.
 
-        :return description: details about the feature set purpose
+        Returns:
+            Details about the feature set purpose
         """
         return self.__description
 
     @description.setter
-    def description(self, value: str):
+    def description(self, value: str) -> None:
         """Attribute "description" setter.
 
-        :param value: used to set attribute "description".
+        Args:
+            value: used to set attribute "description".
         """
         if not isinstance(value, str):
             raise ValueError(
-                "description must be a string with the feature set details"
+                "description must be a string with the feature set details."
             )
         self.__description = value
+
+    @property
+    def keys(self) -> List[KeyFeature]:
+        """Attribute "keys" getter.
+
+        Returns:
+            List of KeyFeatures for this feature set.
+        """
+        return self.__keys
+
+    @keys.setter
+    def keys(self, value: List[KeyFeature]) -> None:
+        """Attribute "keys" setter.
+
+        Args:
+            value: used to set attribute "keys".
+        """
+        if not isinstance(value, list) or not all(
+            isinstance(item, KeyFeature) for item in value
+        ):
+            raise ValueError("keys needs to be a list of KeyFeature objects.")
+
+        key_columns = list(itertools.chain(*[v.get_output_columns() for v in value]))
+        if len(key_columns) != len(set(key_columns)):
+            raise KeyError("key columns will have duplicates.")
+
+        self.__keys = value
+
+    @property
+    def timestamp(self) -> TimestampFeature:
+        """Attribute "timestamp" getter.
+
+        Returns:
+            TimestampFeature for this feature set.
+        """
+        return self.__timestamp
+
+    @timestamp.setter
+    def timestamp(self, value: TimestampFeature):
+        """Attribute "timestamp" setter.
+
+        Args:
+            value: used to set attribute "timestamp".
+        """
+        if not isinstance(value, TimestampFeature):
+            raise ValueError("timestamp needs to be a TimestampFeature object.")
+
+        timestamp_columns = value.get_output_columns()
+        if len(timestamp_columns) > 1:
+            raise ValueError("TimestampFeature will produce multiple output columns.")
+
+        self.__timestamp = value
 
     @property
     def features(self) -> List[Feature]:
         """Attribute "features" getter.
 
-        :return features: features to compose the feature set
+        Returns:
+            Features to compose the feature set.
         """
         return self.__features
 
@@ -107,90 +170,59 @@ class FeatureSet:
     def features(self, value: List[Feature]):
         """Attribute "features" setter.
 
-        :param value: used to set attribute "features".
+        Args:
+            value: used to set attribute "features".
         """
         if not isinstance(value, list) or not all(
             isinstance(item, Feature) for item in value
         ):
-            raise ValueError("features needs to be a list of Feature objects")
+            raise ValueError("features needs to be a list of Feature objects.")
+
+        feature_columns = list(
+            itertools.chain(*[v.get_output_columns() for v in value])
+        )
+        if len(feature_columns) != len(set(feature_columns)):
+            raise KeyError("feature columns will have duplicates.")
+
         self.__features = value
 
-        # check duplicated column names
-        if len(self.feature_set_columns) != len(set(self.feature_set_columns)):
-            raise ValueError("features can't have output_columns with the same name")
-
     @property
-    def feature_set_columns(self) -> List[str]:
-        """Get all the output columns of al features.
+    def columns(self) -> List[str]:
+        """All data columns within this feature set.
 
-        :return: flat list with all the feature columns
+        This references all data columns that will be created by the construct method,
+        given keys, timestamp and features of this feature set.
+
+        Returns:
+            List of column names built in this feature set.
         """
-        features_columns = [feature.get_output_columns() for feature in self.features]
-        return list(chain.from_iterable(features_columns))  # flatten
-
-    @property
-    def key_columns(self) -> List[str]:
-        """Attribute "key_columns" getter.
-
-        :return key_columns: column names to be defined as keys.
-        """
-        return self.__key_columns
-
-    @key_columns.setter
-    def key_columns(self, value: List[str]):
-        """Attribute "key_columns" setter.
-
-        :param value: used to set attribute "key_columns".
-        """
-        if not isinstance(value, list):
-            raise ValueError("key_columns must be a list of key column names")
-        if not value or any(col not in self.feature_set_columns for col in value):
-            raise ValueError(
-                "Not all key_columns are in feature set, "
-                "key_columns = {}, Features = {}".format(
-                    value, self.feature_set_columns
-                )
+        return list(
+            itertools.chain(
+                *[
+                    k.get_output_columns()
+                    for k in self.keys + [self.timestamp] + self.features
+                ]
             )
-        self.__key_columns = value
+        )
 
-    @property
-    def timestamp_column(self) -> str:
-        """Attribute "timestamp_column" getter.
-
-        :return timestamp_column: column name to be defined as timestamp.
-        """
-        return self.__timestamp_column
-
-    @timestamp_column.setter
-    def timestamp_column(self, value: str):
-        """Attribute "timestamp_column" setter.
-
-        :param value: used to set attribute "timestamp_column".
-        """
-        if value not in self.feature_set_columns:
-            raise ValueError(
-                "Timestamp column not found in feature set, "
-                "timestamp_column = {}, Features = {}"
-            )
-        self.__timestamp_column = value
-
-    def construct(self, input_df: DataFrame) -> DataFrame:
+    def construct(self, dataframe: DataFrame) -> DataFrame:
         """Use all the features to build the feature set dataframe.
 
         After that, there's the caching of the dataframe, however since cache() in
         Spark is lazy, an action is triggered in order to force persistence.
 
-        :param input_df: input dataframe to be transformed by the features.
-        :return: Spark dataframe with just the feature columns
+        Args:
+            dataframe: input dataframe to be transformed by the features.
+
+        Returns:
+            Spark dataframe with all the feature columns.
         """
-        if not isinstance(input_df, DataFrame):
+        if not isinstance(dataframe, DataFrame):
             raise ValueError("source_df must be a dataframe")
-        dataframe = reduce(
-            lambda result_df, feature: feature.transform(result_df),
-            self.features,
-            input_df,
-        ).select(*self.feature_set_columns)
+        output_df = reduce(
+            lambda df, feature: feature.transform(df), self.features, dataframe,
+        ).select(*self.columns)
 
-        dataframe.cache().count()
+        output_df.cache().count()
 
-        return dataframe
+        return output_df

@@ -1,13 +1,5 @@
-from functools import partial
-
-from pyspark.sql import DataFrame
-
 from butterfree.core.client import SparkClient
 from butterfree.core.reader import Source
-
-
-def create_temp_view(dataframe: DataFrame, name):
-    dataframe.createOrReplaceTempView(name)
 
 
 class TestSource:
@@ -18,16 +10,14 @@ class TestSource:
         reader_id = "a_source"
         reader = mocker.stub(reader_id)
         reader.build = mocker.stub("build")
-        reader.build.side_effect = partial(create_temp_view, target_df, reader_id)
+        reader.build.side_effect = target_df.createOrReplaceTempView(reader_id)
 
         # when
         source_selector = Source(
-            spark_client=spark_client,
-            readers=[reader],
-            query=f"select * from {reader_id}",  # noqa
+            readers=[reader], query=f"select * from {reader_id}",  # noqa
         )
 
-        result_df = source_selector.construct()
+        result_df = source_selector.construct(spark_client)
 
         assert result_df.collect() == target_df.collect()
 
@@ -38,15 +28,13 @@ class TestSource:
         reader_id = "a_source"
         reader = mocker.stub(reader_id)
         reader.build = mocker.stub("build")
-        reader.build.side_effect = partial(create_temp_view, target_df, reader_id)
+        reader.build.side_effect = target_df.createOrReplaceTempView(reader_id)
 
         # when
         source_selector = Source(
-            spark_client=spark_client,
-            readers=[reader],
-            query=f"select * from {reader_id}",  # noqa
+            readers=[reader], query=f"select * from {reader_id}",  # noqa
         )
 
-        result_df = source_selector.construct()
+        result_df = source_selector.construct(spark_client)
 
         assert result_df.is_cached

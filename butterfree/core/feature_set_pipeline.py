@@ -1,5 +1,5 @@
 """FeatureSetPipeline entity."""
-
+from butterfree.core.client import SparkClient
 from butterfree.core.reader import Source
 from butterfree.core.transform import FeatureSet
 from butterfree.core.writer import Sink
@@ -14,10 +14,17 @@ class FeatureSetPipeline:
         sink: sink used to write dataframes in the desired location.
     """
 
-    def __init__(self, source: Source, feature_set: FeatureSet, sink: Sink):
+    def __init__(
+        self,
+        source: Source,
+        feature_set: FeatureSet,
+        sink: Sink,
+        spark_client: SparkClient = None,
+    ):
         self.source = source
         self.feature_set = feature_set
         self.sink = sink
+        self.spark_client = spark_client
 
     @property
     def source(self):
@@ -73,9 +80,35 @@ class FeatureSetPipeline:
             raise ValueError("sink must be a Sink instance")
         self._sink = sink
 
+    @property
+    def spark_client(self):
+        """Attribute "spark_client" getter.
+
+        :return sink: spark_client entity
+        """
+        return self._spark_client
+
+    @spark_client.setter
+    def spark_client(self, spark_client: SparkClient):
+        """Attribute "spark_client" setter.
+
+        :param spark_client: used to set attribute "spark_client".
+        """
+        self._spark_client = spark_client or SparkClient()
+        if not isinstance(self._spark_client, SparkClient):
+            raise ValueError("spark_client must be a SparkClient instance")
+
     def run(self):
         """Runs feature set pipeline."""
-        dataframe = self.source.construct()
-        dataframe = self.feature_set.construct(input_df=dataframe)
-        self.sink.flush(dataframe=dataframe, feature_set=self.feature_set)
-        self.sink.validate(dataframe=dataframe, feature_set=self.feature_set)
+        dataframe = self.source.construct(client=self.spark_client)
+        dataframe = self.feature_set.construct(dataframe=dataframe)
+        self.sink.flush(
+            dataframe=dataframe,
+            feature_set=self.feature_set,
+            spark_client=self.spark_client,
+        )
+        self.sink.validate(
+            dataframe=dataframe,
+            feature_set=self.feature_set,
+            spark_client=self.spark_client,
+        )

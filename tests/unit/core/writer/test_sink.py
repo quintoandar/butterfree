@@ -1,5 +1,6 @@
 import pytest
 
+from butterfree.core.client import SparkClient
 from butterfree.core.writer import (
     HistoricalFeatureStoreWriter,
     OnlineFeatureStoreWriter,
@@ -10,10 +11,10 @@ from butterfree.core.writer import (
 class TestSink:
     def test_validate(self, feature_set_dataframe, mocker):
         # given
-        spark_client = mocker.stub("spark_client")
+        spark_client = SparkClient()
         writer = [
-            HistoricalFeatureStoreWriter(spark_client),
-            OnlineFeatureStoreWriter(spark_client),
+            HistoricalFeatureStoreWriter(),
+            OnlineFeatureStoreWriter(),
         ]
 
         for w in writer:
@@ -23,7 +24,11 @@ class TestSink:
 
         # when
         sink = Sink(writers=writer)
-        sink.validate(dataframe=feature_set_dataframe, feature_set=feature_set)
+        sink.validate(
+            dataframe=feature_set_dataframe,
+            feature_set=feature_set,
+            spark_client=spark_client,
+        )
 
         # then
         for w in writer:
@@ -31,10 +36,10 @@ class TestSink:
 
     def test_validate_false(self, feature_set_dataframe, mocker):
         # given
-        spark_client = mocker.stub("spark_client")
+        spark_client = SparkClient()
         writer = [
-            HistoricalFeatureStoreWriter(spark_client),
-            OnlineFeatureStoreWriter(spark_client),
+            HistoricalFeatureStoreWriter(),
+            OnlineFeatureStoreWriter(),
         ]
 
         for w in writer:
@@ -48,14 +53,18 @@ class TestSink:
 
         # then
         with pytest.raises(RuntimeError):
-            sink.validate(dataframe=feature_set_dataframe, feature_set=feature_set)
+            sink.validate(
+                dataframe=feature_set_dataframe,
+                feature_set=feature_set,
+                spark_client=spark_client,
+            )
 
     def test_flush(self, feature_set_dataframe, mocker):
         # given
-        spark_client = mocker.stub("spark_client")
+        spark_client = SparkClient()
         writer = [
-            HistoricalFeatureStoreWriter(spark_client),
-            OnlineFeatureStoreWriter(spark_client),
+            HistoricalFeatureStoreWriter(),
+            OnlineFeatureStoreWriter(),
         ]
 
         for w in writer:
@@ -67,7 +76,11 @@ class TestSink:
 
         # when
         sink = Sink(writers=writer)
-        sink.flush(dataframe=feature_set_dataframe, feature_set=feature_set)
+        sink.flush(
+            dataframe=feature_set_dataframe,
+            feature_set=feature_set,
+            spark_client=spark_client,
+        )
 
         # then
         for w in writer:
@@ -75,10 +88,10 @@ class TestSink:
 
     def test_flush_with_invalid_df(self, feature_sets, mocker):
         # given
-        spark_client = mocker.stub("spark_client")
+        spark_client = SparkClient()
         writer = [
-            HistoricalFeatureStoreWriter(spark_client),
-            OnlineFeatureStoreWriter(spark_client),
+            HistoricalFeatureStoreWriter(),
+            OnlineFeatureStoreWriter(),
         ]
         feature_set = mocker.stub("feature_set")
         feature_set.entity = "house"
@@ -89,7 +102,11 @@ class TestSink:
 
         # then
         with pytest.raises(ValueError):
-            sink.flush(dataframe=feature_sets, feature_set=feature_set)
+            sink.flush(
+                dataframe=feature_sets,
+                feature_set=feature_set,
+                spark_client=spark_client,
+            )
 
     def test_flush_with_writers_list_empty(self):
         # given
