@@ -29,19 +29,6 @@ def target_df_table_reader(sc, spark):
 
 
 @pytest.fixture()
-def kafka_df(sc, spark):
-    data = [
-        {"key": 1, "value": 400},
-        {"key": 2, "value": 800},
-        {"key": 3, "value": 1200},
-        {"key": 4, "value": 1600},
-        {"key": 5, "value": 2000},
-        {"key": 6, "value": 2400},
-    ]
-    return spark.read.json(sc.parallelize(data, 1))
-
-
-@pytest.fixture()
 def target_df_source(sc, spark):
     data = [
         {"id": 1, "feature1": 100, "feature2": 200, "feature3": "400"},
