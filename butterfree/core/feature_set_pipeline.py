@@ -101,7 +101,7 @@ class FeatureSetPipeline:
     def run(self):
         """Runs feature set pipeline."""
         dataframe = self.source.construct(client=self.spark_client)
-        dataframe = self.feature_set.construct(input_df=dataframe)
+        dataframe = self.feature_set.construct(dataframe=dataframe)
         self.sink.flush(
             dataframe=dataframe,
             feature_set=self.feature_set,
