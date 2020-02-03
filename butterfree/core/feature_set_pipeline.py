@@ -19,7 +19,7 @@ class FeatureSetPipeline:
         source: Source,
         feature_set: FeatureSet,
         sink: Sink,
-        spark_client: SparkClient,
+        spark_client: SparkClient = None,
     ):
         self.source = source
         self.feature_set = feature_set
@@ -94,13 +94,13 @@ class FeatureSetPipeline:
 
         :param spark_client: used to set attribute "spark_client".
         """
-        if not isinstance(spark_client, SparkClient):
+        self._spark_client = spark_client or SparkClient()
+        if not isinstance(self._spark_client, SparkClient):
             raise ValueError("spark_client must be a SparkClient instance")
-        self._spark_client = spark_client
 
     def run(self):
         """Runs feature set pipeline."""
-        dataframe = self.source.construct(spark_client=self.spark_client)
+        dataframe = self.source.construct(client=self.spark_client)
         dataframe = self.feature_set.construct(input_df=dataframe)
         self.sink.flush(
             dataframe=dataframe,
