@@ -30,7 +30,7 @@ class SparkClient:
             self._session = SparkSession.builder.getOrCreate()
         return self._session
 
-    def read(self, format: str, options: dict, stream=False) -> DataFrame:
+    def read(self, format: str, options: dict, stream: bool = False) -> DataFrame:
         """Use the SparkSession.read interface to load data into a dataframe.
 
         Check docs for more information:

@@ -5,7 +5,7 @@ from butterfree.core.db.configs.abstract_config import AbstractWriteConfig
 
 
 class CassandraConfig(AbstractWriteConfig):
-    """Configuration with spark for Cassandra databases.
+    """Configuration for Spark to connect on Cassandra DB.
 
     References can be found
     [here](https://docs.databricks.com/data/data-sources/cassandra.html).
@@ -14,9 +14,9 @@ class CassandraConfig(AbstractWriteConfig):
         mode: write mode for Spark.
         format_: write format for Spark.
         keyspace:  Cassandra DB keyspace to write data.
-        username: username used in connection to Cassandra DB
-        password: password used in connection to Cassandra DB
-        host: host used in connection to Cassandra DB
+        username: username to use in connection.
+        password: password to use in connection.
+        host: host to use in connection.
     """
 
     def __init__(self, mode: str = None, format_: str = None, keyspace: str = None):
