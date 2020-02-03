@@ -1,12 +1,15 @@
 from pyspark.sql import functions as F
 
-from butterfree.core.transform import Feature, FeatureSet
-from butterfree.core.transform.aggregation import AggregatedTransform
-from butterfree.core.transform.custom import CustomTransform
+from butterfree.core.transform import FeatureSet
+from butterfree.core.transform.features import Feature, KeyFeature, TimestampFeature
+from butterfree.core.transform.transformations import (
+    AggregatedTransform,
+    CustomTransform,
+)
 
 
-def divide(df, name, column1, column2):
-
+def divide(df, fs, column1, column2):
+    name = fs.get_output_columns()[0]
     df = df.withColumn(name, F.col(column1) / F.col(column2))
     return df
 
@@ -20,7 +23,6 @@ class TestFeatureSet:
             entity="entity",
             description="description",
             features=[
-                Feature(name="id", description="The user's Main ID or device ID",),
                 Feature(
                     name="feature1",
                     description="test",
@@ -30,7 +32,6 @@ class TestFeatureSet:
                         windows=["2 minutes", "15 minutes"],
                     ),
                 ),
-                Feature(name="ts", description="The timestamp feature",),
                 Feature(
                     name="divided_feature",
                     description="unit test",
@@ -39,8 +40,8 @@ class TestFeatureSet:
                     ),
                 ),
             ],
-            key_columns=["id"],
-            timestamp_column="ts",
+            keys=[KeyFeature(name="id", description="The user's Main ID or device ID")],
+            timestamp=TimestampFeature(),
         )
 
         # act
