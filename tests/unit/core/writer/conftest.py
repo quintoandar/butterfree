@@ -15,13 +15,57 @@ def base_spark():
 
 
 @fixture
-def feature_set_dataframe():
+def input_feature_set_dataframe():
     sc, spark = base_spark()
     data = [
         {"id": 1, TIMESTAMP_COLUMN: 0, "feature": 100},
         {"id": 2, TIMESTAMP_COLUMN: 0, "feature": 200},
         {"id": 1, TIMESTAMP_COLUMN: 1, "feature": 110},
         {"id": 1, TIMESTAMP_COLUMN: 2, "feature": 120},
+    ]
+    return spark.read.json(sc.parallelize(data, 1))
+
+
+@fixture
+def output_feature_set_dataframe():
+    sc, spark = base_spark()
+    data = [
+        {
+            "feature": 100,
+            "id": 1,
+            TIMESTAMP_COLUMN: 0,
+            "dt": "1969-12-31",
+            "partition__year": 1969,
+            "partition__month": 12,
+            "partition__day": 31,
+        },
+        {
+            "id": 2,
+            TIMESTAMP_COLUMN: 0,
+            "feature": 200,
+            "dt": "1969-12-31",
+            "partition__year": 1969,
+            "partition__month": 12,
+            "partition__day": 31,
+        },
+        {
+            "id": 1,
+            TIMESTAMP_COLUMN: 1,
+            "feature": 110,
+            "dt": "1969-12-31",
+            "partition__year": 1969,
+            "partition__month": 12,
+            "partition__day": 31,
+        },
+        {
+            "id": 1,
+            TIMESTAMP_COLUMN: 2,
+            "feature": 120,
+            "dt": "1969-12-31",
+            "partition__year": 1969,
+            "partition__month": 12,
+            "partition__day": 31,
+        },
     ]
     return spark.read.json(sc.parallelize(data, 1))
 
