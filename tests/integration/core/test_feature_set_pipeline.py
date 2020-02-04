@@ -3,13 +3,16 @@ import os
 from pyspark.sql import DataFrame
 from pyspark.sql import functions as F
 
-from butterfree.core.client import SparkClient
+from butterfree.core.constant.columns import TIMESTAMP_COLUMN
 from butterfree.core.db.configs import S3Config
 from butterfree.core.feature_set_pipeline import FeatureSetPipeline
-from butterfree.core.reader import Source, TableReader
-from butterfree.core.transform import Feature, FeatureSet
-from butterfree.core.transform.aggregation import AggregatedTransform
-from butterfree.core.transform.custom import CustomTransform
+from butterfree.core.reader import FileReader, Source, TableReader
+from butterfree.core.transform import FeatureSet
+from butterfree.core.transform.features import Feature, KeyFeature, TimestampFeature
+from butterfree.core.transform.transformations import (
+    AggregatedTransform,
+    CustomTransform,
+)
 from butterfree.core.writer import HistoricalFeatureStoreWriter, Sink
 
 
@@ -26,8 +29,8 @@ def create_db_and_table(spark, table_reader_id, table_reader_db, table_reader_ta
     )
 
 
-def divide(df, name, column1, column2):
-
+def divide(df, fs, column1, column2):
+    name = fs.get_output_columns()[0]
     df = df.withColumn(name, F.col(column1) / F.col(column2))
     return df
 
@@ -35,7 +38,6 @@ def divide(df, name, column1, column2):
 class TestFeatureSetPipeline:
     def test_feature_set_pipeline(self, mocked_df, spark):
         # given
-        spark_client = SparkClient()
 
         table_reader_id = "a_source"
         table_reader_db = "db"
@@ -51,23 +53,20 @@ class TestFeatureSetPipeline:
 
         test_pipeline = FeatureSetPipeline(
             source=Source(
-                spark_client=spark_client,
                 readers=[
                     TableReader(
                         id=table_reader_id,
-                        spark_client=spark_client,
                         database=table_reader_db,
                         table=table_reader_table,
                     ),
                 ],
-                query=f"select * from {table_reader_id}",  # noqa
+                query=f"select * from {table_reader_id} ",  # noqa
             ),
             feature_set=FeatureSet(
                 name="feature_set",
                 entity="entity",
                 description="description",
                 features=[
-                    Feature(name="id", description="The user's Main ID or device ID",),
                     Feature(
                         name="feature1",
                         description="test",
@@ -77,7 +76,6 @@ class TestFeatureSetPipeline:
                             windows=["2 minutes", "15 minutes"],
                         ),
                     ),
-                    Feature(name="ts", description="The timestamp feature",),
                     Feature(
                         name="divided_feature",
                         description="unit test",
@@ -86,23 +84,52 @@ class TestFeatureSetPipeline:
                         ),
                     ),
                 ],
-                key_columns=["id"],
-                timestamp_column="ts",
+                keys=[
+                    KeyFeature(name="id", description="The user's Main ID or device ID")
+                ],
+                timestamp=TimestampFeature(),
             ),
             sink=Sink(
                 writers=[
                     HistoricalFeatureStoreWriter(
-                        spark_client=spark_client,
                         db_config=S3Config(
                             database="db",
                             format_="parquet",
                             path=os.path.join(
                                 os.path.dirname(os.path.abspath(__file__))
                             ),
-                            partition_by="ts",
+                            partition_by=TIMESTAMP_COLUMN,
                         ),
                     )
                 ],
             ),
         )
         test_pipeline.run()
+
+        df = spark.read.parquet(
+            os.path.join(
+                os.path.dirname(os.path.abspath(__file__)),
+                "historical/entity/feature_set",
+            )
+        ).orderBy(TIMESTAMP_COLUMN).collect()
+
+        assert df[0]["feature1__avg_over_2_minutes"] == 200
+        assert df[1]["feature1__avg_over_2_minutes"] == 300
+        assert df[2]["feature1__avg_over_2_minutes"] == 400
+        assert df[3]["feature1__avg_over_2_minutes"] == 500
+        assert df[0]["feature1__std_over_2_minutes"] == 0
+        assert df[1]["feature1__std_over_2_minutes"] == 0
+        assert df[2]["feature1__std_over_2_minutes"] == 0
+        assert df[3]["feature1__std_over_2_minutes"] == 0
+        assert df[0]["feature1__avg_over_15_minutes"] == 200
+        assert df[1]["feature1__avg_over_15_minutes"] == 250
+        assert df[2]["feature1__avg_over_15_minutes"] == 350
+        assert df[3]["feature1__avg_over_15_minutes"] == 500
+        assert df[0]["feature1__std_over_15_minutes"] == 0
+        assert df[1]["feature1__std_over_15_minutes"] == 50
+        assert df[2]["feature1__std_over_15_minutes"] == 50
+        assert df[3]["feature1__std_over_15_minutes"] == 0
+        assert df[0]["divided_feature"] == 1
+        assert df[1]["divided_feature"] == 1
+        assert df[2]["divided_feature"] == 1
+        assert df[3]["divided_feature"] == 1
