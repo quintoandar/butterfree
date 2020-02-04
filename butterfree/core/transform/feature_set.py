@@ -220,7 +220,9 @@ class FeatureSet:
         if not isinstance(dataframe, DataFrame):
             raise ValueError("source_df must be a dataframe")
         output_df = reduce(
-            lambda df, feature: feature.transform(df), self.features, dataframe,
+            lambda df, feature: feature.transform(df),
+            self.keys + [self.timestamp] + self.features,
+            dataframe,
         ).select(*self.columns)
 
         output_df.cache().count()
