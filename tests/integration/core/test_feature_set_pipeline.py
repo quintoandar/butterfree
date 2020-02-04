@@ -98,7 +98,6 @@ class TestFeatureSetPipeline:
                             path=os.path.join(
                                 os.path.dirname(os.path.abspath(__file__))
                             ),
-                            partition_by=TIMESTAMP_COLUMN,
                         ),
                     )
                 ],
