@@ -3,7 +3,7 @@
 import os
 
 from pyspark.sql.dataframe import DataFrame
-from pyspark.sql.functions import dayofmonth, from_unixtime, month, year
+from pyspark.sql.functions import dayofmonth, month, year
 
 from butterfree.core.client import SparkClient
 from butterfree.core.constant.columns import TIMESTAMP_COLUMN
@@ -40,7 +40,7 @@ class HistoricalFeatureStoreWriter(Writer):
 
         validate_dataframe = VerifyDataframe(dataframe)
         validate_dataframe.checks()
-        dataframe = self._create_partitions(dataframe, TIMESTAMP_COLUMN)
+        dataframe = self._create_partitions(dataframe)
 
         spark_client.write_table(
             dataframe=dataframe,
@@ -77,15 +77,11 @@ class HistoricalFeatureStoreWriter(Writer):
         return True if feature_store == dataframe else False
 
     @staticmethod
-    def _create_partitions(dataframe, timestamp_column):
-        dataframe = dataframe.withColumn(
-            "dt", from_unixtime(dataframe[timestamp_column].cast("long"), "yyyy-MM-dd")
-        )
-
+    def _create_partitions(dataframe):
         dataframe = (
-            dataframe.withColumn("partition__year", year(dataframe["dt"]))
-            .withColumn("partition__month", month(dataframe["dt"]))
-            .withColumn("partition__day", dayofmonth(dataframe["dt"]))
+            dataframe.withColumn("partition__year", year(dataframe[TIMESTAMP_COLUMN]))
+            .withColumn("partition__month", month(dataframe[TIMESTAMP_COLUMN]))
+            .withColumn("partition__day", dayofmonth(dataframe[TIMESTAMP_COLUMN]))
         )
 
         return dataframe
