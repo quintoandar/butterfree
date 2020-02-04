@@ -110,11 +110,11 @@ class S3Config(AbstractWriteConfig):
 
         :param value: used to set attribute "partition_by".
         """
-        self.__partition_by = [
+        self.__partition_by = value or [
             "partition__year",
             "partition__month",
             "partition__day",
-        ] or value
+        ]
 
     def get_options(self, table: str) -> dict:
         """Get options.
