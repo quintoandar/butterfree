@@ -216,3 +216,30 @@ class TestFeatureSet:
         # act and assert
         with pytest.raises(ValueError):
             _ = feature_set.construct("not a dataframe")
+
+    def test_construct_transformations(
+        self,
+        dataframe,
+        feature_set_dataframe,
+        key_id,
+        timestamp_c,
+        feature_add,
+        feature_divide,
+    ):
+        # arrange
+        feature_set = FeatureSet(
+            "name",
+            "entity",
+            "description",
+            [key_id],
+            timestamp_c,
+            [feature_add, feature_divide],
+        )
+
+        # act
+        feature_set.construct(dataframe)
+
+        # act and assert
+        feature_set.timestamp.transform.assert_called_once()
+        for key in range(0, len(feature_set.keys)):
+            feature_set.keys[key].transform.assert_called_once()
