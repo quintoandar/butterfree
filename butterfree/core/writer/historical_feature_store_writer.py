@@ -78,8 +78,6 @@ class HistoricalFeatureStoreWriter(Writer):
 
     @staticmethod
     def _create_partitions(dataframe, timestamp_column):
-        if not timestamp_column:
-            raise ValueError()
         dataframe = dataframe.withColumn(
             "dt", from_unixtime(dataframe[timestamp_column].cast("long"), "yyyy-MM-dd")
         )
