@@ -27,12 +27,25 @@ class TestHistoricalFeatureStoreWriter:
         spark_client.write_table.assert_called_once()
 
         actual_df = spark_client.write_table.call_args[1]["dataframe"].collect()
-        expected_df = output_feature_set_dataframe.collect()
+        output_feature_set_dataframe = output_feature_set_dataframe.collect()
 
-        assert actual_df[0]["feature"] == expected_df[0]["feature"]
-        assert actual_df[0]["partition__year"] == expected_df[0]["partition__year"]
-        assert actual_df[0]["partition__month"] == expected_df[0]["partition__month"]
-        assert actual_df[0]["partition__day"] == expected_df[0]["partition__day"]
+        for row in range(0, 4):
+            assert (
+                actual_df[row]["feature"]
+                == output_feature_set_dataframe[row]["feature"]
+            )
+            assert (
+                actual_df[row]["partition__year"]
+                == output_feature_set_dataframe[row]["partition__year"]
+            )
+            assert (
+                actual_df[row]["partition__month"]
+                == output_feature_set_dataframe[row]["partition__month"]
+            )
+            assert (
+                actual_df[row]["partition__day"]
+                == output_feature_set_dataframe[row]["partition__day"]
+            )
 
         assert (
             writer.db_config.format_ == spark_client.write_table.call_args[1]["format_"]
