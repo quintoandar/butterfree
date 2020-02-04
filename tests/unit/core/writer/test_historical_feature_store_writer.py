@@ -4,7 +4,9 @@ from butterfree.core.writer import HistoricalFeatureStoreWriter
 
 
 class TestHistoricalFeatureStoreWriter:
-    def test_write(self, input_feature_set_dataframe, output_feature_set_dataframe, mocker):
+    def test_write(
+        self, input_feature_set_dataframe, output_feature_set_dataframe, mocker
+    ):
         # given
         spark_client = mocker.stub("spark_client")
         spark_client.write_table = mocker.stub("write_table")
@@ -60,7 +62,9 @@ class TestHistoricalFeatureStoreWriter:
                 spark_client=spark_client,
             )
 
-    def test_validate(self, input_feature_set_dataframe, feature_set_count_dataframe, mocker):
+    def test_validate(
+        self, input_feature_set_dataframe, feature_set_count_dataframe, mocker
+    ):
         # given
         spark_client = mocker.stub("spark_client")
         spark_client.sql = mocker.stub("sql")
