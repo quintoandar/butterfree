@@ -6,7 +6,7 @@ from pyspark.sql import functions as F
 from butterfree.core.constant.columns import TIMESTAMP_COLUMN
 from butterfree.core.db.configs import S3Config
 from butterfree.core.feature_set_pipeline import FeatureSetPipeline
-from butterfree.core.reader import FileReader, Source, TableReader
+from butterfree.core.reader import Source, TableReader
 from butterfree.core.transform import FeatureSet
 from butterfree.core.transform.features import Feature, KeyFeature, TimestampFeature
 from butterfree.core.transform.transformations import (
@@ -106,12 +106,16 @@ class TestFeatureSetPipeline:
         )
         test_pipeline.run()
 
-        df = spark.read.parquet(
-            os.path.join(
-                os.path.dirname(os.path.abspath(__file__)),
-                "historical/entity/feature_set",
+        df = (
+            spark.read.parquet(
+                os.path.join(
+                    os.path.dirname(os.path.abspath(__file__)),
+                    "historical/entity/feature_set",
+                )
             )
-        ).orderBy(TIMESTAMP_COLUMN).collect()
+            .orderBy(TIMESTAMP_COLUMN)
+            .collect()
+        )
 
         assert df[0]["feature1__avg_over_2_minutes"] == 200
         assert df[1]["feature1__avg_over_2_minutes"] == 300
