@@ -1,15 +1,21 @@
 from pyspark import SparkContext
 from pyspark.sql import session
+from pyspark.sql.functions import col
 from pyspark.sql.types import StringType, StructField, StructType
 from pytest import fixture
 
 from butterfree.core.constant.columns import TIMESTAMP_COLUMN
+from butterfree.core.constant.data_type import DataType
 from butterfree.core.db.configs import CassandraConfig
 
 
 def base_spark():
     sc = SparkContext.getOrCreate()
-    spark = session.SparkSession(sc)
+    spark = (
+        session.SparkSession(sc)
+        .builder.config("spark.sql.session.timeZone", "UTC")
+        .getOrCreate()
+    )
 
     return sc, spark
 
@@ -35,7 +41,9 @@ def input_feature_set_dataframe():
         {"id": 1, TIMESTAMP_COLUMN: 1, "feature": 110},
         {"id": 1, TIMESTAMP_COLUMN: 2, "feature": 120},
     ]
-    return spark.read.json(sc.parallelize(data, 1))
+    return spark.read.json(sc.parallelize(data, 1)).withColumn(
+        TIMESTAMP_COLUMN, col(TIMESTAMP_COLUMN).cast(DataType.TIMESTAMP.value)
+    )
 
 
 @fixture
@@ -46,40 +54,38 @@ def output_feature_set_dataframe():
             "feature": 100,
             "id": 1,
             TIMESTAMP_COLUMN: 0,
-            "dt": "1969-12-31",
-            "partition__year": 1969,
-            "partition__month": 12,
-            "partition__day": 31,
+            "partition__year": 1970,
+            "partition__month": 1,
+            "partition__day": 1,
         },
         {
             "id": 2,
             TIMESTAMP_COLUMN: 0,
             "feature": 200,
-            "dt": "1969-12-31",
-            "partition__year": 1969,
-            "partition__month": 12,
-            "partition__day": 31,
+            "partition__year": 1970,
+            "partition__month": 1,
+            "partition__day": 1,
         },
         {
             "id": 1,
             TIMESTAMP_COLUMN: 1,
             "feature": 110,
-            "dt": "1969-12-31",
-            "partition__year": 1969,
-            "partition__month": 12,
-            "partition__day": 31,
+            "partition__year": 1970,
+            "partition__month": 1,
+            "partition__day": 1,
         },
         {
             "id": 1,
             TIMESTAMP_COLUMN: 2,
             "feature": 120,
-            "dt": "1969-12-31",
-            "partition__year": 1969,
-            "partition__month": 12,
-            "partition__day": 31,
+            "partition__year": 1970,
+            "partition__month": 1,
+            "partition__day": 1,
         },
     ]
-    return spark.read.json(sc.parallelize(data, 1))
+    return spark.read.json(sc.parallelize(data, 1)).withColumn(
+        TIMESTAMP_COLUMN, col(TIMESTAMP_COLUMN).cast(DataType.TIMESTAMP.value)
+    )
 
 
 @fixture
