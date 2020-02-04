@@ -121,10 +121,10 @@ class TestFeatureSetPipeline:
         )
         test_pipeline.run()
 
-        assert test_pipeline.source.construct.assert_called_once
-        assert test_pipeline.feature_set.construct.assert_called_once
-        assert test_pipeline.sink.flush.assert_called_once
-        assert test_pipeline.sink.validate.assert_called_once
+        test_pipeline.source.construct.assert_called_once()
+        test_pipeline.feature_set.construct.assert_called_once()
+        test_pipeline.sink.flush.assert_called_once()
+        test_pipeline.sink.validate.assert_called_once()
 
     def test_source_raise(self):
         with pytest.raises(ValueError, match="source must be a Source instance"):
