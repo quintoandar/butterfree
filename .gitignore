@@ -117,3 +117,6 @@ ENV/
 spark-warehouse/
 .vscode/
 init/
+
+# Integration tests output
+tests/integration/output/
