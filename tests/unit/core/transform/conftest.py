@@ -91,15 +91,9 @@ def feature_divide():
 
 @fixture
 def key_id():
-    kid = Mock(spec=KeyFeature)
-    kid.get_output_columns = Mock(return_value=["id"])
-    kid.transform = Mock(return_value=make_fs())
-    return kid
+    return KeyFeature(name="id", description="description")
 
 
 @fixture
 def timestamp_c():
-    timestamp_c = Mock(spec=TimestampFeature)
-    timestamp_c.get_output_columns = Mock(return_value=[TIMESTAMP_COLUMN])
-    timestamp_c.transform = Mock(return_value=make_fs())
-    return timestamp_c
+    return TimestampFeature()

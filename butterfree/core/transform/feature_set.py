@@ -152,6 +152,16 @@ class FeatureSet:
             )
         )
 
+    @property
+    def key_columns(self) -> List[str]:
+        """Name of the key columns in feature set."""
+        return [feature.name for feature in self.keys]
+
+    @property
+    def timestamp_column(self) -> str:
+        """Name of the timestamp column in feature set."""
+        return self.timestamp.name
+
     def construct(self, dataframe: DataFrame) -> DataFrame:
         """Use all the features to build the feature set dataframe.
 

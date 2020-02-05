@@ -92,6 +92,8 @@ class TestFeatureSet:
         assert [key_id] == feature_set.keys
         assert timestamp_c == feature_set.timestamp
         assert [feature_add, feature_divide] == feature_set.features
+        assert "timestamp" == feature_set.timestamp_column
+        assert ["id"] == feature_set.key_columns
 
     def test_duplicate_keys(self, feature_add, feature_divide, key_id, timestamp_c):
         # arrange
@@ -237,9 +239,7 @@ class TestFeatureSet:
         )
 
         # act
-        feature_set.construct(dataframe)
+        result_df = feature_set.construct(dataframe)
 
-        # act and assert
-        feature_set.timestamp.transform.assert_called_once()
-        for key in range(0, len(feature_set.keys)):
-            feature_set.keys[key].transform.assert_called_once()
+        # assert
+        assert result_df.collect() == feature_set_dataframe.collect()
