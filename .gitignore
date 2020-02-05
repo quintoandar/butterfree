@@ -117,3 +117,7 @@ ENV/
 spark-warehouse/
 .vscode/
 init/
+
+# integration tests artifacts
+metastore_db/
+tests/integration/core/historical/
