@@ -62,9 +62,7 @@ class OnlineFeatureStoreWriter(Writer):
 
         """
         id_columns = [key.name for key in feature_set.keys]
-        dataframe = self.filter_latest(
-            dataframe=dataframe, id_columns=id_columns
-        )
+        dataframe = self.filter_latest(dataframe=dataframe, id_columns=id_columns)
         spark_client.write_dataframe(
             dataframe=dataframe,
             format_=self.db_config.format_,
@@ -89,13 +87,9 @@ class OnlineFeatureStoreWriter(Writer):
             raise ValueError("format needs to be a string with the desired read format")
 
         if not isinstance(feature_set.name, str):
-            raise ValueError(
-                "table_name needs to be a string with the local of the registered table"
-            )
+            raise ValueError("table_name needs to be a string with table name")
         id_columns = [key.name for key in feature_set.keys]
-        dataframe = self.filter_latest(
-            dataframe=dataframe, id_columns=id_columns
-        )
+        dataframe = self.filter_latest(dataframe=dataframe, id_columns=id_columns)
         dataframe = dataframe.count()
 
         feature_store = spark_client.read(
