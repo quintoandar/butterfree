@@ -3,6 +3,8 @@ from pyspark.sql import session
 from pyspark.sql.types import StringType, StructField, StructType
 from pytest import fixture
 
+from butterfree.core.constant.columns import TIMESTAMP_COLUMN
+
 
 def base_spark():
     sc = SparkContext.getOrCreate()
@@ -15,10 +17,10 @@ def base_spark():
 def feature_set_dataframe():
     sc, spark = base_spark()
     data = [
-        {"id": 1, "ts": 0, "feature": 100},
-        {"id": 2, "ts": 0, "feature": 200},
-        {"id": 1, "ts": 1, "feature": 110},
-        {"id": 1, "ts": 2, "feature": 120},
+        {"id": 1, TIMESTAMP_COLUMN: 0, "feature": 100},
+        {"id": 2, TIMESTAMP_COLUMN: 0, "feature": 200},
+        {"id": 1, TIMESTAMP_COLUMN: 1, "feature": 110},
+        {"id": 1, TIMESTAMP_COLUMN: 2, "feature": 120},
     ]
     return spark.read.json(sc.parallelize(data, 1))
 

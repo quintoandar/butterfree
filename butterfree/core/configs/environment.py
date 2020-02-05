@@ -140,6 +140,7 @@ class UnspecifiedVariableError(RuntimeError):
         variable_name: environment variable name.
 
     """
+
     def __init__(self, variable_name: str):
         super().__init__(
             f'Variable "{variable_name}" is not listed in the environment'

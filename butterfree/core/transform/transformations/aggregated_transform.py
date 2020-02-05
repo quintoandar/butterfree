@@ -6,7 +6,10 @@ from parameters_validation import non_blank
 from pyspark.sql import DataFrame, functions
 from pyspark.sql.window import Window
 
-from butterfree.core.transform.transform_component import TransformComponent
+from butterfree.core.constant.columns import TIMESTAMP_COLUMN
+from butterfree.core.transform.transformations.transform_component import (
+    TransformComponent,
+)
 
 
 class AggregatedTransform(TransformComponent):
@@ -33,7 +36,7 @@ class AggregatedTransform(TransformComponent):
         self.aggregations = aggregations
         self.windows = windows
         self.partition = partition
-        self.time_column = time_column or "timestamp"
+        self.time_column = time_column or TIMESTAMP_COLUMN
 
     __ALLOWED_AGGREGATIONS = {"avg": functions.avg, "std": functions.stddev_pop}
     __ALLOWED_WINDOWS = {
@@ -163,11 +166,16 @@ class AggregatedTransform(TransformComponent):
                         window_size=int(window.split()[0]),
                     ),
                 )
-                dataframe = dataframe.select(functions.col("*")).withColumn(
+                dataframe = dataframe.withColumn(
                     feature_name,
                     self.__ALLOWED_AGGREGATIONS[aggregation](
                         f"{self._parent.name}"
                     ).over(w),
                 )
+                if self._parent.dtype:
+                    dataframe = dataframe.withColumn(
+                        feature_name,
+                        functions.col(feature_name).cast(self._parent.dtype),
+                    )
 
         return dataframe

@@ -10,15 +10,14 @@ class TableReader(Reader):
     """Responsible for get data from tables registered in the metastore.
 
     Attributes:
-        id: unique string id for register the reader as a view on the metastore
-        spark_client: client for connection to the metastore
-        database: name of the metastore database/schema
-        table: name of the table
+        id: unique string id for register the reader as a view on the metastore.
+        database: name of the metastore database/schema.
+        table: name of the table.
 
     """
 
-    def __init__(self, id: str, spark_client: SparkClient, database: str, table: str):
-        super().__init__(id, spark_client)
+    def __init__(self, id: str, database: str, table: str):
+        super().__init__(id)
         if not isinstance(database, str):
             raise ValueError(
                 "database needs to be a string with the name of the metastore schema"
@@ -30,6 +29,14 @@ class TableReader(Reader):
         self.database = database
         self.table = table
 
-    def consume(self) -> DataFrame:
-        """Extract data from the table."""
-        return self.client.read_table(self.database, self.table)
+    def consume(self, client: SparkClient) -> DataFrame:
+        """Extract data from a table in Spark metastore.
+
+        Args:
+            client: client responsible for connecting to Spark session.
+
+        Returns:
+            Dataframe with all the data from the table.
+
+        """
+        return client.read_table(self.database, self.table)

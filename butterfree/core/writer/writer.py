@@ -11,35 +11,39 @@ from butterfree.core.transform import FeatureSet
 class Writer(ABC):
     """Abstract base class for Writers.
 
-    Attributes:
+    Args:
         spark_client: client for spark connections with external services.
-        db_config: object with access configuration to storage. More information
-            about the module in 'butterfree.core.db.configs'.
+
     """
 
-    def __init__(self, spark_client: SparkClient):
-        self.spark_client = spark_client
-
     @abstractmethod
-    def write(self, feature_set: FeatureSet, dataframe: DataFrame):
+    def write(
+        self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient
+    ):
         """Loads the data from a feature set into the Feature Store.
 
         Feature Store could be Online or Historical.
 
         Args:
-            feature_set: object processed with feature_set informations.
-            dataframe: dataframe containing records from a feature set.
+            feature_set: object processed with feature set metadata.
+            dataframe: Spark dataframe containing data from a feature set.
+            spark_client: client for Spark connections with external services.
+
         """
 
     @abstractmethod
-    def validate(self, feature_set: FeatureSet, dataframe: DataFrame):
-        """Calculate metrics to validate data into Feature Store.
+    def validate(
+        self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient
+    ):
+        """Calculate dataframe rows to validate data into Feature Store.
 
         Args:
-            feature_set: object containing feature set metadata.
-            dataframe: spark dataframe containing data from a feature set.
-            feature_set: FeatureSet:
+            feature_set: object processed with feature set metadata.
+            dataframe: Spark dataframe containing data from a feature set.
+            spark_client: client for Spark connections with external services.
 
         Returns:
-            True for success validation, False otherwise
+            False: fail validation.
+            True: success validation.
+
         """

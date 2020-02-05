@@ -46,7 +46,7 @@ class TestReader:
     )
     def test_with_(self, transformations, spark_client):
         # arrange
-        file_reader = FileReader("test", spark_client, "path/to/file", "format")
+        file_reader = FileReader("test", "path/to/file", "format")
 
         # act
         for transformation in transformations:
@@ -106,7 +106,7 @@ class TestReader:
         self, input_data, transformations, transformed_data, sc, spark, spark_client,
     ):
         # arrange
-        file_reader = FileReader("test", spark_client, "path/to/file", "format")
+        file_reader = FileReader("test", "path/to/file", "format")
         file_reader.transformations = transformations
         input_df = spark.read.json(sc.parallelize(input_data, 1))
         target_df = spark.read.json(sc.parallelize(transformed_data, 1))
@@ -119,11 +119,11 @@ class TestReader:
 
     def test_build(self, target_df, spark_client, spark):
         # arrange
-        file_reader = FileReader("test", spark_client, "path/to/file", "format")
+        file_reader = FileReader("test", "path/to/file", "format")
         spark_client.read.return_value = target_df
 
         # act
-        file_reader.build()
+        file_reader.build(spark_client)
         result_df = spark.sql("select * from test")
 
         # assert

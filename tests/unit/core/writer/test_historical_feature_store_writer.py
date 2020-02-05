@@ -1,5 +1,4 @@
 import pytest
-from tests.unit.core.writer.conftest import feature_set_empty, feature_set_without_ts
 
 from butterfree.core.writer import HistoricalFeatureStoreWriter
 
@@ -10,13 +9,17 @@ class TestHistoricalFeatureStoreWriter:
         spark_client = mocker.stub("spark_client")
         spark_client.write_table = mocker.stub("write_table")
         feature_set = mocker.stub("feature_set")
-        writer = HistoricalFeatureStoreWriter(spark_client)
+        writer = HistoricalFeatureStoreWriter()
 
         feature_set.entity = "house"
         feature_set.name = "test"
 
         # when
-        writer.write(feature_set=feature_set, dataframe=feature_set_dataframe)
+        writer.write(
+            feature_set=feature_set,
+            dataframe=feature_set_dataframe,
+            spark_client=spark_client,
+        )
 
         # then
         spark_client.write_table.assert_called_once()
@@ -34,11 +37,7 @@ class TestHistoricalFeatureStoreWriter:
         )
         assert feature_set.name == spark_client.write_table.call_args[1]["table_name"]
 
-    @pytest.mark.parametrize(
-        "dataframe",
-        [feature_set_empty, feature_set_without_ts, "not a spark df writer"],
-    )
-    def test_write_with_df_invalid(self, dataframe, mocker):
+    def test_write_with_df_invalid(self, feature_sets, mocker):
         # given
         spark_client = mocker.stub("spark_client")
         spark_client.write_table = mocker.stub("write_table")
@@ -46,11 +45,15 @@ class TestHistoricalFeatureStoreWriter:
         feature_set.entity = "house"
         feature_set.name = "test"
 
-        writer = HistoricalFeatureStoreWriter(spark_client)
+        writer = HistoricalFeatureStoreWriter()
 
         # then
         with pytest.raises(ValueError):
-            assert writer.write(feature_set=feature_set, dataframe=dataframe)
+            writer.write(
+                feature_set=feature_set,
+                dataframe=feature_sets,
+                spark_client=spark_client,
+            )
 
     def test_validate(self, feature_set_dataframe, feature_set_count_dataframe, mocker):
         # given
@@ -61,10 +64,10 @@ class TestHistoricalFeatureStoreWriter:
         feature_set.name = "test"
         query = "SELECT COUNT(1) as row FROM feature_store.test"
 
-        writer = HistoricalFeatureStoreWriter(spark_client)
+        writer = HistoricalFeatureStoreWriter()
 
         # when
-        result = writer.validate(feature_set, feature_set_dataframe)
+        result = writer.validate(feature_set, feature_set_dataframe, spark_client)
 
         # then
         spark_client.sql.assert_called_once()
@@ -84,10 +87,10 @@ class TestHistoricalFeatureStoreWriter:
         feature_set = mocker.stub("feature_set")
         feature_set.name = "test"
 
-        writer = HistoricalFeatureStoreWriter(spark_client)
+        writer = HistoricalFeatureStoreWriter()
 
         # when
-        result = writer.validate(feature_set, feature_set_dataframe)
+        result = writer.validate(feature_set, feature_set_dataframe, spark_client)
 
         # then
         assert result is False
