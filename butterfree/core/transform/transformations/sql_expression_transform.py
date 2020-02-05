@@ -39,6 +39,8 @@ class SQLExpressionTransform(TransformComponent):
 
         """
         try:
-            return dataframe.selectExpr(f"*", f"{self.expression} as {self._parent.name}")
+            return dataframe.selectExpr(
+                f"*", f"{self.expression} as {self._parent.name}"
+            )
         except Exception as e:
             raise e
