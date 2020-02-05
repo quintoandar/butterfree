@@ -1,5 +1,3 @@
-from collections import namedtuple
-
 import pytest
 from pyspark.sql.functions import expr
 
@@ -137,10 +135,8 @@ class TestReader:
         spark_client.read.return_value = target_df
 
         # act
-        column = namedtuple("column", "old_expression new_column_name")
         file_reader.build(
-            client=spark_client,
-            columns=[column("col1", "new_col1"), column("col2", "new_col2")],
+            client=spark_client, columns=[("col1", "new_col1"), ("col2", "new_col2")],
         )
         result_df = spark.sql("select * from test")
 
