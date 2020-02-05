@@ -64,7 +64,7 @@ instance/
 .scrapy
 
 # Sphinx documentation
-docs/_build/
+docs/
 
 # PyBuilder
 target/
@@ -119,5 +119,7 @@ spark-warehouse/
 .vscode/
 init/
 
-# Integration tests output
+# integration tests artifacts
+metastore_db/
+tests/integration/core/historical/
 tests/integration/output/

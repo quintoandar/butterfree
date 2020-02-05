@@ -6,12 +6,13 @@ from butterfree.core.writer import Sink
 
 
 class FeatureSetPipeline:
-    """Defines a FeatureSetPipeline.
+    """Defines a ETL pipeline for the construction of a feature set.
 
     Attributes:
-        source: sources defined by user.
-        feature_set: feature set defined by user containing features.
-        sink: sink used to write dataframes in the desired location.
+        source: source of the data, the entry point of the pipeline.
+        feature_set: feature set composed by features and context metadata.
+        sink: sink used to write the output dataframe in the desired locations.
+        spark_client: client used to access Spark connection.
     """
 
     def __init__(
@@ -27,79 +28,58 @@ class FeatureSetPipeline:
         self.spark_client = spark_client
 
     @property
-    def source(self):
-        """Attribute "source" getter.
-
-        :return source: source entity
-        """
+    def source(self) -> Source:
+        """Source of the data, the entry point of the pipeline."""
         return self._source
 
     @source.setter
     def source(self, source: Source):
-        """Attribute "source" setter.
-
-        :param source: used to set attribute "source".
-        """
         if not isinstance(source, Source):
             raise ValueError("source must be a Source instance")
         self._source = source
 
     @property
-    def feature_set(self):
-        """Attribute "feature_set" getter.
-
-        :return feature_set: feature_set entity
-        """
+    def feature_set(self) -> FeatureSet:
+        """Feature set composed by features and context metadata."""
         return self._feature_set
 
     @feature_set.setter
     def feature_set(self, feature_set: FeatureSet):
-        """Attribute "feature_set" setter.
-
-        :param feature_set: used to set attribute "feature_set".
-        """
         if not isinstance(feature_set, FeatureSet):
             raise ValueError("feature_set must be a FeatureSet instance")
         self._feature_set = feature_set
 
     @property
     def sink(self):
-        """Attribute "sink" getter.
-
-        :return sink: sink entity
-        """
+        """Sink used to write the output dataframe in the desired locations."""
         return self._sink
 
     @sink.setter
     def sink(self, sink: Sink):
-        """Attribute "sink" setter.
-
-        :param sink: used to set attribute "sink".
-        """
         if not isinstance(sink, Sink):
             raise ValueError("sink must be a Sink instance")
         self._sink = sink
 
     @property
     def spark_client(self):
-        """Attribute "spark_client" getter.
-
-        :return sink: spark_client entity
-        """
+        """Client used to access Spark connection."""
         return self._spark_client
 
     @spark_client.setter
     def spark_client(self, spark_client: SparkClient):
-        """Attribute "spark_client" setter.
-
-        :param spark_client: used to set attribute "spark_client".
-        """
         self._spark_client = spark_client or SparkClient()
         if not isinstance(self._spark_client, SparkClient):
             raise ValueError("spark_client must be a SparkClient instance")
 
     def run(self):
-        """Runs feature set pipeline."""
+        """Runs the defined feature set pipeline.
+
+        The pipeline consists in the following steps:
+        - Constructs the input dataframe from the data source.
+        - Construct the feature set dataframe using the defined Features.
+        - Load the data to the configured sink locations.
+
+        """
         dataframe = self.source.construct(client=self.spark_client)
         dataframe = self.feature_set.construct(dataframe=dataframe)
         self.sink.flush(

@@ -1,26 +1,33 @@
 """KafkaSource entity."""
 
+from pyspark.sql import DataFrame
+
 from butterfree.core.client import SparkClient
 from butterfree.core.reader.reader import Reader
 
 
 class KafkaReader(Reader):
-    """Reader responsible for get data from a Kafka topic."""
+    """Responsible for get data from a Kafka topic.
+
+    Attributes:
+        id: unique string id for register the reader as a view on the metastore
+        connection_string: string with hosts and ports to connect. In the
+            format: host1:port,host2:port,...,hostN:portN
+        topic: string with the Kafka topic name to subscribe.
+        topic_options: additional options for consuming from topic. See docs:
+            https://spark.apache.org/docs/latest/structured-streaming-kafka-integration.html.
+        stream: flag to indicate the reading mode: stream or batch
+
+    """
 
     def __init__(
-        self, id, connection_string, topic, topic_options=None, stream=True,
+        self,
+        id: str,
+        connection_string: str,
+        topic: str,
+        topic_options: dict = None,
+        stream: bool = True,
     ):
-        """Instantiate KafkaReader with the required parameters.
-
-        :param id: unique string id for register the reader as a view on the metastore
-        :param spark_client: spark_client object client module
-        :param connection_string: string with hosts and ports to connect. In the format:
-        host1:port,host2:port,...,host:port
-        :param topic: string with the Kafka topic name to subscribe.
-        :param topic_options: additional options for consuming from topic. See docs:
-        https://spark.apache.org/docs/latest/structured-streaming-kafka-integration.html.
-        :param stream: flag to indicate the reading mode: stream or batch
-        """
         super().__init__(id)
         if not isinstance(connection_string, str):
             raise ValueError(
@@ -39,10 +46,19 @@ class KafkaReader(Reader):
         )
         self.stream = stream
 
-    def consume(self, client: SparkClient):
+    def consume(self, client: SparkClient) -> DataFrame:
         """Extract data from a kafka topic.
 
-        :return: Spark dataframe
+        When stream mode it will get all the new data arriving at the topic in a
+        streaming dataframe. When not in stream mode it will get all data
+        available in the kafka topic.
+
+        Args:
+            client: client responsible for connecting to Spark session.
+
+        Returns:
+            Dataframe with
+
         """
         raw_stream_df = client.read(
             format="kafka", options=self.options, stream=self.stream

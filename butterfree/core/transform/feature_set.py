@@ -9,19 +9,20 @@ from butterfree.core.transform.features import Feature, KeyFeature, TimestampFea
 
 
 class FeatureSet:
-    """Holds metadata about the feature set and constructs the dataframe.
+    """Holds metadata about the feature set and constructs the final dataframe.
 
     Attributes:
         name:  name of the feature set.
-        entity: business context tag for the feature set, an entity for which we are
-            creating all these features.
+        entity: business context tag for the feature set, an entity for which we
+            are creating all these features.
         description: details about the feature set purpose.
-        keys: list of KeyFeatures for this feature set.
-            Values for keys (may be a composition) should be unique on each moment in
-            time (controlled by the TimestampFeature).
-        timestamp: a TimestampFeature.
-            Should tag a single output column that controls time in this feature set.
+        keys: key features to define this feature set.
+            Values for keys (may be a composition) should be unique on each
+            moment in time (controlled by the TimestampFeature).
+        timestamp: A single feature that define a timestamp for each observation
+            in this feature set.
         features: features to compose the feature set.
+
     """
 
     def __init__(
@@ -42,41 +43,22 @@ class FeatureSet:
 
     @property
     def name(self) -> str:
-        """Attribute "name" getter.
-
-        Returns:
-            Name of the feature set.
-        """
+        """Name of the feature set."""
         return self.__name
 
     @name.setter
     def name(self, value: str) -> None:
-        """Attribute "name" setter.
-
-        Args:
-            value: used to set attribute "name".
-        """
         if not isinstance(value, str):
             raise ValueError("name must be a string with the feature set label.")
         self.__name = value
 
     @property
     def entity(self) -> str:
-        """Attribute "entity" getter.
-
-        Returns:
-            Business context tag for the feature set, an entity for which we are
-                creating all these features.
-        """
+        """Business context tag for the feature set."""
         return self.__entity
 
     @entity.setter
     def entity(self, value: str) -> None:
-        """Attribute "entity" setter.
-
-        Args:
-            value: used to set attribute "entity".
-        """
         if not isinstance(value, str):
             raise ValueError(
                 "entity must be a string tagging the feature set business context."
@@ -85,20 +67,11 @@ class FeatureSet:
 
     @property
     def description(self) -> str:
-        """Attribute "description" getter.
-
-        Returns:
-            Details about the feature set purpose
-        """
+        """Details about the feature set purpose."""
         return self.__description
 
     @description.setter
     def description(self, value: str) -> None:
-        """Attribute "description" setter.
-
-        Args:
-            value: used to set attribute "description".
-        """
         if not isinstance(value, str):
             raise ValueError(
                 "description must be a string with the feature set details."
@@ -107,20 +80,11 @@ class FeatureSet:
 
     @property
     def keys(self) -> List[KeyFeature]:
-        """Attribute "keys" getter.
-
-        Returns:
-            List of KeyFeatures for this feature set.
-        """
+        """Key features to define this feature set."""
         return self.__keys
 
     @keys.setter
     def keys(self, value: List[KeyFeature]) -> None:
-        """Attribute "keys" setter.
-
-        Args:
-            value: used to set attribute "keys".
-        """
         if not isinstance(value, list) or not all(
             isinstance(item, KeyFeature) for item in value
         ):
@@ -134,20 +98,11 @@ class FeatureSet:
 
     @property
     def timestamp(self) -> TimestampFeature:
-        """Attribute "timestamp" getter.
-
-        Returns:
-            TimestampFeature for this feature set.
-        """
+        """Defines a timestamp for each observation in this feature set."""
         return self.__timestamp
 
     @timestamp.setter
     def timestamp(self, value: TimestampFeature):
-        """Attribute "timestamp" setter.
-
-        Args:
-            value: used to set attribute "timestamp".
-        """
         if not isinstance(value, TimestampFeature):
             raise ValueError("timestamp needs to be a TimestampFeature object.")
 
@@ -159,20 +114,11 @@ class FeatureSet:
 
     @property
     def features(self) -> List[Feature]:
-        """Attribute "features" getter.
-
-        Returns:
-            Features to compose the feature set.
-        """
+        """Features to compose the feature set."""
         return self.__features
 
     @features.setter
     def features(self, value: List[Feature]):
-        """Attribute "features" setter.
-
-        Args:
-            value: used to set attribute "features".
-        """
         if not isinstance(value, list) or not all(
             isinstance(item, Feature) for item in value
         ):
@@ -190,11 +136,12 @@ class FeatureSet:
     def columns(self) -> List[str]:
         """All data columns within this feature set.
 
-        This references all data columns that will be created by the construct method,
-        given keys, timestamp and features of this feature set.
+        This references all data columns that will be created by the construct
+        method, given keys, timestamp and features of this feature set.
 
         Returns:
             List of column names built in this feature set.
+
         """
         return list(
             itertools.chain(
@@ -208,14 +155,15 @@ class FeatureSet:
     def construct(self, dataframe: DataFrame) -> DataFrame:
         """Use all the features to build the feature set dataframe.
 
-        After that, there's the caching of the dataframe, however since cache() in
-        Spark is lazy, an action is triggered in order to force persistence.
+        After that, there's the caching of the dataframe, however since cache()
+        in Spark is lazy, an action is triggered in order to force persistence.
 
         Args:
             dataframe: input dataframe to be transformed by the features.
 
         Returns:
             Spark dataframe with all the feature columns.
+
         """
         if not isinstance(dataframe, DataFrame):
             raise ValueError("source_df must be a dataframe")
