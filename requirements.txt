@@ -1,2 +1,4 @@
+cmake==3.13.3
 pyspark==2.4.4
 parameters-validation==1.1.5
+h3==3.4.3
