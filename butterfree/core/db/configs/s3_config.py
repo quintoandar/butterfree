@@ -5,14 +5,15 @@ from butterfree.core.db.configs.abstract_config import AbstractWriteConfig
 
 
 class S3Config(AbstractWriteConfig):
-    """Configuration with spark for AWS S3.
+    """Configuration for Spark metastore database stored on AWS S3.
 
     Attributes:
-        database: specified database name.
-        mode: write mode for spark.
-        format_: string with the file format.
-        path: string with the local to save the feature set.
-        partition_by: names of partitioning columns.
+        database: database name.
+        mode: writing mode used be writers.
+        format_: expected stored file format.
+        path: database root location.
+        partition_by: partition column to use when writing.
+
     """
 
     def __init__(
@@ -32,84 +33,49 @@ class S3Config(AbstractWriteConfig):
 
     @property
     def database(self) -> str:
-        """Attribute "database" getter.
-
-        :return database: write database for S3.
-        """
+        """Database name."""
         return self.__database
 
     @database.setter
     def database(self, value: str):
-        """Attribute "database" setter.
-
-        :param value: used to set attribute "database".
-        """
         self.__database = value or "feature_store"
 
     @property
     def format_(self) -> str:
-        """Attribute "format" getter.
-
-        :return format_: write format for spark with S3.
-        """
+        """Expected stored file format."""
         return self.__format
 
     @format_.setter
     def format_(self, value: str):
-        """Attribute "format" setter.
-
-        :param value: used to set attribute "format_".
-        """
         self.__format = value or "parquet"
 
     @property
     def mode(self) -> str:
-        """Attribute "mode" getter.
-
-        :return mode: write mode for spark with S3.
-        """
+        """Writing mode used be writers."""
         return self.__mode
 
     @mode.setter
     def mode(self, value):
-        """Attribute "mode" setter.
-
-        :param value: used to set attribute "mode".
-        """
         self.__mode = value or "overwrite"
 
     @property
     def path(self) -> str:
-        """Attribute "path" getter.
-
-        :return path: write path for spark with S3.
-        """
+        """Database root location."""
         return self.__path
 
     @path.setter
     def path(self, value):
-        """Attribute "path" setter.
-
-        :param value: used to set attribute "path".
-        """
         self.__path = (
             value or f"s3a://{environment.get_variable('FEATURE_STORE_S3_BUCKET')}"
         )
 
     @property
     def partition_by(self) -> str:
-        """Attribute "partition_by" getter.
-
-        :return path: write partition_by for spark with S3.
-        """
+        """Partition column to use when writing."""
         return self.__partition_by
 
     @partition_by.setter
     def partition_by(self, value):
-        """Attribute "partition_by" setter.
-
-        :param value: used to set attribute "partition_by".
-        """
         self.__partition_by = value or [
             "partition__year",
             "partition__month",
@@ -117,13 +83,17 @@ class S3Config(AbstractWriteConfig):
         ]
 
     def get_options(self, table: str) -> dict:
-        """Get options.
+        """Get options for AWS S3.
 
-        Options will be a dictionary with the write and read configuration for spark to
-        AWS S3.
+        Options will be a dictionary with the write and read configuration for
+        Spark to AWS S3.
 
-        :param table: table name into AWS S3.
-        :return: dict of the params to S3.
+        Args:
+            table: table name into AWS S3.
+
+        Returns:
+            Options configuration for AWS S3.
+
         """
         return {
             "table": table,

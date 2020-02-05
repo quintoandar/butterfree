@@ -16,7 +16,8 @@ class HistoricalFeatureStoreWriter(Writer):
 
     Attributes:
         db_config: configuration with spark for databases or AWS S3 (default).
-            For more information access the class in 'butterfree.core.db.configs'.
+            For more information check module 'butterfree.core.db.configs'.
+
     """
 
     def __init__(self, db_config=None):
@@ -31,6 +32,7 @@ class HistoricalFeatureStoreWriter(Writer):
             feature_set: object processed with feature_set informations.
             dataframe: spark dataframe containing data from a feature set.
             spark_client: client for spark connections with external services.
+
         """
         s3_path = os.path.join(
             self.db_config.path, "historical", feature_set.entity, feature_set.name
@@ -62,6 +64,7 @@ class HistoricalFeatureStoreWriter(Writer):
         Returns:
             False: fail validation.
             True: success validation.
+
         """
         table_name = "{}.{}".format(self.db_config.database, feature_set.name)
         query_format_string = "SELECT COUNT(1) as row FROM {}"

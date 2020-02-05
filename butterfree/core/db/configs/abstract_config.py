@@ -10,22 +10,33 @@ class AbstractWriteConfig(ABC):
     def mode(self) -> str:
         """Config option "mode" for spark write.
 
+        Args:
+
         Returns:
-            str: mode.
+          str: mode.
+
         """
 
     @abstractproperty
     def format_(self) -> str:
         """Config option "format" for spark write.
 
+        Args:
+
         Returns:
-            str: format.
+          str: format.
+
         """
 
     @abstractmethod
     def get_options(self, *args, **kwargs) -> dict:
-        """Additional options for spark write.
+        """Get connection options configuration defined in the entity.
+
+        Args:
+          *args: args to use in the options
+          **kwargs: kwargs to use in the options
 
         Returns:
-            dict: key/value structure with additional options.
+            Connection options configuration.
+
         """

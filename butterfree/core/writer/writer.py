@@ -13,6 +13,7 @@ class Writer(ABC):
 
     Args:
         spark_client: client for spark connections with external services.
+
     """
 
     @abstractmethod
@@ -24,9 +25,10 @@ class Writer(ABC):
         Feature Store could be Online or Historical.
 
         Args:
-            feature_set: object processed with feature_set informations.
-            dataframe: spark dataframe containing data from a feature set.
-            spark_client: client for spark connections with external services.
+            feature_set: object processed with feature set metadata.
+            dataframe: Spark dataframe containing data from a feature set.
+            spark_client: client for Spark connections with external services.
+
         """
 
     @abstractmethod
@@ -36,11 +38,12 @@ class Writer(ABC):
         """Calculate dataframe rows to validate data into Feature Store.
 
         Args:
-            feature_set: object processed with feature_set informations.
-            dataframe: spark dataframe containing data from a feature set.
-            spark_client: client for spark connections with external services.
+            feature_set: object processed with feature set metadata.
+            dataframe: Spark dataframe containing data from a feature set.
+            spark_client: client for Spark connections with external services.
 
         Returns:
             False: fail validation.
             True: success validation.
+
         """

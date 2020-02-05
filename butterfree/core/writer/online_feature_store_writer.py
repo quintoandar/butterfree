@@ -16,8 +16,9 @@ class OnlineFeatureStoreWriter(Writer):
     """Enable writing feature sets into the Online Feature Store.
 
     Attributes:
-        db_config: configuration with spark for databases or Cassandra DB (default).
-            For more information access the class in 'butterfree.core.db.configs'.
+        db_config: Spark configuration for connect databases.
+            For more information check the module 'butterfree.core.db.configs'.
+
     """
 
     def __init__(self, db_config=None):
@@ -32,7 +33,9 @@ class OnlineFeatureStoreWriter(Writer):
             id_columns: unique identifier column set for this feature set.
 
         Returns:
-            dataframe: contains only latest data for each unique id in the feature set.
+            dataframe: contains only latest data for each unique id in the
+                feature set.
+
         """
         if TIMESTAMP_COLUMN not in dataframe.columns:
             raise KeyError("DataFrame must have a 'ts' column to order by.")
@@ -50,12 +53,13 @@ class OnlineFeatureStoreWriter(Writer):
         )
 
     def write(self, feature_set: FeatureSet, dataframe, spark_client: SparkClient):
-        """Loads the latest data from a feature set into the Online Feature Store.
+        """Loads the latest data from a feature set into the Feature Store.
 
         Args:
-            feature_set: object processed with feature_set informations.
-            dataframe: spark dataframe containing data from a feature set.
-            spark_client: client for spark connections with external services.
+            feature_set: object processed with feature set metadata.
+            dataframe: Spark dataframe containing data from a feature set.
+            spark_client: client for Spark connections with external services.
+
         """
         dataframe = self.filter_latest(
             dataframe=dataframe, id_columns=feature_set.key_columns
@@ -71,13 +75,14 @@ class OnlineFeatureStoreWriter(Writer):
         """Calculate dataframe rows to validate data into Feature Store.
 
         Args:
-            feature_set: object processed with feature_set informations.
-            dataframe: spark dataframe containing data from a feature set.
-            spark_client: client for spark connections with external services.
+            feature_set: object processed with feature set metadata.
+            dataframe: Spark dataframe containing data from a feature set.
+            spark_client: client for Spark connections with external services.
 
         Returns:
             False: fail validation.
             True: success validation.
+
         """
         if not isinstance(self.db_config.format_, str):
             raise ValueError("format needs to be a string with the desired read format")

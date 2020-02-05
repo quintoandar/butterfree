@@ -10,10 +10,16 @@ from butterfree.core.writer.writer import Writer
 
 
 class Sink:
-    """Run the Writers and validate process checks on the loaded data.
+    """Define the destinations for the feature set pipeline.
+
+    A Sink is created from a set of writers. The main goal of the Sink is to
+    trigger the load in each defined writers. After the load the entity can be
+    used to make sure that all data was written properly using the validate
+    method.
 
     Attributes:
         writers: list of writers to run.
+
     """
 
     def __init__(self, writers: List[Writer]):
@@ -25,12 +31,16 @@ class Sink:
     def validate(
         self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient
     ):
-        """Validate the data loaded by the defined Writers.
+        """Trigger a validation job in all the defined Writers.
 
         Args:
             dataframe: spark dataframe containing data from a feature set.
-            feature_set: object processed with feature_set informations.
+            feature_set: object processed with feature set metadata.
             spark_client: client used to run a query.
+
+        Raises:
+            RuntimeError: if any on the Writers returns a failed validation.
+
         """
         Validation = namedtuple("Validation", ["writer", "result"])
 
@@ -55,12 +65,13 @@ class Sink:
     def flush(
         self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient
     ):
-        """Trigger all the defined Writers into the Feature Store.
+        """Trigger a write job in all the defined Writers.
 
         Args:
             dataframe: spark dataframe containing data from a feature set.
-            feature_set: object processed with feature_set informations.
+            feature_set: object processed with feature set metadata.
             spark_client: client used to run a query.
+
         """
         for writer in self.writers:
             writer.write(

@@ -190,4 +190,6 @@ and will be ready to consume.
 
 Any contributions are welcome! Feel free to open Pull Requests and
 posting them to [our
-**#squad-mlops** slack channel](https://quintoandar.slack.com/messages/squad-mlops/).
+**#data-products-reviews** slack channel](https://quintoandar.slack.com/messages/data-products-reviews/).
+
+Please **follow the guidelines** described [here](https://github.com/quintoandar/butterfree/tree/master/CONTRIBUTING.md)
