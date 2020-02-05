@@ -1,3 +1,5 @@
+import pytest
+
 from butterfree.core.transform.features import Feature
 from butterfree.core.transform.transformations import SQLExpressionTransform
 
@@ -53,3 +55,13 @@ class TestSQLExpressionTransform:
         assert df[1]["feature1_over_feature2"] == 1
         assert df[2]["feature1_over_feature2"] == 1
         assert df[3]["feature1_over_feature2"] == 1
+
+    def test_feature_transform_invalid_output(self, feature_set_dataframe):
+        with pytest.raises(Exception):
+            test_feature = Feature(
+                name="feature1_plus_a",
+                description="unit test",
+                transformation=SQLExpressionTransform(expression="feature2 + a"),
+            )
+
+            test_feature.transform(feature_set_dataframe).collect()
