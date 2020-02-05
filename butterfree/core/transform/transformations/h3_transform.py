@@ -1,4 +1,4 @@
-"""Aggregated Transform entity."""
+"""H3 Transform entity."""
 
 from typing import List
 
