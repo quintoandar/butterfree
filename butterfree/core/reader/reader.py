@@ -1,7 +1,6 @@
 """Reader entity."""
 
 from abc import ABC, abstractmethod
-from collections import namedtuple
 from functools import reduce
 from typing import Callable, List
 
@@ -69,7 +68,7 @@ class Reader(ABC):
         :return: Spark dataframe
         """
 
-    def build(self, client: SparkClient, columns: List[namedtuple] = None):
+    def build(self, client: SparkClient, columns: List[tuple] = None):
         """Register the data got from the reader in the Spark metastore.
 
         Create a temporary view in Spark metastore referencing the data
@@ -78,20 +77,17 @@ class Reader(ABC):
 
         Args:
             client: client responsible for connecting to Spark session.
-            columns: list of named tuples for renaming/filtering the dataset.
+            columns: list of tuples for renaming/filtering the dataset.
 
         """
-        if columns is None or not columns:
-            return self._apply_transformations(
-                self.consume(client)
-            ).createOrReplaceTempView(self.id)
+        transformed_df = self._apply_transformations(self.consume(client))
 
-        select_expression = []
-        for statement in columns:
-            select_expression.append(
-                f"{statement.old_expression} as {statement.new_column_name}"
+        if columns:
+            select_expression = []
+            for old_expression, new_column_name in columns:
+                select_expression.append(f"{old_expression} as {new_column_name}")
+            transformed_df.selectExpr(*select_expression).createOrReplaceTempView(
+                self.id
             )
 
-        return self._apply_transformations(
-            self.consume(client).selectExpr(*select_expression)
-        ).createOrReplaceTempView(self.id)
+        transformed_df.createOrReplaceTempView(self.id)
