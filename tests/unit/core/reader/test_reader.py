@@ -2,7 +2,7 @@ import pytest
 from pyspark.sql.functions import expr, first
 
 from butterfree.core.reader import FileReader
-from butterfree.core.reader.pre_processing.pivot_transform import pivot_table
+from butterfree.core.transform.pre_processing.pivot_transform import pivot_table
 
 
 def add_value_transformer(df, column, value):
