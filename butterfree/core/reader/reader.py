@@ -3,8 +3,7 @@
 from abc import ABC, abstractmethod
 from collections import namedtuple
 from functools import reduce
-from typing import List
-from typing import Callable
+from typing import Callable, List
 
 from pyspark.sql import DataFrame
 
@@ -79,6 +78,7 @@ class Reader(ABC):
 
         Args:
             client: client responsible for connecting to Spark session.
+            columns: list of named tuples for renaming/filtering the dataset.
 
         """
         if columns is None or not columns:
