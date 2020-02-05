@@ -8,7 +8,7 @@ from butterfree.core.transform.transformations.aggregated_transform import (
     AggregatedTransform,
 )
 from butterfree.core.transform.transformations.custom_transform import CustomTransform
-from butterfree.core.transform.transformations.h3_transform import H3Transform
+from butterfree.core.transform.transformations.h3_transform import H3HashTransform
 from butterfree.core.transform.transformations.transform_component import (
     TransformComponent,
 )
@@ -16,6 +16,6 @@ from butterfree.core.transform.transformations.transform_component import (
 __all__ = [
     "AggregatedTransform",
     "CustomTransform",
-    "H3Transform",
+    "H3HashTransform",
     "TransformComponent",
 ]
