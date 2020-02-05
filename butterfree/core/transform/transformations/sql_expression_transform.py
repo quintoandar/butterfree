@@ -11,7 +11,7 @@ from butterfree.core.transform.transformations.transform_component import (
 
 
 class SQLExpressionTransform(TransformComponent):
-    """Defines an Aggregation.
+    """Defines an SQL Expression Transformation.
 
     Attributes:
         expression: SQL expression defined by the user.
@@ -38,4 +38,7 @@ class SQLExpressionTransform(TransformComponent):
             Transformed dataframe.
 
         """
-        return dataframe.selectExpr(f"*", f"{self.expression} as {self._parent.name}")
+        try:
+            return dataframe.selectExpr(f"*", f"{self.expression} as {self._parent.name}")
+        except Exception as e:
+            raise e
