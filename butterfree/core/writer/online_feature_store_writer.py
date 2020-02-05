@@ -61,14 +61,15 @@ class OnlineFeatureStoreWriter(Writer):
             spark_client: client for Spark connections with external services.
 
         """
+        id_columns = [key.name for key in feature_set.keys]
         dataframe = self.filter_latest(
-            dataframe=dataframe, id_columns=feature_set.key_columns
+            dataframe=dataframe, id_columns=id_columns
         )
         spark_client.write_dataframe(
             dataframe=dataframe,
-            mode=self.db_config.mode,
             format_=self.db_config.format_,
-            options=self.db_config.get_options(table=feature_set.name),
+            mode=self.db_config.mode,
+            **self.db_config.get_options(table=feature_set.name),
         )
 
     def validate(self, feature_set: FeatureSet, dataframe, spark_client: SparkClient):
@@ -91,9 +92,9 @@ class OnlineFeatureStoreWriter(Writer):
             raise ValueError(
                 "table_name needs to be a string with the local of the registered table"
             )
-
+        id_columns = [key.name for key in feature_set.keys]
         dataframe = self.filter_latest(
-            dataframe=dataframe, id_columns=feature_set.key_columns
+            dataframe=dataframe, id_columns=id_columns
         )
         dataframe = dataframe.count()
 

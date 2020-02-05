@@ -86,7 +86,7 @@ class TestSink:
         for w in writer:
             w.write.assert_called_once()
 
-    def test_flush_with_invalid_df(self, feature_sets, mocker):
+    def test_flush_with_invalid_df(self, not_feature_set_dataframe, mocker):
         # given
         spark_client = SparkClient()
         writer = [
@@ -103,7 +103,7 @@ class TestSink:
         # then
         with pytest.raises(ValueError):
             sink.flush(
-                dataframe=feature_sets,
+                dataframe=not_feature_set_dataframe,
                 feature_set=feature_set,
                 spark_client=spark_client,
             )
