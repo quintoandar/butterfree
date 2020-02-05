@@ -52,7 +52,6 @@ def input_dataframe():
     ]
     return spark.read.json(sc.parallelize(data, 1))
 
-
 @fixture
 def feature_set():
     key_features = [KeyFeature(name="id", description="Description")]
