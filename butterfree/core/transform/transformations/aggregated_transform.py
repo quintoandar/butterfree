@@ -117,7 +117,8 @@ class AggregatedTransform(TransformComponent):
 
         return w
 
-    def _get_window_span(self, window_unit, window_size):
+    def get_window_span(self, window_unit: str, window_size: int):
+        """Returns window span."""
         for key in self.__ALLOWED_WINDOWS.keys():
             if window_unit in key:
                 return self.__ALLOWED_WINDOWS[key] * window_size
@@ -161,7 +162,7 @@ class AggregatedTransform(TransformComponent):
                 w = self._window_definition(
                     partition=f"{self.partition}",
                     time_column=f"{self.time_column}",
-                    window_span=self._get_window_span(
+                    window_span=self.get_window_span(
                         window_unit=window.split()[1],
                         window_size=int(window.split()[0]),
                     ),
