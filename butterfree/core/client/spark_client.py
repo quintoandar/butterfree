@@ -8,10 +8,7 @@ from pyspark.sql import DataFrame, SparkSession
 class SparkClient:
     """Handle Spark session connection.
 
-    Get query results with SQL and reads data from external systems.
-
-    Attributes:
-        _session: Spark session
+    Get query results with SQL, reads and writes data on external systems.
 
     """
 
