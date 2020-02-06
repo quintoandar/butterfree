@@ -155,7 +155,7 @@ class FeatureSet:
     @property
     def key_columns(self) -> List[str]:
         """Name of the key columns in feature set."""
-        return [feature.name for feature in self.keys]
+        return list(itertools.chain(*[k.get_output_columns() for k in self.keys]))
 
     @property
     def timestamp_column(self) -> str:
