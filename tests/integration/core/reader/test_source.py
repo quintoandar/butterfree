@@ -37,9 +37,9 @@ class TestSource:
         # given
         spark_client = SparkClient()
 
-        table_reader_id = "a_source"
+        table_reader_id = "a_test_source"
         table_reader_db = "db"
-        table_reader_table = "table"
+        table_reader_table = "table_test_source"
 
         create_temp_view(dataframe=target_df_table_reader, name=table_reader_id)
         create_db_and_table(
@@ -49,7 +49,7 @@ class TestSource:
             table_reader_table=table_reader_table,
         )
 
-        file_reader_id = "b_source"
+        file_reader_id = "b_test_source"
         data_sample_path = INPUT_PATH + "/data.json"
 
         # when
