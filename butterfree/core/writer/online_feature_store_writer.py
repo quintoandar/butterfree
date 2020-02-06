@@ -62,7 +62,7 @@ class OnlineFeatureStoreWriter(Writer):
 
         """
         dataframe = self.filter_latest(
-            dataframe=dataframe, id_columns=feature_set.key_columns
+            dataframe=dataframe, id_columns=feature_set.keys_columns
         )
         spark_client.write_dataframe(
             dataframe=dataframe,
@@ -91,7 +91,7 @@ class OnlineFeatureStoreWriter(Writer):
             raise ValueError("table_name needs to be a string with table name")
 
         dataframe = self.filter_latest(
-            dataframe=dataframe, id_columns=feature_set.key_columns
+            dataframe=dataframe, id_columns=feature_set.keys_columns
         )
         dataframe = dataframe.count()
 
