@@ -86,8 +86,6 @@ class Reader(ABC):
             select_expression = []
             for old_expression, new_column_name in columns:
                 select_expression.append(f"{old_expression} as {new_column_name}")
-            transformed_df.selectExpr(*select_expression).createOrReplaceTempView(
-                self.id
-            )
+            transformed_df = transformed_df.selectExpr(*select_expression)
 
         transformed_df.createOrReplaceTempView(self.id)
