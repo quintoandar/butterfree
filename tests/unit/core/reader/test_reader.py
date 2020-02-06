@@ -141,4 +141,4 @@ class TestReader:
         result_df = spark.sql("select * from test")
 
         # assert
-        assert target_df.collect() == result_df.collect()
+        assert column_target_df.collect() == result_df.collect()
