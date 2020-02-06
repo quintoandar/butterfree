@@ -40,7 +40,7 @@ class TestSource:
 
         file_reader_id = "b_source"
         data_sample_path = os.path.join(
-            os.path.dirname(os.path.abspath(__file__)), "data_sample.parquet"
+            os.path.dirname(os.path.abspath(__file__)), "data_sample.json/data.json"
         )
 
         # when
@@ -51,7 +51,7 @@ class TestSource:
                     database=table_reader_db,
                     table=table_reader_table,
                 ),
-                FileReader(id=file_reader_id, path=data_sample_path, format="parquet",),
+                FileReader(id=file_reader_id, path=data_sample_path, format="json"),
             ],
             query=f"select a.*, b.feature2 "  # noqa
             f"from {table_reader_id} a "  # noqa
