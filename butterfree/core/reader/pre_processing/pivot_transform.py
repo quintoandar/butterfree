@@ -18,6 +18,8 @@ def pivot_table(
         group_by_columns: list of columns' names to be grouped.
         pivot_column: column to be pivoted.
         aggregation_expression: desired aggregation to be performed with a column.
+        An example: spark_agg(col_name). See docs for all spark_agg:
+            https://spark.apache.org/docs/2.3.1/api/python/_modules/pyspark/sql/functions.html
 
     """
     return (
