@@ -73,7 +73,7 @@ class Reader(ABC):
 
         Create a temporary view in Spark metastore referencing the data
         extracted from the target origin after the application of all the
-        defined pre-processing transformations.
+        defined pre_processing transformations.
 
         Args:
             client: client responsible for connecting to Spark session.
