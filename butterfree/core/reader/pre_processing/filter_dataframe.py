@@ -2,11 +2,26 @@
 from pyspark.sql.dataframe import DataFrame
 
 
-def filter_dataframe(dataframe: DataFrame, conditions):
-    if isinstance(conditions, str):
-        return dataframe.filter(conditions)
-    elif conditions in dataframe.columns:
-        return dataframe.filter(conditions)
+def filter_dataframe(dataframe: DataFrame, column, condition, value):
+    """Filters DataFrame's rows using the given condition and value.
+
+    Args:
+        dataframe: Spark DataFrame.
+        column: DataFrame column.
+        condition: the filter condition, example: =, >, <, not in.
+        value: the filter value.
+
+    Returns:
+        DataFrame
+    """
+    if not isinstance(column, str):
+        raise TypeError("column should be string.")
+    elif column not in dataframe.columns:
+        raise ValueError("column should be a DataFrame's column")
+
+    if condition == "not in":
+        return dataframe.filter(~dataframe[column].isin(value))
     else:
-        raise TypeError("condition should be string or DataFrame's column")
+        return dataframe.filter('{}''{}''{}'.format(column, condition, value))
+
 
