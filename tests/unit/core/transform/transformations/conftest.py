@@ -26,3 +26,17 @@ def feature_set_dataframe():
     df = df.withColumn(TIMESTAMP_COLUMN, df.origin_ts.cast(DataType.TIMESTAMP.value))
 
     return df
+
+
+@fixture
+def h3_dataframe():
+    sc, spark = base_spark()
+    data = [
+        {"id": 1, "feature": 200, "lat": -23.554190, "lng": -46.670723},
+        {"id": 1, "feature": 300, "lat": -23.554190, "lng": -46.670723},
+        {"id": 1, "feature": 400, "lat": -23.554190, "lng": -46.670723},
+        {"id": 1, "feature": 500, "lat": -23.554190, "lng": -46.670723},
+    ]
+    df = spark.read.json(sc.parallelize(data, 1))
+
+    return df
