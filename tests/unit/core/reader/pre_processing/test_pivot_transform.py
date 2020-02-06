@@ -1,7 +1,20 @@
+from typing import List
+
+from pyspark.sql import DataFrame
 from pyspark.sql.functions import first
 
 from butterfree.core.reader import FileReader
 from butterfree.core.reader.pre_processing.pivot_transform import pivot_table
+
+
+def compare_dataframes(
+    actual_df: DataFrame, expected_df: DataFrame, columns_sort: List[str] = None
+):
+    if not columns_sort:
+        columns_sort = actual_df.schema.fieldNames()
+    return sorted(actual_df.select(*columns_sort).collect()) == sorted(
+        expected_df.select(*columns_sort).collect()
+    )
 
 
 class TestPivotTransform:
@@ -41,14 +54,15 @@ class TestPivotTransform:
         )
 
         # act
-        result_df = sorted(file_reader._apply_transformations(pivot_df).collect())
-        target_df = target_pivot_df.collect()
+        result_df = file_reader._apply_transformations(pivot_df)
+        target_df = target_pivot_df
 
         # assert
-        for line in range(0, 4):
-            assert result_df[line]["id"] == target_df[line]["id"]
-            assert result_df[line]["ts"] == target_df[line]["ts"]
-            assert result_df[line]["1"] == target_df[line]["1"]
-            assert result_df[line]["2"] == target_df[line]["2"]
-            assert result_df[line]["3"] == target_df[line]["3"]
-            assert result_df[line]["4"] == target_df[line]["4"]
+        assert (
+            compare_dataframes(
+                actual_df=result_df,
+                expected_df=target_df,
+                columns_sort=result_df.columns,
+            )
+            is True
+        )
