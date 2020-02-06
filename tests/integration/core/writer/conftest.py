@@ -59,10 +59,6 @@ def feature_set():
     ts_feature = TimestampFeature(from_column="timestamp")
     features = [
         Feature(name="feature", description="Description"),
-        # TODO: remove partition features when implemented in historical writer
-        Feature(name="partition__year", description="Description"),
-        Feature(name="partition__month", description="Description"),
-        Feature(name="partition__day", description="Description"),
     ]
     return FeatureSet(
         "test_sink_feature_set",
