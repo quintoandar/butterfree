@@ -76,7 +76,7 @@ pipeline:
   export-releases-to-s3-prod:
     image: plugins/s3
     pull: true
-    bucket: 5a-artifacts
+    bucket: artifacts.s3.data.quintoandar.com.br
     source: dist/*.whl
     target: butterfree/
     strip_prefix: dist/
