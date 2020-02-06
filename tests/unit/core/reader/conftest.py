@@ -16,6 +16,12 @@ def spark(sc):
 
 
 @pytest.fixture()
+def column_target_df(sc, spark):
+    data = [{"new_col1": "value", "new_col2": 123}]
+    return spark.read.json(sc.parallelize(data, 1))
+
+
+@pytest.fixture()
 def target_df(sc, spark):
     data = [{"col1": "value", "col2": 123}]
     return spark.read.json(sc.parallelize(data, 1))

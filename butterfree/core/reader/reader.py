@@ -2,7 +2,7 @@
 
 from abc import ABC, abstractmethod
 from functools import reduce
-from typing import Callable
+from typing import Callable, List
 
 from pyspark.sql import DataFrame
 
@@ -65,9 +65,10 @@ class Reader(ABC):
         Returns:
             Dataframe with all the data.
 
+        :return: Spark dataframe
         """
 
-    def build(self, client: SparkClient):
+    def build(self, client: SparkClient, columns: List[tuple] = None):
         """Register the data got from the reader in the Spark metastore.
 
         Create a temporary view in Spark metastore referencing the data
@@ -76,8 +77,15 @@ class Reader(ABC):
 
         Args:
             client: client responsible for connecting to Spark session.
+            columns: list of tuples for renaming/filtering the dataset.
 
         """
-        self._apply_transformations(self.consume(client)).createOrReplaceTempView(
-            self.id
-        )
+        transformed_df = self._apply_transformations(self.consume(client))
+
+        if columns:
+            select_expression = []
+            for old_expression, new_column_name in columns:
+                select_expression.append(f"{old_expression} as {new_column_name}")
+            transformed_df = transformed_df.selectExpr(*select_expression)
+
+        transformed_df.createOrReplaceTempView(self.id)
