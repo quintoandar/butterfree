@@ -1,3 +1,5 @@
+from unittest.mock import Mock
+
 from tests.integration import OUTPUT_PATH
 
 from butterfree.core.client import SparkClient
@@ -7,8 +9,6 @@ from butterfree.core.writer import (
     OnlineFeatureStoreWriter,
     Sink,
 )
-
-from unittest.mock import Mock
 
 
 def test_writer(input_dataframe, feature_set):

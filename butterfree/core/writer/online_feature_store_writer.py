@@ -61,7 +61,6 @@ class OnlineFeatureStoreWriter(Writer):
             spark_client: client for Spark connections with external services.
 
         """
-        id_columns = [key.name for key in feature_set.keys]
         dataframe = self.filter_latest(
             dataframe=dataframe, id_columns=feature_set.keys_columns
         )
