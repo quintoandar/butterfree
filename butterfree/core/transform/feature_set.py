@@ -78,6 +78,10 @@ class FeatureSet:
             )
         self.__description = value
 
+    @staticmethod
+    def _get_features_columns(*features) -> List[str]:
+        return list(itertools.chain(*[k.get_output_columns() for k in features]))
+
     @property
     def keys(self) -> List[KeyFeature]:
         """Key features to define this feature set."""
@@ -90,7 +94,7 @@ class FeatureSet:
         ):
             raise ValueError("keys needs to be a list of KeyFeature objects.")
 
-        key_columns = list(itertools.chain(*[v.get_output_columns() for v in value]))
+        key_columns = self._get_features_columns(*value)
         if len(key_columns) != len(set(key_columns)):
             raise KeyError("key columns will have duplicates.")
 
@@ -124,13 +128,26 @@ class FeatureSet:
         ):
             raise ValueError("features needs to be a list of Feature objects.")
 
-        feature_columns = list(
-            itertools.chain(*[v.get_output_columns() for v in value])
-        )
+        feature_columns = self._get_features_columns(*value)
         if len(feature_columns) != len(set(feature_columns)):
             raise KeyError("feature columns will have duplicates.")
 
         self.__features = value
+
+    @property
+    def keys_columns(self) -> List[str]:
+        """Name of the columns of all keys in feature set."""
+        return self._get_features_columns(*self.keys)
+
+    @property
+    def timestamp_column(self) -> str:
+        """Name of the timestamp column in feature set."""
+        return self._get_features_columns(self.timestamp).pop()
+
+    @property
+    def features_columns(self) -> List[str]:
+        """Name of the columns of all features in feature set."""
+        return self._get_features_columns(*self.features)
 
     @property
     def columns(self) -> List[str]:
@@ -143,14 +160,7 @@ class FeatureSet:
             List of column names built in this feature set.
 
         """
-        return list(
-            itertools.chain(
-                *[
-                    k.get_output_columns()
-                    for k in self.keys + [self.timestamp] + self.features
-                ]
-            )
-        )
+        return self.keys_columns + [self.timestamp_column] + self.features_columns
 
     def construct(self, dataframe: DataFrame) -> DataFrame:
         """Use all the features to build the feature set dataframe.
@@ -168,7 +178,9 @@ class FeatureSet:
         if not isinstance(dataframe, DataFrame):
             raise ValueError("source_df must be a dataframe")
         output_df = reduce(
-            lambda df, feature: feature.transform(df), self.features, dataframe,
+            lambda df, feature: feature.transform(df),
+            self.keys + [self.timestamp] + self.features,
+            dataframe,
         ).select(*self.columns)
 
         output_df.cache().count()

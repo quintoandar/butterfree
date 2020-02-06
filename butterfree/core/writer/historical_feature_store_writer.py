@@ -3,8 +3,10 @@
 import os
 
 from pyspark.sql.dataframe import DataFrame
+from pyspark.sql.functions import dayofmonth, month, year
 
 from butterfree.core.client import SparkClient
+from butterfree.core.constant.columns import TIMESTAMP_COLUMN
 from butterfree.core.dataframe.verify_dataframe import VerifyDataframe
 from butterfree.core.db.configs import S3Config
 from butterfree.core.transform import FeatureSet
@@ -40,6 +42,7 @@ class HistoricalFeatureStoreWriter(Writer):
 
         validate_dataframe = VerifyDataframe(dataframe)
         validate_dataframe.checks()
+        dataframe = self._create_partitions(dataframe)
 
         spark_client.write_table(
             dataframe=dataframe,
@@ -75,3 +78,13 @@ class HistoricalFeatureStoreWriter(Writer):
         dataframe = dataframe.count()
 
         return True if feature_store == dataframe else False
+
+    @staticmethod
+    def _create_partitions(dataframe):
+        dataframe = (
+            dataframe.withColumn("partition__year", year(dataframe[TIMESTAMP_COLUMN]))
+            .withColumn("partition__month", month(dataframe[TIMESTAMP_COLUMN]))
+            .withColumn("partition__day", dayofmonth(dataframe[TIMESTAMP_COLUMN]))
+        )
+
+        return dataframe
