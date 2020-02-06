@@ -2,7 +2,6 @@
 
 from typing import List
 
-from h3 import h3
 from parameters_validation import non_blank
 from pyspark.sql import DataFrame
 from pyspark.sql.functions import lit, udf
@@ -11,6 +10,15 @@ from pyspark.sql.types import StringType
 from butterfree.core.transform.transformations.transform_component import (
     TransformComponent,
 )
+
+try:
+    from h3 import h3
+except ModuleNotFoundError as e:
+    e.msg = (
+        "H3 not found. To be able to use this module,"
+        "you must install quintoandar-butterfree[h3]."
+    )
+    raise
 
 
 @udf(StringType())
