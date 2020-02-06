@@ -9,6 +9,7 @@ from tests.unit.core.transform.conftest import (
 )
 
 from butterfree.core.transform import FeatureSet
+from butterfree.core.transform.features import Feature
 
 
 class TestFeatureSet:
@@ -92,6 +93,8 @@ class TestFeatureSet:
         assert [key_id] == feature_set.keys
         assert timestamp_c == feature_set.timestamp
         assert [feature_add, feature_divide] == feature_set.features
+        assert "timestamp" == feature_set.timestamp_column
+        assert ["id"] == feature_set.keys_columns
 
     def test_duplicate_keys(self, feature_add, feature_divide, key_id, timestamp_c):
         # arrange
@@ -237,9 +240,28 @@ class TestFeatureSet:
         )
 
         # act
-        feature_set.construct(dataframe)
+        result_df = feature_set.construct(dataframe)
 
-        # act and assert
-        feature_set.timestamp.transform.assert_called_once()
-        for key in range(0, len(feature_set.keys)):
-            feature_set.keys[key].transform.assert_called_once()
+        # assert
+        assert result_df.collect() == feature_set_dataframe.collect()
+
+    def test__get_features_columns(self):
+        # arrange
+        feature_1 = Feature("feature1", "description")
+        feature_1.get_output_columns = Mock(return_value=["col_a", "col_b"])
+
+        feature_2 = Feature("feature2", "description")
+        feature_2.get_output_columns = Mock(return_value=["col_c"])
+
+        feature_3 = Feature("feature3", "description")
+        feature_3.get_output_columns = Mock(return_value=["col_d"])
+
+        target_features_columns = ["col_a", "col_b", "col_c", "col_d"]
+
+        # act
+        result_features_columns = FeatureSet._get_features_columns(
+            feature_1, feature_2, feature_3
+        )
+
+        # assert
+        assert target_features_columns == result_features_columns
