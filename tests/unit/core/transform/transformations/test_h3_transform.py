@@ -98,9 +98,11 @@ class TestH3Transform:
     def test_import_error(self):
         import sys
 
-        with patch.dict(sys.modules, flask=None):
+        with patch.dict(sys.modules, h3=None):
             modules = [m for m in sys.modules if m.startswith("butterfree")]
             for m in modules:
                 del sys.modules[m]
             with pytest.raises(ModuleNotFoundError, match="you must install"):
-                from butterfree.core.transform.transformations import H3HashTransform
+                from butterfree.core.transform.transformations import (  # noqa
+                    H3HashTransform,  # noqa
+                )  # noqa
