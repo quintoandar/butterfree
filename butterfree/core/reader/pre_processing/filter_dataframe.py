@@ -9,19 +9,21 @@ def filter_dataframe(dataframe: DataFrame, column, condition, value):
         dataframe: Spark DataFrame.
         column: DataFrame column.
         condition: the filter condition, example: =, >, <, not in.
-        value: the filter value.
+        value: the value should be filtered.
 
     Returns:
         DataFrame
     """
     if not isinstance(column, str):
         raise TypeError("column should be string.")
-    elif column not in dataframe.columns:
+
+    if not isinstance(condition, str):
+        raise TypeError("condition should be string.")
+
+    if column not in dataframe.columns:
         raise ValueError("column should be a DataFrame's column")
 
     if condition == "not in":
         return dataframe.filter(~dataframe[column].isin(value))
     else:
-        return dataframe.filter('{}''{}''{}'.format(column, condition, value))
-
-
+        return dataframe.filter("{}" "{}" "{}".format(column, condition, value))
