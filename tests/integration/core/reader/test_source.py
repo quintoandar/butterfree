@@ -1,6 +1,7 @@
-import os
+from typing import List
 
 from pyspark.sql import DataFrame
+from tests.integration import INPUT_PATH
 
 from butterfree.core.client import SparkClient
 from butterfree.core.reader import FileReader, Source, TableReader
@@ -16,6 +17,16 @@ def create_db_and_table(spark, table_reader_id, table_reader_db, table_reader_ta
     spark.sql(
         f"create table if not exists {table_reader_db}.{table_reader_table} "  # noqa
         f"as select * from {table_reader_id}"  # noqa
+    )
+
+
+def compare_dataframes(
+    actual_df: DataFrame, expected_df: DataFrame, columns_sort: List[str] = None
+):
+    if not columns_sort:
+        columns_sort = actual_df.schema.fieldNames()
+    return sorted(actual_df.select(*columns_sort).collect()) == sorted(
+        expected_df.select(*columns_sort).collect()
     )
 
 
@@ -39,9 +50,7 @@ class TestSource:
         )
 
         file_reader_id = "b_source"
-        data_sample_path = os.path.join(
-            os.path.dirname(os.path.abspath(__file__)), "data_sample.json/data.json"
-        )
+        data_sample_path = INPUT_PATH + "/data.json"
 
         # when
         source = Source(
@@ -58,11 +67,15 @@ class TestSource:
             f"inner join {file_reader_id} b on a.id = b.id ",  # noqa
         )
 
-        result_df = source.construct(client=spark_client).collect()
-        target_df = target_df_source.collect()
+        result_df = source.construct(client=spark_client)
+        target_df = target_df_source
 
         # then
-        for i in range(0, 6):
-            assert result_df[i]["id"] == target_df[i]["id"]
-            assert result_df[i]["feature1"] == target_df[i]["feature1"]
-            assert result_df[i]["feature2"] == target_df[i]["feature2"]
+        assert (
+            compare_dataframes(
+                actual_df=result_df,
+                expected_df=target_df,
+                columns_sort=result_df.columns,
+            )
+            is True
+        )
