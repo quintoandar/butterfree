@@ -99,7 +99,6 @@ class SparkClient:
             raise ValueError("format needs to be a string")
         if not isinstance(mode, str):
             raise ValueError("mode needs to be a string")
-
         dataframe.write.save(format=format_, mode=mode, **options)
 
     @staticmethod
