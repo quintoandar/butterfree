@@ -5,7 +5,7 @@ from parameters_validation import non_blank
 from pyspark.sql import Column, DataFrame
 
 
-def pivot_table(
+def pivot(
     dataframe: DataFrame,
     group_by_columns: non_blank(List[str]),
     pivot_column: non_blank(str),

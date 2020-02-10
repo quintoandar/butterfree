@@ -4,7 +4,7 @@ from pyspark.sql import DataFrame
 from pyspark.sql.functions import first
 
 from butterfree.core.reader import FileReader
-from butterfree.core.reader.pre_processing.pivot_transform import pivot_table
+from butterfree.core.reader.pre_processing.pivot_transform import pivot
 
 
 def compare_dataframes(
@@ -21,7 +21,7 @@ class TestPivotTransform:
     def test_pivot_transformation(
         self, pivot_df, target_pivot_df,
     ):
-        result_df = pivot_table(
+        result_df = pivot(
             dataframe=pivot_df,
             group_by_columns=["id", "ts"],
             pivot_column="pivot_column",
@@ -44,7 +44,7 @@ class TestPivotTransform:
         # arrange
         file_reader = FileReader("test", "path/to/file", "format")
         file_reader.with_(
-            transformer=pivot_table,
+            transformer=pivot,
             group_by_columns=["id", "ts"],
             pivot_column="pivot_column",
             aggregation_expression=first("has_feature"),
