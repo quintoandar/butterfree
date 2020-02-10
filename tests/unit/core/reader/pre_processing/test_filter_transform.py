@@ -3,7 +3,7 @@ from pyspark.sql.utils import AnalysisException
 
 from butterfree.core.constant.columns import TIMESTAMP_COLUMN
 from butterfree.core.reader import FileReader
-from butterfree.core.reader.pre_processing import filter_dataframe
+from butterfree.core.reader.pre_processing import filter
 
 
 class TestFilterDataFrame:
@@ -12,7 +12,7 @@ class TestFilterDataFrame:
         file_reader = FileReader("test", "path/to/file", "format")
 
         file_reader.with_(
-            transformer=filter_dataframe,
+            transformer=filter,
             condition="test not in ('fail') and feature in (110, 120)",
         )
 
@@ -33,7 +33,7 @@ class TestFilterDataFrame:
         file_reader = FileReader("test", "path/to/file", "format")
 
         file_reader.with_(
-            transformer=filter_dataframe, condition="column_not_exist = 100",
+            transformer=filter, condition="column_not_exist = 100",
         )
 
         # then
@@ -49,7 +49,7 @@ class TestFilterDataFrame:
         # given
         file_reader = FileReader("test", "path/to/file", "format")
 
-        file_reader.with_(transformer=filter_dataframe, condition=condition)
+        file_reader.with_(transformer=filter, condition=condition)
 
         # then
         with pytest.raises(TypeError):
