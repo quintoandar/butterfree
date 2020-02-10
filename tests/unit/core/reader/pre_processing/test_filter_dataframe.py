@@ -1,4 +1,5 @@
 import pytest
+from pyspark.sql.utils import AnalysisException
 
 from butterfree.core.constant.columns import TIMESTAMP_COLUMN
 from butterfree.core.reader import FileReader
@@ -12,16 +13,7 @@ class TestFilterDataFrame:
 
         file_reader.with_(
             transformer=filter_dataframe,
-            column="test",
-            condition="not in",
-            value="running",
-        )
-
-        file_reader.with_(
-            transformer=filter_dataframe,
-            column="test",
-            condition="not in",
-            value="fail",
+            condition="test not in ('fail') and feature in (110, 120)",
         )
 
         # when
@@ -41,28 +33,23 @@ class TestFilterDataFrame:
         file_reader = FileReader("test", "path/to/file", "format")
 
         file_reader.with_(
-            transformer=filter_dataframe,
-            column="column_not_exist",
-            condition="=",
-            value=100,
+            transformer=filter_dataframe, condition="column_not_exist = 100",
         )
 
         # then
-        with pytest.raises(ValueError):
+        with pytest.raises(AnalysisException):
             file_reader._apply_transformations(feature_set_dataframe)
 
     @pytest.mark.parametrize(
-        "column, condition", [(None, "="), ("test", None), (100, 234)],
+        "condition", [None, 100],
     )
     def test_filter_with_invalidations(
-        self, feature_set_dataframe, column, condition, spark, sc
+        self, feature_set_dataframe, condition, spark, sc
     ):
         # given
         file_reader = FileReader("test", "path/to/file", "format")
 
-        file_reader.with_(
-            transformer=filter_dataframe, column=column, condition=condition, value=100
-        )
+        file_reader.with_(transformer=filter_dataframe, condition=condition)
 
         # then
         with pytest.raises(TypeError):
