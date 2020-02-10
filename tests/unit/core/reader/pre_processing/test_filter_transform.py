@@ -1,5 +1,4 @@
 import pytest
-from pyspark.sql.utils import AnalysisException
 
 from butterfree.core.constant.columns import TIMESTAMP_COLUMN
 from butterfree.core.reader import FileReader
@@ -19,26 +18,14 @@ class TestFilterDataFrame:
         # when
         result_df = file_reader._apply_transformations(feature_set_dataframe)
 
-        transformation_df = [
+        target_data = [
             {"id": 1, TIMESTAMP_COLUMN: 1, "feature": 110, "test": "pass"},
             {"id": 1, TIMESTAMP_COLUMN: 2, "feature": 120, "test": "pass"},
         ]
-        spark_df = spark.read.json(sc.parallelize(transformation_df, 1))
+        target_df = spark.read.json(sc.parallelize(target_data, 1))
 
         # then
-        assert result_df.collect() == spark_df.collect()
-
-    def test_filter_with_column_not_exist(self, feature_set_dataframe, spark, sc):
-        # given
-        file_reader = FileReader("test", "path/to/file", "format")
-
-        file_reader.with_(
-            transformer=filter, condition="column_not_exist = 100",
-        )
-
-        # then
-        with pytest.raises(AnalysisException):
-            file_reader._apply_transformations(feature_set_dataframe)
+        assert result_df.collect() == target_df.collect()
 
     @pytest.mark.parametrize(
         "condition", [None, 100],

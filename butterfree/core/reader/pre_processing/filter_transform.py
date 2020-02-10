@@ -7,10 +7,11 @@ def filter(dataframe: DataFrame, condition):
 
     Args:
         dataframe: Spark DataFrame.
-        condition: the string SQL expression with column, operation and value.
+        condition: SQL expression with column, operation and value
+            to filter the dataframe.
 
     Returns:
-        DataFrame
+        Filtered dataframe
     """
     if not isinstance(condition, str):
         raise TypeError("condition should be string.")
