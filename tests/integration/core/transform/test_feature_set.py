@@ -27,9 +27,10 @@ class TestFeatureSet:
                     name="feature1",
                     description="test",
                     transformation=AggregatedTransform(
-                        aggregations=["avg", "std"],
+                        aggregations=["avg", "stddev_pop"],
                         partition="id",
                         windows=["2 minutes", "15 minutes"],
+                        mode=["fixed_windows"],
                     ),
                 ),
                 Feature(
@@ -48,22 +49,22 @@ class TestFeatureSet:
         df = feature_set.construct(feature_set_dataframe).collect()
 
         # assert
-        assert df[0]["feature1__avg_over_2_minutes"] == 200
-        assert df[1]["feature1__avg_over_2_minutes"] == 300
-        assert df[2]["feature1__avg_over_2_minutes"] == 400
-        assert df[3]["feature1__avg_over_2_minutes"] == 500
-        assert df[0]["feature1__std_over_2_minutes"] == 0
-        assert df[1]["feature1__std_over_2_minutes"] == 0
-        assert df[2]["feature1__std_over_2_minutes"] == 0
-        assert df[3]["feature1__std_over_2_minutes"] == 0
-        assert df[0]["feature1__avg_over_15_minutes"] == 200
-        assert df[1]["feature1__avg_over_15_minutes"] == 250
-        assert df[2]["feature1__avg_over_15_minutes"] == 350
-        assert df[3]["feature1__avg_over_15_minutes"] == 500
-        assert df[0]["feature1__std_over_15_minutes"] == 0
-        assert df[1]["feature1__std_over_15_minutes"] == 50
-        assert df[2]["feature1__std_over_15_minutes"] == 50
-        assert df[3]["feature1__std_over_15_minutes"] == 0
+        assert df[0]["feature1__avg_over_2_minutes_fixed_windows"] == 200
+        assert df[1]["feature1__avg_over_2_minutes_fixed_windows"] == 300
+        assert df[2]["feature1__avg_over_2_minutes_fixed_windows"] == 400
+        assert df[3]["feature1__avg_over_2_minutes_fixed_windows"] == 500
+        assert df[0]["feature1__stddev_pop_over_2_minutes_fixed_windows"] == 0
+        assert df[1]["feature1__stddev_pop_over_2_minutes_fixed_windows"] == 0
+        assert df[2]["feature1__stddev_pop_over_2_minutes_fixed_windows"] == 0
+        assert df[3]["feature1__stddev_pop_over_2_minutes_fixed_windows"] == 0
+        assert df[0]["feature1__avg_over_15_minutes_fixed_windows"] == 200
+        assert df[1]["feature1__avg_over_15_minutes_fixed_windows"] == 250
+        assert df[2]["feature1__avg_over_15_minutes_fixed_windows"] == 350
+        assert df[3]["feature1__avg_over_15_minutes_fixed_windows"] == 500
+        assert df[0]["feature1__stddev_pop_over_15_minutes_fixed_windows"] == 0
+        assert df[1]["feature1__stddev_pop_over_15_minutes_fixed_windows"] == 50
+        assert df[2]["feature1__stddev_pop_over_15_minutes_fixed_windows"] == 50
+        assert df[3]["feature1__stddev_pop_over_15_minutes_fixed_windows"] == 0
         assert df[0]["divided_feature"] == 1
         assert df[1]["divided_feature"] == 1
         assert df[2]["divided_feature"] == 1
