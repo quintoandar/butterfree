@@ -11,9 +11,10 @@ class TestAggregatedTransform:
             name="feature1",
             description="unit test",
             transformation=AggregatedTransform(
-                aggregations=["avg", "std"],
+                aggregations=["avg", "stddev_pop"],
                 partition="id",
                 windows=["7 days", "2 weeks"],
+                mode=["fixed_windows"],
             ),
         )
 
@@ -30,10 +31,10 @@ class TestAggregatedTransform:
                         "id",
                         "origin_ts",
                         TIMESTAMP_COLUMN,
-                        "feature1__avg_over_7_days",
-                        "feature1__avg_over_2_weeks",
-                        "feature1__std_over_7_days",
-                        "feature1__std_over_2_weeks",
+                        "feature1__avg_over_7_days_fixed_windows",
+                        "feature1__avg_over_2_weeks_fixed_windows",
+                        "feature1__stddev_pop_over_7_days_fixed_windows",
+                        "feature1__stddev_pop_over_2_weeks_fixed_windows",
                     ],
                 )
             ]
@@ -44,9 +45,10 @@ class TestAggregatedTransform:
             name="feature1",
             description="unit test",
             transformation=AggregatedTransform(
-                aggregations=["avg", "std"],
+                aggregations=["avg", "stddev_pop"],
                 partition="id",
                 windows=["7 days", "2 weeks"],
+                mode=["fixed_windows"],
             ),
         )
 
@@ -58,10 +60,10 @@ class TestAggregatedTransform:
                 for a, b in zip(
                     df_columns,
                     [
-                        "feature1__avg_over_7_days",
-                        "feature1__avg_over_2_weeks",
-                        "feature1__std_over_7_days",
-                        "feature1__std_over_2_weeks",
+                        "feature1__avg_over_7_days_fixed_windows",
+                        "feature1__avg_over_2_weeks_fixed_windows",
+                        "feature1__stddev_pop_over_7_days_fixed_windows",
+                        "feature1__stddev_pop_over_2_weeks_fixed_windows",
                     ],
                 )
             ]
@@ -76,6 +78,7 @@ class TestAggregatedTransform:
                     aggregations=["median"],
                     partition="id",
                     windows=["7 days", "2 weeks"],
+                    mode=["fixed_windows"],
                 ),
             )
 
@@ -85,7 +88,10 @@ class TestAggregatedTransform:
                 name="feature1",
                 description="unit test",
                 transformation=AggregatedTransform(
-                    aggregations=[], partition="id", windows=["7 days", "2 weeks"],
+                    aggregations=[],
+                    partition="id",
+                    windows=["7 days", "2 weeks"],
+                    mode=["fixed_windows"],
                 ),
             )
 
@@ -95,9 +101,10 @@ class TestAggregatedTransform:
                 name="feature1",
                 description="unit test",
                 transformation=AggregatedTransform(
-                    aggregations=["avg", "std"],
+                    aggregations=["avg", "stddev_pop"],
                     partition="id",
                     windows=["7 daily", "2 weeks"],
+                    mode=["fixed_windows"],
                 ),
             )
 
@@ -107,7 +114,10 @@ class TestAggregatedTransform:
                 name="feature1",
                 description="unit test",
                 transformation=AggregatedTransform(
-                    aggregations=["avg", "std"], partition="id", windows=[],
+                    aggregations=["avg", "stddev_pop"],
+                    partition="id",
+                    windows=[],
+                    mode=["fixed_windows"],
                 ),
             )
 
@@ -117,7 +127,10 @@ class TestAggregatedTransform:
                 name="feature1",
                 description="unit test",
                 transformation=AggregatedTransform(
-                    aggregations=["avg", "std"], partition="id", windows={"2 weeks"},
+                    aggregations=["avg", "stddev_pop"],
+                    partition="id",
+                    windows={"2 weeks"},
+                    mode=["fixed_windows"],
                 ),
             )
 
@@ -127,36 +140,130 @@ class TestAggregatedTransform:
                 name="feature1",
                 description="unit test",
                 transformation=AggregatedTransform(
-                    aggregations=["avg", "std"], partition="id", windows=["-2 weeks"],
+                    aggregations=["avg", "stddev_pop"],
+                    partition="id",
+                    windows=["-2 weeks"],
+                    mode=["fixed_windows"],
                 ),
             )
 
-    def test_feature_transform_output(self, feature_set_dataframe):
+    def test_feature_transform_output_fixed_windows(self, feature_set_dataframe):
         test_feature = Feature(
             name="feature1",
             description="unit test",
             transformation=AggregatedTransform(
-                aggregations=["avg", "std"],
+                aggregations=["avg", "stddev_pop"],
                 partition="id",
                 windows=["2 minutes", "15 minutes"],
+                mode=["fixed_windows"],
             ),
         )
 
         df = test_feature.transform(feature_set_dataframe).collect()
 
-        assert df[0]["feature1__avg_over_2_minutes"] == 200
-        assert df[1]["feature1__avg_over_2_minutes"] == 300
-        assert df[2]["feature1__avg_over_2_minutes"] == 400
-        assert df[3]["feature1__avg_over_2_minutes"] == 500
-        assert df[0]["feature1__std_over_2_minutes"] == 0
-        assert df[1]["feature1__std_over_2_minutes"] == 0
-        assert df[2]["feature1__std_over_2_minutes"] == 0
-        assert df[3]["feature1__std_over_2_minutes"] == 0
-        assert df[0]["feature1__avg_over_15_minutes"] == 200
-        assert df[1]["feature1__avg_over_15_minutes"] == 250
-        assert df[2]["feature1__avg_over_15_minutes"] == 350
-        assert df[3]["feature1__avg_over_15_minutes"] == 500
-        assert df[0]["feature1__std_over_15_minutes"] == 0
-        assert df[1]["feature1__std_over_15_minutes"] == 50
-        assert df[2]["feature1__std_over_15_minutes"] == 50
-        assert df[3]["feature1__std_over_15_minutes"] == 0
+        assert df[0]["feature1__avg_over_2_minutes_fixed_windows"] == 200
+        assert df[1]["feature1__avg_over_2_minutes_fixed_windows"] == 300
+        assert df[2]["feature1__avg_over_2_minutes_fixed_windows"] == 400
+        assert df[3]["feature1__avg_over_2_minutes_fixed_windows"] == 500
+        assert df[0]["feature1__stddev_pop_over_2_minutes_fixed_windows"] == 0
+        assert df[1]["feature1__stddev_pop_over_2_minutes_fixed_windows"] == 0
+        assert df[2]["feature1__stddev_pop_over_2_minutes_fixed_windows"] == 0
+        assert df[3]["feature1__stddev_pop_over_2_minutes_fixed_windows"] == 0
+        assert df[0]["feature1__avg_over_15_minutes_fixed_windows"] == 200
+        assert df[1]["feature1__avg_over_15_minutes_fixed_windows"] == 250
+        assert df[2]["feature1__avg_over_15_minutes_fixed_windows"] == 350
+        assert df[3]["feature1__avg_over_15_minutes_fixed_windows"] == 500
+        assert df[0]["feature1__stddev_pop_over_15_minutes_fixed_windows"] == 0
+        assert df[1]["feature1__stddev_pop_over_15_minutes_fixed_windows"] == 50
+        assert df[2]["feature1__stddev_pop_over_15_minutes_fixed_windows"] == 50
+        assert df[3]["feature1__stddev_pop_over_15_minutes_fixed_windows"] == 0
+
+    def test_feature_transform_output_rolling_windows(self, feature_set_dataframe):
+        test_feature = Feature(
+            name="feature1",
+            description="unit test",
+            transformation=AggregatedTransform(
+                aggregations=["avg", "stddev_pop"],
+                partition="id",
+                windows=["15 minutes", "25 minutes"],
+                mode=["rolling_windows"],
+                slide_duration="10 minutes",
+            ),
+        )
+
+        df = test_feature.transform(feature_set_dataframe).collect()
+
+        assert df[0]["feature1__avg_over_15_minutes_rolling_windows"] == 200
+        assert df[1]["feature1__avg_over_15_minutes_rolling_windows"] == 250
+        assert df[2]["feature1__avg_over_15_minutes_rolling_windows"] == 500
+        assert df[3]["feature1__avg_over_15_minutes_rolling_windows"] == 350
+        assert df[4]["feature1__avg_over_15_minutes_rolling_windows"] is None
+        assert df[5]["feature1__avg_over_15_minutes_rolling_windows"] == 500
+        assert df[0]["feature1__stddev_pop_over_15_minutes_rolling_windows"] == 0
+        assert df[1]["feature1__stddev_pop_over_15_minutes_rolling_windows"] == 50
+        assert df[2]["feature1__stddev_pop_over_15_minutes_rolling_windows"] == 0
+        assert df[3]["feature1__stddev_pop_over_15_minutes_rolling_windows"] == 50
+        assert df[4]["feature1__stddev_pop_over_15_minutes_rolling_windows"] is None
+        assert df[5]["feature1__stddev_pop_over_15_minutes_rolling_windows"] == 0
+        assert df[0]["feature1__avg_over_25_minutes_rolling_windows"] == 200
+        assert df[1]["feature1__avg_over_25_minutes_rolling_windows"] == 250
+        assert df[2]["feature1__avg_over_25_minutes_rolling_windows"] == 400
+        assert df[3]["feature1__avg_over_25_minutes_rolling_windows"] == 300
+        assert df[4]["feature1__avg_over_25_minutes_rolling_windows"] == 500
+        assert df[5]["feature1__avg_over_25_minutes_rolling_windows"] == 500
+        assert df[0]["feature1__stddev_pop_over_25_minutes_rolling_windows"] == 0
+        assert df[1]["feature1__stddev_pop_over_25_minutes_rolling_windows"] == 50
+        assert (
+            df[2]["feature1__stddev_pop_over_25_minutes_rolling_windows"]
+            == 81.64965809277261
+        )
+        assert (
+            df[3]["feature1__stddev_pop_over_25_minutes_rolling_windows"]
+            == 81.64965809277261
+        )
+        assert df[4]["feature1__stddev_pop_over_25_minutes_rolling_windows"] == 0
+        assert df[5]["feature1__stddev_pop_over_25_minutes_rolling_windows"] == 0
+
+    def test_feature_transform_empty_mode(self, feature_set_dataframe):
+        with pytest.raises(ValueError, match="Modes must not be empty."):
+            Feature(
+                name="feature1",
+                description="unit test",
+                transformation=AggregatedTransform(
+                    aggregations=["avg", "stddev_pop"],
+                    partition="id",
+                    windows=["25 minutes", "15 minutes"],
+                    mode=[],
+                    slide_duration="10 minutes",
+                ),
+            )
+
+    def test_feature_transform_two_modes(self, feature_set_dataframe):
+        with pytest.raises(
+            NotImplementedError, match="We currently accept just one mode per feature."
+        ):
+            Feature(
+                name="feature1",
+                description="unit test",
+                transformation=AggregatedTransform(
+                    aggregations=["avg", "stddev_pop"],
+                    partition="id",
+                    windows=["25 minutes", "15 minutes"],
+                    mode=["fixed_windows", "rolling_windows"],
+                    slide_duration="10 minutes",
+                ),
+            )
+
+    def test_feature_transform_invalid_mode(self, feature_set_dataframe):
+        with pytest.raises(KeyError, match="rolling_stones is not supported."):
+            Feature(
+                name="feature1",
+                description="unit test",
+                transformation=AggregatedTransform(
+                    aggregations=["avg", "stddev_pop"],
+                    partition="id",
+                    windows=["25 minutes", "15 minutes"],
+                    mode=["rolling_stones"],
+                    slide_duration="10 minutes",
+                ),
+            )
