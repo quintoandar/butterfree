@@ -1,3 +1,7 @@
+from unittest.mock import patch
+
+import pytest
+
 from butterfree.core.transform.features import Feature
 from butterfree.core.transform.transformations import H3HashTransform
 
@@ -90,3 +94,15 @@ class TestH3Transform:
             assert df[line]["lat_lng__h3_hash__10"] == "8aa8100ea0d7fff"
             assert df[line]["lat_lng__h3_hash__11"] == "8ba8100ea0d5fff"
             assert df[line]["lat_lng__h3_hash__12"] == "8ca8100ea0d57ff"
+
+    def test_import_error(self):
+        import sys
+
+        with patch.dict(sys.modules, h3=None):
+            modules = [m for m in sys.modules if m.startswith("butterfree")]
+            for m in modules:
+                del sys.modules[m]
+            with pytest.raises(ModuleNotFoundError, match="you must install"):
+                from butterfree.core.transform.transformations import (  # noqa
+                    H3HashTransform,  # noqa
+                )  # noqa
