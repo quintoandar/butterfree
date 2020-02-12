@@ -24,6 +24,56 @@ class FeatureSet:
             in this feature set.
         features: features to compose the feature set.
 
+    Example:
+        This an example regarding the feature set definition. All features
+        and its transformations are defined.
+    >>> from butterfree.core.transform.features import (
+    ...     Feature,
+    ...     KeyFeature,
+    ...     TimestampFeature,
+    ...)
+    >>> from butterfree.core.transform.transformations import (
+    ...     AggregatedTransform,
+    ...     CustomTransform,
+    ... )
+    >>> import pyspark.sql.functions as F
+
+    >>> def divide(df, fs, column1, column2):
+    ...     name = fs.get_output_columns()[0]
+    ...     df = df.withColumn(name, F.col(column1) / F.col(column2))
+    ...     return df
+
+    >>> feature_set = FeatureSet(
+    ...    name="feature_set",
+    ...    entity="entity",
+    ...    description="description",
+    ...    features=[
+    ...        Feature(
+    ...            name="feature1",
+    ...            description="test",
+    ...            transformation=AggregatedTransform(
+    ...                aggregations=["avg", "std"],
+    ...                partition="id",
+    ...                windows=["2 minutes", "15 minutes"],
+    ...            ),
+    ...        ),
+    ...        Feature(
+    ...            name="divided_feature",
+    ...            description="unit test",
+    ...            transformation=CustomTransform(
+    ...                transformer=divide, column1="feature1", column2="feature2",
+    ...            ),
+    ...        ),
+    ...    ],
+    ...    keys=[KeyFeature(name="id", description="The user's Main ID or device ID")],
+    ...    timestamp=TimestampFeature(),
+    ...)
+
+    >>> feature_set.construct(dataframe=dataframe)
+
+        This last method (construct) will execute the feature set,
+        computing all the defined transformations.
+
     """
 
     def __init__(
