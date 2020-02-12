@@ -19,6 +19,27 @@ class OnlineFeatureStoreWriter(Writer):
         db_config: Spark configuration for connect databases.
             For more information check the module 'butterfree.core.db.configs'.
 
+    Example:
+        Simple example regarding OnlineFeatureStoreWriter class instantiation.
+        We can instantiate this class without db configurations, so the class get the
+        CassandraConfig() where it's default configurations about CassandraDB.
+    >>> writer = OnlineFeatureStoreWriter()
+    >>> writer.write()
+
+        However, we can define the db configurations and provide to OnlineFeatureStoreWriter.
+    >>> writer = OnlineFeatureStoreWriter(db_config=CassandraConfig(mode="overwrite",
+        ...                                                        format_="parquet",
+        ...                                                        keyspace="keyspace_name"))
+    >>> writer.write()
+        For what settings you can use on CassandraConfig and default settings,
+        to read CassandraConfig class.
+
+        We can instantiate this class to validate write job, you will use the same configurations.
+    >>> writer = OnlineFeatureStoreWriter()
+    >>> writer.validate()
+
+        These both methods (writer and validate) will need the Spark Client, Feature Set and DataFrame,
+        to write or to validate, according to OnlineFeatureStoreWriter class arguments.
     """
 
     def __init__(self, db_config=None):

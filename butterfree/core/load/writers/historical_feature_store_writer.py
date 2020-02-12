@@ -21,6 +21,29 @@ class HistoricalFeatureStoreWriter(Writer):
         db_config: configuration with spark for databases or AWS S3 (default).
             For more information check module 'butterfree.core.db.configs'.
 
+    Example:
+        Simple example regarding HistoricalFeatureStoreWriter class instantiation.
+        We can instantiate this class without db configurations, so the class get the
+        S3Config() where it's default configurations about AWS S3 service.
+    >>> writer = HistoricalFeatureStoreWriter()
+    >>> writer.write()
+
+        However, we can define the db configurations and provide to HistoricalFeatureStoreWriter.
+    >>> writer = HistoricalFeatureStoreWriter(db_config=S3Config(database="feature_set",
+        ...                                                      mode="append",
+        ...                                                      format_="csv",
+        ...                                                      path="s3a://feature-store/",
+        ...                                                      partition_by= "partition__year"))
+    >>> writer.write()
+        For what settings you can use on S3Config and default settings,
+        to read S3Config class.
+
+        We can instantiate this class to validate write job, you will use the same configurations.
+    >>> writer = HistoricalFeatureStoreWriter()
+    >>> writer.validate()
+
+        These both methods (writer and validate) will need the Spark Client, Feature Set and DataFrame,
+        to write or to validate, according to HistoricalFeatureStoreWriter class arguments.
     """
 
     PARTITION_BY = [
