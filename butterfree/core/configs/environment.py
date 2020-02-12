@@ -67,7 +67,14 @@ def get_environment_specification(filename: str = None) -> dict:
     return sanitized_spec
 
 
-specification = get_environment_specification()
+specification = {
+    "ENVIRONMENT": "dev",
+    "CASSANDRA_HOST": "test",
+    "CASSANDRA_KEYSPACE": "test",
+    "CASSANDRA_USERNAME": "test",
+    "CASSANDRA_PASSWORD": "test",
+    "FEATURE_STORE_S3_BUCKET": "test",
+}
 
 
 def get_current_environment() -> str:
