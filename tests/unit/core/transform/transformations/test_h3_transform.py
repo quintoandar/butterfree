@@ -3,7 +3,7 @@ from unittest.mock import patch
 import pytest
 
 from butterfree.core.transform.features import Feature
-from butterfree.core.transform.transformations import H3HashTransform
+from butterfree.core.transform.transformations.h3_transform import H3HashTransform
 
 
 class TestH3Transform:
