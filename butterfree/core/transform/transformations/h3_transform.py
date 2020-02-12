@@ -45,6 +45,38 @@ class H3HashTransform(TransformComponent):
         lat_column: latitude column.
         lng_column: longitude column.
 
+        Example:
+        It's necessary to declare the desired h3 resolutions and
+        latitude and longitude columns.
+        >>> from pyspark import SparkContext
+        >>> from pyspark.sql import session
+        >>> from butterfree.core.transform.features import Feature
+        >>> sc = SparkContext.getOrCreate()
+        >>> spark = session.SparkSession(sc)
+        >>> df = spark.createDataFrame([(1, 200, -23.554190, -46.670723),
+        ...                             (1, 300, -23.554190, -46.670723),
+        ...                             (1, 400, -23.554190, -46.670723),
+        ...                             (1, 500, -23.554190, -46.670723)]
+        ...                           ).toDF("id", "feature", "lat", "lng")
+        >>> feature = Feature(
+        ...    name="feature",
+        ...    description="h3 hash transform usage example",
+        ...    transformation=H3HashTransform(
+        ...        h3_resolutions=[6, 7, 8, 9, 10, 11, 12],
+        ...        lat_column="lat",
+        ...        lng_column="lng",
+        ...    )
+        ...)
+        >>> feature.transform(df).show()
+        +-------+---+---------+----------+-------------------+-------------------+
+        |feature| id|      lat|       lng|lat_lng__h3_hash__6|lat_lng__h3_hash__7|
+        +-------+---+---------+----------+-------------------+-------------------+
+        |    200|  1|-23.55419|-46.670723|    86a8100efffffff|    87a8100eaffffff|
+        |    300|  1|-23.55419|-46.670723|    86a8100efffffff|    87a8100eaffffff|
+        |    400|  1|-23.55419|-46.670723|    86a8100efffffff|    87a8100eaffffff|
+        |    500|  1|-23.55419|-46.670723|    86a8100efffffff|    87a8100eaffffff|
+        +-------+---+---------+----------+-------------------+-------------------+
+
     """
 
     def __init__(
