@@ -16,6 +16,19 @@ class FileReader(Reader):
         format_options: additional options required by some formats. Check docs:
             https://spark.apache.org/docs/latest/sql-data-sources-load-save-functions.html#manually-specifying-options
 
+    Example:
+        Simple example regarding FileReader class instantiation.
+    >>> file_reader = FileReader(
+    ...                 id="file_reader_id",
+    ...                 database="data_path",
+    ...                 table="json"
+    ...               )
+    >>> file_reader.consume()
+
+        This last method will use the Spark Client, as default, to read
+        the desired file, loading data into a dataframe, according to
+        FileReader class arguments.
+
     """
 
     def __init__(self, id: str, path: str, format: str, format_options: dict = None):
