@@ -18,6 +18,19 @@ class KafkaReader(Reader):
             https://spark.apache.org/docs/latest/structured-streaming-kafka-integration.html.
         stream: flag to indicate the reading mode: stream or batch
 
+    Example:
+        Simple example regarding KafkaReader class instantiation.
+    >>> kafka_reader = KafkaReader(
+    ...                 id="kafka_reader_id",
+    ...                 connection_string="host1:port,host2:port",
+    ...                 topic="topic"
+    ...                )
+    >>> kafka_reader.consume()
+
+        This last method will use the Spark Client, as default, to read
+        the desired topic, loading data into a dataframe, according to
+        KafkaReader class arguments.
+
     """
 
     def __init__(
