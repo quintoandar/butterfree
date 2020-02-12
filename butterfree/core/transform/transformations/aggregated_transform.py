@@ -26,6 +26,39 @@ class AggregatedTransform(TransformComponent):
         partition: column to be used in window partition.
         time_column: timestamp column to be use as sorting reference.
 
+    Example:
+        It's necessary to declare the desired custom method, (average and
+        standard deviation are currently supported), the partition column
+        and, finally, choose both window lenght and time unit.
+        >>> from pyspark import SparkContext
+        >>> from pyspark.sql import session
+        >>> from butterfree.core.transform.features import Feature
+        >>> sc = SparkContext.getOrCreate()
+        >>> spark = session.SparkSession(sc)
+        >>> df = spark.createDataFrame([(1, "2016-04-11 11:31:11", 200),
+        ...                             (1, "2016-04-11 11:44:12", 300),
+        ...                             (1, "2016-04-11 11:46:24", 400),
+        ...                             (1, "2016-04-11 12:03:21", 500)]
+        ...                           ).toDF("id", "timestamp", "feature")
+        >>> feature = Feature(
+        ...    name="feature",
+        ...    description="aggregated transform usage example",
+        ...    transformation=AggregatedTransform(
+        ...        aggregations=["avg"],
+        ...        partition="id",
+        ...        windows=["15 minutes"],
+        ...    )
+        ...)
+        >>> feature.transform(df).orderBy("timestamp").show()
+        +--------+-----------------------+-----------------------------+
+        |feature | id|          timestamp| feature__avg_over_15_minutes|
+        +--------+---+-------------------+-----------------------------+
+        |     200|  1|2016-04-11 11:31:11|                        200.0|
+        |     300|  1|2016-04-11 11:44:12|                        250.0|
+        |     400|  1|2016-04-11 11:46:24|                        350.0|
+        |     500|  1|2016-04-11 12:03:21|                        500.0|
+        +--------+---+-------------------+-----------------------------+
+
     """
 
     SLIDE_DURATION = "1 day"
