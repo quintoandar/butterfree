@@ -14,6 +14,18 @@ class TableReader(Reader):
         database: name of the metastore database/schema.
         table: name of the table.
 
+    Example:
+        Simple example regarding TableReader class instantiation.
+    >>> table_reader = TableReader(
+    ...                     id="table_reader_id",
+    ...                     database="table_reader_db",
+    ...                     table="table_reader_table"
+    ...                )
+    >>> table_reader.consume()
+
+        This last method will use the Spark Client, as default, to read
+        the desired table, regarding TableReader class arguments.
+
     """
 
     def __init__(self, id: str, database: str, table: str):
