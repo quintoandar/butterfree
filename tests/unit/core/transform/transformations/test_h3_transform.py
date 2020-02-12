@@ -103,6 +103,6 @@ class TestH3Transform:
             for m in modules:
                 del sys.modules[m]
             with pytest.raises(ModuleNotFoundError, match="you must install"):
-                from butterfree.core.transform.transformations import (  # noqa
+                from butterfree.core.transform.transformations.h3_transform import (  # noqa
                     H3HashTransform,  # noqa
                 )  # noqa
