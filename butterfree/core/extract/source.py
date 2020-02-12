@@ -22,6 +22,28 @@ class Source:
         readers: list of readers from where the source will get data.
         query: Spark SQL query to run against the readers.
 
+    Example:
+        Simple example regarding Source class instantiation.
+    >>> from butterfree.core.reader import TableReader, FileReader
+    >>> source = Source(
+    ...    readers=[
+    ...        TableReader(
+    ...            id="table_reader_id",
+    ...            database="table_reader_db",
+    ...            table="table_reader_table",
+    ...        ),
+    ...        FileReader(id="file_reader_id", path="data_sample_path", format="json"),
+    ...    ],
+    ...    query=f"select a.*, b.feature2 "
+    ...    f"from table_reader_id a "
+    ...    f"inner join file_reader_id b on a.id = b.id ",
+    ...)
+    >>> source.construct()
+
+        This last method will use the Spark Client, as default, to create
+        temporary views regarding each reader and, after, will run the
+        desired query and return a dataframe.
+
     """
 
     def __init__(self, readers: List[Reader], query: str) -> None:
