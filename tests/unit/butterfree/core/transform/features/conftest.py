@@ -11,7 +11,7 @@ from butterfree.core.transform.features import Feature
 @fixture
 def base_spark():
     sc = SparkContext.getOrCreate()
-    spark = session.SparkSession(sc)
+    spark = session.SparkSession(sc).builder.config("spark.sql.session.timeZone", "UTC").getOrCreate()
 
     return sc, spark
 
