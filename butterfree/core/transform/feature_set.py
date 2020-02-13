@@ -134,17 +134,15 @@ class FeatureSet:
             raise KeyError("feature columns will have duplicates.")
 
         for feature in value:
-            if isinstance(feature.transformation, AggregatedTransform):
-                if (
-                    feature.transformation.mode[0] == "rolling_windows"
-                    and len(value) > 1
-                ):
-                    raise ValueError(
-                        "You can define only one feature within the scope of the "
-                        "rolling windows aggregated transform, since the output "
-                        "dataframe will only contain features related to this "
-                        "transformation."
-                    )
+            if isinstance(feature.transformation, AggregatedTransform) and (
+                feature.transformation.mode[0] == "rolling_windows" and len(value) > 1
+            ):
+                raise ValueError(
+                    "You can define only one feature within the scope of the "
+                    "rolling windows aggregated transform, since the output "
+                    "dataframe will only contain features related to this "
+                    "transformation."
+                )
 
         self.__features = value
 
