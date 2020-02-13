@@ -282,7 +282,9 @@ class TestAggregatedTransform:
             )
 
     def test_feature_transform_invalid_rolling_window(self, feature_set_dataframe):
-        with pytest.raises(ValueError, match="Window duration has to be greater or equal than 1 day"):
+        with pytest.raises(
+            ValueError, match="Window duration has to be greater or equal than 1 day"
+        ):
             Feature(
                 name="feature1",
                 description="unit test",
