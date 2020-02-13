@@ -6,6 +6,7 @@ from typing import List
 from pyspark.sql.dataframe import DataFrame
 
 from butterfree.core.transform.features import Feature, KeyFeature, TimestampFeature
+from butterfree.core.transform.transformations import AggregatedTransform
 
 
 class FeatureSet:
@@ -131,6 +132,19 @@ class FeatureSet:
         feature_columns = self._get_features_columns(*value)
         if len(feature_columns) != len(set(feature_columns)):
             raise KeyError("feature columns will have duplicates.")
+
+        for feature in value:
+            if isinstance(feature.transformation, AggregatedTransform):
+                if (
+                    feature.transformation.mode[0] == "rolling_windows"
+                    and len(value) > 1
+                ):
+                    raise ValueError(
+                        "You can define only one feature within the scope of the "
+                        "rolling windows aggregated transform, since the output "
+                        "dataframe will only contain features related to this "
+                        "transformation."
+                    )
 
         self.__features = value
 
