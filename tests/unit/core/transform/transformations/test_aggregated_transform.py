@@ -185,48 +185,47 @@ class TestAggregatedTransform:
             transformation=AggregatedTransform(
                 aggregations=["avg", "stddev_pop"],
                 partition="id",
-                windows=["15 minutes", "25 minutes"],
+                windows=["1 day", "1 week"],
                 mode=["rolling_windows"],
-                slide_duration="10 minutes",
             ),
         )
 
         df = (
             test_feature.transform(feature_set_dataframe)
-            .orderBy("window_end_time")
+            .orderBy("timestamp")
             .collect()
         )
 
-        assert df[0]["feature1__avg_over_15_minutes_rolling_windows"] == 200
-        assert df[1]["feature1__avg_over_15_minutes_rolling_windows"] == 250
-        assert df[2]["feature1__avg_over_15_minutes_rolling_windows"] == 350
-        assert df[3]["feature1__avg_over_15_minutes_rolling_windows"] == 500
-        assert df[4]["feature1__avg_over_15_minutes_rolling_windows"] == 500
-        assert df[5]["feature1__avg_over_15_minutes_rolling_windows"] is None
-        assert df[0]["feature1__stddev_pop_over_15_minutes_rolling_windows"] == 0
-        assert df[1]["feature1__stddev_pop_over_15_minutes_rolling_windows"] == 50
-        assert df[2]["feature1__stddev_pop_over_15_minutes_rolling_windows"] == 50
-        assert df[3]["feature1__stddev_pop_over_15_minutes_rolling_windows"] == 0
-        assert df[4]["feature1__stddev_pop_over_15_minutes_rolling_windows"] == 0
-        assert df[5]["feature1__stddev_pop_over_15_minutes_rolling_windows"] is None
-        assert df[0]["feature1__avg_over_25_minutes_rolling_windows"] == 200
-        assert df[1]["feature1__avg_over_25_minutes_rolling_windows"] == 250
-        assert df[2]["feature1__avg_over_25_minutes_rolling_windows"] == 300
-        assert df[3]["feature1__avg_over_25_minutes_rolling_windows"] == 400
-        assert df[4]["feature1__avg_over_25_minutes_rolling_windows"] == 500
-        assert df[5]["feature1__avg_over_25_minutes_rolling_windows"] == 500
-        assert df[0]["feature1__stddev_pop_over_25_minutes_rolling_windows"] == 0
-        assert df[1]["feature1__stddev_pop_over_25_minutes_rolling_windows"] == 50
+        assert df[0]["feature1__avg_over_1_day_rolling_windows"] == 350
+        assert df[1]["feature1__avg_over_1_day_rolling_windows"] is None
+        assert df[2]["feature1__avg_over_1_day_rolling_windows"] is None
+        assert df[3]["feature1__avg_over_1_day_rolling_windows"] is None
+        assert df[4]["feature1__avg_over_1_day_rolling_windows"] is None
+        assert df[5]["feature1__avg_over_1_day_rolling_windows"] is None
+        assert df[0]["feature1__stddev_pop_over_1_day_rolling_windows"] == 111.80339887498948
+        assert df[1]["feature1__stddev_pop_over_1_day_rolling_windows"] is None
+        assert df[2]["feature1__stddev_pop_over_1_day_rolling_windows"] is None
+        assert df[3]["feature1__stddev_pop_over_1_day_rolling_windows"] is None
+        assert df[4]["feature1__stddev_pop_over_1_day_rolling_windows"] is None
+        assert df[5]["feature1__stddev_pop_over_1_day_rolling_windows"] is None
+        assert df[0]["feature1__avg_over_1_week_rolling_windows"] == 350
+        assert df[1]["feature1__avg_over_1_week_rolling_windows"] == 350
+        assert df[2]["feature1__avg_over_1_week_rolling_windows"] == 350
+        assert df[3]["feature1__avg_over_1_week_rolling_windows"] == 350
+        assert df[4]["feature1__avg_over_1_week_rolling_windows"] == 350
+        assert df[5]["feature1__avg_over_1_week_rolling_windows"] == 350
+        assert df[0]["feature1__stddev_pop_over_1_week_rolling_windows"] == 111.80339887498948
+        assert df[1]["feature1__stddev_pop_over_1_week_rolling_windows"] == 111.80339887498948
         assert (
-            df[2]["feature1__stddev_pop_over_25_minutes_rolling_windows"]
-            == 81.64965809277261
+            df[2]["feature1__stddev_pop_over_1_week_rolling_windows"]
+            == 111.80339887498948
         )
         assert (
-            df[3]["feature1__stddev_pop_over_25_minutes_rolling_windows"]
-            == 81.64965809277261
+            df[3]["feature1__stddev_pop_over_1_week_rolling_windows"]
+            == 111.80339887498948
         )
-        assert df[4]["feature1__stddev_pop_over_25_minutes_rolling_windows"] == 0
-        assert df[5]["feature1__stddev_pop_over_25_minutes_rolling_windows"] == 0
+        assert df[4]["feature1__stddev_pop_over_1_week_rolling_windows"] == 111.80339887498948
+        assert df[5]["feature1__stddev_pop_over_1_week_rolling_windows"] == 111.80339887498948
 
     def test_feature_transform_empty_mode(self, feature_set_dataframe):
         with pytest.raises(ValueError, match="Modes must not be empty."):
@@ -238,7 +237,6 @@ class TestAggregatedTransform:
                     partition="id",
                     windows=["25 minutes", "15 minutes"],
                     mode=[],
-                    slide_duration="10 minutes",
                 ),
             )
 
@@ -254,7 +252,6 @@ class TestAggregatedTransform:
                     partition="id",
                     windows=["25 minutes", "15 minutes"],
                     mode=["fixed_windows", "rolling_windows"],
-                    slide_duration="10 minutes",
                 ),
             )
 
@@ -268,6 +265,5 @@ class TestAggregatedTransform:
                     partition="id",
                     windows=["25 minutes", "15 minutes"],
                     mode=["rolling_stones"],
-                    slide_duration="10 minutes",
                 ),
             )
