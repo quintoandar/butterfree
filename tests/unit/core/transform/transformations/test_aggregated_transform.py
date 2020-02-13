@@ -280,3 +280,16 @@ class TestAggregatedTransform:
                     mode=["rolling_stones"],
                 ),
             )
+
+    def test_feature_transform_invalid_rolling_window(self, feature_set_dataframe):
+        with pytest.raises(ValueError, match="Window duration has to be greater or equal than 1 day"):
+            Feature(
+                name="feature1",
+                description="unit test",
+                transformation=AggregatedTransform(
+                    aggregations=["avg", "stddev_pop"],
+                    partition="id",
+                    windows=["25 minutes", "15 minutes"],
+                    mode=["rolling_windows"],
+                ),
+            )
