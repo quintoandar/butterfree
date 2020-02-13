@@ -108,15 +108,14 @@ class AggregatedTransform(TransformComponent):
                 raise KeyError(f"{window} have negative element.")
             if self.mode[0] == "rolling_windows":
                 for key in self.__ALLOWED_WINDOWS.keys():
-                    if window.split()[1] in key:
-                        if (
-                            self.__ALLOWED_WINDOWS[key] * int(window.split()[0])
-                            < self.__ALLOWED_WINDOWS[("day", "days")]
-                        ):
-                            raise ValueError(
-                                "Window duration has to be greater or equal than 1 day"
-                                " in rolling_windows mode."
-                            )
+                    if window.split()[1] in key and (
+                        self.__ALLOWED_WINDOWS[key] * int(window.split()[0])
+                        < self.__ALLOWED_WINDOWS[("day", "days")]
+                    ):
+                        raise ValueError(
+                            "Window duration has to be greater or equal than 1 day"
+                            " in rolling_windows mode."
+                        )
         self._windows = windows
 
     @property
