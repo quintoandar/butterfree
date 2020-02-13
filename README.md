@@ -4,7 +4,7 @@ _This library is part of the QuintoAndar-specific libraries.
 
 This repository contains ETL scripts defining the feature sets. Our current architecture is the following:
 
-![](https://i.imgur.com/38fhHJI.png)
+![](https://i.imgur.com/IRugOsa.png)
 
 ```python
 from butterfree import my_lib
