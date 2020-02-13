@@ -1,4 +1,5 @@
 """Aggregated Transform entity."""
+import warnings
 from functools import reduce
 from typing import List
 
@@ -17,7 +18,8 @@ class AggregatedTransform(TransformComponent):
     """Defines an Aggregation.
 
     Attributes:
-        mode: available modes to be used in time aggregations.
+        mode: available modes to be used in time aggregations, which are
+        fixed_windows or rolling_windows.
         aggregations: aggregations to be used in the windows, it can be
             avg and std.
         windows: time ranges to be used in the windows, it can be second(s),
@@ -28,6 +30,8 @@ class AggregatedTransform(TransformComponent):
 
     """
 
+    SLIDE_DURATION = "1 day"
+
     def __init__(
         self,
         mode: non_blank(str),
@@ -35,7 +39,6 @@ class AggregatedTransform(TransformComponent):
         windows: non_blank(List[str]),
         partition: non_blank(str) = None,
         time_column: str = None,
-        slide_duration: str = None,
     ):
         super().__init__()
         self.mode = mode
@@ -43,7 +46,6 @@ class AggregatedTransform(TransformComponent):
         self.windows = windows
         self.partition = partition
         self.time_column = time_column or TIMESTAMP_COLUMN
-        self.slide_duration = slide_duration or SLIDE_DURATION
 
     __ALLOWED_AGGREGATIONS = {"avg": functions.avg, "stddev_pop": functions.stddev_pop}
     __ALLOWED_WINDOWS = {
@@ -104,6 +106,17 @@ class AggregatedTransform(TransformComponent):
                 raise KeyError(f"Windows must have one item at least.")
             if not all(int(window.split()[0]) >= 0 for window in windows):
                 raise KeyError(f"{window} have negative element.")
+            if self.mode[0] == "rolling_windows":
+                for key in self.__ALLOWED_WINDOWS.keys():
+                    if window.split()[1] in key:
+                        if (
+                            self.__ALLOWED_WINDOWS[key] * int(window.split()[0])
+                            < self.__ALLOWED_WINDOWS[("day", "days")]
+                        ):
+                            raise ValueError(
+                                "Window duration has to be greater or equal than 1 day"
+                                " in rolling_windows mode."
+                            )
         self._windows = windows
 
     @property
@@ -132,6 +145,11 @@ class AggregatedTransform(TransformComponent):
                     f"{mode} is not supported. These are the allowed "
                     f"modes that you can use: "
                     f"{self.allowed_modes}"
+                )
+            if mode in ["rolling_windows"]:
+                warnings.warn(
+                    f"{mode} mode will change the dataset granularity! "
+                    f"You cannot perform any other transformation. "
                 )
             modes.append(mode)
         self._mode = modes
@@ -202,7 +220,7 @@ class AggregatedTransform(TransformComponent):
 
     def _dataframe_list_join(self, df_base, df):
         return df_base.join(
-            df, on=[f"{self.partition}", "window_end_time"], how="full_outer"
+            df, on=[f"{self.partition}", f"{self.time_column}"], how="full_outer"
         )
 
     def _rolling_windows_agg(
@@ -214,13 +232,13 @@ class AggregatedTransform(TransformComponent):
                 functions.window(
                     timeColumn=f"{self.time_column}",
                     windowDuration=f"{window.split()[0]} {window.split()[1]}",
-                    slideDuration=self.slide_duration,
+                    slideDuration=SLIDE_DURATION,
                 ),
             ).agg(self.__ALLOWED_AGGREGATIONS[aggregation](f"{self._parent.name}"),)
         ).select(
             functions.col(f"{self.partition}"),
             functions.col(f"{aggregation}({self._parent.name})").alias(feature_name),
-            functions.col("window.end").alias(f"window_end_time"),
+            functions.col("window.end").alias(self.time_column),
         )
 
         df_list.append(df)
