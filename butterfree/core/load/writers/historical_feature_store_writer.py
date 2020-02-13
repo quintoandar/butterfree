@@ -28,22 +28,26 @@ class HistoricalFeatureStoreWriter(Writer):
     >>> writer = HistoricalFeatureStoreWriter()
     >>> writer.write()
 
-        However, we can define the db configurations and provide to HistoricalFeatureStoreWriter.
-    >>> writer = HistoricalFeatureStoreWriter(db_config=S3Config(database="feature_set",
-        ...                                                      mode="append",
-        ...                                                      format_="csv",
-        ...                                                      path="s3a://feature-store/",
-        ...                                                      partition_by= "partition__year"))
+        However, we can define the db configurations and provide
+        to HistoricalFeatureStoreWriter.
+    >>> writer = HistoricalFeatureStoreWriter(
+        ...   db_config=S3Config(database="feature_set",
+        ...                      mode="append",
+        ...                      format_="csv",
+        ...                      path="s3a://feature-store/",
+        ...                      partition_by= "partition__year"))
     >>> writer.write()
         For what settings you can use on S3Config and default settings,
         to read S3Config class.
 
-        We can instantiate this class to validate write job, you will use the same configurations.
+        We can instantiate this class to validate write job,
+        you will use the same configurations.
     >>> writer = HistoricalFeatureStoreWriter()
     >>> writer.validate()
 
-        These both methods (writer and validate) will need the Spark Client, Feature Set and DataFrame,
-        to write or to validate, according to HistoricalFeatureStoreWriter class arguments.
+        These both methods (writer and validate) will need the Spark Client,
+        Feature Set and DataFrame, to write or to validate, according to
+        HistoricalFeatureStoreWriter class arguments.
     """
 
     PARTITION_BY = [

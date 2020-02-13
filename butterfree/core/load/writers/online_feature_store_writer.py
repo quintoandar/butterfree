@@ -26,20 +26,24 @@ class OnlineFeatureStoreWriter(Writer):
     >>> writer = OnlineFeatureStoreWriter()
     >>> writer.write()
 
-        However, we can define the db configurations and provide to OnlineFeatureStoreWriter.
-    >>> writer = OnlineFeatureStoreWriter(db_config=CassandraConfig(mode="overwrite",
-        ...                                                        format_="parquet",
-        ...                                                        keyspace="keyspace_name"))
+        However, we can define the db configurations and provide to
+        OnlineFeatureStoreWriter.
+    >>> writer = OnlineFeatureStoreWriter(
+        ...        db_config=CassandraConfig(mode="overwrite",
+        ...                                  format_="parquet",
+        ...                                  keyspace="keyspace_name"))
     >>> writer.write()
         For what settings you can use on CassandraConfig and default settings,
         to read CassandraConfig class.
 
-        We can instantiate this class to validate write job, you will use the same configurations.
+        We can instantiate this class to validate write job,
+        you will use the same configurations.
     >>> writer = OnlineFeatureStoreWriter()
     >>> writer.validate()
 
-        These both methods (writer and validate) will need the Spark Client, Feature Set and DataFrame,
-        to write or to validate, according to OnlineFeatureStoreWriter class arguments.
+        These both methods (writer and validate) will need the Spark Client,
+        Feature Set and DataFrame, to write or to validate,
+        according to OnlineFeatureStoreWriter class arguments.
     """
 
     def __init__(self, db_config=None):
