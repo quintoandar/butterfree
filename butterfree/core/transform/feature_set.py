@@ -27,6 +27,7 @@ class FeatureSet:
     Example:
         This an example regarding the feature set definition. All features
         and its transformations are defined.
+    >>> from butterfree.core.feature_set_pipeline import FeatureSet
     >>> from butterfree.core.transform.features import (
     ...     Feature,
     ...     KeyFeature,
