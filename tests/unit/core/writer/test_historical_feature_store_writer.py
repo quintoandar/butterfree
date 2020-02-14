@@ -44,8 +44,7 @@ class TestHistoricalFeatureStoreWriter:
         )
         assert writer.db_config.mode == spark_client.write_table.call_args[1]["mode"]
         assert (
-            writer.db_config.partition_by
-            == spark_client.write_table.call_args[1]["partition_by"]
+            writer.PARTITION_BY == spark_client.write_table.call_args[1]["partition_by"]
         )
         assert feature_set.name == spark_client.write_table.call_args[1]["table_name"]
 
@@ -77,9 +76,7 @@ class TestHistoricalFeatureStoreWriter:
 
         writer = HistoricalFeatureStoreWriter()
         query_format_string = "SELECT COUNT(1) as row FROM {}.{}"
-        query_count = query_format_string.format(
-            writer.db_config.database, feature_set.name
-        )
+        query_count = query_format_string.format(writer.database, feature_set.name)
 
         # when
         result = writer.validate(feature_set, feature_set_dataframe, spark_client)

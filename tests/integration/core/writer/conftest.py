@@ -2,6 +2,7 @@ from pyspark import SparkContext
 from pyspark.sql import session
 from pytest import fixture
 
+from butterfree.core.constant import columns
 from butterfree.core.transform import FeatureSet
 from butterfree.core.transform.features import Feature, KeyFeature, TimestampFeature
 
@@ -21,33 +22,33 @@ def input_dataframe():
             "id": 1,
             "timestamp": "2019-12-01",
             "feature": 100,
-            "partition__year": 2019,
-            "partition__month": 12,
-            "partition__day": 1,
+            columns.PARTITION_YEAR: 2019,
+            columns.PARTITION_MONTH: 12,
+            columns.PARTITION_DAY: 1,
         },
         {
             "id": 2,
             "timestamp": "2020-01-01",
             "feature": 200,
-            "partition__year": 2020,
-            "partition__month": 1,
-            "partition__day": 1,
+            columns.PARTITION_YEAR: 2020,
+            columns.PARTITION_MONTH: 1,
+            columns.PARTITION_DAY: 1,
         },
         {
             "id": 1,
             "timestamp": "2020-02-01",
             "feature": 110,
-            "partition__year": 2020,
-            "partition__month": 2,
-            "partition__day": 1,
+            columns.PARTITION_YEAR: 2020,
+            columns.PARTITION_MONTH: 2,
+            columns.PARTITION_DAY: 1,
         },
         {
             "id": 1,
             "timestamp": "2020-02-02",
             "feature": 120,
-            "partition__year": 2020,
-            "partition__month": 2,
-            "partition__day": 2,
+            columns.PARTITION_YEAR: 2020,
+            columns.PARTITION_MONTH: 2,
+            columns.PARTITION_DAY: 2,
         },
     ]
     return spark.read.json(sc.parallelize(data, 1))

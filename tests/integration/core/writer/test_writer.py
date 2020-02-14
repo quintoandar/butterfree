@@ -1,9 +1,7 @@
+import shutil
 from unittest.mock import Mock
 
-from tests.integration import OUTPUT_PATH
-
 from butterfree.core.client import SparkClient
-from butterfree.core.db.configs import S3Config
 from butterfree.core.writer import (
     HistoricalFeatureStoreWriter,
     OnlineFeatureStoreWriter,
@@ -21,18 +19,23 @@ def test_writer(input_dataframe, feature_set):
     columns_sort = feature_set_df.schema.fieldNames()
 
     # setup historical writer
-    historical_config = S3Config(path=OUTPUT_PATH + "/historical/feature_store")
-    historical_writer = HistoricalFeatureStoreWriter(db_config=historical_config)
+    s3config = Mock()
+    s3config.get_options = Mock(
+        return_value={
+            "mode": "overwrite",
+            "format_": "parquet",
+            "path": "test_folder/historical/entity/feature_set",
+        }
+    )
+    historical_writer = HistoricalFeatureStoreWriter(db_config=s3config)
 
     # setup online writer
     # TODO: Change for CassandraConfig when Cassandra for test is ready
-    online_config = S3Config(path=OUTPUT_PATH + "/online/feature_store")
+    online_config = Mock()
+    online_config.mode = "overwrite"
+    online_config.format_ = "parquet"
     online_config.get_options = Mock(
-        return_value={
-            "path": "{}/{}/{}/".format(
-                online_config.path, feature_set.entity, feature_set.name
-            )
-        }
+        return_value={"path": "test_folder/online/entity/feature_set"}
     )
     online_writer = OnlineFeatureStoreWriter(db_config=online_config)
 
@@ -40,12 +43,12 @@ def test_writer(input_dataframe, feature_set):
     sink = Sink(writers)
 
     # act
-    client.sql("CREATE DATABASE IF NOT EXISTS {}".format(historical_config.database))
+    client.sql("CREATE DATABASE IF NOT EXISTS {}".format(historical_writer.database))
     sink.flush(feature_set, feature_set_df, client)
 
     # get historical results
     historical_result_df = client.read_table(
-        historical_config.database, feature_set.name
+        historical_writer.database, feature_set.name
     )
 
     # get online results
@@ -63,3 +66,6 @@ def test_writer(input_dataframe, feature_set):
     assert sorted(target_latest_df.select(*columns_sort).collect()) == sorted(
         online_result_df.select(*columns_sort).collect()
     )
+
+    # tear down
+    shutil.rmtree("test_folder")
