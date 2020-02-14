@@ -1,6 +1,6 @@
 """TimestampFeature entity."""
 from pyspark.sql import DataFrame
-from pyspark.sql.functions import to_timestamp
+from pyspark.sql.functions import from_unixtime, to_timestamp
 
 from butterfree.core.constants.columns import TIMESTAMP_COLUMN
 from butterfree.core.constants.data_type import DataType
@@ -67,7 +67,7 @@ class TimestampFeature(Feature):
 
         if self.from_ms:
             dataframe = dataframe.withColumn(
-                column_name, dataframe[column_name] / 1000.0
+                column_name, from_unixtime(dataframe[column_name] / 1000.0)
             )
         if self.mask:
             dataframe = dataframe.withColumn(
