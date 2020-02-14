@@ -1,8 +1,10 @@
 ## Butterfree Python Library
 
-_This library is part of the QuintoAndar-specific libraries_
+_This library is part of the QuintoAndar-specific libraries.
 
-This repository contains ETL scripts defining the feature sets
+This repository contains ETL scripts defining the feature sets. Our current architecture is the following:
+
+![](https://i.imgur.com/IRugOsa.png)
 
 ```python
 from butterfree import my_lib
@@ -100,7 +102,7 @@ If you receive one error like this one:
  failed with error code 1 in /tmp/pip-build-98gth33d/googleapis-common-protos/
 ```
  
-You can try to fix running:
+You can try to fix it running:
 
 ```bash
 python -m pip install --upgrade pip setuptools wheel
