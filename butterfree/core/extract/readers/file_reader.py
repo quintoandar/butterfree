@@ -18,6 +18,7 @@ class FileReader(Reader):
 
     Example:
         Simple example regarding FileReader class instantiation.
+    >>> from butterfree.core.reader.file_reader import FileReader
     >>> file_reader = FileReader(
     ...                 id="file_reader_id",
     ...                 database="data_path",
