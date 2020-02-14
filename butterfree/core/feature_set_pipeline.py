@@ -17,6 +17,7 @@ class FeatureSetPipeline:
     Example:
         This an example regarding the feature set pipeline definition. All
         sources, feature set (and its features) and writers are defined.
+    >>> from butterfree.core.feature_set_pipeline import FeatureSetPipeline
     >>> from butterfree.core.db.configs import S3Config
     >>> from butterfree.core.reader import Source, TableReader
     >>> from butterfree.core.transform import FeatureSet
