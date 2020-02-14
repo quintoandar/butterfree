@@ -103,7 +103,7 @@ class AggregatedTransform(TransformComponent):
                 )
             if len(window) == 0:
                 raise KeyError(f"Windows must have one item at least.")
-            if int(window.split()[0]) >= 0:
+            if int(window.split()[0]) <= 0:
                 raise KeyError(f"{window} have negative element.")
             if self.mode[0] == "rolling_windows":
                 for key in self.__ALLOWED_WINDOWS.keys():
