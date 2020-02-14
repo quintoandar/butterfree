@@ -1,4 +1,4 @@
-from datetime import datetime
+from pyspark.sql.types import StringType
 
 from butterfree.core.constants.columns import TIMESTAMP_COLUMN
 from butterfree.core.constants.data_type import DataType
@@ -26,33 +26,33 @@ class TestTimestampFeature:
 
         test_key = TimestampFeature(from_column="ts", from_ms=True)
 
-        df = (
-            test_key.transform(feature_set_dataframe_ms_from_column)
-            .orderBy("timestamp")
-            .collect()
+        df = test_key.transform(feature_set_dataframe_ms_from_column).orderBy(
+            "timestamp"
         )
 
-        assert df[0]["timestamp"] == datetime(2020, 2, 12, 18, 18, 31)
-        assert df[1]["timestamp"] == datetime(2020, 2, 12, 18, 18, 42)
+        df = df.withColumn("timestamp", df["timestamp"].cast(StringType())).collect()
+
+        assert df[0]["timestamp"] == "2020-02-12 21:18:31"
+        assert df[1]["timestamp"] == "2020-02-12 21:18:42"
 
     def test_transform_ms(self, feature_set_dataframe_ms):
 
         test_key = TimestampFeature(from_ms=True)
 
-        df = test_key.transform(feature_set_dataframe_ms).orderBy("timestamp").collect()
+        df = test_key.transform(feature_set_dataframe_ms).orderBy("timestamp")
 
-        assert df[0]["timestamp"] == datetime(2020, 2, 12, 18, 18, 31)
-        assert df[1]["timestamp"] == datetime(2020, 2, 12, 18, 18, 42)
+        df = df.withColumn("timestamp", df["timestamp"].cast(StringType())).collect()
+
+        assert df[0]["timestamp"] == "2020-02-12 21:18:31"
+        assert df[1]["timestamp"] == "2020-02-12 21:18:42"
 
     def test_transform_mask(self, feature_set_dataframe_date):
 
         test_key = TimestampFeature(mask="yyyy-MM-dd")
 
-        df = (
-            test_key.transform(feature_set_dataframe_date)
-            .orderBy("timestamp")
-            .collect()
-        )
+        df = test_key.transform(feature_set_dataframe_date).orderBy("timestamp")
 
-        assert df[0]["timestamp"] == datetime(2020, 2, 7, 0, 0, 0)
-        assert df[1]["timestamp"] == datetime(2020, 2, 8, 0, 0, 0)
+        df = df.withColumn("timestamp", df["timestamp"].cast(StringType())).collect()
+
+        assert df[0]["timestamp"] == "2020-02-07 00:00:00"
+        assert df[1]["timestamp"] == "2020-02-08 00:00:00"
