@@ -24,7 +24,7 @@ class Source:
 
     Example:
         Simple example regarding Source class instantiation.
-    >>> from butterfree.core.reader import TableReader, FileReader
+    >>> from butterfree.core.reader import TableReader, FileReader, Source
     >>> source = Source(
     ...    readers=[
     ...        TableReader(
