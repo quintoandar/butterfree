@@ -22,10 +22,10 @@ class TestFeatureSetPipeline:
         out_columns = [
             "user_id",
             "timestamp",
-            "listing_page_viewed__rent_per_month__avg_over_7_days",
-            "listing_page_viewed__rent_per_month__avg_over_2_weeks",
-            "listing_page_viewed__rent_per_month__std_over_7_days",
-            "listing_page_viewed__rent_per_month__std_over_2_weeks",
+            "listing_page_viewed__rent_per_month__avg_over_7_days_fixed_windows",
+            "listing_page_viewed__rent_per_month__avg_over_2_weeks_fixed_windows",
+            "listing_page_viewed__rent_per_month__stddev_pop_over_7_days_fixed_windows",
+            "listing_page_viewed__rent_per_month__stddev_pop_over_2_weeks_fixed_windows",  # noqa
         ]
         pipeline = FeatureSetPipeline(
             source=Source(
@@ -51,9 +51,10 @@ class TestFeatureSetPipeline:
                         name="listing_page_viewed__rent_per_month",
                         description="Average of something.",
                         transformation=AggregatedTransform(
-                            aggregations=["avg", "std"],
+                            aggregations=["avg", "stddev_pop"],
                             partition="user_id",
                             windows=["7 days", "2 weeks"],
+                            mode=["fixed_windows"],
                         ),
                     ),
                 ],
@@ -108,9 +109,10 @@ class TestFeatureSetPipeline:
                         name="listing_page_viewed__rent_per_month",
                         description="Average of something.",
                         transformation=AggregatedTransform(
-                            aggregations=["avg", "std"],
+                            aggregations=["avg", "stddev_pop"],
                             partition="user_id",
                             windows=["7 days", "2 weeks"],
+                            mode=["fixed_windows"],
                         ),
                     ),
                 ],
@@ -154,9 +156,10 @@ class TestFeatureSetPipeline:
                             name="listing_page_viewed__rent_per_month",
                             description="Average of something.",
                             transformation=AggregatedTransform(
-                                aggregations=["avg", "std"],
+                                aggregations=["avg", "stddev_pop"],
                                 partition="user_id",
                                 windows=["7 days", "2 weeks"],
+                                mode=["fixed_windows"],
                             ),
                         ),
                     ],
@@ -195,9 +198,10 @@ class TestFeatureSetPipeline:
                             name="listing_page_viewed__rent_per_month",
                             description="Average of something.",
                             transformation=AggregatedTransform(
-                                aggregations=["avg", "std"],
+                                aggregations=["avg", "stddev_pop"],
                                 partition="user_id",
                                 windows=["7 days", "2 weeks"],
+                                mode=["fixed_windows"],
                             ),
                         ),
                     ],
