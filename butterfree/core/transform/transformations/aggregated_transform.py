@@ -25,7 +25,6 @@ class AggregatedTransform(TransformComponent):
             minute(s), hour(s), day(s), week(s), month(s) and year(s).
         partition: column to be used in window partition.
         time_column: timestamp column to be use as sorting reference.
-        slide_duration: defines the slide duration regarding the time aggregation.
 
     """
 
