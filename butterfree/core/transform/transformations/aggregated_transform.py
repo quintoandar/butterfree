@@ -8,7 +8,6 @@ from pyspark.sql import DataFrame, functions
 from pyspark.sql.window import Window
 
 from butterfree.core.constant.columns import TIMESTAMP_COLUMN
-from butterfree.core.constant.constants import SLIDE_DURATION
 from butterfree.core.transform.transformations.transform_component import (
     TransformComponent,
 )
@@ -231,7 +230,7 @@ class AggregatedTransform(TransformComponent):
                 functions.window(
                     timeColumn=f"{self.time_column}",
                     windowDuration=f"{window.split()[0]} {window.split()[1]}",
-                    slideDuration=SLIDE_DURATION,
+                    slideDuration=self.SLIDE_DURATION,
                 ),
             ).agg(self.__ALLOWED_AGGREGATIONS[aggregation](f"{self._parent.name}"),)
         ).select(
