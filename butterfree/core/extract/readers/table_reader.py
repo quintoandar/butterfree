@@ -16,6 +16,7 @@ class TableReader(Reader):
 
     Example:
         Simple example regarding TableReader class instantiation.
+    >>> from butterfree.core.reader.table_reader import TableReader
     >>> table_reader = TableReader(
     ...                     id="table_reader_id",
     ...                     database="table_reader_db",
