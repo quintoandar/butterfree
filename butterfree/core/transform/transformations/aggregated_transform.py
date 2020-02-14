@@ -119,8 +119,8 @@ class AggregatedTransform(TransformComponent):
 
     def _window_duration(self, window, key):
         if window.split()[1] in key and (
-                self.__ALLOWED_WINDOWS[key] * int(window.split()[0])
-                < self.__ALLOWED_WINDOWS[("day", "days")]
+            self.__ALLOWED_WINDOWS[key] * int(window.split()[0])
+            < self.__ALLOWED_WINDOWS[("day", "days")]
         ):
             return True
 
