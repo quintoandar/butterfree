@@ -13,6 +13,91 @@ class FeatureSetPipeline:
         feature_set: feature set composed by features and context metadata.
         sink: sink used to write the output dataframe in the desired locations.
         spark_client: client used to access Spark connection.
+
+    Example:
+        This an example regarding the feature set pipeline definition. All
+        sources, feature set (and its features) and writers are defined.
+    >>> from butterfree.core.feature_set_pipeline import FeatureSetPipeline
+    >>> from butterfree.core.db.configs import S3Config
+    >>> from butterfree.core.reader import Source, TableReader
+    >>> from butterfree.core.transform import FeatureSet
+    >>> from butterfree.core.transform.features import (
+    ...     Feature,
+    ...     KeyFeature,
+    ...     TimestampFeature,
+    ...)
+    >>> from butterfree.core.transform.transformations import (
+    ...     AggregatedTransform,
+    ...     CustomTransform,
+    ... )
+    >>> from butterfree.core.writer import HistoricalFeatureStoreWriter, Sink
+    >>> import pyspark.sql.functions as F
+    >>> import os
+
+    >>> def divide(df, fs, column1, column2):
+    ...     name = fs.get_output_columns()[0]
+    ...     df = df.withColumn(name, F.col(column1) / F.col(column2))
+    ...     return df
+
+    >>> pipeline = FeatureSetPipeline(
+    ...    source=Source(
+    ...        readers=[
+    ...            TableReader(
+    ...                id="table_reader_id",
+    ...                database="table_reader_db",
+    ...                table="table_reader_table",
+    ...            ),
+    ...        ],
+    ...        query=f"select * from table_reader_id ",
+    ...    ),
+    ...    feature_set=FeatureSet(
+    ...        name="feature_set",
+    ...        entity="entity",
+    ...        description="description",
+    ...        features=[
+    ...            Feature(
+    ...                name="feature1",
+    ...                description="test",
+    ...                transformation=AggregatedTransform(
+    ...                    aggregations=["avg", "std"],
+    ...                    partition="id",
+    ...                    windows=["2 minutes", "15 minutes"],
+    ...                ),
+    ...            ),
+    ...            Feature(
+    ...                name="divided_feature",
+    ...                description="unit test",
+    ...                transformation=CustomTransform(
+    ...                    transformer=divide, column1="feature1", column2="feature2",
+    ...                ),
+    ...            ),
+    ...        ],
+    ...        keys=[
+    ...            KeyFeature(name="id", description="The user's Main ID or device ID")
+    ...        ],
+    ...        timestamp=TimestampFeature(),
+    ...    ),
+    ...    sink=Sink(
+    ...         writers=[
+    ...            HistoricalFeatureStoreWriter(
+    ...                db_config=S3Config(
+    ...                    database="db",
+    ...                    format_="parquet",
+    ...                    path=os.path.join(
+    ...                        os.path.dirname(os.path.abspath(__file__))
+    ...                    ),
+    ...                ),
+    ...            )
+    ...        ],
+    ...    ),
+    ...)
+
+    >>> pipeline.run()
+
+        This last method (run) will execute the pipeline flow, it'll read from
+        the defined sources, compute all the transformations and save the data
+        to the specified locations.
+
     """
 
     def __init__(
