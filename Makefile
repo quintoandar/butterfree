@@ -103,6 +103,7 @@ clean:
 	@find ./ -type f -name 'coverage-badge.svg' -exec rm -f {} \;
 	@find ./ -type f -name 'coverage.xml' -exec rm -f {} \;
 	@find ./ -type f -name '.coverage*' -exec rm -f {} \;
+	@find ./ -type f -name '*derby.log' -exec rm -f {} \;
 	@find ./ -name '*.pyc' -exec rm -f {} \;
 	@find ./ -name '*.pyo' -exec rm -f {} \;
 	@find ./ -name '*~' -exec rm -f {} \;
