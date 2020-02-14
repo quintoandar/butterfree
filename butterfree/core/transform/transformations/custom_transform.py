@@ -19,10 +19,11 @@ class CustomTransform(TransformComponent):
     Example:
         It's necessary to declare the desired custom method and
         its arguments.
+        >>> from butterfree.core.transform.transformations import CustomTransform
+        >>> from butterfree.core.transform.features import Feature
         >>> from pyspark import SparkContext
         >>> from pyspark.sql import session
         >>> import pyspark.sql.functions as F
-        >>> from butterfree.core.transform.features import Feature
         >>> sc = SparkContext.getOrCreate()
         >>> spark = session.SparkSession(sc)
         >>> df = spark.createDataFrame([(1, "2016-04-11 11:31:11", 200, 200),
