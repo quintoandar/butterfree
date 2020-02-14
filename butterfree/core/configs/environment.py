@@ -74,6 +74,7 @@ specification = {
     "CASSANDRA_USERNAME": "test",
     "CASSANDRA_PASSWORD": "test",
     "FEATURE_STORE_S3_BUCKET": "test",
+    "FEATURE_STORE_HISTORICAL_DATABASE": "test",
 }
 
 
