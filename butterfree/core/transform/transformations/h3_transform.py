@@ -48,9 +48,10 @@ class H3HashTransform(TransformComponent):
         Example:
         It's necessary to declare the desired h3 resolutions and
         latitude and longitude columns.
+        >>> from butterfree.core.transform.features import Feature
+        >>> from butterfree.core.transform.transformations.h3_transform import H3HashTransform
         >>> from pyspark import SparkContext
         >>> from pyspark.sql import session
-        >>> from butterfree.core.transform.features import Feature
         >>> sc = SparkContext.getOrCreate()
         >>> spark = session.SparkSession(sc)
         >>> df = spark.createDataFrame([(1, 200, -23.554190, -46.670723),
