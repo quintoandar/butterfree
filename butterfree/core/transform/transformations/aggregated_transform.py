@@ -94,6 +94,8 @@ class AggregatedTransform(TransformComponent):
             raise KeyError("Windows must not be empty.")
         if not isinstance(windows, List):
             raise KeyError(f"Windows must be a list.")
+        if len(windows) == 0:
+            raise KeyError(f"Windows must have one item at least.")
         for window in windows:
             if window.split()[1] not in self.allowed_windows:
                 raise KeyError(
@@ -101,28 +103,25 @@ class AggregatedTransform(TransformComponent):
                     f"time windows that you can use: "
                     f"{self.allowed_windows}."
                 )
-            if len(window) == 0:
-                raise KeyError(f"Windows must have one item at least.")
             if int(window.split()[0]) <= 0:
                 raise KeyError(f"{window} have negative element.")
-            if self.mode[0] == "rolling_windows":
-                for key in self.__ALLOWED_WINDOWS.keys():
-                    if window.split()[1] in key and (
-                        self.__ALLOWED_WINDOWS[key] * int(window.split()[0])
-                        < self.__ALLOWED_WINDOWS[("day", "days")]
-                    ):
-                        raise ValueError(
-                            "Window duration has to be greater or equal than 1 day"
-                            " in rolling_windows mode."
-                        )
+            if self.mode[
+                0
+            ] == "rolling_windows" and self._rolling_windows_allowed_duration(window):
+                raise ValueError(
+                    "Window duration has to be greater or equal than 1 day"
+                    " in rolling_windows mode."
+                )
         self._windows = windows
 
-    def _window_duration(self, window, key):
-        if window.split()[1] in key and (
-            self.__ALLOWED_WINDOWS[key] * int(window.split()[0])
-            < self.__ALLOWED_WINDOWS[("day", "days")]
-        ):
-            return True
+    def _rolling_windows_allowed_duration(self, window):
+        for key in self.__ALLOWED_WINDOWS.keys():
+            if window.split()[1] in key and (
+                self.__ALLOWED_WINDOWS[key] * int(window.split()[0])
+                < self.__ALLOWED_WINDOWS[("day", "days")]
+            ):
+                return True
+        return
 
     @property
     def allowed_windows(self) -> List[str]:
