@@ -20,6 +20,7 @@ class KafkaReader(Reader):
 
     Example:
         Simple example regarding KafkaReader class instantiation.
+    >>> from butterfree.core.reader.kafka_reader import KafkaReader
     >>> kafka_reader = KafkaReader(
     ...                 id="kafka_reader_id",
     ...                 connection_string="host1:port,host2:port",
