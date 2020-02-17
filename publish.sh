@@ -1,7 +1,12 @@
 #!/usr/bin/env bash
 
 make version
-make package-name
+if [ -z "$1" ]
+  then
+    make package-name
+else
+  make package-name build=-"$1"
+fi
 make repository-url
 
 if [[ ! -d "python-package-server" ]]; then
