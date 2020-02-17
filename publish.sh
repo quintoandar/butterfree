@@ -45,5 +45,10 @@ fi
 git config user.email "${DRONE_COMMIT_AUTHOR_EMAIL}"
 git config user.name "${DRONE_COMMIT_AUTHOR}"
 git add .
-git commit -m "$(cat ../.package_name) version $(cat ../.version)"
+if [ -z "$1" ]
+  then
+    git commit -m "$(cat ../.package_name) version $(cat ../.version)"
+else
+  git commit -m "$(cat ../.package_name) version $(cat ../.version).$(head -c 7 ../.commit_hash)"
+fi
 git push https://${GITHUB_TOKEN}@github.com/quintoandar/python-package-server master
