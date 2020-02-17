@@ -20,7 +20,7 @@ class AggregatedTransform(TransformComponent):
         mode: available modes to be used in time aggregations, which are
         fixed_windows or rolling_windows.
         aggregations: aggregations to be used in the windows, it can be
-            avg and std.
+            avg, std and count.
         windows: time ranges to be used in the windows, it can be second(s),
             minute(s), hour(s), day(s), week(s), month(s) and year(s).
         partition: column to be used in window partition.
@@ -45,7 +45,11 @@ class AggregatedTransform(TransformComponent):
         self.partition = partition
         self.time_column = time_column or TIMESTAMP_COLUMN
 
-    __ALLOWED_AGGREGATIONS = {"avg": functions.avg, "stddev_pop": functions.stddev_pop}
+    __ALLOWED_AGGREGATIONS = {
+        "avg": functions.avg,
+        "stddev_pop": functions.stddev_pop,
+        "count": functions.count,
+    }
     __ALLOWED_WINDOWS = {
         ("second", "seconds"): 1,
         ("minute", "minutes"): 60,
