@@ -2,7 +2,20 @@
 
 from enum import Enum
 
-from pyspark.sql.types import TimestampType, BinaryType, BooleanType, ByteType, DateType, DecimalType, DoubleType, FloatType, IntegerType, LongType, ShortType, StringType
+from pyspark.sql.types import (
+    BinaryType,
+    BooleanType,
+    ByteType,
+    DateType,
+    DecimalType,
+    DoubleType,
+    FloatType,
+    IntegerType,
+    LongType,
+    ShortType,
+    StringType,
+    TimestampType,
+)
 
 
 class DataType(Enum):
