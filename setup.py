@@ -12,7 +12,7 @@ setup(
     version=__version__,
     url=__repository_url__,
     packages=find_packages(
-        exclude=["tests", "pipenv", "env", "examples", "htmlcov", ".pytest_cache"]
+        exclude=("tests", "tests.*", "pipenv", "env", "examples", "htmlcov", ".pytest_cache")
     ),
     license="Copyright",
     author="QuintoAndar",
