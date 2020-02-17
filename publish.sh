@@ -34,7 +34,12 @@ if [[ ! -f "$(cat ../.package_name)/index.html" ]]; then
 EOF
 fi
 
-sed -i '/<!-- package-server-links-start -->/ a <a href="git+'"$(cat ../.repository_url)"'@'"$(cat ../.version)"'#egg='"$(cat ../.package_name)"'-'"$(cat ../.version)"'">'"$(cat ../.package_name)"'-'"$(cat ../.version)"'</a><br/>' ./"$(cat ../.package_name)"/index.html
+if [ -z "$1" ]
+  then
+    sed -i '/<!-- package-server-links-start -->/ a <a href="git+'"$(cat ../.repository_url)"'@'"$(cat ../.version)"'#egg='"$(cat ../.package_name)"'-'"$(cat ../.version)"'">'"$(cat ../.package_name)"'-'"$(cat ../.version)"'</a><br/>' ./"$(cat ../.package_name)"/index.html
+else
+  sed -i '/<!-- package-server-links-start -->/ a <a href="git+'"$(cat ../.repository_url)"'@staging#egg='"$(cat ../.package_name)"'-'"$(cat ../.version)"'">'"$(cat ../.package_name)"'-'"$(cat ../.version)"'</a><br/>' ./"$(cat ../.package_name)"/index.html
+fi
 
 git config user.email "${DRONE_COMMIT_AUTHOR_EMAIL}"
 git config user.name "${DRONE_COMMIT_AUTHOR}"
