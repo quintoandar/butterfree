@@ -113,6 +113,12 @@ version:
 	@grep __version__ setup.py | head -1 | cut -d \" -f2 | cut -d \' -f2 > .version
 	@cat .version
 
+.PHONY: commit-hash
+## dump latest commit hash into .commit_has file and show
+commit-hash:
+	@git rev-parse HEAD > .commit_hash
+	@cat .commit_hash
+
 .PHONY: package-name
 ## dump package name into .package_name file and show
 package-name:
