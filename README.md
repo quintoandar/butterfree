@@ -1,19 +1,101 @@
 ## Butterfree Python Library
 
-_This library is part of the QuintoAndar-specific libraries.
+_This library is part of the QuintoAndar-specific libraries._
 
-This repository contains ETL scripts defining the feature sets. Our current architecture is the following:
+This library supports Python version 3.6+ and meant to provide tools for
+building ETL pipelines for feature stores using [Apache Spark](https://spark.apache.org/).
+Every pipeline uses the idea of feature sets. Each feature set is, in
+summary, a compound of features for an entity object (like House, for
+example) that can be created easily from a small set of sources.
+
+More about this idea latter :)
 
 ![](https://i.imgur.com/IRugOsa.png)
 
-```python
-from butterfree import my_lib
+## Creating your first feature set
 
-def foo(arg):
-    return my_lib.awesome_function(arg)  # change me
+```python
+from butterfree.core.feature_set_pipeline import FeatureSetPipeline
+from butterfree.core.reader import Source, TableReader
+from butterfree.core.transform import FeatureSet
+from butterfree.core.transform.features import Feature, KeyFeature, TimestampFeature
+from butterfree.core.transform.transformations import AggregatedTransform
+from butterfree.core.writer import (
+    Sink,
+    HistoricalFeatureStoreWriter,
+    OnlineFeatureStoreWriter,
+)
+​
+​
+class ListingPageViewedEvents(FeatureSetPipeline):
+    def __init__(self):
+        super(ListingPageViewedEvents, self).__init__(
+            source=Source(
+                readers=[
+                    TableReader(
+                        id="amplitude_events",
+                        database="datalake_amplitude_clean",
+                        table="events_repartitioned",
+                    ).with_(
+                        filter,
+                        condition="event_type='listing_page_viewed' and id_app=170698 and ts_event > '2019-01-01'",
+                    )
+                ],
+                query=(
+                    """
+                    select
+                        ts_event,
+                        get_json_object(event_properties, '$.house_id') as event_house_id,
+                        id_app
+                    from amplitude_events
+                    """
+                ),
+            ),
+            feature_set=FeatureSet(
+                name="house_listing_page_viewed",
+                entity="house",
+                description=(
+                    """
+                    Holds all house listing page viewed events within amplitude's scope.
+​
+                    It has information since 2019 and only for PWA app (170698).
+                    """
+                ),
+                keys=[
+                    KeyFeature(
+                        name="id",
+                        description="The user's Main ID or device ID",
+                        from_column="event_house_id",
+                    )
+                ],
+                timestamp=TimestampFeature(from_column="ts_event"),
+                features=[
+                    Feature(
+                        name="id",
+                        description="Aggregated Feature.",
+                        transformation=AggregatedTransform(
+                            aggregations=["count"],
+                            partition="id",
+                            windows=["1 week", "2 weeks", "4 weeks"],
+                            mode=["rolling_windows"],
+                        ),
+                    )
+                ],
+            ),
+            sink=Sink(
+                writers=[HistoricalFeatureStoreWriter(), OnlineFeatureStoreWriter()]
+            ),
+        )
 ```
 
-This library supports Python version 3.6+ and meant for COMPLETE ME!
+In summary, this class will setup a batch pipeline for building the count
+of listing page views, over 1, 2 and 4 weeks past, per house and day. Data
+will be sent to the Historical Feature Store (which default is a Hadoop
+table, mapping files in S3, partitioned by year, month and day of the
+feature values). From there, users can query the feature set, to find
+values for each feature in any point of time. Also, latest data (latest
+version of each feature for each house) is written to a Cassandra DB,
+our default Online Feature Store, for fast lookup. 
 
 ## Installing
 
@@ -32,14 +114,15 @@ Or after listing `quintoandar-butterfree` in your
 pip install -r requirements.txt --extra-index-url https://quintoandar.github.io/python-package-server/
 ```
 
-This will expose `my_lib` under `butterfree` module:
+### DEV Build
 
-```python
-from butterfree import my_lib
+You may also have access to our preview build (unstable) by
+installing `quintoandar-butterfree-dev`. 
 
-def foo():
-    bar = my_lib.cool_method()
+```bash
+pip install quintoandar-butterfree-dev --extra-index-url https://quintoandar.github.io/python-package-server/
 ```
+
 
 ## Development Environment
 
