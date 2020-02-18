@@ -1,15 +1,15 @@
 import shutil
 from unittest.mock import Mock
 
-from butterfree.core.clients import SparkClient
-from butterfree.core.load import Sink
-from butterfree.core.load.writers import (
+from butterfree.core.client import SparkClient
+from butterfree.core.writer import (
     HistoricalFeatureStoreWriter,
     OnlineFeatureStoreWriter,
+    Sink,
 )
 
 
-def test_sink(input_dataframe, feature_set):
+def test_writer(input_dataframe, feature_set):
     # arrange
     client = SparkClient()
     feature_set_df = feature_set.construct(input_dataframe)
