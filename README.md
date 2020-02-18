@@ -8,7 +8,7 @@ Every pipeline uses the idea of feature sets. Each feature set is, in
 summary, a compound of features for an entity object (like House, for
 example) that can be created easily from a small set of sources.
 
-More about this idea latter :)
+More about this idea later :smile:
 
 ![](https://i.imgur.com/IRugOsa.png)
 
@@ -27,9 +27,9 @@ from butterfree.core.writer import (
 )
 ​
 ​
-class ListingPageViewedEvents(FeatureSetPipeline):
+class HouseListingPageViewedEvents(FeatureSetPipeline):
     def __init__(self):
-        super(ListingPageViewedEvents, self).__init__(
+        super(HouseListingPageViewedEvents, self).__init__(
             source=Source(
                 readers=[
                     TableReader(
@@ -86,6 +86,9 @@ class ListingPageViewedEvents(FeatureSetPipeline):
                 writers=[HistoricalFeatureStoreWriter(), OnlineFeatureStoreWriter()]
             ),
         )
+
+pipeline = HouseListingPageViewedEvents()
+pipeline.run()
 ```
 
 In summary, this class will setup a batch pipeline for building the count
@@ -93,9 +96,11 @@ of listing page views, over 1, 2 and 4 weeks past, per house and day. Data
 will be sent to the Historical Feature Store (which default is a Hadoop
 table, mapping files in S3, partitioned by year, month and day of the
 feature values). From there, users can query the feature set, to find
-values for each feature in any point of time. Also, latest data (latest
-version of each feature for each house) is written to a Cassandra DB,
-our default Online Feature Store, for fast lookup. 
+values for each feature in any point of time.
+
+Also, latest data (latest version of each feature for each house) is
+written to a Cassandra DB, our default Online Feature Store, for fast
+lookup at prediction time. 
 
 ## Installing
 
