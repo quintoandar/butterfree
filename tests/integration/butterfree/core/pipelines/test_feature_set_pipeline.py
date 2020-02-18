@@ -5,18 +5,16 @@ from pyspark.sql import DataFrame
 from pyspark.sql import functions as F
 
 from butterfree.core.configs import environment
-from butterfree.core.constants.columns import TIMESTAMP_COLUMN
-from butterfree.core.extract import Source
-from butterfree.core.extract.readers import TableReader
-from butterfree.core.load import Sink
-from butterfree.core.load.writers import HistoricalFeatureStoreWriter
-from butterfree.core.pipelines.feature_set_pipeline import FeatureSetPipeline
+from butterfree.core.constant.columns import TIMESTAMP_COLUMN
+from butterfree.core.feature_set_pipeline import FeatureSetPipeline
+from butterfree.core.reader import Source, TableReader
 from butterfree.core.transform import FeatureSet
 from butterfree.core.transform.features import Feature, KeyFeature, TimestampFeature
 from butterfree.core.transform.transformations import (
     AggregatedTransform,
     CustomTransform,
 )
+from butterfree.core.writer import HistoricalFeatureStoreWriter, Sink
 
 
 def create_temp_view(dataframe: DataFrame, name):
@@ -39,14 +37,14 @@ def divide(df, fs, column1, column2):
 
 
 class TestFeatureSetPipeline:
-    def test_feature_set_pipeline(self, mocked_df, spark_session):
+    def test_feature_set_pipeline(self, mocked_df, spark):
         # arrange
         table_reader_id = "a_source"
         table_reader_table = "table"
         table_reader_db = environment.get_variable("FEATURE_STORE_HISTORICAL_DATABASE")
         create_temp_view(dataframe=mocked_df, name=table_reader_id)
         create_db_and_table(
-            spark=spark_session,
+            spark=spark,
             table_reader_id=table_reader_id,
             table_reader_db=table_reader_db,
             table_reader_table=table_reader_table,
@@ -106,7 +104,7 @@ class TestFeatureSetPipeline:
 
         # assert
         path = dbconfig.get_options("historical/entity/feature_set").get("path")
-        df = spark_session.read.parquet(path).orderBy(TIMESTAMP_COLUMN).collect()
+        df = spark.read.parquet(path).orderBy(TIMESTAMP_COLUMN).collect()
 
         assert df[0]["feature1__avg_over_2_minutes_fixed_windows"] == 200
         assert df[1]["feature1__avg_over_2_minutes_fixed_windows"] == 300
