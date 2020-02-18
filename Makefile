@@ -93,6 +93,9 @@ apply-style:
 .PHONY: clean
 ## clean unused artifacts
 clean:
+	@find ./ -type d -name 'dist' -exec rm -rf {} +;
+	@find ./ -type d -name 'build' -exec rm -rf {} +;
+	@find ./ -type d -name 'quintoandar_butterfree.egg-info' -exec rm -rf {} +;
 	@find ./ -type d -name 'htmlcov' -exec rm -rf {} +;
 	@find ./ -type d -name '.pytest_cache' -exec rm -rf {} +;
 	@find ./ -type d -name 'spark-warehouse' -exec rm -rf {} +;
@@ -110,10 +113,16 @@ version:
 	@grep __version__ setup.py | head -1 | cut -d \" -f2 | cut -d \' -f2 > .version
 	@cat .version
 
+.PHONY: commit-hash
+## dump latest commit hash into .commit_has file and show
+commit-hash:
+	@git rev-parse HEAD > .commit_hash
+	@cat .commit_hash
+
 .PHONY: package-name
 ## dump package name into .package_name file and show
 package-name:
-	@grep __package_name__ setup.py | head -1 | cut -d \" -f2 | cut -d \' -f2 > .package_name
+	@grep __package_name__ setup.py | head -1 | cut -d \" -f2 | cut -d \' -f2 | sed 's/.*/&${build}/' > .package_name
 	@cat .package_name
 
 .PHONY: repository-url
@@ -134,7 +143,7 @@ package:
 .PHONY: publish
 ## publishes quintoandar-butterfree package wheel to quintoandar's private package server
 publish:
-	@bash ./publish.sh
+	@bash ./publish.sh ${build}
 
 .DEFAULT_GOAL := help
 
