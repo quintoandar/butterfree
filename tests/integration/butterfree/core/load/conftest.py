@@ -2,7 +2,7 @@ from pyspark import SparkContext
 from pyspark.sql import session
 from pytest import fixture
 
-from butterfree.core.constant import columns
+from butterfree.core.constants import columns
 from butterfree.core.transform import FeatureSet
 from butterfree.core.transform.features import Feature, KeyFeature, TimestampFeature
 
