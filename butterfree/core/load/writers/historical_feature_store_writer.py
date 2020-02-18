@@ -24,28 +24,27 @@ class HistoricalFeatureStoreWriter(Writer):
     Example:
         Simple example regarding HistoricalFeatureStoreWriter class instantiation.
         We can instantiate this class without db configurations, so the class get the
-        S3Config() where it's default configurations about AWS S3 service.
+        S3Config() where it provides default configurations about AWS S3 service.
     >>> writer = HistoricalFeatureStoreWriter()
     >>> writer.write()
 
-        However, we can define the db configurations and provide
-        to HistoricalFeatureStoreWriter.
-    >>> writer = HistoricalFeatureStoreWriter(
-        ...   db_config=S3Config(database="feature_set",
-        ...                      mode="append",
-        ...                      format_="csv",
-        ...                      path="s3a://feature-store/",
-        ...                      partition_by= "partition__year"))
+        However, we can define the db configurations (write mode, file format and S3 bucket)
+        and provide them to HistoricalFeatureStoreWriter.
+    >>> config = S3Config(bucket="wonka.s3.forno.data.quintoandar.com.br",
+        ...               mode="append",
+        ...               format_="parquet")
+
+    >>> writer = HistoricalFeatureStoreWriter(db_config=config)
     >>> writer.write()
         For what settings you can use on S3Config and default settings,
         to read S3Config class.
 
-        We can instantiate this class to validate write job,
-        you will use the same configurations.
+        We can instantiate HistoricalFeatureStoreWriter class to validate the writers,
+        using the default or custom configs.
     >>> writer = HistoricalFeatureStoreWriter()
     >>> writer.validate()
 
-        These both methods (writer and validate) will need the Spark Client,
+        Both methods (writer and validate) will need the Spark Client,
         Feature Set and DataFrame, to write or to validate, according to
         HistoricalFeatureStoreWriter class arguments.
     """
