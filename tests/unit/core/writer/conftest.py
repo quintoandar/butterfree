@@ -3,6 +3,7 @@ from pyspark.sql import session
 from pyspark.sql.types import StringType, StructField, StructType
 from pytest import fixture
 
+from butterfree.core.constant import columns
 from butterfree.core.constant.columns import TIMESTAMP_COLUMN
 from butterfree.core.db.configs import CassandraConfig
 from butterfree.core.transform import FeatureSet
@@ -57,33 +58,33 @@ def historical_feature_set_dataframe():
             "feature": 100,
             "id": 1,
             TIMESTAMP_COLUMN: "2019-12-31",
-            "partition__year": 2019,
-            "partition__month": 12,
-            "partition__day": 31,
+            columns.PARTITION_YEAR: 2019,
+            columns.PARTITION_MONTH: 12,
+            columns.PARTITION_DAY: 31,
         },
         {
             "id": 2,
             TIMESTAMP_COLUMN: "2019-12-31",
             "feature": 200,
-            "partition__year": 2019,
-            "partition__month": 12,
-            "partition__day": 31,
+            columns.PARTITION_YEAR: 2019,
+            columns.PARTITION_MONTH: 12,
+            columns.PARTITION_DAY: 31,
         },
         {
             "id": 1,
             TIMESTAMP_COLUMN: "2020-01-15",
             "feature": 110,
-            "partition__year": 2020,
-            "partition__month": 1,
-            "partition__day": 15,
+            columns.PARTITION_YEAR: 2020,
+            columns.PARTITION_MONTH: 1,
+            columns.PARTITION_DAY: 15,
         },
         {
             "id": 1,
             TIMESTAMP_COLUMN: "2020-02-01",
             "feature": 120,
-            "partition__year": 2020,
-            "partition__month": 2,
-            "partition__day": 1,
+            columns.PARTITION_YEAR: 2020,
+            columns.PARTITION_MONTH: 2,
+            columns.PARTITION_DAY: 1,
         },
     ]
     return spark.read.json(sc.parallelize(data, 1))

@@ -6,7 +6,8 @@ from pyspark.sql.dataframe import DataFrame
 from pyspark.sql.functions import dayofmonth, month, year
 
 from butterfree.core.client import SparkClient
-from butterfree.core.constant.columns import TIMESTAMP_COLUMN
+from butterfree.core.configs import environment
+from butterfree.core.constant import columns
 from butterfree.core.dataframe.verify_dataframe import VerifyDataframe
 from butterfree.core.db.configs import S3Config
 from butterfree.core.transform import FeatureSet
@@ -22,8 +23,17 @@ class HistoricalFeatureStoreWriter(Writer):
 
     """
 
-    def __init__(self, db_config=None):
+    PARTITION_BY = [
+        columns.PARTITION_YEAR,
+        columns.PARTITION_MONTH,
+        columns.PARTITION_DAY,
+    ]
+
+    def __init__(self, db_config=None, database=None):
         self.db_config = db_config or S3Config()
+        self.database = database or environment.get_variable(
+            "FEATURE_STORE_HISTORICAL_DATABASE"
+        )
 
     def write(
         self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient
@@ -36,9 +46,7 @@ class HistoricalFeatureStoreWriter(Writer):
             spark_client: client for spark connections with external services.
 
         """
-        s3_path = os.path.join(
-            self.db_config.path, "historical", feature_set.entity, feature_set.name
-        )
+        s3_key = os.path.join("historical", feature_set.entity, feature_set.name)
 
         validate_dataframe = VerifyDataframe(dataframe)
         validate_dataframe.checks()
@@ -46,12 +54,10 @@ class HistoricalFeatureStoreWriter(Writer):
 
         spark_client.write_table(
             dataframe=dataframe,
-            database=self.db_config.database,
+            database=self.database,
             table_name=feature_set.name,
-            format_=self.db_config.format_,
-            mode=self.db_config.mode,
-            partition_by=self.db_config.partition_by,
-            path=s3_path,
+            partition_by=self.PARTITION_BY,
+            **self.db_config.get_options(s3_key),
         )
 
     def validate(
@@ -65,26 +71,31 @@ class HistoricalFeatureStoreWriter(Writer):
             spark_client: client for spark connections with external services.
 
         Returns:
-            False: fail validation.
-            True: success validation.
+            Boolean indicating count of written data matches count in current feature
+                set dataframe.
 
         """
-        table_name = "{}.{}".format(self.db_config.database, feature_set.name)
+        table_name = "{}.{}".format(self.database, feature_set.name)
         query_format_string = "SELECT COUNT(1) as row FROM {}"
         query_count = query_format_string.format(table_name)
 
-        feature_store = spark_client.sql(query=query_count).collect().pop()["row"]
+        written_count = spark_client.sql(query=query_count).collect().pop()["row"]
+        dataframe_count = dataframe.count()
 
-        dataframe = dataframe.count()
-
-        return True if feature_store == dataframe else False
+        return written_count == dataframe_count
 
     @staticmethod
     def _create_partitions(dataframe):
-        dataframe = (
-            dataframe.withColumn("partition__year", year(dataframe[TIMESTAMP_COLUMN]))
-            .withColumn("partition__month", month(dataframe[TIMESTAMP_COLUMN]))
-            .withColumn("partition__day", dayofmonth(dataframe[TIMESTAMP_COLUMN]))
+        # create year partition column
+        dataframe = dataframe.withColumn(
+            columns.PARTITION_YEAR, year(dataframe[columns.TIMESTAMP_COLUMN])
         )
-
+        # create month partition column
+        dataframe = dataframe.withColumn(
+            columns.PARTITION_MONTH, month(dataframe[columns.TIMESTAMP_COLUMN])
+        )
+        # create day partition column
+        dataframe = dataframe.withColumn(
+            columns.PARTITION_DAY, dayofmonth(dataframe[columns.TIMESTAMP_COLUMN])
+        )
         return dataframe

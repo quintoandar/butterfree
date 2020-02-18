@@ -38,37 +38,15 @@ class TestS3Config:
         # then
         assert s3_config.format_ == format_
 
-    def test_path(self, s3_config):
+    def test_bucket(self, s3_config):
         # expecting
-        default = f"s3a://{environment.get_variable('FEATURE_STORE_S3_BUCKET')}"
-        assert s3_config.path == default
+        default = environment.get_variable("FEATURE_STORE_S3_BUCKET")
+        assert s3_config.bucket == default
 
-    def test_path_custom(self, s3_config):
+    def test_bucket_custom(self, s3_config):
         # given
-        path = "local/butterfree"
-        s3_config.path = path
+        bucket = "test"
+        s3_config.bucket = bucket
 
         # then
-        assert s3_config.path == path
-
-    def test_partition_by(self, s3_config):
-        # expecting
-        default = [
-            "partition__year",
-            "partition__month",
-            "partition__day",
-        ]
-        assert s3_config.partition_by == default
-
-        # given
-        s3_config.partition_by = None
-        # then
-        assert s3_config.partition_by == default
-
-    def test_partition_by_custom(self, s3_config):
-        # given
-        partition_by = "ts_column"
-        s3_config.partition_by = partition_by
-
-        # then
-        assert s3_config.partition_by == partition_by
+        assert s3_config.bucket == bucket
