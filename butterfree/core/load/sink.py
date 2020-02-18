@@ -4,9 +4,9 @@ from typing import List
 
 from pyspark.sql.dataframe import DataFrame
 
-from butterfree.core.client import SparkClient
+from butterfree.core.clients import SparkClient
+from butterfree.core.load.writers.writer import Writer
 from butterfree.core.transform import FeatureSet
-from butterfree.core.writer.writer import Writer
 
 
 class Sink:

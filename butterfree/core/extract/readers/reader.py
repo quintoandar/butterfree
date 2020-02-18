@@ -6,7 +6,7 @@ from typing import Callable, List
 
 from pyspark.sql import DataFrame
 
-from butterfree.core.client import SparkClient
+from butterfree.core.clients import SparkClient
 
 
 class Reader(ABC):

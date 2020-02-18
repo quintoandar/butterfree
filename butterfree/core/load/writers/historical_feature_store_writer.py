@@ -5,13 +5,13 @@ import os
 from pyspark.sql.dataframe import DataFrame
 from pyspark.sql.functions import dayofmonth, month, year
 
-from butterfree.core.client import SparkClient
+from butterfree.core.clients import SparkClient
 from butterfree.core.configs import environment
-from butterfree.core.constant import columns
-from butterfree.core.dataframe.verify_dataframe import VerifyDataframe
-from butterfree.core.db.configs import S3Config
+from butterfree.core.configs.db import S3Config
+from butterfree.core.constants import columns
+from butterfree.core.load.writers.writer import Writer
 from butterfree.core.transform import FeatureSet
-from butterfree.core.writer.writer import Writer
+from butterfree.core.validations.validate_dataframe import ValidateDataframe
 
 
 class HistoricalFeatureStoreWriter(Writer):
@@ -48,7 +48,7 @@ class HistoricalFeatureStoreWriter(Writer):
         """
         s3_key = os.path.join("historical", feature_set.entity, feature_set.name)
 
-        validate_dataframe = VerifyDataframe(dataframe)
+        validate_dataframe = ValidateDataframe(dataframe)
         validate_dataframe.checks()
         dataframe = self._create_partitions(dataframe)
 

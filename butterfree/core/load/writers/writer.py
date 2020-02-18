@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 
 from pyspark.sql.dataframe import DataFrame
 
-from butterfree.core.client import SparkClient
+from butterfree.core.clients import SparkClient
 from butterfree.core.transform import FeatureSet
 
 

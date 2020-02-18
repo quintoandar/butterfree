@@ -5,11 +5,11 @@ from typing import Any, List
 from pyspark.sql import DataFrame, Window
 from pyspark.sql.functions import col, row_number
 
-from butterfree.core.client import SparkClient
-from butterfree.core.constant.columns import TIMESTAMP_COLUMN
-from butterfree.core.db.configs import CassandraConfig
+from butterfree.core.clients import SparkClient
+from butterfree.core.configs.db import CassandraConfig
+from butterfree.core.constants.columns import TIMESTAMP_COLUMN
+from butterfree.core.load.writers.writer import Writer
 from butterfree.core.transform import FeatureSet
-from butterfree.core.writer.writer import Writer
 
 
 class OnlineFeatureStoreWriter(Writer):

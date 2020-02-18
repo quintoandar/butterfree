@@ -1,7 +1,7 @@
 """Holds configurations to read and write with Spark to Cassandra DB."""
 
 from butterfree.core.configs import environment
-from butterfree.core.db.configs.abstract_config import AbstractWriteConfig
+from butterfree.core.configs.db.abstract_config import AbstractWriteConfig
 
 
 class CassandraConfig(AbstractWriteConfig):

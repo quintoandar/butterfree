@@ -2,8 +2,8 @@
 
 from pyspark.sql import DataFrame
 
-from butterfree.core.client import SparkClient
-from butterfree.core.reader.reader import Reader
+from butterfree.core.clients import SparkClient
+from butterfree.core.extract.readers.reader import Reader
 
 
 class TableReader(Reader):

@@ -7,7 +7,7 @@ from parameters_validation import non_blank
 from pyspark.sql import DataFrame, functions
 from pyspark.sql.window import Window
 
-from butterfree.core.constant.columns import TIMESTAMP_COLUMN
+from butterfree.core.constants.columns import TIMESTAMP_COLUMN
 from butterfree.core.transform.transformations.transform_component import (
     TransformComponent,
 )

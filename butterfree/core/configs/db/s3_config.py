@@ -3,7 +3,7 @@
 import os
 
 from butterfree.core.configs import environment
-from butterfree.core.db.configs.abstract_config import AbstractWriteConfig
+from butterfree.core.configs.db.abstract_config import AbstractWriteConfig
 
 
 class S3Config(AbstractWriteConfig):

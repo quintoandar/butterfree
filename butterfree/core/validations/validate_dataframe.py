@@ -1,10 +1,10 @@
 """Check dataframe's informations to write in Loader."""
 from pyspark.sql.dataframe import DataFrame
 
-from butterfree.core.constant.columns import TIMESTAMP_COLUMN
+from butterfree.core.constants.columns import TIMESTAMP_COLUMN
 
 
-class VerifyDataframe:
+class ValidateDataframe:
     """Validate dataframe before to save.
 
     Attributes:
@@ -22,11 +22,11 @@ class VerifyDataframe:
             ValueError: if any of the verifications fail
 
         """
-        self.verify_df_is_spark_df()
-        self.verify_column_ts()
-        self.verify_df_is_empty()
+        self.validate_df_is_spark_df()
+        self.validate_column_ts()
+        self.validate_df_is_empty()
 
-    def verify_column_ts(self):
+    def validate_column_ts(self):
         """Check dataframe's ts column.
 
         Raises:
@@ -36,7 +36,7 @@ class VerifyDataframe:
         if TIMESTAMP_COLUMN not in self.dataframe.columns:
             raise ValueError(f"DataFrame must have a '{TIMESTAMP_COLUMN}' column.")
 
-    def verify_df_is_empty(self):
+    def validate_df_is_empty(self):
         """Check dataframe emptiness.
 
         Raises:
@@ -46,7 +46,7 @@ class VerifyDataframe:
         if self.dataframe.rdd.isEmpty():
             raise ValueError("DataFrame can't be empty.")
 
-    def verify_df_is_spark_df(self):
+    def validate_df_is_spark_df(self):
         """Check type of dataframe object.
 
         Raises:
