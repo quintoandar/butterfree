@@ -1,6 +1,7 @@
-import json
 from unittest.mock import Mock
 
+from pyspark import SparkContext
+from pyspark.sql import session
 from pytest import fixture
 
 from butterfree.core.constants.columns import TIMESTAMP_COLUMN
@@ -8,7 +9,15 @@ from butterfree.core.constants.data_type import DataType
 from butterfree.core.transform.features import Feature, KeyFeature, TimestampFeature
 
 
-def make_dataframe(spark_context, spark_session):
+def base_spark():
+    sc = SparkContext.getOrCreate()
+    spark = session.SparkSession(sc)
+
+    return sc, spark
+
+
+def make_dataframe():
+    sc, spark = base_spark()
     data = [
         {
             "id": 1,
@@ -39,100 +48,45 @@ def make_dataframe(spark_context, spark_session):
             "nonfeature": 0,
         },
     ]
-    df = spark_session.read.json(spark_context.parallelize(data, 1))
+    df = spark.read.json(sc.parallelize(data, 1))
     df = df.withColumn(TIMESTAMP_COLUMN, df.ts.cast(DataType.TIMESTAMP.value))
 
     return df
 
 
-def make_filtering_dataframe(spark_context, spark_session):
-    data = [
-        {"id": 1, "ts": 1, "feature1": 0, "feature2": None, "feature3": 1},
-        {"id": 1, "ts": 2, "feature1": 0, "feature2": 1, "feature3": 1},
-        {"id": 1, "ts": 3, "feature1": None, "feature2": None, "feature3": None},
-        {"id": 1, "ts": 4, "feature1": 0, "feature2": 1, "feature3": 1},
-        {"id": 1, "ts": 5, "feature1": 0, "feature2": 1, "feature3": 1},
-        {"id": 1, "ts": 6, "feature1": None, "feature2": None, "feature3": None},
-        {"id": 1, "ts": 7, "feature1": None, "feature2": None, "feature3": None},
-    ]
-    df = spark_session.read.json(
-        spark_context.parallelize(data).map(lambda x: json.dumps(x))
-    )
-    df = df.withColumn(TIMESTAMP_COLUMN, df.ts.cast(DataType.TIMESTAMP.value))
-
-    return df
-
-
-def make_fs(spark_context, spark_session):
-    df = make_dataframe(spark_context, spark_session)
-    df = (
+def make_fs():
+    df = make_dataframe()
+    return (
         df.withColumn("add", df.feature1 + df.feature2)
         .withColumn("divide", df.feature1 / df.feature2)
         .select("id", TIMESTAMP_COLUMN, "add", "divide")
     )
 
-    return df
+
+@fixture
+def dataframe():
+    return make_dataframe()
 
 
 @fixture
-def dataframe(spark_context, spark_session):
-    return make_dataframe(spark_context, spark_session)
+def feature_set_dataframe():
+    return make_fs()
 
 
 @fixture
-def feature_set_dataframe(spark_context, spark_session):
-    return make_fs(spark_context, spark_session)
-
-
-@fixture
-def filtering_dataframe(spark_context, spark_session):
-    return make_filtering_dataframe(spark_context, spark_session)
-
-
-@fixture
-def feature_add(spark_context, spark_session):
+def feature_add():
     fadd = Mock(spec=Feature)
     fadd.get_output_columns = Mock(return_value=["add"])
-    fadd.transform = Mock(return_value=make_fs(spark_context, spark_session))
+    fadd.transform = Mock(return_value=make_fs())
     return fadd
 
 
 @fixture
-def feature_divide(spark_context, spark_session):
+def feature_divide():
     fdivide = Mock(spec=Feature)
     fdivide.get_output_columns = Mock(return_value=["divide"])
-    fdivide.transform = Mock(return_value=make_fs(spark_context, spark_session))
+    fdivide.transform = Mock(return_value=make_fs())
     return fdivide
-
-
-@fixture
-def feature1(spark_context, spark_session):
-    feature1 = Mock(spec=Feature)
-    feature1.get_output_columns = Mock(return_value=["feature1"])
-    feature1.transform = Mock(
-        return_value=make_filtering_dataframe(spark_context, spark_session)
-    )
-    return feature1
-
-
-@fixture
-def feature2(spark_context, spark_session):
-    feature2 = Mock(spec=Feature)
-    feature2.get_output_columns = Mock(return_value=["feature2"])
-    feature2.transform = Mock(
-        return_value=make_filtering_dataframe(spark_context, spark_session)
-    )
-    return feature2
-
-
-@fixture
-def feature3(spark_context, spark_session):
-    feature3 = Mock(spec=Feature)
-    feature3.get_output_columns = Mock(return_value=["feature3"])
-    feature3.transform = Mock(
-        return_value=make_filtering_dataframe(spark_context, spark_session)
-    )
-    return feature3
 
 
 @fixture
