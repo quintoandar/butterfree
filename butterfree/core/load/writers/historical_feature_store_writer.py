@@ -50,9 +50,7 @@ class HistoricalFeatureStoreWriter(Writer):
 
         validate_dataframe = ValidateDataframe(dataframe)
         validate_dataframe.checks()
-        dataframe = self._create_partitions(dataframe).repartition(
-            *self.db_config.partition_by
-        )
+        dataframe = self._create_partitions(dataframe).repartition(*self.PARTITION_BY)
 
         spark_client.write_table(
             dataframe=dataframe,
