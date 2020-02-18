@@ -5,7 +5,7 @@ from typing import List
 from pyspark.sql import DataFrame
 from pyspark.sql.functions import col
 
-from butterfree.core.constant.data_type import DataType
+from butterfree.core.constants.data_type import DataType
 from butterfree.core.transform.transformations import TransformComponent
 
 

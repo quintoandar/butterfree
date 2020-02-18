@@ -1,1 +1,1 @@
-"""Holds general configurations for butterfree."""
+"""Holds configuration/setup for Butterfree components."""

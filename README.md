@@ -15,13 +15,14 @@ More about this idea later :smile:
 ## Creating your first feature set
 
 ```python
-from butterfree.core.feature_set_pipeline import FeatureSetPipeline
-from butterfree.core.reader import Source, TableReader
+from butterfree.core.pipelines.feature_set_pipeline import FeatureSetPipeline
+from butterfree.core.extract import Source
+from butterfree.core.extract.readers import TableReader
 from butterfree.core.transform import FeatureSet
 from butterfree.core.transform.features import Feature, KeyFeature, TimestampFeature
 from butterfree.core.transform.transformations import AggregatedTransform
-from butterfree.core.writer import (
-    Sink,
+from butterfree.core.load import Sink
+from butterfree.core.load.writers import (
     HistoricalFeatureStoreWriter,
     OnlineFeatureStoreWriter,
 )
