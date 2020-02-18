@@ -5,16 +5,18 @@ from pyspark.sql import DataFrame
 from pyspark.sql import functions as F
 
 from butterfree.core.configs import environment
-from butterfree.core.constant.columns import TIMESTAMP_COLUMN
-from butterfree.core.feature_set_pipeline import FeatureSetPipeline
-from butterfree.core.reader import Source, TableReader
+from butterfree.core.constants.columns import TIMESTAMP_COLUMN
+from butterfree.core.extract import Source
+from butterfree.core.extract.readers import TableReader
+from butterfree.core.load import Sink
+from butterfree.core.load.writers import HistoricalFeatureStoreWriter
+from butterfree.core.pipelines.feature_set_pipeline import FeatureSetPipeline
 from butterfree.core.transform import FeatureSet
 from butterfree.core.transform.features import Feature, KeyFeature, TimestampFeature
 from butterfree.core.transform.transformations import (
     AggregatedTransform,
     CustomTransform,
 )
-from butterfree.core.writer import HistoricalFeatureStoreWriter, Sink
 
 
 def create_temp_view(dataframe: DataFrame, name):

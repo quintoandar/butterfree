@@ -3,9 +3,9 @@ from pyspark.sql import session
 from pyspark.sql.types import StringType, StructField, StructType
 from pytest import fixture
 
-from butterfree.core.constant import columns
-from butterfree.core.constant.columns import TIMESTAMP_COLUMN
-from butterfree.core.db.configs import CassandraConfig
+from butterfree.core.configs.db import CassandraConfig
+from butterfree.core.constants import columns
+from butterfree.core.constants.columns import TIMESTAMP_COLUMN
 from butterfree.core.transform import FeatureSet
 from butterfree.core.transform.features import Feature, KeyFeature, TimestampFeature
 
