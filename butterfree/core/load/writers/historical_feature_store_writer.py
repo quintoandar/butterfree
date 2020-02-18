@@ -28,7 +28,8 @@ class HistoricalFeatureStoreWriter(Writer):
     >>> writer = HistoricalFeatureStoreWriter()
     >>> writer.write()
 
-        However, we can define the db configurations (write mode, file format and S3 bucket)
+        However, we can define the db configurations,
+        like write mode, file format and S3 bucket,
         and provide them to HistoricalFeatureStoreWriter.
     >>> config = S3Config(bucket="wonka.s3.forno.data.quintoandar.com.br",
         ...               mode="append",
