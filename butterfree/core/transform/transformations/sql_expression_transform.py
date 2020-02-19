@@ -17,7 +17,12 @@ class SQLExpressionTransform(TransformComponent):
         expression: SQL expression defined by the user.
 
     Example:
-        It's necessary to declare the custom SQL query.
+        It's necessary to declare the custom SQL query, such that it
+        corresponds to operations between existing columns in the dataframe.
+        Besides, the usage of SparkSQL functions is also allowed. Finally,
+        a "complete select statement", such as "select col_a * col_b from
+        my_table", is not necessary, just the simple operations are
+        required, for instance "col_a / col_b" or "col_a * col_b".
         >>> from butterfree.core.transform.features import Feature
         >>> from butterfree.core.transform.transformations import SQLExpressionTransform
         >>> from pyspark import SparkContext
