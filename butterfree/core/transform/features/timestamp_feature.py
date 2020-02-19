@@ -73,6 +73,5 @@ class TimestampFeature(Feature):
             dataframe = dataframe.withColumn(
                 column_name, to_timestamp(dataframe[column_name], self.mask)
             )
-        dataframe = super().transform(dataframe)
 
-        return dataframe
+        return super().transform(dataframe)
