@@ -27,9 +27,10 @@ class AggregatedTransform(TransformComponent):
         time_column: timestamp column to be use as sorting reference.
 
     Example:
-        It's necessary to declare the desired aggregation method, (average and
-        standard deviation are currently supported), the partition column,
-        choose both window lenght and time unit and, finally, define the mode.
+        It's necessary to declare the desired aggregation method, (average,
+        standard deviation and count are currently supported, as it can be
+        seen in __ALLOWED_AGGREGATIONS), the partition column, choose both
+        window lenght and time unit and, finally, define the mode.
         >>> from butterfree.core.transform.transformations import AggregatedTransform
         >>> from butterfree.core.transform.features import Feature
         >>> from pyspark import SparkContext
@@ -74,7 +75,7 @@ class AggregatedTransform(TransformComponent):
         +---+-------------------+---------------------------------------+
         | id|          timestamp|feature__avg_over_1_day_rolling_windows|
         +---+-------------------+---------------------------------------+
-        |  1|2016-04-12 00:00:00|                                  350.0|
+        |  1|2016-04-11 21:00:00|                                  350.0|
         +---+-------------------+---------------------------------------+
 
         It's important to notice that rolling_windows mode affects the
