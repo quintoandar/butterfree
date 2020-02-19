@@ -24,7 +24,10 @@ class Source:
 
     Example:
         Simple example regarding Source class instantiation.
-    >>> from butterfree.core.reader import TableReader, FileReader, Source
+    >>> from butterfree.core.extract import Source
+    >>> from butterfree.core.extract.readers import TableReader, FileReader
+    >>> from butterfree.core.clients import SparkClient
+    >>> spark_client = SparkClient()
     >>> source = Source(
     ...    readers=[
     ...        TableReader(
@@ -38,7 +41,7 @@ class Source:
     ...    f"from table_reader_id a "
     ...    f"inner join file_reader_id b on a.id = b.id ",
     ...)
-    >>> source.construct()
+    >>> df = source.construct(spark_client)
 
         This last method will use the Spark Client, as default, to create
         temporary views regarding each reader and, after, will run the
