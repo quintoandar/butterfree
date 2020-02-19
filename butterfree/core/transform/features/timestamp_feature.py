@@ -1,4 +1,6 @@
 """TimestampFeature entity."""
+from pyspark.sql import DataFrame
+from pyspark.sql.functions import from_unixtime, to_timestamp
 
 from butterfree.core.constants.columns import TIMESTAMP_COLUMN
 from butterfree.core.constants.data_type import DataType
@@ -28,11 +30,18 @@ class TimestampFeature(Feature):
             is given. But a timestamp can be derived from multiple columns, like
             year, month and day, for example. The transformation must always
             handle naming and typing.
+        from_ms: true if timestamp column presents milliseconds time unit. A
+        conversion is then performed.
+        mask: specified timestamp format by the user.
 
     """
 
     def __init__(
-        self, from_column: str = None, transformation: TransformComponent = None
+        self,
+        from_column: str = None,
+        transformation: TransformComponent = None,
+        from_ms: bool = False,
+        mask: str = None,
     ) -> None:
         description = "Time tag for the state of all features."
         super(TimestampFeature, self).__init__(
@@ -42,3 +51,27 @@ class TimestampFeature(Feature):
             dtype=DataType.TIMESTAMP,
             transformation=transformation,
         )
+        self.from_ms = from_ms
+        self.mask = mask
+
+    def transform(self, dataframe: DataFrame) -> DataFrame:
+        """Performs a transformation to the feature pipeline.
+
+        Args:
+            dataframe: input dataframe for the transformation.
+
+        Returns:
+            Transformed dataframe.
+        """
+        column_name = self.from_column if self.from_column else self.name
+
+        if self.from_ms:
+            dataframe = dataframe.withColumn(
+                column_name, from_unixtime(dataframe[column_name] / 1000.0)
+            )
+        if self.mask:
+            dataframe = dataframe.withColumn(
+                column_name, to_timestamp(dataframe[column_name], self.mask)
+            )
+
+        return super().transform(dataframe)

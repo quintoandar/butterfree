@@ -11,7 +11,11 @@ def sc():
 
 @pytest.fixture()
 def spark(sc):
-    return session.SparkSession(sc)
+    return (
+        session.SparkSession(sc)
+        .builder.config("spark.sql.session.timeZone", "UTC")
+        .getOrCreate()
+    )
 
 
 @pytest.fixture()
