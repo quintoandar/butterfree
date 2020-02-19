@@ -6,8 +6,8 @@ from butterfree.core.transform.features import Feature
 from butterfree.core.transform.transformations import CustomTransform
 
 
-def divide(df, fs, column1, column2):
-    name = fs.get_output_columns()[0]
+def divide(df, parent_feature, column1, column2):
+    name = parent_feature.get_output_columns()[0]
     df = df.withColumn(name, F.col(column1) / F.col(column2))
     return df
 
