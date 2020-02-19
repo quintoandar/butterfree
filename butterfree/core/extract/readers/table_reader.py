@@ -16,16 +16,27 @@ class TableReader(Reader):
 
     Example:
         Simple example regarding TableReader class instantiation.
-    >>> from butterfree.core.reader.table_reader import TableReader
+    >>> from butterfree.core.extract.readers import TableReader
+    >>> from butterfree.core.clients import SparkClient
+    >>> from butterfree.core.extract.pre_processing import filter
+    >>> spark_client = SparkClient()
     >>> table_reader = TableReader(
     ...                     id="table_reader_id",
     ...                     database="table_reader_db",
     ...                     table="table_reader_table"
     ...                )
-    >>> table_reader.consume()
+    >>> df = table_reader.consume(spark_client)
 
         This last method will use the Spark Client, as default, to read
-        the desired table, regarding TableReader class arguments.
+        the desired table, loading data into a dataframe, according to
+        TableReader class arguments.
+
+        It's also possible to define simple transformations within the
+        reader's scope:
+    >>> table_reader.with_(filter, condition="year = 2019").build(spark_client)
+
+        In this case, however, a temp view will be created, cointaining
+        the transformed data.
 
     """
 
