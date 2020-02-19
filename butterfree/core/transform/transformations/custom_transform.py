@@ -17,8 +17,10 @@ class CustomTransform(TransformComponent):
         **kwargs: kwargs for the transformer
 
     Example:
-        It's necessary to declare the desired custom method and
-        its arguments.
+        It's necessary to instantiate the CustomTransform class using
+        a custom method that must always receive a dataframe and the
+        parent feature as arguments and the custom arguments must be
+        passed to the builder through *kwargs.
         >>> from butterfree.core.transform.transformations import CustomTransform
         >>> from butterfree.core.transform.features import Feature
         >>> from pyspark import SparkContext
@@ -31,9 +33,9 @@ class CustomTransform(TransformComponent):
         ...                             (1, "2016-04-11 11:46:24", 400, 400),
         ...                             (1, "2016-04-11 12:03:21", 500, 500)]
         ...                           ).toDF("id", "timestamp", "feature1", "feature2")
-        >>> def divide(df, name, column1, column2):
-        ...     name = fs.get_output_columns()[0]
-        ...     df = df.withColumn("name", F.col(column1) / F.col(column2))
+        >>> def divide(df, parent_feature, column1, column2):
+        ...     name = parent_feature.get_output_columns()[0]
+        ...     df = df.withColumn(name, F.col(column1) / F.col(column2))
         ...     return df
         >>> feature = Feature(
         ...    name="feature",
