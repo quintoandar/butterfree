@@ -25,29 +25,43 @@ class HistoricalFeatureStoreWriter(Writer):
         Simple example regarding HistoricalFeatureStoreWriter class instantiation.
         We can instantiate this class without db configurations, so the class get the
         S3Config() where it provides default configurations about AWS S3 service.
+    >>> spark_client = SparkClient()
     >>> writer = HistoricalFeatureStoreWriter()
-    >>> writer.write()
+    >>> writer.write(feature_set=feature_set,
+       ...           dataframe=dataframe,
+       ...           spark_client=spark_client)
 
         However, we can define the db configurations,
         like write mode, file format and S3 bucket,
         and provide them to HistoricalFeatureStoreWriter.
+    >>> spark_client = SparkClient()
     >>> config = S3Config(bucket="wonka.s3.forno.data.quintoandar.com.br",
         ...               mode="append",
         ...               format_="parquet")
 
     >>> writer = HistoricalFeatureStoreWriter(db_config=config)
-    >>> writer.write()
+    >>> writer.write(feature_set=feature_set,
+       ...           dataframe=dataframe,
+       ...           spark_client=spark_client)
         For what settings you can use on S3Config and default settings,
         to read S3Config class.
 
         We can instantiate HistoricalFeatureStoreWriter class to validate the writers,
         using the default or custom configs.
+    >>> spark_client = SparkClient()
     >>> writer = HistoricalFeatureStoreWriter()
-    >>> writer.validate()
+    >>> writer.validate(feature_set=feature_set,
+       ...              dataframe=dataframe,
+       ...              spark_client=spark_client)
 
         Both methods (writer and validate) will need the Spark Client,
         Feature Set and DataFrame, to write or to validate, according to
         HistoricalFeatureStoreWriter class arguments.
+
+        P.S.: When load, the HistoricalFeatureStoreWrite partitions
+        the data to improving queries performance.
+        The partition are stored in separate folders in AWS S3,
+        and to partition the data based on time (per year, month and day).
     """
 
     PARTITION_BY = [

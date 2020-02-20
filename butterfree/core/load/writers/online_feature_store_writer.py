@@ -23,24 +23,33 @@ class OnlineFeatureStoreWriter(Writer):
         Simple example regarding OnlineFeatureStoreWriter class instantiation.
         We can instantiate this class without db configurations, so the class get the
         CassandraConfig() where it provides default configurations about CassandraDB.
+    >>> spark_client = SparkClient()
     >>> writer = OnlineFeatureStoreWriter()
-    >>> writer.write()
+    >>> writer.write(feature_set=feature_set,
+       ...           dataframe=dataframe,
+       ...           spark_client=spark_client)
 
         However, we can define the db configurations and provide them to
         OnlineFeatureStoreWriter.
+    >>> spark_client = SparkClient()
     >>> config = CassandraConfig(mode="overwrite",
         ...                      format_="parquet",
         ...                      keyspace="keyspace_name")
 
     >>> writer = OnlineFeatureStoreWriter(db_config=config)
-    >>> writer.write()
+    >>> writer.write(feature_set=feature_set,
+       ...           dataframe=dataframe,
+       ...           spark_client=spark_client)
         For what settings you can use on CassandraConfig and default settings,
         to read CassandraConfig class.
 
         We can instantiate OnlineFeatureStoreWriter class to validate the writers,
         using the default or custom configs.
+    >>> spark_client = SparkClient()
     >>> writer = OnlineFeatureStoreWriter()
-    >>> writer.validate()
+    >>> writer.validate(feature_set=feature_set,
+       ...              dataframe=dataframe,
+       ...              spark_client=spark_client)
 
         Both methods (writer and validate) will need the Spark Client,
         Feature Set and DataFrame, to write or to validate,
