@@ -22,7 +22,14 @@ class TestKafkaReader:
         ],
     )
     def test_consume(
-        self, connection_string, topic, topic_options, stream, spark_client, spark, sc,
+        self,
+        connection_string,
+        topic,
+        topic_options,
+        stream,
+        spark_client,
+        spark_context,
+        spark_session,
     ):
         """Test for consume method in KafkaReader class.
 
@@ -37,8 +44,8 @@ class TestKafkaReader:
             {"key": 10101111, "value": 10101111}
         ]  # data gets in binary to spark
         target_data = [{"key": "10101111", "value": "10101111"}]
-        raw_stream_df = spark.read.json(sc.parallelize(raw_data, 1))
-        target_df = spark.read.json(sc.parallelize(target_data, 1))
+        raw_stream_df = spark_session.read.json(spark_context.parallelize(raw_data, 1))
+        target_df = spark_session.read.json(spark_context.parallelize(target_data, 1))
 
         spark_client.read.return_value = raw_stream_df
         kafka_reader = KafkaReader(
