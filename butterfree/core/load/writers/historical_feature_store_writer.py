@@ -84,8 +84,7 @@ class HistoricalFeatureStoreWriter(Writer):
 
         return written_count == dataframe_count
 
-    @staticmethod
-    def _create_partitions(dataframe):
+    def _create_partitions(self, dataframe):
         # create year partition column
         dataframe = dataframe.withColumn(
             columns.PARTITION_YEAR, year(dataframe[columns.TIMESTAMP_COLUMN])
@@ -98,4 +97,6 @@ class HistoricalFeatureStoreWriter(Writer):
         dataframe = dataframe.withColumn(
             columns.PARTITION_DAY, dayofmonth(dataframe[columns.TIMESTAMP_COLUMN])
         )
+        dataframe.repartition(*self.PARTITION_BY)
+
         return dataframe
