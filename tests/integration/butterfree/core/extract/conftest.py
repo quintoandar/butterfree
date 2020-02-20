@@ -1,22 +1,10 @@
 from unittest.mock import Mock
 
 import pytest
-from pyspark import SparkContext
-from pyspark.sql import SparkSession
 
 
 @pytest.fixture()
-def sc():
-    return SparkContext.getOrCreate()
-
-
-@pytest.fixture()
-def spark():
-    return SparkSession.builder.enableHiveSupport().getOrCreate()
-
-
-@pytest.fixture()
-def target_df_table_reader(sc, spark):
+def target_df_table_reader(spark_context, spark_session):
     data = [
         {"id": 1, "feature1": 100},
         {"id": 2, "feature1": 200},
@@ -25,11 +13,11 @@ def target_df_table_reader(sc, spark):
         {"id": 5, "feature1": 500},
         {"id": 6, "feature1": 600},
     ]
-    return spark.read.json(sc.parallelize(data, 1))
+    return spark_session.read.json(spark_context.parallelize(data, 1))
 
 
 @pytest.fixture()
-def target_df_source(sc, spark):
+def target_df_source(spark_context, spark_session):
     data = [
         {"id": 1, "feature1": 100, "feature2": 200},
         {"id": 2, "feature1": 200, "feature2": 400},
@@ -38,7 +26,7 @@ def target_df_source(sc, spark):
         {"id": 5, "feature1": 500, "feature2": 1000},
         {"id": 6, "feature1": 600, "feature2": 1200},
     ]
-    return spark.read.json(sc.parallelize(data, 1))
+    return spark_session.read.json(spark_context.parallelize(data, 1))
 
 
 @pytest.fixture()
