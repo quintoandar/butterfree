@@ -1,24 +1,12 @@
 from unittest.mock import Mock
 
 import pytest
-from pyspark import SparkContext
-from pyspark.sql import session
 
 
 @pytest.fixture()
-def sc():
-    return SparkContext.getOrCreate()
-
-
-@pytest.fixture()
-def spark(sc):
-    return session.SparkSession(sc)
-
-
-@pytest.fixture()
-def target_df(sc, spark):
+def target_df(spark_context, spark_session):
     data = [{"col1": "value", "col2": 123}]
-    return spark.read.json(sc.parallelize(data, 1))
+    return spark_session.read.json(spark_context.parallelize(data, 1))
 
 
 @pytest.fixture()
