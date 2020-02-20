@@ -103,13 +103,21 @@ class TestReader:
         ],
     )
     def test__apply_transformations(
-        self, input_data, transformations, transformed_data, sc, spark, spark_client,
+        self,
+        input_data,
+        transformations,
+        transformed_data,
+        spark_context,
+        spark_session,
+        spark_client,
     ):
         # arrange
         file_reader = FileReader("test", "path/to/file", "format")
         file_reader.transformations = transformations
-        input_df = spark.read.json(sc.parallelize(input_data, 1))
-        target_df = spark.read.json(sc.parallelize(transformed_data, 1))
+        input_df = spark_session.read.json(spark_context.parallelize(input_data, 1))
+        target_df = spark_session.read.json(
+            spark_context.parallelize(transformed_data, 1)
+        )
 
         # act
         result_df = file_reader._apply_transformations(input_df)
@@ -117,19 +125,21 @@ class TestReader:
         # assert
         assert target_df.collect() == result_df.collect()
 
-    def test_build(self, target_df, spark_client, spark):
+    def test_build(self, target_df, spark_client, spark_session):
         # arrange
         file_reader = FileReader("test", "path/to/file", "format")
         spark_client.read.return_value = target_df
 
         # act
         file_reader.build(spark_client)
-        result_df = spark.sql("select * from test")
+        result_df = spark_session.sql("select * from test")
 
         # assert
         assert target_df.collect() == result_df.collect()
 
-    def test_build_with_columns(self, target_df, column_target_df, spark_client, spark):
+    def test_build_with_columns(
+        self, target_df, column_target_df, spark_client, spark_session
+    ):
         # arrange
         file_reader = FileReader("test", "path/to/file", "format")
         spark_client.read.return_value = target_df
@@ -138,7 +148,7 @@ class TestReader:
         file_reader.build(
             client=spark_client, columns=[("col1", "new_col1"), ("col2", "new_col2")],
         )
-        result_df = spark.sql("select * from test")
+        result_df = spark_session.sql("select * from test")
 
         # assert
         assert column_target_df.collect() == result_df.collect()
