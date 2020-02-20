@@ -1,7 +1,5 @@
 from unittest.mock import Mock
 
-from pyspark import SparkContext
-from pyspark.sql import session
 from pytest import fixture
 
 from butterfree.core.constants.columns import TIMESTAMP_COLUMN
@@ -9,15 +7,7 @@ from butterfree.core.constants.data_type import DataType
 from butterfree.core.transform.features import Feature, KeyFeature, TimestampFeature
 
 
-def base_spark():
-    sc = SparkContext.getOrCreate()
-    spark = session.SparkSession(sc)
-
-    return sc, spark
-
-
-def make_dataframe():
-    sc, spark = base_spark()
+def make_dataframe(spark_context, spark_session):
     data = [
         {
             "id": 1,
@@ -48,44 +38,46 @@ def make_dataframe():
             "nonfeature": 0,
         },
     ]
-    df = spark.read.json(sc.parallelize(data, 1))
+    df = spark_session.read.json(spark_context.parallelize(data, 1))
     df = df.withColumn(TIMESTAMP_COLUMN, df.ts.cast(DataType.TIMESTAMP.value))
 
     return df
 
 
-def make_fs():
-    df = make_dataframe()
-    return (
+def make_fs(spark_context, spark_session):
+    df = make_dataframe(spark_context, spark_session)
+    df = (
         df.withColumn("add", df.feature1 + df.feature2)
         .withColumn("divide", df.feature1 / df.feature2)
         .select("id", TIMESTAMP_COLUMN, "add", "divide")
     )
 
-
-@fixture
-def dataframe():
-    return make_dataframe()
+    return df
 
 
 @fixture
-def feature_set_dataframe():
-    return make_fs()
+def dataframe(spark_context, spark_session):
+    return make_dataframe(spark_context, spark_session)
 
 
 @fixture
-def feature_add():
+def feature_set_dataframe(spark_context, spark_session):
+    return make_fs(spark_context, spark_session)
+
+
+@fixture
+def feature_add(spark_context, spark_session):
     fadd = Mock(spec=Feature)
     fadd.get_output_columns = Mock(return_value=["add"])
-    fadd.transform = Mock(return_value=make_fs())
+    fadd.transform = Mock(return_value=make_fs(spark_context, spark_session))
     return fadd
 
 
 @fixture
-def feature_divide():
+def feature_divide(spark_context, spark_session):
     fdivide = Mock(spec=Feature)
     fdivide.get_output_columns = Mock(return_value=["divide"])
-    fdivide.transform = Mock(return_value=make_fs())
+    fdivide.transform = Mock(return_value=make_fs(spark_context, spark_session))
     return fdivide
 
 
