@@ -12,7 +12,7 @@ def pivot(
     group_by_columns: non_blank(List[str]),
     pivot_column: non_blank(str),
     agg_column: non_blank(str),
-    agg: non_null(Callable),
+    aggregation: non_null(Callable),
     mock_value: non_null(object) = None,
     mock_type: non_null(object) = None,
     with_forward_fill: non_null(bool) = False,
@@ -23,9 +23,15 @@ def pivot(
         dataframe: dataframe to be pivoted.
         group_by_columns: list of columns' names to be grouped.
         pivot_column: column to be pivoted.
-        aggregation_expression: desired aggregation to be performed with a column.
-        An example: spark_agg(col_name). See docs for all spark_agg:
+        agg_column: column to be aggregated by pivoted category.
+        aggregation: desired spark aggregation function to be performed.
+            An example: spark_agg(col_name). See docs for all spark_agg:
             https://spark.apache.org/docs/2.3.1/api/python/_modules/pyspark/sql/functions.html
+        mock_value: value used to make a difference between true nulls resulting from
+            the aggregation and empty values from the pivot transformation.
+        mock_type: mock_value data type (compatible with spark).
+        with_forward_fill: applies a forward fill to null values after the pivot
+            operation.
 
     Example:
         >>> dataframe.orderBy("ts", "id", "amenity").show()
@@ -57,7 +63,7 @@ def pivot(
         assumed from previous modifications. In this example, amenity "oven" for the
         id=1 was set to null and "pool" was set to true at ts=4. All other amenities
         should then be kept to their actual state at that ts. To do that, we will use
-        a technique forward fill:
+        a technique called forward fill:
 
         >>> pivoted = pivot(
         ...     dataframe,
@@ -108,20 +114,28 @@ def pivot(
         |  1|  4|   null| false|null| true|
         |  1|  5|   true| false|null| true|
         +---+---+-------+------+----+-----+
+
+        During transformation, this method will cast the agg_column to mock_type
+        data type and fill all "true nulls" with the mock_value. After pivot and forward
+        fill are applied, all new pivoted columns will then return to the original type
+        with all mock values replaced by null.
     """
     agg_column_type = None
     if mock_value is not None:
-        assert mock_type is not None, (
-            "When proving a mock value, users must inform the data type,"
-            " which should be supported by Spark."
-        )
+        if mock_type is None:
+            raise AttributeError(
+                "When proving a mock value, users must inform the data type,"
+                " which should be supported by Spark."
+            )
         agg_column_type = dict(dataframe.dtypes).get(agg_column)
         dataframe = dataframe.withColumn(
             agg_column, functions.col(agg_column).cast(mock_type)
         ).fillna({agg_column: mock_value})
 
     pivoted = (
-        dataframe.groupBy(*group_by_columns).pivot(pivot_column).agg(agg(agg_column))
+        dataframe.groupBy(*group_by_columns)
+        .pivot(pivot_column)
+        .agg(aggregation(agg_column))
     )
 
     new_columns = [c for c in pivoted.columns if c not in group_by_columns]
