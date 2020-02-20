@@ -33,7 +33,7 @@ def compare_dataframes(
 
 class TestSource:
     def test_source(
-        self, target_df_source, target_df_table_reader, spark,
+        self, target_df_source, target_df_table_reader, spark_session,
     ):
         # given
         spark_client = SparkClient()
@@ -44,7 +44,7 @@ class TestSource:
 
         create_temp_view(dataframe=target_df_table_reader, name=table_reader_id)
         create_db_and_table(
-            spark=spark,
+            spark=spark_session,
             table_reader_id=table_reader_id,
             table_reader_db=table_reader_db,
             table_reader_table=table_reader_table,
