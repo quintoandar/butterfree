@@ -6,7 +6,7 @@ from butterfree.core.extract.readers import FileReader
 
 
 class TestFilterDataFrame:
-    def test_filter(self, feature_set_dataframe, spark, sc):
+    def test_filter(self, feature_set_dataframe, spark_context, spark_session):
         # given
         file_reader = FileReader("test", "path/to/file", "format")
 
@@ -22,7 +22,7 @@ class TestFilterDataFrame:
             {"id": 1, TIMESTAMP_COLUMN: 1, "feature": 110, "test": "pass"},
             {"id": 1, TIMESTAMP_COLUMN: 2, "feature": 120, "test": "pass"},
         ]
-        target_df = spark.read.json(sc.parallelize(target_data, 1))
+        target_df = spark_session.read.json(spark_context.parallelize(target_data, 1))
 
         # then
         assert result_df.collect() == target_df.collect()
@@ -31,7 +31,7 @@ class TestFilterDataFrame:
         "condition", [None, 100],
     )
     def test_filter_with_invalidations(
-        self, feature_set_dataframe, condition, spark, sc
+        self, feature_set_dataframe, condition, spark_context, spark_session
     ):
         # given
         file_reader = FileReader("test", "path/to/file", "format")
