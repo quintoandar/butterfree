@@ -26,6 +26,62 @@ class AggregatedTransform(TransformComponent):
         partition: column to be used in window partition.
         time_column: timestamp column to be use as sorting reference.
 
+    Example:
+        It's necessary to declare the desired aggregation method, (average,
+        standard deviation and count are currently supported, as it can be
+        seen in __ALLOWED_AGGREGATIONS), the partition column, choose both
+        window lenght and time unit and, finally, define the mode.
+        >>> from butterfree.core.transform.transformations import AggregatedTransform
+        >>> from butterfree.core.transform.features import Feature
+        >>> from pyspark import SparkContext
+        >>> from pyspark.sql import session
+        >>> sc = SparkContext.getOrCreate()
+        >>> spark = session.SparkSession(sc)
+        >>> df = spark.createDataFrame([(1, "2016-04-11 11:31:11", 200),
+        ...                             (1, "2016-04-11 11:44:12", 300),
+        ...                             (1, "2016-04-11 11:46:24", 400),
+        ...                             (1, "2016-04-11 12:03:21", 500)]
+        ...                           ).toDF("id", "timestamp", "feature")
+        >>> feature_fixed_windows = Feature(
+        ...    name="feature",
+        ...    description="aggregated transform with fixed windows usage example",
+        ...    transformation=AggregatedTransform(
+        ...        aggregations=["avg"],
+        ...        partition="id",
+        ...        windows=["15 minutes"],
+        ...        mode=["fixed_windows"],
+        ...    )
+        ...)
+        >>> feature_fixed_windows.transform(df).orderBy("timestamp").show()
+        +--------+-----------------------+-----------------------------+
+        |feature | id|          timestamp| feature__avg_over_15_minutes|
+        +--------+---+-------------------+-----------------------------+
+        |     200|  1|2016-04-11 11:31:11|                        200.0|
+        |     300|  1|2016-04-11 11:44:12|                        250.0|
+        |     400|  1|2016-04-11 11:46:24|                        350.0|
+        |     500|  1|2016-04-11 12:03:21|                        500.0|
+        +--------+---+-------------------+-----------------------------+
+        >>> feature_rolling_windows = Feature(
+        ...    name="feature",
+        ...    description="aggregated transform with rolling windows usage example",
+        ...    transformation=AggregatedTransform(
+        ...        aggregations=["avg"],
+        ...        partition="id",
+        ...        windows=["1 day"],
+        ...        mode=["rolling_windows"],
+        ...    )
+        ...)
+        >>> feature_rolling_windows.transform(df).orderBy("timestamp").show()
+        +---+-------------------+---------------------------------------+
+        | id|          timestamp|feature__avg_over_1_day_rolling_windows|
+        +---+-------------------+---------------------------------------+
+        |  1|2016-04-11 21:00:00|                                  350.0|
+        +---+-------------------+---------------------------------------+
+
+        It's important to notice that rolling_windows mode affects the
+        dataframe granularity and, as it's possible to see, returns only
+        columns related to its transformation.
+
     """
 
     SLIDE_DURATION = "1 day"
@@ -68,6 +124,7 @@ class AggregatedTransform(TransformComponent):
 
     @aggregations.setter
     def aggregations(self, value: List[str]):
+        """Aggregations definitions to be used in the windows."""
         aggregations = []
         if not value:
             raise ValueError("Aggregations must not be empty.")
@@ -93,6 +150,7 @@ class AggregatedTransform(TransformComponent):
 
     @windows.setter
     def windows(self, windows: List[str]):
+        """Time ranges definitions to be used in the windows."""
         if not windows:
             raise KeyError("Windows must not be empty.")
         if not isinstance(windows, List):
@@ -118,6 +176,7 @@ class AggregatedTransform(TransformComponent):
         self._windows = windows
 
     def _rolling_windows_allowed_duration(self, window):
+        """Allowed rolling windows durations regarding the slide duration."""
         for key in self.__ALLOWED_WINDOWS.keys():
             if window.split()[1] in key and (
                 self.__ALLOWED_WINDOWS[key] * int(window.split()[0])
@@ -141,6 +200,7 @@ class AggregatedTransform(TransformComponent):
 
     @mode.setter
     def mode(self, value: List[str]):
+        """Modes definitions to be used in the windows."""
         modes = []
         if not value:
             raise ValueError("Modes must not be empty.")
@@ -167,6 +227,7 @@ class AggregatedTransform(TransformComponent):
         return self.__ALLOWED_MODES
 
     def _get_feature_name(self, aggregation, window_unit, window_size):
+        """Construct features name based on passed criteria."""
         return (
             f"{self._parent.name}__{aggregation}_over_"
             f"{str(window_size)}_{window_unit}_{self.mode[0]}"
@@ -188,6 +249,7 @@ class AggregatedTransform(TransformComponent):
 
     @staticmethod
     def _window_definition(partition: str, time_column: str, window_span: int):
+        """Defines windows based on passed criteria."""
         w = (
             Window()
             .partitionBy(functions.col(partition))
@@ -206,6 +268,7 @@ class AggregatedTransform(TransformComponent):
     def _fixed_windows_agg(
         self, dataframe: DataFrame, window, feature_name, aggregation
     ):
+        """Returns aggregations for fixed_windows mode."""
         w = self._window_definition(
             partition=f"{self.partition}",
             time_column=f"{self.time_column}",
@@ -226,6 +289,7 @@ class AggregatedTransform(TransformComponent):
         return dataframe
 
     def _dataframe_list_join(self, df_base, df):
+        """Joins a list of passed dataframes base on partition and time columns."""
         return df_base.join(
             df, on=[f"{self.partition}", f"{self.time_column}"], how="full_outer"
         )
@@ -233,6 +297,7 @@ class AggregatedTransform(TransformComponent):
     def _rolling_windows_agg(
         self, dataframe: DataFrame, window, aggregation, feature_name, df_list
     ):
+        """Returns aggregations for rolling_windows mode."""
         df = (
             dataframe.groupBy(
                 f"{self.partition}",

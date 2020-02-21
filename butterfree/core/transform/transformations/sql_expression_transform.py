@@ -15,6 +15,41 @@ class SQLExpressionTransform(TransformComponent):
 
     Attributes:
         expression: SQL expression defined by the user.
+
+    Example:
+        It's necessary to declare the custom SQL query, such that it
+        corresponds to operations between existing columns in the dataframe.
+        Besides, the usage of SparkSQL functions is also allowed. Finally,
+        a "complete select statement", such as "select col_a * col_b from
+        my_table", is not necessary, just the simple operations are
+        required, for instance "col_a / col_b" or "col_a * col_b".
+        >>> from butterfree.core.transform.features import Feature
+        >>> from butterfree.core.transform.transformations import SQLExpressionTransform
+        >>> from pyspark import SparkContext
+        >>> from pyspark.sql import session
+        >>> import pyspark.sql.functions as F
+        >>> sc = SparkContext.getOrCreate()
+        >>> spark = session.SparkSession(sc)
+        >>> df = spark.createDataFrame([(1, "2016-04-11 11:31:11", 200, 200),
+        ...                             (1, "2016-04-11 11:44:12", 300, 300),
+        ...                             (1, "2016-04-11 11:46:24", 400, 400),
+        ...                             (1, "2016-04-11 12:03:21", 500, 500)]
+        ...                           ).toDF("id", "timestamp", "feature1", "feature2")
+        >>> feature = Feature(
+        ...    name="feature",
+        ...    description="SQL expression transform usage example",
+        ...    transformation=SQLExpressionTransform(expression="feature1/feature2"),
+        ...)
+        >>> feature.transform(df).orderBy("timestamp").show()
+        +--------+--------+---+-------------------+----------------------+
+        |feature1|feature2| id|          timestamp|feature1_over_feature2|
+        +--------+--------+---+-------------------+----------------------+
+        |     200|     200|  1|2016-04-11 11:31:11|                   1.0|
+        |     300|     300|  1|2016-04-11 11:44:12|                   1.0|
+        |     400|     400|  1|2016-04-11 11:46:24|                   1.0|
+        |     500|     500|  1|2016-04-11 12:03:21|                   1.0|
+        +--------+--------+---+-------------------+----------------------+
+
     """
 
     def __init__(
