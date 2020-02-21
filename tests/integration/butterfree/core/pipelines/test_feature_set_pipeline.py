@@ -39,14 +39,14 @@ def divide(df, fs, column1, column2):
 
 
 class TestFeatureSetPipeline:
-    def test_feature_set_pipeline(self, mocked_df, spark):
+    def test_feature_set_pipeline(self, mocked_df, spark_session):
         # arrange
         table_reader_id = "a_source"
         table_reader_table = "table"
         table_reader_db = environment.get_variable("FEATURE_STORE_HISTORICAL_DATABASE")
         create_temp_view(dataframe=mocked_df, name=table_reader_id)
         create_db_and_table(
-            spark=spark,
+            spark=spark_session,
             table_reader_id=table_reader_id,
             table_reader_db=table_reader_db,
             table_reader_table=table_reader_table,
@@ -106,7 +106,7 @@ class TestFeatureSetPipeline:
 
         # assert
         path = dbconfig.get_options("historical/entity/feature_set").get("path")
-        df = spark.read.parquet(path).orderBy(TIMESTAMP_COLUMN).collect()
+        df = spark_session.read.parquet(path).orderBy(TIMESTAMP_COLUMN).collect()
 
         assert df[0]["feature1__avg_over_2_minutes_fixed_windows"] == 200
         assert df[1]["feature1__avg_over_2_minutes_fixed_windows"] == 300
