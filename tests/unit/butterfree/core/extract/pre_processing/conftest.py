@@ -14,7 +14,9 @@ def input_df(spark_context, spark_session):
         {"id": 1, "ts": "2016-04-11 12:03:21", "pivot_column": 4, "has_feature": 0},
         {"id": 1, "ts": "2016-04-11 13:46:24", "pivot_column": 3, "has_feature": None},
     ]
-    df = spark_session.read.json(spark_context.parallelize(data).map(lambda x: json.dumps(x)))
+    df = spark_session.read.json(
+        spark_context.parallelize(data).map(lambda x: json.dumps(x))
+    )
     return df
 
 
@@ -34,7 +36,9 @@ def pivot_df(spark_context, spark_session):
             "4": None,
         },
     ]
-    df = spark_session.read.json(spark_context.parallelize(data).map(lambda x: json.dumps(x)))
+    df = spark_session.read.json(
+        spark_context.parallelize(data).map(lambda x: json.dumps(x))
+    )
     return df.orderBy("ts")
 
 
@@ -47,7 +51,9 @@ def pivot_ffill_df(spark_context, spark_session):
         {"id": 1, "ts": "2016-04-11 12:03:21", "1": 1, "2": 0, "3": 1, "4": 0},
         {"id": 1, "ts": "2016-04-11 13:46:24", "1": 1, "2": 0, "3": 1, "4": 0},
     ]
-    df = spark_session.read.json(spark_context.parallelize(data).map(lambda x: json.dumps(x)))
+    df = spark_session.read.json(
+        spark_context.parallelize(data).map(lambda x: json.dumps(x))
+    )
     return df.orderBy("ts")
 
 
@@ -60,7 +66,9 @@ def pivot_ffill_mock_df(spark_context, spark_session):
         {"id": 1, "ts": "2016-04-11 12:03:21", "1": 1, "2": 0, "3": 1, "4": 0},
         {"id": 1, "ts": "2016-04-11 13:46:24", "1": 1, "2": 0, "3": None, "4": 0},
     ]
-    df = spark_session.read.json(spark_context.parallelize(data).map(lambda x: json.dumps(x)))
+    df = spark_session.read.json(
+        spark_context.parallelize(data).map(lambda x: json.dumps(x))
+    )
     return df.orderBy("ts")
 
 
