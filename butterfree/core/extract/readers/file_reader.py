@@ -16,6 +16,30 @@ class FileReader(Reader):
         format_options: additional options required by some formats. Check docs:
             https://spark.apache.org/docs/latest/sql-data-sources-load-save-functions.html#manually-specifying-options
 
+    Example:
+        Simple example regarding FileReader class instantiation.
+    >>> from butterfree.core.extract.readers import FileReader
+    >>> from butterfree.core.clients import SparkClient
+    >>> from butterfree.core.extract.pre_processing import filter
+    >>> spark_client = SparkClient()
+    >>> file_reader = FileReader(
+    ...                 id="file_reader_id",
+    ...                 path="data_path",
+    ...                 format="json"
+    ...               )
+    >>> df = file_reader.consume(spark_client)
+
+        This last method will use the Spark Client, as default, to read
+        the desired file, loading data into a dataframe, according to
+        FileReader class arguments.
+
+        It's also possible to define simple transformations within the
+        reader's scope:
+    >>> file_reader.with_(filter, condition="year = 2019").build(spark_client)
+
+        In this case, however, a temp view will be created, cointaining
+        the transformed data.
+
     """
 
     def __init__(self, id: str, path: str, format: str, format_options: dict = None):

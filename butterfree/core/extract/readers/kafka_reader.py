@@ -18,6 +18,30 @@ class KafkaReader(Reader):
             https://spark.apache.org/docs/latest/structured-streaming-kafka-integration.html.
         stream: flag to indicate the reading mode: stream or batch
 
+    Example:
+        Simple example regarding KafkaReader class instantiation.
+    >>> from butterfree.core.extract.readers import KafkaReader
+    >>> from butterfree.core.clients import SparkClient
+    >>> from butterfree.core.extract.pre_processing import filter
+    >>> spark_client = SparkClient()
+    >>> kafka_reader = KafkaReader(
+    ...                 id="kafka_reader_id",
+    ...                 connection_string="host1:port,host2:port",
+    ...                 topic="topic"
+    ...                )
+    >>> df = kafka_reader.consume(spark_client)
+
+        This last method will use the Spark Client, as default, to read
+        the desired topic, loading data into a dataframe, according to
+        KafkaReader class arguments.
+
+        It's also possible to define simple transformations within the
+        reader's scope:
+    >>> kafka_reader.with_(filter, condition="year = 2019").build(spark_client)
+
+        In this case, however, a temp view will be created, cointaining
+        the transformed data.
+
     """
 
     def __init__(
