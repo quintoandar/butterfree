@@ -4,7 +4,6 @@ from pyspark.sql.functions import col, when
 
 @pytest.fixture()
 def pivot_df(spark_context, spark_session):
-    spark_session.conf.set("spark.sql.session.timeZone", "UTC")
     data = [
         {"id": 1, "ts": "2016-04-11 11:31:11", "pivot_column": 1, "has_feature": 1},
         {"id": 1, "ts": "2016-04-11 11:44:12", "pivot_column": 2, "has_feature": 0},
@@ -18,7 +17,6 @@ def pivot_df(spark_context, spark_session):
 
 @pytest.fixture()
 def target_pivot_df(spark_context, spark_session):
-    spark_session.conf.set("spark.sql.session.timeZone", "UTC")
     data = [
         {"id": 1, "ts": "2016-04-11 11:31:11", "1": 1, "2": None, "3": None, "4": None},
         {"id": 1, "ts": "2016-04-11 11:44:12", "1": 1, "2": 0, "3": None, "4": None},
