@@ -38,52 +38,50 @@ pipeline:
       - git clone https://github.com/quintoandar/python-package-server.git --quiet
       - make -s check-version
     when:
-      event: [pull_request, push, tag]
+      event: [ pull_request, push, tag ]
       branch: master
 
-  package:
+  package-dev:
     image: python:3.6
     commands:
       - make package
     when:
-      event: [push, tag]
-      branch: [master, forno]
+      event: push
+      branch: [ staging, forno ]
+
+  package-prod:
+    image: python:3.6
+    commands:
+      - make package
+    when:
+      event: tag
+      branch: master
+
+  tag:
+    image: quintoandar/drone-github-tag
+    commands:
+      - PLUGIN_VERSION=$(cat ./.version) /bin/entrypoint.sh
+    secrets:
+      - source: github_access_token
+        target: github_token
+    when:
+      branch: master
+      event: push
+
+  prepare-release-dev:
+    image: alpine:3.10
+    commands:
+      - find . -wholename "./dist/quintoandar_butterfree-*-py3-none-any.whl" -exec mv '{}' ./dist/quintoandar_butterfree-dev-py3-none-any.whl \;
+    when:
+      event: push
+      branch: [ forno, staging ]
 
   prepare-release-prod:
     image: alpine:3.10
     commands:
       - find . -wholename "./dist/quintoandar_butterfree-*-py3-none-any.whl" -exec cp '{}' ./dist/quintoandar_butterfree-latest-py3-none-any.whl \;
     when:
-      event: [tag]
-      branch: master
-
-  prepare-release-staging:
-    image: alpine:3.10
-    commands:
-      - find . -wholename "./dist/quintoandar_butterfree-*-py3-none-any.whl" -exec mv '{}' ./dist/quintoandar_butterfree-staging-py3-none-any.whl \;
-    when:
-      event: [push]
-      branch: master
-
-  prepare-release-forno:
-    image: alpine:3.10
-    commands:
-      - find . -wholename "./dist/quintoandar_butterfree-*-py3-none-any.whl" -exec mv '{}' ./dist/quintoandar_butterfree-latest-py3-none-any.whl \;
-    when:
-      event: push
-      branch: forno
-
-  export-releases-to-s3-prod:
-    image: plugins/s3
-    pull: true
-    bucket: artifacts.s3.data.quintoandar.com.br
-    source: dist/*.whl
-    target: butterfree/
-    strip_prefix: dist/
-    acl: bucket-owner-full-control
-    cache_control: no-cache
-    when:
-      event: [push, tag]
+      event: tag
       branch: master
 
   export-releases-to-s3-forno:
@@ -96,10 +94,47 @@ pipeline:
     acl: bucket-owner-full-control
     cache_control: no-cache
     when:
-      event: [push]
+      event: push
       branch: forno
 
-  publish:
+  export-releases-to-s3-dev:
+    image: plugins/s3
+    pull: true
+    bucket: artifacts.s3.data.quintoandar.com.br
+    source: dist/*.whl
+    target: butterfree/
+    strip_prefix: dist/
+    acl: bucket-owner-full-control
+    cache_control: no-cache
+    when:
+      event: push
+      branch: staging
+
+  export-releases-to-s3-prod:
+    image: plugins/s3
+    pull: true
+    bucket: artifacts.s3.data.quintoandar.com.br
+    source: dist/*.whl
+    target: butterfree/
+    strip_prefix: dist/
+    acl: bucket-owner-full-control
+    cache_control: no-cache
+    when:
+      event: tag
+      branch: master
+
+  publish-dev:
+    image: python:3.6
+    commands:
+      - make publish build=dev
+    secrets:
+      - source: github_access_token
+        target: github_token
+    when:
+      event: push
+      branch: staging
+
+  publish-prod:
     image: python:3.6
     commands:
       - make publish
@@ -107,8 +142,8 @@ pipeline:
       - source: github_access_token
         target: github_token
     when:
-      branch: [master]
-      event: [tag]
+      event: tag
+      branch: master
 
   sonar-preview:
     image: newtmitch/sonar-scanner
@@ -130,7 +165,7 @@ pipeline:
     secrets: [ sonar_password, github_access_token ]
     when:
       event: pull_request
-      branch: [ master ]
+      branch: [ master, staging ]
 
   ###
   ### PRODUCTION
@@ -153,8 +188,8 @@ pipeline:
           -Dsonar.password=$${SONAR_PASSWORD}
     secrets: [ sonar_password, github_access_token ]
     when:
-      event: push
-      branch: [ master ]
+      event: tag
+      branch: master
 
   notify:
     image: plugins/slack
@@ -162,5 +197,5 @@ pipeline:
     secrets: [ slack_webhook ]
     when:
       event: [ push ]
-      branch: [ forno, master ]
+      branch: [ forno, staging, master ]
       status: [ success, failure ]

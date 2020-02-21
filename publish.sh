@@ -1,7 +1,13 @@
 #!/usr/bin/env bash
 
 make version
-make package-name
+if [ -z "$1" ]
+  then
+    make package-name
+else
+  make package-name build=-"$1"
+  make commit-hash
+fi
 make repository-url
 
 if [[ ! -d "python-package-server" ]]; then
@@ -29,10 +35,20 @@ if [[ ! -f "$(cat ../.package_name)/index.html" ]]; then
 EOF
 fi
 
-sed -i '/<!-- package-server-links-start -->/ a <a href="git+'"$(cat ../.repository_url)"'@'"$(cat ../.version)"'#egg='"$(cat ../.package_name)"'-'"$(cat ../.version)"'">'"$(cat ../.package_name)"'-'"$(cat ../.version)"'</a><br/>' ./"$(cat ../.package_name)"/index.html
+if [ -z "$1" ]
+  then
+    sed -i '/<!-- package-server-links-start -->/ a <a href="git+'"$(cat ../.repository_url)"'@'"$(cat ../.version)"'#egg='"$(cat ../.package_name)"'-'"$(cat ../.version)"'">'"$(cat ../.package_name)"'-'"$(cat ../.version)"'</a><br/>' ./"$(cat ../.package_name)"/index.html
+else
+  sed -i '/<!-- package-server-links-start -->/ a <a href="git+'"$(cat ../.repository_url)"'@'"$(cat ../.commit_hash)"'#egg='"$(cat ../.package_name)"'-'"$(cat ../.version)"'.'"$(head -c 7 ../.commit_hash)"'">'"$(cat ../.package_name)"'-'"$(cat ../.version)"'.'"$(head -c 7 ../.commit_hash)"'</a><br/>' ./"$(cat ../.package_name)"/index.html
+fi
 
 git config user.email "${DRONE_COMMIT_AUTHOR_EMAIL}"
 git config user.name "${DRONE_COMMIT_AUTHOR}"
 git add .
-git commit -m "$(cat ../.package_name) version $(cat ../.version)"
+if [ -z "$1" ]
+  then
+    git commit -m "$(cat ../.package_name) version $(cat ../.version)"
+else
+  git commit -m "$(cat ../.package_name) version $(cat ../.version).$(head -c 7 ../.commit_hash)"
+fi
 git push https://${GITHUB_TOKEN}@github.com/quintoandar/python-package-server master

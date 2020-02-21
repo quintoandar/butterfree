@@ -112,6 +112,7 @@ ENV/
 .version
 .package_name
 .repository_url
+.commit_hash
 *cov/
 
 # VSCode Workspace
@@ -121,5 +122,3 @@ init/
 
 # integration tests artifacts
 metastore_db/
-tests/integration/core/historical/
-tests/integration/output/
