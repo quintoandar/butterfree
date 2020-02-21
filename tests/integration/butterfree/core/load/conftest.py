@@ -1,5 +1,3 @@
-from pyspark import SparkContext
-from pyspark.sql import session
 from pytest import fixture
 
 from butterfree.core.constants import columns
@@ -7,16 +5,8 @@ from butterfree.core.transform import FeatureSet
 from butterfree.core.transform.features import Feature, KeyFeature, TimestampFeature
 
 
-def base_spark():
-    sc = SparkContext.getOrCreate()
-    spark = session.SparkSession(sc)
-
-    return sc, spark
-
-
 @fixture
-def input_dataframe():
-    sc, spark = base_spark()
+def input_dataframe(spark_context, spark_session):
     data = [
         {
             "id": 1,
@@ -51,7 +41,7 @@ def input_dataframe():
             columns.PARTITION_DAY: 2,
         },
     ]
-    return spark.read.json(sc.parallelize(data, 1))
+    return spark_session.read.json(spark_context.parallelize(data, 1))
 
 
 @fixture
