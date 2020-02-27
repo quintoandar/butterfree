@@ -1,6 +1,7 @@
 from unittest.mock import Mock
 
 import pytest
+from testing import compare_dataframes
 from tests.unit.butterfree.core.transform.conftest import (
     feature_add,
     feature_divide,
@@ -170,13 +171,7 @@ class TestFeatureSet:
         )
 
     def test_construct(
-        self,
-        dataframe,
-        feature_set_dataframe,
-        key_id,
-        timestamp_c,
-        feature_add,
-        feature_divide,
+        self, df, fs_target_df, key_id, timestamp_c, feature_add, feature_divide,
     ):
         # arrange
         feature_set = FeatureSet(
@@ -189,8 +184,8 @@ class TestFeatureSet:
         )
 
         # act
-        result_df = feature_set.construct(dataframe)
-        result_columns = result_df.columns
+        output_df = feature_set.construct(df)
+        result_columns = output_df.columns
 
         # assert
         assert (
@@ -200,8 +195,8 @@ class TestFeatureSet:
             + feature_add.get_output_columns()
             + feature_divide.get_output_columns()
         )
-        assert result_df.collect() == feature_set_dataframe.collect()
-        assert result_df.is_cached
+        assert compare_dataframes(output_df, fs_target_df)
+        assert output_df.is_cached
 
     def test_construct_invalid_df(
         self, key_id, timestamp_c, feature_add, feature_divide
@@ -221,13 +216,7 @@ class TestFeatureSet:
             _ = feature_set.construct("not a dataframe")
 
     def test_construct_transformations(
-        self,
-        dataframe,
-        feature_set_dataframe,
-        key_id,
-        timestamp_c,
-        feature_add,
-        feature_divide,
+        self, df, fs_target_df, key_id, timestamp_c, feature_add, feature_divide,
     ):
         # arrange
         feature_set = FeatureSet(
@@ -240,12 +229,12 @@ class TestFeatureSet:
         )
 
         # act
-        result_df = feature_set.construct(dataframe)
+        output_df = feature_set.construct(df)
 
         # assert
-        assert result_df.collect() == feature_set_dataframe.collect()
+        assert compare_dataframes(output_df, fs_target_df)
 
-    def test__get_features_columns(self):
+    def test_get_features_columns(self):
         # arrange
         feature_1 = Feature("feature1", "description")
         feature_1.get_output_columns = Mock(return_value=["col_a", "col_b"])
