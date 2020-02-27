@@ -1,5 +1,6 @@
 import pytest
 from pyspark.sql import DataFrame
+from testing import compare_dataframes
 
 from butterfree.core.clients import SparkClient
 
@@ -37,12 +38,12 @@ class TestSparkClient:
         spark_client._session = mocked_spark_read
 
         # act
-        result_df = spark_client.read(format, options, stream)
+        output_df = spark_client.read(format, options, stream)
 
         # assert
         mocked_spark_read.format.assert_called_once_with(format)
         mocked_spark_read.options.assert_called_once_with(**options)
-        assert target_df.collect() == result_df.collect()
+        assert compare_dataframes(output_df, target_df)
 
     @pytest.mark.parametrize(
         "format, options",
@@ -62,10 +63,10 @@ class TestSparkClient:
         create_temp_view(target_df, "test")
 
         # act
-        result_df = spark_client.sql("select * from test")
+        output_df = spark_client.sql("select * from test")
 
         # assert
-        assert result_df.collect() == target_df.collect()
+        assert compare_dataframes(output_df, target_df)
 
     def test_read_table(self, target_df, mocked_spark_read):
         # arrange
@@ -76,11 +77,11 @@ class TestSparkClient:
         spark_client._session = mocked_spark_read
 
         # act
-        result_df = spark_client.read_table(database, table)
+        output_df = spark_client.read_table(database, table)
 
         # assert
         mocked_spark_read.table.assert_called_once_with("{}.{}".format(database, table))
-        assert target_df == result_df
+        assert compare_dataframes(output_df, target_df)
 
     @pytest.mark.parametrize(
         "database, table", [(None, "table"), ("database", None), ("database", 123)],
