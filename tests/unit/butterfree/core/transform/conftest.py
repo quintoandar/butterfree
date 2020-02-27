@@ -7,7 +7,7 @@ from butterfree.core.constants.data_type import DataType
 from butterfree.core.transform.features import Feature, KeyFeature, TimestampFeature
 
 
-def make_dataframe(spark_context, spark_session):
+def make_df(spark_context, spark_session):
     data = [
         {
             "id": 1,
@@ -45,7 +45,7 @@ def make_dataframe(spark_context, spark_session):
 
 
 def make_fs(spark_context, spark_session):
-    df = make_dataframe(spark_context, spark_session)
+    df = make_df(spark_context, spark_session)
     df = (
         df.withColumn("add", df.feature1 + df.feature2)
         .withColumn("divide", df.feature1 / df.feature2)
@@ -56,12 +56,12 @@ def make_fs(spark_context, spark_session):
 
 
 @fixture
-def dataframe(spark_context, spark_session):
-    return make_dataframe(spark_context, spark_session)
+def df(spark_context, spark_session):
+    return make_df(spark_context, spark_session)
 
 
 @fixture
-def feature_set_dataframe(spark_context, spark_session):
+def fs_target_df(spark_context, spark_session):
     return make_fs(spark_context, spark_session)
 
 
