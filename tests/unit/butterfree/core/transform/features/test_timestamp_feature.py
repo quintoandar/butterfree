@@ -1,4 +1,4 @@
-from pyspark.sql.types import StringType
+from testing import compare_dataframes
 
 from butterfree.core.constants.columns import TIMESTAMP_COLUMN
 from butterfree.core.constants.data_type import DataType
@@ -14,45 +14,34 @@ class TestTimestampFeature:
         assert test_key.from_column == "ts"
         assert test_key.dtype == DataType.TIMESTAMP
 
-    def test_transform(self, feature_set_dataframe):
+    def test_transform(self, target_df):
 
         test_key = TimestampFeature()
 
-        df = test_key.transform(feature_set_dataframe)
+        output_df = test_key.transform(target_df)
 
-        assert df.schema[TIMESTAMP_COLUMN].dataType == DataType.TIMESTAMP.value
+        assert output_df.schema[TIMESTAMP_COLUMN].dataType == DataType.TIMESTAMP.value
 
-    def test_transform_ms_from_column(self, feature_set_dataframe_ms_from_column):
+    def test_transform_ms_from_column(self, input_ms_from_column, target_df):
 
         test_key = TimestampFeature(from_column="ts", from_ms=True)
 
-        df = test_key.transform(feature_set_dataframe_ms_from_column).orderBy(
-            "timestamp"
-        )
+        output_df = test_key.transform(input_ms_from_column).orderBy("timestamp")
 
-        df = df.withColumn("timestamp", df["timestamp"].cast(StringType())).collect()
+        assert compare_dataframes(output_df, target_df)
 
-        assert df[0]["timestamp"] == "2020-02-12 21:18:31"
-        assert df[1]["timestamp"] == "2020-02-12 21:18:42"
-
-    def test_transform_ms(self, feature_set_dataframe_ms):
+    def test_transform_ms(self, input_ms, target_df):
 
         test_key = TimestampFeature(from_ms=True)
 
-        df = test_key.transform(feature_set_dataframe_ms).orderBy("timestamp")
+        output_df = test_key.transform(input_ms)
 
-        df = df.withColumn("timestamp", df["timestamp"].cast(StringType())).collect()
+        assert compare_dataframes(output_df, target_df)
 
-        assert df[0]["timestamp"] == "2020-02-12 21:18:31"
-        assert df[1]["timestamp"] == "2020-02-12 21:18:42"
-
-    def test_transform_mask(self, feature_set_dataframe_date):
+    def test_transform_mask(self, input_date, date_target_df):
 
         test_key = TimestampFeature(mask="yyyy-MM-dd")
 
-        df = test_key.transform(feature_set_dataframe_date).orderBy("timestamp")
+        output_df = test_key.transform(input_date).orderBy("timestamp")
 
-        df = df.withColumn("timestamp", df["timestamp"].cast(StringType())).collect()
-
-        assert df[0]["timestamp"] == "2020-02-07 00:00:00"
-        assert df[1]["timestamp"] == "2020-02-08 00:00:00"
+        assert compare_dataframes(output_df, date_target_df)
