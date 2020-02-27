@@ -1,34 +1,22 @@
 import pytest
+from testing import compare_dataframes
 
 from butterfree.core.transform.features import Feature
 from butterfree.core.transform.transformations import SQLExpressionTransform
 
 
 class TestSQLExpressionTransform:
-    def test_feature_transform(self, feature_set_dataframe):
+    def test_feature_transform(self, target_df):
         test_feature = Feature(
             name="feature1_over_feature2",
             description="unit test",
             transformation=SQLExpressionTransform(expression="feature1/feature2"),
         )
 
-        df = test_feature.transform(feature_set_dataframe)
+        output_df = test_feature.transform(target_df)
 
-        assert all(
-            [
-                a == b
-                for a, b in zip(
-                    df.columns,
-                    [
-                        "feature1",
-                        "feature2",
-                        "id",
-                        "origin_ts",
-                        "timestamp",
-                        "feature1_over_feature2",
-                    ],
-                )
-            ]
+        assert sorted(output_df.columns) == sorted(
+            ["feature1", "feature2", "id", "timestamp", "feature1_over_feature2"]
         )
 
     def test_output_columns(self):
@@ -38,25 +26,22 @@ class TestSQLExpressionTransform:
             transformation=SQLExpressionTransform(expression="feature1/feature2"),
         )
 
-        df_columns = test_feature.get_output_columns()
+        assert sorted(test_feature.get_output_columns()) == sorted(
+            ["feature1_over_feature2"]
+        )
 
-        assert all([a == b for a, b in zip(df_columns, ["feature1_over_feature2"],)])
-
-    def test_feature_transform_output(self, feature_set_dataframe):
+    def test_feature_transform_output(self, target_df, sql_target_df):
         test_feature = Feature(
             name="feature1_over_feature2",
             description="unit test",
             transformation=SQLExpressionTransform(expression="feature1/feature2"),
         )
 
-        df = test_feature.transform(feature_set_dataframe).collect()
+        output_df = test_feature.transform(target_df)
 
-        assert df[0]["feature1_over_feature2"] == 1
-        assert df[1]["feature1_over_feature2"] == 1
-        assert df[2]["feature1_over_feature2"] == 1
-        assert df[3]["feature1_over_feature2"] == 1
+        assert compare_dataframes(output_df, sql_target_df)
 
-    def test_feature_transform_invalid_output(self, feature_set_dataframe):
+    def test_feature_transform_invalid_output(self, target_df):
         with pytest.raises(Exception):
             test_feature = Feature(
                 name="feature1_plus_a",
@@ -64,4 +49,4 @@ class TestSQLExpressionTransform:
                 transformation=SQLExpressionTransform(expression="feature2 + a"),
             )
 
-            test_feature.transform(feature_set_dataframe).collect()
+            test_feature.transform(target_df)
