@@ -1,5 +1,6 @@
 import pytest
 from pyspark.sql import functions as F
+from testing import compare_dataframes
 
 from butterfree.core.constants.columns import TIMESTAMP_COLUMN
 from butterfree.core.transform.features import Feature
@@ -13,7 +14,7 @@ def divide(df, parent_feature, column1, column2):
 
 
 class TestCustomTransform:
-    def test_feature_transform(self, feature_set_dataframe):
+    def test_feature_transform(self, target_df):
 
         test_feature = Feature(
             name="feature",
@@ -23,26 +24,13 @@ class TestCustomTransform:
             ),
         )
 
-        df = test_feature.transform(feature_set_dataframe)
+        output_df = test_feature.transform(target_df)
 
-        assert all(
-            [
-                a == b
-                for a, b in zip(
-                    df.columns,
-                    [
-                        "feature1",
-                        "feature2",
-                        "id",
-                        "origin_ts",
-                        TIMESTAMP_COLUMN,
-                        "feature",
-                    ],
-                )
-            ]
+        assert sorted(output_df.columns) == sorted(
+            ["feature1", "feature2", "id", TIMESTAMP_COLUMN, "feature"]
         )
 
-    def test_output_columns(self, feature_set_dataframe):
+    def test_output_columns(self):
 
         test_feature = Feature(
             name="feature",
@@ -52,12 +40,12 @@ class TestCustomTransform:
             ),
         )
 
-        df_columns = test_feature.get_output_columns()
+        output_df_columns = test_feature.get_output_columns()
 
-        assert isinstance(df_columns, list)
-        assert df_columns == ["feature"]
+        assert isinstance(output_df_columns, list)
+        assert output_df_columns == ["feature"]
 
-    def test_custom_transform_output(self, feature_set_dataframe):
+    def test_custom_transform_output(self, custom_target_df):
         test_feature = Feature(
             name="feature",
             description="unit test",
@@ -66,14 +54,11 @@ class TestCustomTransform:
             ),
         )
 
-        df = test_feature.transform(feature_set_dataframe).collect()
+        output_df = test_feature.transform(custom_target_df)
 
-        assert df[0]["feature"] == 1
-        assert df[1]["feature"] == 1
-        assert df[2]["feature"] == 1
-        assert df[3]["feature"] == 1
+        assert compare_dataframes(output_df, custom_target_df)
 
-    def test_blank_transformer(self, feature_set_dataframe):
+    def test_blank_transformer(self):
         with pytest.raises(ValueError):
             Feature(
                 name="feature",
