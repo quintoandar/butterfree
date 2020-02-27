@@ -4,14 +4,14 @@ from butterfree.core.validations import ValidateDataframe
 
 
 class TestValidateDataframe:
-    def test_validate_without_column_ts(self, feature_set_without_ts):
-        check = ValidateDataframe(feature_set_without_ts)
+    def test_validate_without_column_ts(self, target_df_without_ts):
+        check = ValidateDataframe(target_df_without_ts)
 
         with pytest.raises(ValueError):
             check.validate_column_ts()
 
-    def test_validate_empty(self, feature_set_empty):
-        check = ValidateDataframe(feature_set_empty)
+    def test_validate_empty(self, target_df_empty):
+        check = ValidateDataframe(target_df_empty)
 
         with pytest.raises(ValueError):
             check.validate_df_is_empty()
