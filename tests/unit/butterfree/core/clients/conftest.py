@@ -4,12 +4,6 @@ import pytest
 
 
 @pytest.fixture()
-def target_df(spark_context, spark_session):
-    data = [{"col1": "value", "col2": 123}]
-    return spark_session.read.json(spark_context.parallelize(data, 1))
-
-
-@pytest.fixture()
 def mocked_spark_read():
     mock = Mock()
     mock.readStream = mock
