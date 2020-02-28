@@ -10,7 +10,6 @@ services:
       - CASSANDRA_DC=datacenter1
       - CASSANDRA_USERNAME=user
       - CASSANDRA_PASSWORD=pwd
-      - CASSANDRA_KEYSPACE=test
 
   localstack:
     image: localstack/localstack

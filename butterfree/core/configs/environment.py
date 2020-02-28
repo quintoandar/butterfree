@@ -70,11 +70,11 @@ def get_environment_specification(filename: str = None) -> dict:
 specification = {
     "ENVIRONMENT": "dev",
     "CASSANDRA_HOST": "cassandra",
-    "CASSANDRA_KEYSPACE": "test",
+    "CASSANDRA_KEYSPACE": "keyspace",
     "CASSANDRA_USERNAME": "user",
     "CASSANDRA_PASSWORD": "pwd",
-    "FEATURE_STORE_S3_BUCKET": "test",
-    "FEATURE_STORE_HISTORICAL_DATABASE": "test",
+    "FEATURE_STORE_S3_BUCKET": "bucket",
+    "FEATURE_STORE_HISTORICAL_DATABASE": "database",
 }
 
 

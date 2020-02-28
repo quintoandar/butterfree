@@ -9,7 +9,7 @@ from butterfree.core.load.writers import (
 )
 
 
-def test_sink(input_dataframe, feature_set):
+def test_sink(input_dataframe, feature_set, environment=None):
     # arrange
     spark_client = SparkClient()
     cassandra_client = CassandraClient()
@@ -20,7 +20,7 @@ def test_sink(input_dataframe, feature_set):
     columns_sort = feature_set_df.schema.fieldNames()
 
     # setup historical writer
-    create_bucket("test")
+    create_bucket(environment.get_variable("FEATURE_STORE_S3_BUCKET"))
     s3_config = S3Config()
     historical_writer = HistoricalFeatureStoreWriter(db_config=s3_config)
 
@@ -36,12 +36,14 @@ def test_sink(input_dataframe, feature_set):
         "CREATE DATABASE IF NOT EXISTS {}".format(historical_writer.database)
     )
     cassandra_client.sql(
-        "CREATE KEYSPACE IF NOT EXISTS test "
+        "CREATE KEYSPACE IF NOT EXISTS "
+        f"{environment.get_variable('CASSANDRA_KEYSPACE')} "
         "WITH REPLICATION = {'class':'SimpleStrategy', "
         "'replication_factor':1};"
     )
     cassandra_client.sql(
-        "CREATE TABLE IF NOT EXISTS test.test_sink_feature_set "
+        "CREATE TABLE IF NOT EXISTS "
+        f"{environment.get_variable('CASSANDRA_KEYSPACE')}.test_sink_feature_set "
         "(id int, timestamp timestamp, "
         "feature int, PRIMARY KEY (id));"
     )
