@@ -1,3 +1,4 @@
+import json
 from unittest.mock import Mock
 
 from pytest import fixture
@@ -38,7 +39,9 @@ def make_df(spark_context, spark_session):
             "nonfeature": 0,
         },
     ]
-    df = spark_session.read.json(spark_context.parallelize(data, 1))
+    df = spark_session.read.json(
+        spark_context.parallelize(data).map(lambda x: json.dumps(x))
+    )
     df = df.withColumn(TIMESTAMP_COLUMN, df.ts.cast(DataType.TIMESTAMP.value))
 
     return df

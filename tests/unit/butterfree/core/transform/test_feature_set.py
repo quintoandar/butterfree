@@ -1,7 +1,7 @@
 from unittest.mock import Mock
 
 import pytest
-from testing import compare_dataframes
+from testing import check_dataframe_equality
 from tests.unit.butterfree.core.transform.conftest import (
     feature_add,
     feature_divide,
@@ -195,7 +195,7 @@ class TestFeatureSet:
             + feature_add.get_output_columns()
             + feature_divide.get_output_columns()
         )
-        assert compare_dataframes(output_df, fs_target_df)
+        assert check_dataframe_equality(output_df, fs_target_df)
         assert output_df.is_cached
 
     def test_construct_invalid_df(
@@ -232,7 +232,7 @@ class TestFeatureSet:
         output_df = feature_set.construct(df)
 
         # assert
-        assert compare_dataframes(output_df, fs_target_df)
+        assert check_dataframe_equality(output_df, fs_target_df)
 
     def test_get_features_columns(self):
         # arrange
