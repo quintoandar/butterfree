@@ -68,7 +68,7 @@ def get_s3_client():
         aws_access_key_id="",
         aws_secret_access_key="",
         region_name="us-east-1",
-        endpoint_url="http://s3.amazonaws.com:4572",
+        endpoint_url="http://localstack:4572",
     )
 
 
