@@ -13,6 +13,16 @@ services:
 
   localstack:
     image: localstack/localstack
+    privileged: true
+    environment:
+      DOCKER_HOST: unix:///var/run/docker.sock
+    volumes:
+      - name: docker-socket
+        path: /var/run/docker.sock
+      - name: localstack-vol
+        path: /tmp/localstack
+    ports:
+      - 8080
 
 pipeline:
   install: &install
