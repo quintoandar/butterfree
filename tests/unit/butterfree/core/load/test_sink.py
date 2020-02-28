@@ -9,7 +9,7 @@ from butterfree.core.load.writers import (
 
 
 class TestSink:
-    def test_validate(self, feature_set_dataframe, mocker):
+    def test_validate(self, input_df, mocker):
         # given
         spark_client = SparkClient()
         writer = [
@@ -25,16 +25,14 @@ class TestSink:
         # when
         sink = Sink(writers=writer)
         sink.validate(
-            dataframe=feature_set_dataframe,
-            feature_set=feature_set,
-            spark_client=spark_client,
+            dataframe=input_df, feature_set=feature_set, spark_client=spark_client,
         )
 
         # then
         for w in writer:
             w.validate.assert_called_once()
 
-    def test_validate_false(self, feature_set_dataframe, mocker):
+    def test_validate_false(self, input_df, mocker):
         # given
         spark_client = SparkClient()
         writer = [
@@ -54,12 +52,10 @@ class TestSink:
         # then
         with pytest.raises(RuntimeError):
             sink.validate(
-                dataframe=feature_set_dataframe,
-                feature_set=feature_set,
-                spark_client=spark_client,
+                dataframe=input_df, feature_set=feature_set, spark_client=spark_client,
             )
 
-    def test_flush(self, feature_set_dataframe, mocker):
+    def test_flush(self, input_df, mocker):
         # given
         spark_client = SparkClient()
         writer = [
@@ -77,16 +73,14 @@ class TestSink:
         # when
         sink = Sink(writers=writer)
         sink.flush(
-            dataframe=feature_set_dataframe,
-            feature_set=feature_set,
-            spark_client=spark_client,
+            dataframe=input_df, feature_set=feature_set, spark_client=spark_client,
         )
 
         # then
         for w in writer:
             w.write.assert_called_once()
 
-    def test_flush_with_invalid_df(self, not_feature_set_dataframe, mocker):
+    def test_flush_with_invalid_df(self, not_df, mocker):
         # given
         spark_client = SparkClient()
         writer = [
@@ -103,9 +97,7 @@ class TestSink:
         # then
         with pytest.raises(ValueError):
             sink.flush(
-                dataframe=not_feature_set_dataframe,
-                feature_set=feature_set,
-                spark_client=spark_client,
+                dataframe=not_df, feature_set=feature_set, spark_client=spark_client,
             )
 
     def test_flush_with_writers_list_empty(self):
