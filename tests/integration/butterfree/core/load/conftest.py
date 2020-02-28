@@ -63,10 +63,10 @@ def feature_set():
 
 
 def get_s3_client():
-    return boto3.client(
+    return boto3.client(  # noqa: S106
         "s3",
-        aws_access_key_id="",
-        aws_secret_access_key="",
+        aws_access_key_id='',
+        aws_secret_access_key='',
         region_name="us-east-1",
         endpoint_url="http://localhost:4572",
     )
