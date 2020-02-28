@@ -1,3 +1,5 @@
+from testing import check_dataframe_equality
+
 from butterfree.core.clients import SparkClient
 from butterfree.core.extract import Source
 
@@ -17,9 +19,9 @@ class TestSource:
             readers=[reader], query=f"select * from {reader_id}",  # noqa
         )
 
-        result_df = source_selector.construct(spark_client)
+        output_df = source_selector.construct(spark_client)
 
-        assert result_df.collect() == target_df.collect()
+        assert check_dataframe_equality(output_df, target_df)
 
     def test_is_cached(self, mocker, target_df):
         # given
@@ -35,6 +37,6 @@ class TestSource:
             readers=[reader], query=f"select * from {reader_id}",  # noqa
         )
 
-        result_df = source_selector.construct(spark_client)
+        output_df = source_selector.construct(spark_client)
 
-        assert result_df.is_cached
+        assert output_df.is_cached
