@@ -1,3 +1,4 @@
+from butterfree.core.configs import environment
 from tests.integration.butterfree.core.load.conftest import create_bucket
 
 from butterfree.core.clients import CassandraClient, SparkClient
@@ -9,7 +10,7 @@ from butterfree.core.load.writers import (
 )
 
 
-def test_sink(input_dataframe, feature_set, environment=None):
+def test_sink(input_dataframe, feature_set):
     # arrange
     spark_client = SparkClient()
     cassandra_client = CassandraClient()
