@@ -1,59 +1,42 @@
 import pytest
+from testing import check_dataframe_equality
 
 from butterfree.core.load.writers import OnlineFeatureStoreWriter
 
 
 class TestOnlineFeatureStoreWriter:
-    def test_filter_latest(
-        self, feature_set_dataframe, latest_feature_set_dataframe, cassandra_config
-    ):
+    def test_filter_latest(self, input_df, latest_df, cassandra_config):
         # with
         writer = OnlineFeatureStoreWriter(cassandra_config)
 
         # when
-        result_df = writer.filter_latest(feature_set_dataframe, id_columns=["id"])
-        sort_columns = result_df.schema.fieldNames()
+        output_df = writer.filter_latest(input_df, id_columns=["id"])
 
         # then
-        assert sorted(
-            latest_feature_set_dataframe.select(*sort_columns).collect()
-        ) == sorted(result_df.select(*sort_columns).collect())
+        assert check_dataframe_equality(output_df, latest_df)
 
-    def test_filter_latest_without_ts(
-        self, feature_set_dataframe_without_ts, cassandra_config
-    ):
+    def test_filter_latest_without_ts(self, df_without_ts, cassandra_config):
         # with
         writer = OnlineFeatureStoreWriter(cassandra_config)
 
         # then
         with pytest.raises(KeyError):
-            _ = writer.filter_latest(
-                feature_set_dataframe_without_ts, id_columns=["id"]
-            )
+            _ = writer.filter_latest(df_without_ts, id_columns=["id"])
 
-    def test_filter_latest_without_id_columns(
-        self, feature_set_dataframe, cassandra_config
-    ):
+    def test_filter_latest_without_id_columns(self, input_df, cassandra_config):
         # with
         writer = OnlineFeatureStoreWriter(cassandra_config)
 
         # then
         with pytest.raises(ValueError, match="must provide the unique identifiers"):
-            _ = writer.filter_latest(feature_set_dataframe, id_columns=[])
+            _ = writer.filter_latest(input_df, id_columns=[])
 
         # then
         with pytest.raises(KeyError, match="not found"):
-            _ = writer.filter_latest(
-                feature_set_dataframe.drop("id"), id_columns=["id"]
-            )
+            _ = writer.filter_latest(input_df.drop("id"), id_columns=["id"])
 
     def test_write(
-        self,
-        feature_set_dataframe,
-        latest_feature_set_dataframe,
-        cassandra_config,
-        mocker,
-        feature_set,
+        self, input_df, latest_df, cassandra_config, mocker, feature_set,
     ):
         # with
         spark_client = mocker.stub("spark_client")
@@ -61,12 +44,12 @@ class TestOnlineFeatureStoreWriter:
         writer = OnlineFeatureStoreWriter(cassandra_config)
 
         # when
-        writer.write(feature_set, feature_set_dataframe, spark_client)
+        writer.write(feature_set, input_df, spark_client)
 
         # then
         spark_client.write_dataframe.assert_called_once()
 
-        assert sorted(latest_feature_set_dataframe.collect()) == sorted(
+        assert sorted(latest_df.collect()) == sorted(
             spark_client.write_dataframe.call_args[1]["dataframe"].collect()
         )
         assert (
@@ -83,16 +66,14 @@ class TestOnlineFeatureStoreWriter:
             for item in writer.db_config.get_options(table=feature_set.name).items()
         )
 
-    def test_validate(
-        self, feature_set_dataframe, cassandra_config, mocker, feature_set
-    ):
+    def test_validate(self, input_df, cassandra_config, mocker, feature_set):
         # given
         spark_client = mocker.stub("spark_client")
         spark_client.read = mocker.stub("read")
         writer = OnlineFeatureStoreWriter(cassandra_config)
 
         # when
-        writer.validate(feature_set, feature_set_dataframe, spark_client)
+        writer.validate(feature_set, input_df, spark_client)
 
         # then
         spark_client.read.assert_called_once()
@@ -102,7 +83,7 @@ class TestOnlineFeatureStoreWriter:
         [(None, "table"), ("org.apache.spark.sql.cassandra", None), (1, 123)],
     )
     def test_validate_invalid_params(
-        self, feature_set_dataframe, format_, table_name, mocker,
+        self, input_df, format_, table_name, mocker,
     ):
         # given
         spark_client = mocker.stub("spark_client")
@@ -118,4 +99,4 @@ class TestOnlineFeatureStoreWriter:
 
         # then
         with pytest.raises(ValueError):
-            writer.validate(feature_set, feature_set_dataframe, spark_client)
+            writer.validate(feature_set, input_df, spark_client)
