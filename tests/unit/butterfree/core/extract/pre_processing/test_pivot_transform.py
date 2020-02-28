@@ -1,17 +1,16 @@
 import pytest
 from pyspark.sql.functions import first
+from testing import check_dataframe_equality
 
 from butterfree.core.extract.pre_processing import pivot
 from butterfree.core.extract.readers import FileReader
-
-from .conftest import compare_dataframes
 
 
 class TestPivotTransform:
     def test_pivot_transformation(
         self, input_df, pivot_df,
     ):
-        result_df = pivot(
+        output_df = pivot(
             dataframe=input_df,
             group_by_columns=["id", "ts"],
             pivot_column="pivot_column",
@@ -20,12 +19,12 @@ class TestPivotTransform:
         )
 
         # assert
-        assert compare_dataframes(actual_df=result_df, expected_df=pivot_df,)
+        assert check_dataframe_equality(output_df, pivot_df)
 
     def test_pivot_transformation_with_forward_fill(
         self, input_df, pivot_ffill_df,
     ):
-        result_df = pivot(
+        output_df = pivot(
             dataframe=input_df,
             group_by_columns=["id", "ts"],
             pivot_column="pivot_column",
@@ -35,12 +34,12 @@ class TestPivotTransform:
         )
 
         # assert
-        assert compare_dataframes(actual_df=result_df, expected_df=pivot_ffill_df,)
+        assert check_dataframe_equality(output_df, pivot_ffill_df)
 
     def test_pivot_transformation_with_forward_fill_and_mock(
         self, input_df, pivot_ffill_mock_df,
     ):
-        result_df = pivot(
+        output_df = pivot(
             dataframe=input_df,
             group_by_columns=["id", "ts"],
             pivot_column="pivot_column",
@@ -52,7 +51,7 @@ class TestPivotTransform:
         )
 
         # assert
-        assert compare_dataframes(actual_df=result_df, expected_df=pivot_ffill_mock_df,)
+        assert check_dataframe_equality(output_df, pivot_ffill_mock_df)
 
     def test_pivot_transformation_mock_without_type(
         self, input_df, pivot_ffill_mock_df,
@@ -80,7 +79,7 @@ class TestPivotTransform:
         )
 
         # act
-        result_df = file_reader._apply_transformations(input_df)
+        output_df = file_reader._apply_transformations(input_df)
 
         # assert
-        assert compare_dataframes(actual_df=result_df, expected_df=pivot_df,)
+        assert check_dataframe_equality(output_df, pivot_df)

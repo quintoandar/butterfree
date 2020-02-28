@@ -1,4 +1,5 @@
 import pytest
+from testing import check_dataframe_equality
 
 from butterfree.core.constants.columns import TIMESTAMP_COLUMN
 from butterfree.core.extract.pre_processing import filter
@@ -6,7 +7,7 @@ from butterfree.core.extract.readers import FileReader
 
 
 class TestFilterDataFrame:
-    def test_filter(self, feature_set_dataframe, spark_context, spark_session):
+    def test_filter(self, filter_input_df, spark_context, spark_session):
         # given
         file_reader = FileReader("test", "path/to/file", "format")
 
@@ -16,7 +17,7 @@ class TestFilterDataFrame:
         )
 
         # when
-        result_df = file_reader._apply_transformations(feature_set_dataframe)
+        output_df = file_reader._apply_transformations(filter_input_df)
 
         target_data = [
             {"id": 1, TIMESTAMP_COLUMN: 1, "feature": 110, "test": "pass"},
@@ -25,13 +26,13 @@ class TestFilterDataFrame:
         target_df = spark_session.read.json(spark_context.parallelize(target_data, 1))
 
         # then
-        assert result_df.collect() == target_df.collect()
+        assert check_dataframe_equality(output_df, target_df)
 
     @pytest.mark.parametrize(
         "condition", [None, 100],
     )
     def test_filter_with_invalidations(
-        self, feature_set_dataframe, condition, spark_context, spark_session
+        self, target_df, condition, spark_context, spark_session
     ):
         # given
         file_reader = FileReader("test", "path/to/file", "format")
@@ -40,4 +41,4 @@ class TestFilterDataFrame:
 
         # then
         with pytest.raises(TypeError):
-            file_reader._apply_transformations(feature_set_dataframe)
+            file_reader._apply_transformations(target_df)

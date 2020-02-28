@@ -1,8 +1,8 @@
 import json
-from typing import List
 
 import pytest
-from pyspark.sql import DataFrame
+
+from butterfree.core.constants.columns import TIMESTAMP_COLUMN
 
 
 @pytest.fixture()
@@ -72,11 +72,14 @@ def pivot_ffill_mock_df(spark_context, spark_session):
     return df.orderBy("ts")
 
 
-def compare_dataframes(
-    actual_df: DataFrame, expected_df: DataFrame, columns_sort: List[str] = None
-):
-    if not columns_sort:
-        columns_sort = actual_df.schema.fieldNames()
-    return sorted(actual_df.select(*columns_sort).collect()) == sorted(
-        expected_df.select(*columns_sort).collect()
+@pytest.fixture()
+def filter_input_df(spark_context, spark_session):
+    data = [
+        {"id": 1, TIMESTAMP_COLUMN: 0, "feature": 100, "test": "fail"},
+        {"id": 2, TIMESTAMP_COLUMN: 0, "feature": 200, "test": "running"},
+        {"id": 1, TIMESTAMP_COLUMN: 1, "feature": 110, "test": "pass"},
+        {"id": 1, TIMESTAMP_COLUMN: 2, "feature": 120, "test": "pass"},
+    ]
+    return spark_session.read.json(
+        spark_context.parallelize(data).map(lambda x: json.dumps(x))
     )
