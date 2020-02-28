@@ -69,7 +69,7 @@ def get_environment_specification(filename: str = None) -> dict:
 
 specification = {
     "ENVIRONMENT": "dev",
-    "CASSANDRA_HOST": "0.0.0.0",
+    "CASSANDRA_HOST": "localhost",
     "CASSANDRA_KEYSPACE": "test",
     "CASSANDRA_USERNAME": "user",
     "CASSANDRA_PASSWORD": "pwd",

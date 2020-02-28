@@ -36,11 +36,13 @@ def test_sink(input_dataframe, feature_set):
         "CREATE DATABASE IF NOT EXISTS {}".format(historical_writer.database)
     )
     cassandra_client.sql(
-        "CREATE KEYSPACE IF NOT EXISTS test WITH REPLICATION = {'class':'SimpleStrategy', "
+        "CREATE KEYSPACE IF NOT EXISTS test "
+        "WITH REPLICATION = {'class':'SimpleStrategy', "
         "'replication_factor':1};"
     )
     cassandra_client.sql(
-        "CREATE TABLE IF NOT EXISTS test.test_sink_feature_set (id int, timestamp timestamp, "
+        "CREATE TABLE IF NOT EXISTS test.test_sink_feature_set "
+        "(id int, timestamp timestamp, "
         "feature int, PRIMARY KEY (id));"
     )
     sink.flush(feature_set, feature_set_df, spark_client)
