@@ -18,6 +18,7 @@ class CassandraClient:
     def __init__(self):
         self.username = environment.get_variable("CASSANDRA_USERNAME")
         self.password = environment.get_variable("CASSANDRA_PASSWORD")
+        self.host = environment.get_variable("CASSANDRA_HOST")
 
     @property
     def conn(self):
@@ -26,7 +27,7 @@ class CassandraClient:
         Returns:
             Cassandra session
         """
-        cluster = Cluster()
+        cluster = Cluster([self.host])
         session = cluster.connect()
         return session
 
