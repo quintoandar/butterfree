@@ -4,6 +4,8 @@ from typing import List
 
 from pyspark.sql import DataFrame, SparkSession
 
+from butterfree.core.configs import environment
+
 
 class SparkClient:
     """Handle Spark session connection.
@@ -25,6 +27,14 @@ class SparkClient:
         """
         if not self._session:
             self._session = SparkSession.builder.getOrCreate()
+            if environment.get_variable("ENVIRONMENT", "dev"):
+                hadoop_conf = self._session.sparkContext._jsc.hadoopConfiguration()
+                hadoop_conf.set("fs.s3.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem")
+                hadoop_conf.set("fs.s3a.endpoint", "http://127.0.0.1:4572")
+                hadoop_conf.set("fs.s3a.path.style.access", "true")
+                hadoop_conf.set("fs.s3a.connection.ssl.enabled", "false")
+                hadoop_conf.set("fs.s3a.access.key", "mock")
+                hadoop_conf.set("fs.s3a.secret.key", "mock")
         return self._session
 
     def read(self, format: str, options: dict, stream: bool = False) -> DataFrame:

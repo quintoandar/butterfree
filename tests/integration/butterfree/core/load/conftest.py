@@ -1,5 +1,8 @@
+import boto3
+from pyspark.sql import SparkSession
 from pytest import fixture
 
+from butterfree.core.configs import environment
 from butterfree.core.constants import columns
 from butterfree.core.transform import FeatureSet
 from butterfree.core.transform.features import Feature, KeyFeature, TimestampFeature
@@ -59,3 +62,18 @@ def feature_set():
         timestamp=ts_feature,
         features=features,
     )
+
+
+def get_s3_client():
+    return boto3.client(
+        "s3",
+        aws_access_key_id="",
+        aws_secret_access_key="",
+        region_name="us-east-1",
+        endpoint_url="http://127.0.0.1:4572",
+    )
+
+
+def create_bucket(bucket_name):
+    s3_client = get_s3_client()
+    s3_client.create_bucket(Bucket=bucket_name)
