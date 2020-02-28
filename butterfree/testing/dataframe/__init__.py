@@ -13,9 +13,9 @@ def assert_dataframe_equality(output_df: DataFrame, target_df: DataFrame):
         raise AssertionError(
             f"DataFrame shape mismatch: \n"
             f"output_df shape: {len(output_df.columns)} columns and "
-            f"{output_df.count()} lines\n"
+            f"{output_df.count()} rows\n"
             f"target_df shape: {len(target_df.columns)} columns and "
-            f"{target_df.count()} lines."
+            f"{target_df.count()} rows."
         )
 
     select_cols = [col(c) for c in output_df.schema.fieldNames()]
