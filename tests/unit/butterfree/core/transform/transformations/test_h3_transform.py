@@ -1,7 +1,7 @@
 from unittest.mock import patch
 
 import pytest
-from testing import compare_dataframes
+from testing import check_dataframe_equality
 
 from butterfree.core.transform.features import Feature
 from butterfree.core.transform.transformations.h3_transform import H3HashTransform
@@ -71,7 +71,7 @@ class TestH3Transform:
 
         output_df = test_feature.transform(h3_df)
 
-        assert compare_dataframes(output_df, h3_target_df)
+        assert check_dataframe_equality(output_df, h3_target_df)
 
     def test_import_error(self):
         import sys

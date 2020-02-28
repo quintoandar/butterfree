@@ -1,3 +1,5 @@
+import json
+
 from pytest import fixture
 
 from butterfree.core.constants.columns import TIMESTAMP_COLUMN
@@ -12,7 +14,9 @@ def h3_df(spark_context, spark_session):
         {"id": 1, "feature": 400, "lat": -23.554190, "lng": -46.670723},
         {"id": 1, "feature": 500, "lat": -23.554190, "lng": -46.670723},
     ]
-    df = spark_session.read.json(spark_context.parallelize(data, 1))
+    df = spark_session.read.json(
+        spark_context.parallelize(data).map(lambda x: json.dumps(x))
+    )
 
     return df
 
@@ -57,7 +61,9 @@ def h3_target_df(spark_context, spark_session):
             "lat_lng__h3_hash__8": "88a8100ea1fffff",
         },
     ]
-    df = spark_session.read.json(spark_context.parallelize(data, 1))
+    df = spark_session.read.json(
+        spark_context.parallelize(data).map(lambda x: json.dumps(x))
+    )
 
     return df
 
@@ -94,7 +100,9 @@ def custom_target_df(spark_context, spark_session):
             "feature": 1.0,
         },
     ]
-    df = spark_session.read.json(spark_context.parallelize(data, 1))
+    df = spark_session.read.json(
+        spark_context.parallelize(data).map(lambda x: json.dumps(x))
+    )
     df = df.withColumn(TIMESTAMP_COLUMN, df.timestamp.cast(DataType.TIMESTAMP.value))
     return df
 
@@ -151,7 +159,9 @@ def fixed_windows_target_df(spark_context, spark_session):
             "feature1__count_over_15_minutes_fixed_windows": 1,
         },
     ]
-    df = spark_session.read.json(spark_context.parallelize(data, 1))
+    df = spark_session.read.json(
+        spark_context.parallelize(data).map(lambda x: json.dumps(x))
+    )
     df = df.withColumn(TIMESTAMP_COLUMN, df.timestamp.cast(DataType.TIMESTAMP.value))
     return df
 
@@ -172,21 +182,21 @@ def rolling_windows_target_df(spark_context, spark_session):
         {
             "id": 1,
             TIMESTAMP_COLUMN: "2016-04-13 00:00:00",
-            "feature1__avg_over_1_day_rolling_windows": "None",
+            "feature1__avg_over_1_day_rolling_windows": None,
             "feature1__avg_over_3_days_rolling_windows": 100.0,
-            "feature1__stddev_pop_over_1_day_rolling_windows": "None",
+            "feature1__stddev_pop_over_1_day_rolling_windows": None,
             "feature1__stddev_pop_over_3_days_rolling_windows": 0.0,
-            "feature1__count_over_1_day_rolling_windows": "None",
+            "feature1__count_over_1_day_rolling_windows": None,
             "feature1__count_over_3_days_rolling_windows": 1,
         },
         {
             "id": 1,
             TIMESTAMP_COLUMN: "2016-04-14 00:00:00",
-            "feature1__avg_over_1_day_rolling_windows": "None",
+            "feature1__avg_over_1_day_rolling_windows": None,
             "feature1__avg_over_3_days_rolling_windows": 100.0,
-            "feature1__stddev_pop_over_1_day_rolling_windows": "None",
+            "feature1__stddev_pop_over_1_day_rolling_windows": None,
             "feature1__stddev_pop_over_3_days_rolling_windows": 0.0,
-            "feature1__count_over_1_day_rolling_windows": "None",
+            "feature1__count_over_1_day_rolling_windows": None,
             "feature1__count_over_3_days_rolling_windows": 1,
         },
         {
@@ -202,21 +212,21 @@ def rolling_windows_target_df(spark_context, spark_session):
         {
             "id": 2,
             TIMESTAMP_COLUMN: "2016-04-13 00:00:00",
-            "feature1__avg_over_1_day_rolling_windows": "None",
+            "feature1__avg_over_1_day_rolling_windows": None,
             "feature1__avg_over_3_days_rolling_windows": 200.0,
-            "feature1__stddev_pop_over_1_day_rolling_windows": "None",
+            "feature1__stddev_pop_over_1_day_rolling_windows": None,
             "feature1__stddev_pop_over_3_days_rolling_windows": 0.0,
-            "feature1__count_over_1_day_rolling_windows": "None",
+            "feature1__count_over_1_day_rolling_windows": None,
             "feature1__count_over_3_days_rolling_windows": 1,
         },
         {
             "id": 2,
             TIMESTAMP_COLUMN: "2016-04-14 00:00:00",
-            "feature1__avg_over_1_day_rolling_windows": "None",
+            "feature1__avg_over_1_day_rolling_windows": None,
             "feature1__avg_over_3_days_rolling_windows": 200.0,
-            "feature1__stddev_pop_over_1_day_rolling_windows": "None",
+            "feature1__stddev_pop_over_1_day_rolling_windows": None,
             "feature1__stddev_pop_over_3_days_rolling_windows": 0.0,
-            "feature1__count_over_1_day_rolling_windows": "None",
+            "feature1__count_over_1_day_rolling_windows": None,
             "feature1__count_over_3_days_rolling_windows": 1,
         },
         {
@@ -232,21 +242,21 @@ def rolling_windows_target_df(spark_context, spark_session):
         {
             "id": 3,
             TIMESTAMP_COLUMN: "2016-04-13 00:00:00",
-            "feature1__avg_over_1_day_rolling_windows": "None",
+            "feature1__avg_over_1_day_rolling_windows": None,
             "feature1__avg_over_3_days_rolling_windows": 300.0,
-            "feature1__stddev_pop_over_1_day_rolling_windows": "None",
+            "feature1__stddev_pop_over_1_day_rolling_windows": None,
             "feature1__stddev_pop_over_3_days_rolling_windows": 0.0,
-            "feature1__count_over_1_day_rolling_windows": "None",
+            "feature1__count_over_1_day_rolling_windows": None,
             "feature1__count_over_3_days_rolling_windows": 1,
         },
         {
             "id": 3,
             TIMESTAMP_COLUMN: "2016-04-14 00:00:00",
-            "feature1__avg_over_1_day_rolling_windows": "None",
+            "feature1__avg_over_1_day_rolling_windows": None,
             "feature1__avg_over_3_days_rolling_windows": 300.0,
-            "feature1__stddev_pop_over_1_day_rolling_windows": "None",
+            "feature1__stddev_pop_over_1_day_rolling_windows": None,
             "feature1__stddev_pop_over_3_days_rolling_windows": 0.0,
-            "feature1__count_over_1_day_rolling_windows": "None",
+            "feature1__count_over_1_day_rolling_windows": None,
             "feature1__count_over_3_days_rolling_windows": 1,
         },
         {
@@ -262,25 +272,27 @@ def rolling_windows_target_df(spark_context, spark_session):
         {
             "id": 4,
             TIMESTAMP_COLUMN: "2016-04-13 00:00:00",
-            "feature1__avg_over_1_day_rolling_windows": "None",
+            "feature1__avg_over_1_day_rolling_windows": None,
             "feature1__avg_over_3_days_rolling_windows": 400.0,
-            "feature1__stddev_pop_over_1_day_rolling_windows": "None",
+            "feature1__stddev_pop_over_1_day_rolling_windows": None,
             "feature1__stddev_pop_over_3_days_rolling_windows": 0.0,
-            "feature1__count_over_1_day_rolling_windows": "None",
+            "feature1__count_over_1_day_rolling_windows": None,
             "feature1__count_over_3_days_rolling_windows": 1,
         },
         {
             "id": 4,
             TIMESTAMP_COLUMN: "2016-04-14 00:00:00",
-            "feature1__avg_over_1_day_rolling_windows": "None",
+            "feature1__avg_over_1_day_rolling_windows": None,
             "feature1__avg_over_3_days_rolling_windows": 400.0,
-            "feature1__stddev_pop_over_1_day_rolling_windows": "None",
+            "feature1__stddev_pop_over_1_day_rolling_windows": None,
             "feature1__stddev_pop_over_3_days_rolling_windows": 0.0,
-            "feature1__count_over_1_day_rolling_windows": "None",
+            "feature1__count_over_1_day_rolling_windows": None,
             "feature1__count_over_3_days_rolling_windows": 1,
         },
     ]
-    df = spark_session.read.json(spark_context.parallelize(data, 1))
+    df = spark_session.read.json(
+        spark_context.parallelize(data).map(lambda x: json.dumps(x))
+    )
     df = df.withColumn(TIMESTAMP_COLUMN, df.timestamp.cast(DataType.TIMESTAMP.value))
     return df
 
@@ -317,6 +329,8 @@ def sql_target_df(spark_context, spark_session):
             "feature1_over_feature2": 1.0,
         },
     ]
-    df = spark_session.read.json(spark_context.parallelize(data, 1))
+    df = spark_session.read.json(
+        spark_context.parallelize(data).map(lambda x: json.dumps(x))
+    )
     df = df.withColumn(TIMESTAMP_COLUMN, df.timestamp.cast(DataType.TIMESTAMP.value))
     return df

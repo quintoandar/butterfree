@@ -1,6 +1,6 @@
 import pytest
 from pyspark.sql import functions as F
-from testing import compare_dataframes
+from testing import check_dataframe_equality
 
 from butterfree.core.constants.columns import TIMESTAMP_COLUMN
 from butterfree.core.transform.features import Feature
@@ -56,7 +56,7 @@ class TestCustomTransform:
 
         output_df = test_feature.transform(custom_target_df)
 
-        assert compare_dataframes(output_df, custom_target_df)
+        assert check_dataframe_equality(output_df, custom_target_df)
 
     def test_blank_transformer(self):
         with pytest.raises(ValueError):

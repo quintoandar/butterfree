@@ -1,5 +1,5 @@
 import pytest
-from testing import compare_dataframes
+from testing import check_dataframe_equality
 
 from butterfree.core.transform.features import Feature
 from butterfree.core.transform.transformations import SQLExpressionTransform
@@ -39,7 +39,7 @@ class TestSQLExpressionTransform:
 
         output_df = test_feature.transform(target_df)
 
-        assert compare_dataframes(output_df, sql_target_df)
+        assert check_dataframe_equality(output_df, sql_target_df)
 
     def test_feature_transform_invalid_output(self, target_df):
         with pytest.raises(Exception):

@@ -1,5 +1,5 @@
 import pytest
-from testing import compare_dataframes
+from testing import check_dataframe_equality
 
 from butterfree.core.constants.columns import TIMESTAMP_COLUMN
 from butterfree.core.transform.features import Feature
@@ -149,7 +149,7 @@ class TestAggregatedTransform:
 
         output_df = test_feature.transform(target_df)
 
-        assert compare_dataframes(output_df, fixed_windows_target_df)
+        assert check_dataframe_equality(output_df, fixed_windows_target_df)
 
     def test_feature_transform_output_rolling_windows(
         self, target_df, rolling_windows_target_df
@@ -167,7 +167,7 @@ class TestAggregatedTransform:
 
         output_df = test_feature.transform(target_df)
 
-        assert compare_dataframes(output_df, rolling_windows_target_df)
+        assert check_dataframe_equality(output_df, rolling_windows_target_df)
 
     def test_feature_transform_empty_mode(self):
         with pytest.raises(ValueError, match="Modes must not be empty."):
