@@ -11,7 +11,7 @@ services:
       - CASSANDRA_USERNAME=user
       - CASSANDRA_PASSWORD=pwd
 
-  - name: s3.amazonaws.com
+  s3.amazonaws.com:
     image: localstack/localstack
 
 pipeline:
