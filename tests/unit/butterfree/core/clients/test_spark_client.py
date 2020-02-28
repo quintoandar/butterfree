@@ -1,6 +1,6 @@
 import pytest
 from pyspark.sql import DataFrame
-from testing import compare_dataframes
+from testing import check_dataframe_equality
 
 from butterfree.core.clients import SparkClient
 
@@ -43,7 +43,7 @@ class TestSparkClient:
         # assert
         mocked_spark_read.format.assert_called_once_with(format)
         mocked_spark_read.options.assert_called_once_with(**options)
-        assert compare_dataframes(output_df, target_df)
+        assert check_dataframe_equality(output_df, target_df)
 
     @pytest.mark.parametrize(
         "format, options",
@@ -66,7 +66,7 @@ class TestSparkClient:
         output_df = spark_client.sql("select * from test")
 
         # assert
-        assert compare_dataframes(output_df, target_df)
+        assert check_dataframe_equality(output_df, target_df)
 
     def test_read_table(self, target_df, mocked_spark_read):
         # arrange
@@ -81,7 +81,7 @@ class TestSparkClient:
 
         # assert
         mocked_spark_read.table.assert_called_once_with("{}.{}".format(database, table))
-        assert compare_dataframes(output_df, target_df)
+        assert check_dataframe_equality(output_df, target_df)
 
     @pytest.mark.parametrize(
         "database, table", [(None, "table"), ("database", None), ("database", 123)],
