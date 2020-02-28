@@ -1,7 +1,7 @@
-from butterfree.core.configs import environment
 from tests.integration.butterfree.core.load.conftest import create_bucket
 
 from butterfree.core.clients import CassandraClient, SparkClient
+from butterfree.core.configs import environment
 from butterfree.core.configs.db import CassandraConfig, S3Config
 from butterfree.core.load import Sink
 from butterfree.core.load.writers import (

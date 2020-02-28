@@ -11,12 +11,8 @@ services:
       - CASSANDRA_USERNAME=user
       - CASSANDRA_PASSWORD=pwd
 
-  localstack:
+  - name: s3.amazonaws.com
     image: localstack/localstack
-    privileged: true
-    volumes:
-      - name: localstack-vol
-        path: /tmp/localstack
 
 pipeline:
   install: &install
