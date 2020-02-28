@@ -1,5 +1,8 @@
+import json
+
 import pytest
 from pyspark.sql.functions import expr
+from testing import check_dataframe_equality
 
 from butterfree.core.extract.readers import FileReader
 
@@ -114,16 +117,18 @@ class TestReader:
         # arrange
         file_reader = FileReader("test", "path/to/file", "format")
         file_reader.transformations = transformations
-        input_df = spark_session.read.json(spark_context.parallelize(input_data, 1))
+        input_df = spark_session.read.json(
+            spark_context.parallelize(input_data).map(lambda x: json.dumps(x))
+        )
         target_df = spark_session.read.json(
-            spark_context.parallelize(transformed_data, 1)
+            spark_context.parallelize(transformed_data).map(lambda x: json.dumps(x))
         )
 
         # act
-        result_df = file_reader._apply_transformations(input_df)
+        output_df = file_reader._apply_transformations(input_df)
 
         # assert
-        assert target_df.collect() == result_df.collect()
+        assert check_dataframe_equality(output_df, target_df)
 
     def test_build(self, target_df, spark_client, spark_session):
         # arrange
@@ -132,10 +137,10 @@ class TestReader:
 
         # act
         file_reader.build(spark_client)
-        result_df = spark_session.sql("select * from test")
+        output_df = spark_session.sql("select * from test")
 
         # assert
-        assert target_df.collect() == result_df.collect()
+        assert check_dataframe_equality(output_df, target_df)
 
     def test_build_with_columns(
         self, target_df, column_target_df, spark_client, spark_session
@@ -146,9 +151,10 @@ class TestReader:
 
         # act
         file_reader.build(
-            client=spark_client, columns=[("col1", "new_col1"), ("col2", "new_col2")],
+            client=spark_client,
+            columns=[("feature1", "new_feature1"), ("feature2", "new_feature2")],
         )
-        result_df = spark_session.sql("select * from test")
+        output_df = spark_session.sql("select * from test")
 
         # assert
-        assert column_target_df.collect() == result_df.collect()
+        assert check_dataframe_equality(output_df, column_target_df)

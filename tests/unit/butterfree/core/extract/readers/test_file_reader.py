@@ -1,4 +1,5 @@
 import pytest
+from testing import check_dataframe_equality
 
 from butterfree.core.extract.readers import FileReader
 
@@ -35,4 +36,4 @@ class TestFileReader:
 
         # assert
         spark_client.read.assert_called_once_with(format, options)
-        assert target_df.collect() == output_df.collect()
+        assert check_dataframe_equality(output_df, target_df)

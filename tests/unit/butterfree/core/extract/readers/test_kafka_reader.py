@@ -1,4 +1,5 @@
 import pytest
+from testing import check_dataframe_equality
 
 from butterfree.core.extract.readers import KafkaReader
 
@@ -63,4 +64,4 @@ class TestKafkaReader:
         spark_client.read.assert_called_once_with(
             format="kafka", options=options, stream=kafka_reader.stream
         )
-        assert target_df.collect() == output_df.collect()
+        assert check_dataframe_equality(output_df, target_df)
