@@ -13,8 +13,6 @@ services:
 
   localstack:
     image: localstack/localstack
-    commands:
-      - localstack start --docker
 
 pipeline:
   install: &install
