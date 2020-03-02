@@ -1,13 +1,16 @@
 """FeatureSet entity."""
 import itertools
+from datetime import datetime
 from functools import reduce
 from typing import List
 
+import pyspark.sql.functions as F
 from pyspark.sql import Window
-from pyspark.sql import functions as F
 from pyspark.sql.dataframe import DataFrame
 
+from butterfree.core.clients import SparkClient
 from butterfree.core.constants.columns import TIMESTAMP_COLUMN
+from butterfree.core.constants.data_type import DataType
 from butterfree.core.transform.features import Feature, KeyFeature, TimestampFeature
 from butterfree.core.transform.transformations import AggregatedTransform
 
@@ -85,6 +88,8 @@ class FeatureSet:
     method can be found at filter_duplicated_rows docstring.
     """
 
+    DAY_IN_SECONDS = 60 * 60 * 24
+
     def __init__(
         self,
         name: str,
@@ -93,6 +98,7 @@ class FeatureSet:
         keys: List[KeyFeature],
         timestamp: TimestampFeature,
         features: List[Feature],
+        base_date: str = None,
     ) -> None:
         self.name = name
         self.entity = entity
@@ -100,6 +106,8 @@ class FeatureSet:
         self.keys = keys
         self.timestamp = timestamp
         self.features = features
+        self.base_date = base_date or datetime.now()
+        self.spark_client = SparkClient()
 
     @property
     def name(self) -> str:
@@ -192,17 +200,6 @@ class FeatureSet:
         if len(feature_columns) != len(set(feature_columns)):
             raise KeyError("feature columns will have duplicates.")
 
-        for feature in value:
-            if isinstance(feature.transformation, AggregatedTransform) and (
-                feature.transformation.mode[0] == "rolling_windows" and len(value) > 1
-            ):
-                raise ValueError(
-                    "You can define only one feature within the scope of the "
-                    "rolling windows aggregated transform, since the output "
-                    "dataframe will only contain features related to this "
-                    "transformation."
-                )
-
         self.__features = value
 
     @property
@@ -232,6 +229,73 @@ class FeatureSet:
 
         """
         return self.keys_columns + [self.timestamp_column] + self.features_columns
+
+    def _rolling_windows_only(self):
+        """Checks if there's a rolling window mode within the scope of the
+        AggregatedTransform.
+
+        Returns:
+            True if there's a rolling window aggregation mode.
+
+        """
+        for feature in self.features:
+            if isinstance(feature.transformation, AggregatedTransform) and (
+                feature.transformation.mode[0] == "rolling_windows"
+            ):
+                return True
+            return
+
+    def _generate_dates(self, client: SparkClient, date_range):
+        start_date, end_date = date_range
+        date_df = client.conn.createDataFrame(
+            [(start_date, end_date)], ("start_date", "end_date")
+        ).select(
+            [
+                F.col(c).cast(DataType.TIMESTAMP.value)
+                for c in ("start_date", "end_date")
+            ]
+        )
+        date_df = date_df.withColumn(
+            "end_date", F.date_add("end_date", 1).cast(DataType.TIMESTAMP.value)
+        ).select(
+            [F.col(c).cast(DataType.BIGINT.value) for c in ("start_date", "end_date")]
+        )
+        start_date, end_date = date_df.first()
+        return client.conn.range(start_date, end_date, self.DAY_IN_SECONDS).select(
+            F.col("id").cast(DataType.TIMESTAMP.value).alias(TIMESTAMP_COLUMN)
+        )
+
+    def _cross_join_df(self, client: SparkClient, date_df, output_df):
+        client.conn.conf.set("spark.sql.crossJoin.enabled", True)
+        unique_df = output_df.dropDuplicates(subset=self.keys_columns).select(self.keys_columns)
+        return date_df.join(unique_df)
+
+    def _filter_dataframe(self, df):
+
+        window_id = Window.partitionBy("id").orderBy(TIMESTAMP_COLUMN)
+        window_all = Window.partitionBy(["id"] + self.features_columns).orderBy(TIMESTAMP_COLUMN)
+
+        df = df.withColumn("rn_by_id", F.row_number().over(window_id))
+        df = df.withColumn("rn_by_all", F.row_number().over(window_all))
+        df = df.withColumn("lag_rn_by_id", F.lag("rn_by_id", 1).over(window_all))
+        df = df.withColumn("diff", F.col("rn_by_id") - F.col("lag_rn_by_id"))
+        return df.filter("rn_by_all = 1 or diff > 1")
+
+    def _rolling_window_transformation(self, dataframe, output_df):
+        date_range = [
+            (
+                dataframe.select(F.min(TIMESTAMP_COLUMN))
+                .collect()[0][0]
+                .strftime("%Y-%m-%d")
+            ),
+            self.base_date if isinstance(self.base_date, str) else self.base_date.strftime("%Y-%m-%d"),
+        ]
+        date_df = self._generate_dates(self.spark_client, date_range)
+        cross_join_df = self._cross_join_df(self.spark_client, date_df, output_df)
+        output_df = cross_join_df.join(output_df, on=self.keys_columns + [TIMESTAMP_COLUMN], how="left")
+        output_df = self._filter_dataframe(output_df)
+
+        return output_df
 
     def _filter_duplicated_rows(self, df):
         """Filter dataframe duplicated rows.
@@ -330,11 +394,15 @@ class FeatureSet:
         """
         if not isinstance(dataframe, DataFrame):
             raise ValueError("source_df must be a dataframe")
+
         output_df = reduce(
             lambda df, feature: feature.transform(df),
             self.keys + [self.timestamp] + self.features,
             dataframe,
         ).select(*self.columns)
+
+        if self._rolling_windows_only():
+            output_df = self._rolling_window_transformation(dataframe, output_df)
 
         output_df = self._filter_duplicated_rows(output_df)
 
