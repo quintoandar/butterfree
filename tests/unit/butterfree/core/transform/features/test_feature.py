@@ -3,6 +3,7 @@ from unittest.mock import Mock
 from butterfree.core.constants.columns import TIMESTAMP_COLUMN
 from butterfree.core.constants.data_type import DataType
 from butterfree.core.transform.features import Feature
+from butterfree.testing.dataframe import assert_column_equality
 
 
 class TestFeature:
@@ -50,10 +51,32 @@ class TestFeature:
             [
                 a == b
                 for a, b in zip(
-                    sorted(df.columns), sorted(["new_feature", "id", TIMESTAMP_COLUMN])
+                    sorted(df.columns),
+                    sorted(["new_feature", "id", TIMESTAMP_COLUMN, "feature"]),
                 )
             ]
         )
+
+    def test_feature_transform_with_from_column_and_column_name_exists(
+        self, feature_set_dataframe
+    ):
+
+        test_feature = Feature(
+            name="feature", from_column="id", description="unit test",
+        )
+
+        df = test_feature.transform(feature_set_dataframe)
+
+        assert all(
+            [
+                a == b
+                for a, b in zip(
+                    sorted(df.columns), sorted(["id", TIMESTAMP_COLUMN, "feature"])
+                )
+            ]
+        )
+
+        assert_column_equality(df, feature_set_dataframe, "feature", "id")
 
     def test_feature_transform_with_dtype(self, feature_set_dataframe):
 

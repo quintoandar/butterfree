@@ -81,7 +81,7 @@ class Feature:
             return self.transformation.transform(dataframe)
 
         if self.from_column:
-            dataframe = dataframe.withColumnRenamed(self.from_column, self.name)
+            dataframe = dataframe.withColumn(self.name, col(self.from_column))
         if self.dtype:
             dataframe = dataframe.withColumn(
                 self.name, col(self.name).cast(self.dtype.value)
