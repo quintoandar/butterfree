@@ -13,6 +13,8 @@ services:
 
   localstack:
     image: localstack/localstack
+    entrypoint: [ "localstack" ]
+    command: [ "start --docker" ]
 
 pipeline:
   install: &install
