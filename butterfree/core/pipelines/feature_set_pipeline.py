@@ -19,10 +19,10 @@ class FeatureSetPipeline:
         sources, feature set (and its features) and writers are defined.
         >>> import os
 
-        >>> from butterfree.core.pipeline import FeatureSetPipeline
+        >>> from butterfree.core.pipelines import FeatureSetPipeline
         >>> from butterfree.core.configs.db import S3Config
         >>> from butterfree.core.extract import Source
-        >>> from butterfree.core.extract.reader import TableReader
+        >>> from butterfree.core.extract.readers import TableReader
         >>> from butterfree.core.transform import FeatureSet
         >>> from butterfree.core.transform.features import (
         ...     Feature,
@@ -34,7 +34,7 @@ class FeatureSetPipeline:
         ...     CustomTransform,
         ... )
         >>> from butterfree.core.load import Sink
-        >>> from butterfree.core.load.writer import HistoricalFeatureStoreWriter
+        >>> from butterfree.core.load.writers import HistoricalFeatureStoreWriter
         >>> import pyspark.sql.functions as F
 
         >>> def divide(df, fs, column1, column2):
