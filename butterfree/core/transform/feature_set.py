@@ -267,13 +267,17 @@ class FeatureSet:
 
     def _cross_join_df(self, client: SparkClient, date_df, output_df):
         client.conn.conf.set("spark.sql.crossJoin.enabled", True)
-        unique_df = output_df.dropDuplicates(subset=self.keys_columns).select(self.keys_columns)
+        unique_df = output_df.dropDuplicates(subset=self.keys_columns).select(
+            self.keys_columns
+        )
         return date_df.join(unique_df)
 
     def _filter_dataframe(self, df):
 
         window_id = Window.partitionBy("id").orderBy(TIMESTAMP_COLUMN)
-        window_all = Window.partitionBy(["id"] + self.features_columns).orderBy(TIMESTAMP_COLUMN)
+        window_all = Window.partitionBy(["id"] + self.features_columns).orderBy(
+            TIMESTAMP_COLUMN
+        )
 
         df = df.withColumn("rn_by_id", F.row_number().over(window_id))
         df = df.withColumn("rn_by_all", F.row_number().over(window_all))
@@ -288,11 +292,15 @@ class FeatureSet:
                 .collect()[0][0]
                 .strftime("%Y-%m-%d")
             ),
-            self.base_date if isinstance(self.base_date, str) else self.base_date.strftime("%Y-%m-%d"),
+            self.base_date
+            if isinstance(self.base_date, str)
+            else self.base_date.strftime("%Y-%m-%d"),
         ]
         date_df = self._generate_dates(self.spark_client, date_range)
         cross_join_df = self._cross_join_df(self.spark_client, date_df, output_df)
-        output_df = cross_join_df.join(output_df, on=self.keys_columns + [TIMESTAMP_COLUMN], how="left")
+        output_df = cross_join_df.join(
+            output_df, on=self.keys_columns + [TIMESTAMP_COLUMN], how="left"
+        )
         output_df = self._filter_dataframe(output_df)
 
         return output_df

@@ -91,7 +91,7 @@ class TestFeatureSet:
             ],
             keys=[KeyFeature(name="id", description="The user's Main ID or device ID")],
             timestamp=TimestampFeature(),
-            base_date="2016-04-23"
+            base_date="2016-04-23",
         )
 
         # act
