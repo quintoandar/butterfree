@@ -12,7 +12,10 @@ services:
       - CASSANDRA_PASSWORD=pwd
 
   localstack:
-    image: localstack/localstack
+    image: localstack/localstack:latest
+    environment:
+      - HOSTNAME_EXTERNAL=localstack
+      - SERVICES=s3
 
 pipeline:
   install: &install
