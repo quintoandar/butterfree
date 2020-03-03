@@ -5,7 +5,6 @@ from functools import reduce
 from typing import List
 
 import pyspark.sql.functions as F
-from pyspark.sql import Window
 from pyspark.sql.dataframe import DataFrame
 
 from butterfree.core.clients import SparkClient
@@ -200,6 +199,17 @@ class FeatureSet:
         if len(feature_columns) != len(set(feature_columns)):
             raise KeyError("feature columns will have duplicates.")
 
+        for feature in value:
+            if isinstance(feature.transformation, AggregatedTransform) and (
+                feature.transformation.mode[0] == "rolling_windows" and len(value) > 1
+            ):
+                raise ValueError(
+                    "You can define only one feature within the scope of the "
+                    "rolling windows aggregated transform, since the output "
+                    "dataframe will only contain features related to this "
+                    "transformation."
+                )
+
         self.__features = value
 
     @property
@@ -231,7 +241,9 @@ class FeatureSet:
         return self.keys_columns + [self.timestamp_column] + self.features_columns
 
     def _rolling_windows_only(self):
-        """Checks if there's a rolling window mode within the scope of the
+        """Aggregated Transform mode check.
+
+        Checks if there's a rolling window mode within the scope of the
         AggregatedTransform.
 
         Returns:
@@ -246,6 +258,15 @@ class FeatureSet:
             return
 
     def _generate_dates(self, client: SparkClient, date_range):
+        """Generate date dataframe.
+
+        Create a Spark DataFrame with a single column named timestamp and a
+        range of dates within the desired interval (start and end dates included).
+
+        Attributes:
+            client:  spark client used to create the dataframe.
+            date_range: list of the desired date interval.
+        """
         start_date, end_date = date_range
         date_df = client.conn.createDataFrame(
             [(start_date, end_date)], ("start_date", "end_date")
@@ -266,26 +287,32 @@ class FeatureSet:
         )
 
     def _cross_join_df(self, client: SparkClient, date_df, output_df):
+        """Cross join between desired dataframes.
+
+        Returns a cross join between the date daframe and transformed
+        dataframe.
+
+        Attributes:
+            client:  spark client used to create the dataframe.
+            date_df: date dataframe.
+            output_df: transformed dataframe.
+        """
         client.conn.conf.set("spark.sql.crossJoin.enabled", True)
         unique_df = output_df.dropDuplicates(subset=self.keys_columns).select(
             self.keys_columns
         )
         return date_df.join(unique_df)
 
-    def _filter_dataframe(self, df):
+    def _rolling_window_joins(self, dataframe, output_df):
+        """Performs a join between dataframes.
 
-        window_id = Window.partitionBy("id").orderBy(TIMESTAMP_COLUMN)
-        window_all = Window.partitionBy(["id"] + self.features_columns).orderBy(
-            TIMESTAMP_COLUMN
-        )
+        Performs a join between the transformed dataframe and the date
+        dataframe.
 
-        df = df.withColumn("rn_by_id", F.row_number().over(window_id))
-        df = df.withColumn("rn_by_all", F.row_number().over(window_all))
-        df = df.withColumn("lag_rn_by_id", F.lag("rn_by_id", 1).over(window_all))
-        df = df.withColumn("diff", F.col("rn_by_id") - F.col("lag_rn_by_id"))
-        return df.filter("rn_by_all = 1 or diff > 1")
-
-    def _rolling_window_transformation(self, dataframe, output_df):
+        Attributes:
+            dataframe:  source dataframe.
+            output_df: transformed dataframe.
+        """
         date_range = [
             (
                 dataframe.select(F.min(TIMESTAMP_COLUMN))
@@ -301,8 +328,6 @@ class FeatureSet:
         output_df = cross_join_df.join(
             output_df, on=self.keys_columns + [TIMESTAMP_COLUMN], how="left"
         )
-        output_df = self._filter_dataframe(output_df)
-
         return output_df
 
     def _filter_duplicated_rows(self, df):
@@ -410,7 +435,7 @@ class FeatureSet:
         ).select(*self.columns)
 
         if self._rolling_windows_only():
-            output_df = self._rolling_window_transformation(dataframe, output_df)
+            output_df = self._rolling_window_joins(dataframe, output_df)
 
         output_df = self._filter_duplicated_rows(output_df)
 
