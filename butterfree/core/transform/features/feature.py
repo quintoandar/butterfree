@@ -30,12 +30,12 @@ class Feature:
     """
 
     def __init__(
-            self,
-            name: str,
-            description: str,
-            dtype: DataType = None,
-            from_column: str = None,
-            transformation: TransformComponent = None,
+        self,
+        name: str,
+        description: str,
+        dtype: DataType = None,
+        from_column: str = None,
+        transformation: TransformComponent = None,
     ) -> None:
         self.name = name
         self.description = description
