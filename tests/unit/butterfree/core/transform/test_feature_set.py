@@ -10,6 +10,7 @@ from tests.unit.butterfree.core.transform.conftest import (
 
 from butterfree.core.transform import FeatureSet
 from butterfree.core.transform.features import Feature
+from butterfree.core.transform.transformations import AggregatedTransform
 
 
 class TestFeatureSet:
@@ -244,6 +245,79 @@ class TestFeatureSet:
 
         # assert
         assert result_df.collect() == feature_set_dataframe.collect()
+
+    def test_construct_rolling_agg(
+        self, dataframe, feature_set_dataframe, key_id, timestamp_c,
+    ):
+        feature_set = FeatureSet(
+            name="name",
+            entity="entity",
+            description="description",
+            features=[
+                Feature(
+                    name="feature1",
+                    description="test",
+                    transformation=AggregatedTransform(
+                        aggregations=["avg"],
+                        partition="id",
+                        windows=["1 week"],
+                        mode=["rolling_windows"],
+                    ),
+                ),
+            ],
+            keys=[key_id],
+            timestamp=timestamp_c,
+        )
+
+        # act
+        result_df = feature_set.construct(dataframe).collect()
+
+        # assert
+        assert result_df[0]["feature1__avg_over_1_week_rolling_windows"] is None
+        assert result_df[1]["feature1__avg_over_1_week_rolling_windows"] == 350
+        assert result_df[2]["feature1__avg_over_1_week_rolling_windows"] == 350
+        assert result_df[3]["feature1__avg_over_1_week_rolling_windows"] == 350
+        assert result_df[4]["feature1__avg_over_1_week_rolling_windows"] == 350
+        assert result_df[5]["feature1__avg_over_1_week_rolling_windows"] == 350
+        assert result_df[6]["feature1__avg_over_1_week_rolling_windows"] == 350
+        assert result_df[7]["feature1__avg_over_1_week_rolling_windows"] == 350
+
+    def test_construct_rolling_agg_with_base_date(
+        self, dataframe, feature_set_dataframe, key_id, timestamp_c,
+    ):
+        feature_set = FeatureSet(
+            name="name",
+            entity="entity",
+            description="description",
+            features=[
+                Feature(
+                    name="feature1",
+                    description="test",
+                    transformation=AggregatedTransform(
+                        aggregations=["avg"],
+                        partition="id",
+                        windows=["1 week"],
+                        mode=["rolling_windows"],
+                    ),
+                ),
+            ],
+            keys=[key_id],
+            timestamp=timestamp_c,
+            base_date="2016-04-18",
+        )
+
+        # act
+        result_df = feature_set.construct(dataframe).collect()
+
+        # assert
+        assert result_df[0]["feature1__avg_over_1_week_rolling_windows"] is None
+        assert result_df[1]["feature1__avg_over_1_week_rolling_windows"] == 350
+        assert result_df[2]["feature1__avg_over_1_week_rolling_windows"] == 350
+        assert result_df[3]["feature1__avg_over_1_week_rolling_windows"] == 350
+        assert result_df[4]["feature1__avg_over_1_week_rolling_windows"] == 350
+        assert result_df[5]["feature1__avg_over_1_week_rolling_windows"] == 350
+        assert result_df[6]["feature1__avg_over_1_week_rolling_windows"] == 350
+        assert result_df[7]["feature1__avg_over_1_week_rolling_windows"] == 350
 
     def test__get_features_columns(self):
         # arrange
