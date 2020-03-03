@@ -1,5 +1,5 @@
 """Feature entity."""
-
+import warnings
 from typing import List
 
 from pyspark.sql import DataFrame
@@ -81,7 +81,16 @@ class Feature:
             return self.transformation.transform(dataframe)
 
         if self.from_column:
-            dataframe = dataframe.withColumnRenamed(self.from_column, self.name)
+            for column_name in dataframe.schema.fieldNames():
+                if column_name == self.name:
+                    warnings.warn(
+                        f"The column name {self.name} "
+                        "already exists in the dataframe and "
+                        "will be overwritten with another column."
+                    )
+
+            dataframe = dataframe.withColumn(self.name, col(self.from_column))
+
         if self.dtype:
             dataframe = dataframe.withColumn(
                 self.name, col(self.name).cast(self.dtype.value)
