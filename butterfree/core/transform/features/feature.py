@@ -30,12 +30,12 @@ class Feature:
     """
 
     def __init__(
-        self,
-        name: str,
-        description: str,
-        dtype: DataType = None,
-        from_column: str = None,
-        transformation: TransformComponent = None,
+            self,
+            name: str,
+            description: str,
+            dtype: DataType = None,
+            from_column: str = None,
+            transformation: TransformComponent = None,
     ) -> None:
         self.name = name
         self.description = description
@@ -81,13 +81,12 @@ class Feature:
             return self.transformation.transform(dataframe)
 
         if self.from_column:
-            for column_name in dataframe.schema.fieldNames():
-                if column_name == self.name:
-                    warnings.warn(
-                        f"The column name {self.name} "
-                        "already exists in the dataframe and "
-                        "will be overwritten with another column."
-                    )
+            if self.name in dataframe.columns:
+                warnings.warn(
+                    f"The column name {self.name} "
+                    "already exists in the dataframe and "
+                    "will be overwritten with another column."
+                )
 
             dataframe = dataframe.withColumn(self.name, col(self.from_column))
 
