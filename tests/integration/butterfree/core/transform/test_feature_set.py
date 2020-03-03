@@ -91,7 +91,7 @@ class TestFeatureSet:
             ],
             keys=[KeyFeature(name="id", description="The user's Main ID or device ID")],
             timestamp=TimestampFeature(),
-            base_date="2016-04-23",
+            base_date="2016-04-18",
         )
 
         # act
@@ -101,7 +101,7 @@ class TestFeatureSet:
         assert df[0]["feature1__avg_over_1_day_rolling_windows"] == 350
         assert df[1]["feature1__avg_over_1_day_rolling_windows"] is None
         assert (
-            df[0]["feature1__stddev_pop_over_1_day_rolling_windows"]
+            df[1]["feature1__stddev_pop_over_1_day_rolling_windows"]
             == 111.80339887498948
         )
         assert df[1]["feature1__stddev_pop_over_1_day_rolling_windows"] is None
@@ -140,34 +140,37 @@ class TestFeatureSet:
         )
 
         # act
-        df = feature_set.construct(feature_set_dataframe).orderBy("timestamp")
+        df = feature_set.construct(feature_set_dataframe).orderBy("timestamp").collect()
 
         # assert
-        assert df[0]["feature1__avg_over_1_day_rolling_windows"] == 350
-        assert df[1]["feature1__avg_over_1_day_rolling_windows"] is None
+        assert df[0]["feature1__avg_over_1_day_rolling_windows"] is None
+        assert df[1]["feature1__avg_over_1_day_rolling_windows"] == 350
         assert df[2]["feature1__avg_over_1_day_rolling_windows"] is None
         assert df[3]["feature1__avg_over_1_day_rolling_windows"] is None
         assert df[4]["feature1__avg_over_1_day_rolling_windows"] is None
         assert df[5]["feature1__avg_over_1_day_rolling_windows"] is None
+        assert df[6]["feature1__avg_over_1_day_rolling_windows"] is None
+        assert df[7]["feature1__avg_over_1_day_rolling_windows"] is None
+        assert df[0]["feature1__stddev_pop_over_1_day_rolling_windows"] is None
         assert (
-            df[0]["feature1__stddev_pop_over_1_day_rolling_windows"]
+            df[1]["feature1__stddev_pop_over_1_day_rolling_windows"]
             == 111.80339887498948
         )
-        assert df[1]["feature1__stddev_pop_over_1_day_rolling_windows"] is None
         assert df[2]["feature1__stddev_pop_over_1_day_rolling_windows"] is None
         assert df[3]["feature1__stddev_pop_over_1_day_rolling_windows"] is None
         assert df[4]["feature1__stddev_pop_over_1_day_rolling_windows"] is None
         assert df[5]["feature1__stddev_pop_over_1_day_rolling_windows"] is None
-        assert df[0]["feature1__avg_over_1_week_rolling_windows"] == 350
+        assert df[6]["feature1__stddev_pop_over_1_day_rolling_windows"] is None
+        assert df[7]["feature1__stddev_pop_over_1_day_rolling_windows"] is None
+        assert df[0]["feature1__avg_over_1_week_rolling_windows"] is None
         assert df[1]["feature1__avg_over_1_week_rolling_windows"] == 350
         assert df[2]["feature1__avg_over_1_week_rolling_windows"] == 350
         assert df[3]["feature1__avg_over_1_week_rolling_windows"] == 350
         assert df[4]["feature1__avg_over_1_week_rolling_windows"] == 350
         assert df[5]["feature1__avg_over_1_week_rolling_windows"] == 350
-        assert (
-            df[0]["feature1__stddev_pop_over_1_week_rolling_windows"]
-            == 111.80339887498948
-        )
+        assert df[6]["feature1__avg_over_1_week_rolling_windows"] == 350
+        assert df[7]["feature1__avg_over_1_week_rolling_windows"] == 350
+        assert df[0]["feature1__stddev_pop_over_1_week_rolling_windows"] is None
         assert (
             df[1]["feature1__stddev_pop_over_1_week_rolling_windows"]
             == 111.80339887498948
@@ -186,5 +189,13 @@ class TestFeatureSet:
         )
         assert (
             df[5]["feature1__stddev_pop_over_1_week_rolling_windows"]
+            == 111.80339887498948
+        )
+        assert (
+            df[6]["feature1__stddev_pop_over_1_week_rolling_windows"]
+            == 111.80339887498948
+        )
+        assert (
+            df[7]["feature1__stddev_pop_over_1_week_rolling_windows"]
             == 111.80339887498948
         )
