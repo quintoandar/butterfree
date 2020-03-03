@@ -1,17 +1,22 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each release or unreleased log for a better organization. 
+Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each release or unreleased log for a better organization.
 ## Unreleased
 
-## [0.3.0](https://github.com/quintoandar/butterfree/releases/tag/0.2.0)
+## [0.3.1](https://github.com/quintoandar/butterfree/releases/tag/0.3.1)
+
+### Fixed
+* [MLOP-157] Ambiguous Name Bug on Feature Set ([#71](https://github.com/quintoandar/butterfree/pull/71))
+
+## [0.3.0](https://github.com/quintoandar/butterfree/releases/tag/0.3.0)
 
 ### Added
 * [MLOP-153] Butterfree testing module - Compare DataFrames ([#68](https://github.com/quintoandar/butterfree/pull/68))
 
 ## [0.2.0](https://github.com/quintoandar/butterfree/releases/tag/0.2.0)
 
-### Added 
+### Added
 * Flow with Staging Branch configuration ([#61](https://github.com/quintoandar/butterfree/pull/61))
 * [MLOP-91] Usage examples in docstrings for load step ([#57](https://github.com/quintoandar/butterfree/pull/57))
 * [MLOP-126] Timestamp conversions from long in ms (ure.timestamp) ([#56](https://github.com/quintoandar/butterfree/pull/56))
