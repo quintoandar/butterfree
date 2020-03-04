@@ -10,7 +10,7 @@ from tests.unit.butterfree.core.transform.conftest import (
 
 from butterfree.core.clients import SparkClient
 from butterfree.core.transform import FeatureSet
-from butterfree.core.transform.features import Feature
+from butterfree.core.transform.features import Feature, TimestampFeature
 from butterfree.core.transform.transformations import AggregatedTransform
 
 
@@ -254,7 +254,12 @@ class TestFeatureSet:
         assert result_df.collect() == feature_set_dataframe.collect()
 
     def test_construct_rolling_agg(
-        self, dataframe, feature_set_dataframe, key_id, timestamp_c,
+        self,
+        dataframe,
+        feature_set_dataframe,
+        key_id,
+        timestamp_c,
+        rolling_windows_agg_dataframe,
     ):
         spark_client = SparkClient()
 
@@ -275,24 +280,32 @@ class TestFeatureSet:
                 ),
             ],
             keys=[key_id],
-            timestamp=timestamp_c,
+            timestamp=TimestampFeature(from_column="ts"),
         )
 
         # act
-        result_df = feature_set.construct(dataframe, spark_client).collect()
+        result_df = (
+            feature_set.construct(dataframe, spark_client)
+            .orderBy(feature_set.timestamp_column)
+            .select(feature_set.columns)
+            .take(9)
+        )
 
         # assert
-        assert result_df[0]["feature1__avg_over_1_week_rolling_windows"] is None
-        assert result_df[1]["feature1__avg_over_1_week_rolling_windows"] == 350
-        assert result_df[2]["feature1__avg_over_1_week_rolling_windows"] == 350
-        assert result_df[3]["feature1__avg_over_1_week_rolling_windows"] == 350
-        assert result_df[4]["feature1__avg_over_1_week_rolling_windows"] == 350
-        assert result_df[5]["feature1__avg_over_1_week_rolling_windows"] == 350
-        assert result_df[6]["feature1__avg_over_1_week_rolling_windows"] == 350
-        assert result_df[7]["feature1__avg_over_1_week_rolling_windows"] == 350
+        assert (
+            result_df
+            == rolling_windows_agg_dataframe.orderBy(feature_set.timestamp_column)
+            .select(feature_set.columns)
+            .collect()
+        )
 
     def test_construct_rolling_agg_with_base_date(
-        self, dataframe, feature_set_dataframe, key_id, timestamp_c,
+        self,
+        dataframe,
+        feature_set_dataframe,
+        key_id,
+        timestamp_c,
+        rolling_windows_agg_dataframe,
     ):
         spark_client = SparkClient()
 
@@ -317,19 +330,20 @@ class TestFeatureSet:
         )
 
         # act
-        result_df = feature_set.construct(
-            dataframe, spark_client, "2016-04-18"
-        ).collect()
+        result_df = (
+            feature_set.construct(dataframe, spark_client, "2016-04-19")
+            .orderBy(feature_set.timestamp_column)
+            .select(feature_set.columns)
+            .take(9)
+        )
 
         # assert
-        assert result_df[0]["feature1__avg_over_1_week_rolling_windows"] is None
-        assert result_df[1]["feature1__avg_over_1_week_rolling_windows"] == 350
-        assert result_df[2]["feature1__avg_over_1_week_rolling_windows"] == 350
-        assert result_df[3]["feature1__avg_over_1_week_rolling_windows"] == 350
-        assert result_df[4]["feature1__avg_over_1_week_rolling_windows"] == 350
-        assert result_df[5]["feature1__avg_over_1_week_rolling_windows"] == 350
-        assert result_df[6]["feature1__avg_over_1_week_rolling_windows"] == 350
-        assert result_df[7]["feature1__avg_over_1_week_rolling_windows"] == 350
+        assert (
+            result_df
+            == rolling_windows_agg_dataframe.orderBy(feature_set.timestamp_column)
+            .select(feature_set.columns)
+            .collect()
+        )
 
     def test__get_features_columns(self):
         # arrange
