@@ -280,7 +280,23 @@ class TestFeatureSet:
         )
 
         # act
-        result_df = feature_set.construct(filtering_dataframe)
+        result_df = (
+            feature_set.construct(filtering_dataframe).orderBy("timestamp").collect()
+        )
 
         # assert
-        # assert result_df.collect() == feature_set_dataframe.collect()
+        assert result_df[0]["feature1"] == 0
+        assert result_df[1]["feature1"] == 0
+        assert result_df[2]["feature1"] is None
+        assert result_df[3]["feature1"] == 0
+        assert result_df[4]["feature1"] is None
+        assert result_df[0]["feature2"] is None
+        assert result_df[1]["feature2"] == 1
+        assert result_df[2]["feature2"] is None
+        assert result_df[3]["feature2"] == 1
+        assert result_df[4]["feature2"] is None
+        assert result_df[0]["feature3"] == 1
+        assert result_df[1]["feature3"] == 1
+        assert result_df[2]["feature3"] is None
+        assert result_df[3]["feature3"] == 1
+        assert result_df[4]["feature3"] is None
