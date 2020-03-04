@@ -47,13 +47,13 @@ def make_dataframe(spark_context, spark_session):
 
 def make_filtering_dataframe(spark_context, spark_session):
     data = [
-        {"id": 1, "ts": 1, "feature1": 0, "feature2": None, "feature3": 1,},
-        {"id": 1, "ts": 2, "feature1": 0, "feature2": 1, "feature3": 1,},
-        {"id": 1, "ts": 3, "feature1": None, "feature2": None, "feature3": None,},
-        {"id": 1, "ts": 4, "feature1": 0, "feature2": 1, "feature3": 1,},
-        {"id": 1, "ts": 5, "feature1": 0, "feature2": 1, "feature3": 1,},
-        {"id": 1, "ts": 6, "feature1": None, "feature2": None, "feature3": None,},
-        {"id": 1, "ts": 7, "feature1": None, "feature2": None, "feature3": None,},
+        {"id": 1, "ts": 1, "feature1": 0, "feature2": None, "feature3": 1},
+        {"id": 1, "ts": 2, "feature1": 0, "feature2": 1, "feature3": 1},
+        {"id": 1, "ts": 3, "feature1": None, "feature2": None, "feature3": None},
+        {"id": 1, "ts": 4, "feature1": 0, "feature2": 1, "feature3": 1},
+        {"id": 1, "ts": 5, "feature1": 0, "feature2": 1, "feature3": 1},
+        {"id": 1, "ts": 6, "feature1": None, "feature2": None, "feature3": None},
+        {"id": 1, "ts": 7, "feature1": None, "feature2": None, "feature3": None},
     ]
     df = spark_session.read.json(
         spark_context.parallelize(data).map(lambda x: json.dumps(x))
@@ -109,7 +109,9 @@ def feature_divide(spark_context, spark_session):
 def feature1(spark_context, spark_session):
     feature1 = Mock(spec=Feature)
     feature1.get_output_columns = Mock(return_value=["feature1"])
-    feature1.transform = Mock(return_value=make_filtering_dataframe(spark_context, spark_session))
+    feature1.transform = Mock(
+        return_value=make_filtering_dataframe(spark_context, spark_session)
+    )
     return feature1
 
 
@@ -117,7 +119,9 @@ def feature1(spark_context, spark_session):
 def feature2(spark_context, spark_session):
     feature2 = Mock(spec=Feature)
     feature2.get_output_columns = Mock(return_value=["feature2"])
-    feature2.transform = Mock(return_value=make_filtering_dataframe(spark_context, spark_session))
+    feature2.transform = Mock(
+        return_value=make_filtering_dataframe(spark_context, spark_session)
+    )
     return feature2
 
 
@@ -125,7 +129,9 @@ def feature2(spark_context, spark_session):
 def feature3(spark_context, spark_session):
     feature3 = Mock(spec=Feature)
     feature3.get_output_columns = Mock(return_value=["feature3"])
-    feature3.transform = Mock(return_value=make_filtering_dataframe(spark_context, spark_session))
+    feature3.transform = Mock(
+        return_value=make_filtering_dataframe(spark_context, spark_session)
+    )
     return feature3
 
 
