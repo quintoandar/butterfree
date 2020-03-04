@@ -265,3 +265,22 @@ class TestFeatureSet:
 
         # assert
         assert target_features_columns == result_features_columns
+
+    def test_filtering(
+        self, filtering_dataframe, key_id, timestamp_c, feature1, feature2, feature3,
+    ):
+        # arrange
+        feature_set = FeatureSet(
+            "name",
+            "entity",
+            "description",
+            [key_id],
+            timestamp_c,
+            [feature1, feature2, feature3],
+        )
+
+        # act
+        result_df = feature_set.construct(filtering_dataframe)
+
+        # assert
+        # assert result_df.collect() == feature_set_dataframe.collect()
