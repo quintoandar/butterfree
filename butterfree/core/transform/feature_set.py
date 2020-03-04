@@ -87,8 +87,6 @@ class FeatureSet:
     method can be found at filter_duplicated_rows docstring.
     """
 
-    DAY_IN_SECONDS = 60 * 60 * 24
-
     def __init__(
         self,
         name: str,
@@ -97,7 +95,6 @@ class FeatureSet:
         keys: List[KeyFeature],
         timestamp: TimestampFeature,
         features: List[Feature],
-        base_date: str = None,
     ) -> None:
         self.name = name
         self.entity = entity
@@ -105,8 +102,6 @@ class FeatureSet:
         self.keys = keys
         self.timestamp = timestamp
         self.features = features
-        self.base_date = base_date or datetime.now()
-        self.spark_client = SparkClient()
 
     @property
     def name(self) -> str:
@@ -199,16 +194,13 @@ class FeatureSet:
         if len(feature_columns) != len(set(feature_columns)):
             raise KeyError("feature columns will have duplicates.")
 
-        for feature in value:
-            if isinstance(feature.transformation, AggregatedTransform) and (
-                feature.transformation.mode[0] == "rolling_windows" and len(value) > 1
-            ):
-                raise ValueError(
-                    "You can define only one feature within the scope of the "
-                    "rolling windows aggregated transform, since the output "
-                    "dataframe will only contain features related to this "
-                    "transformation."
-                )
+        if self._has_rolling_windows_only(value) and len(value) > 1:
+            raise ValueError(
+                "You can define only one feature within the scope of the "
+                "rolling windows aggregated transform, since the output "
+                "dataframe will only contain features related to this "
+                "transformation."
+            )
 
         self.__features = value
 
@@ -240,7 +232,8 @@ class FeatureSet:
         """
         return self.keys_columns + [self.timestamp_column] + self.features_columns
 
-    def _rolling_windows_only(self):
+    @staticmethod
+    def _has_rolling_windows_only(features):
         """Aggregated Transform mode check.
 
         Checks if there's a rolling window mode within the scope of the
@@ -250,60 +243,78 @@ class FeatureSet:
             True if there's a rolling window aggregation mode.
 
         """
-        for feature in self.features:
+        for feature in features:
             if isinstance(feature.transformation, AggregatedTransform) and (
                 feature.transformation.mode[0] == "rolling_windows"
             ):
                 return True
-            return
+            return False
 
-    def _generate_dates(self, client: SparkClient, date_range):
+    @staticmethod
+    def _generate_dates(client: SparkClient, date_range, step=None):
         """Generate date dataframe.
 
         Create a Spark DataFrame with a single column named timestamp and a
         range of dates within the desired interval (start and end dates included).
+        It's also possible to provide a step argument.
 
         Attributes:
             client:  spark client used to create the dataframe.
             date_range: list of the desired date interval.
+            step: time step.
         """
+        day_in_seconds = 60 * 60 * 24
         start_date, end_date = date_range
+        step = step or day_in_seconds
         date_df = client.conn.createDataFrame(
             [(start_date, end_date)], ("start_date", "end_date")
         ).select(
             [
-                F.col(c).cast(DataType.TIMESTAMP.value)
+                F.col(c).cast(DataType.TIMESTAMP.value).cast(DataType.BIGINT.value)
                 for c in ("start_date", "end_date")
             ]
         )
-        date_df = date_df.withColumn(
-            "end_date", F.date_add("end_date", 1).cast(DataType.TIMESTAMP.value)
-        ).select(
-            [F.col(c).cast(DataType.BIGINT.value) for c in ("start_date", "end_date")]
-        )
         start_date, end_date = date_df.first()
-        return client.conn.range(start_date, end_date, self.DAY_IN_SECONDS).select(
+        return client.conn.range(start_date, end_date + step, step).select(
             F.col("id").cast(DataType.TIMESTAMP.value).alias(TIMESTAMP_COLUMN)
         )
 
-    def _cross_join_df(self, client: SparkClient, date_df, output_df):
+    def _get_unique_values(self, output_df):
+        """Get key columns unique values.
+
+        Create a Spark DataFrame with unique key columns values.
+
+        Attributes:
+            output_df:  dataframe to get unique key values.
+        """
+        return output_df.dropDuplicates(subset=self.keys_columns).select(
+            self.keys_columns
+        )
+
+    @staticmethod
+    def _cross_join_df(client: SparkClient, first_df, second_df):
         """Cross join between desired dataframes.
 
         Returns a cross join between the date daframe and transformed
-        dataframe.
+        dataframe. In order to make this operation faster, the smaller
+        dataframe is cached and autoBroadcastJoinThreshold conf is
+        setted to False.
 
         Attributes:
             client:  spark client used to create the dataframe.
-            date_df: date dataframe.
-            output_df: transformed dataframe.
+            first_df: a generic dataframe.
+            second_df: another generic dataframe.
         """
-        client.conn.conf.set("spark.sql.crossJoin.enabled", True)
-        unique_df = output_df.dropDuplicates(subset=self.keys_columns).select(
-            self.keys_columns
-        )
-        return date_df.join(unique_df)
+        client.conn.conf.set("spark.sql.crossJoin.enabled", "True")
+        client.conn.conf.set("spark.sql.autoBroadcastJoinThreshold", "0")
+        first_df.cache().take(
+            1
+        ) if second_df.count() >= first_df.count() else second_df.cache().take(1)
+        return first_df.join(second_df)
 
-    def _rolling_window_joins(self, dataframe, output_df):
+    def _rolling_window_joins(
+        self, dataframe, output_df, client: SparkClient, base_date
+    ):
         """Performs a join between dataframes.
 
         Performs a join between the transformed dataframe and the date
@@ -312,21 +323,22 @@ class FeatureSet:
         Attributes:
             dataframe:  source dataframe.
             output_df: transformed dataframe.
+            client: client responsible for connecting to Spark session.
         """
+        base_date = base_date or datetime.now()
         date_range = [
             (
                 dataframe.select(F.min(TIMESTAMP_COLUMN))
                 .collect()[0][0]
                 .strftime("%Y-%m-%d")
             ),
-            self.base_date
-            if isinstance(self.base_date, str)
-            else self.base_date.strftime("%Y-%m-%d"),
+            base_date if isinstance(base_date, str) else base_date.strftime("%Y-%m-%d"),
         ]
-        date_df = self._generate_dates(self.spark_client, date_range)
-        cross_join_df = self._cross_join_df(self.spark_client, date_df, output_df)
+        date_df = self._generate_dates(client, date_range)
+        unique_df = self._get_unique_values(output_df)
+        cross_join_df = self._cross_join_df(client, date_df, unique_df)
         output_df = cross_join_df.join(
-            output_df, on=self.keys_columns + [TIMESTAMP_COLUMN], how="left"
+            output_df, on=self.keys_columns + [self.timestamp_column], how="left"
         )
         return output_df
 
@@ -412,7 +424,9 @@ class FeatureSet:
 
         return df.select([column for column in self.columns])
 
-    def construct(self, dataframe: DataFrame) -> DataFrame:
+    def construct(
+        self, dataframe: DataFrame, client: SparkClient, base_date: str = None
+    ) -> DataFrame:
         """Use all the features to build the feature set dataframe.
 
         After that, there's the caching of the dataframe, however since cache()
@@ -420,6 +434,8 @@ class FeatureSet:
 
         Args:
             dataframe: input dataframe to be transformed by the features.
+            client: client responsible for connecting to Spark session.
+            base_date: user defined base date.
 
         Returns:
             Spark dataframe with all the feature columns.
@@ -434,8 +450,10 @@ class FeatureSet:
             dataframe,
         ).select(*self.columns)
 
-        if self._rolling_windows_only():
-            output_df = self._rolling_window_joins(dataframe, output_df)
+        if self._has_rolling_windows_only(self.features):
+            output_df = self._rolling_window_joins(
+                dataframe, output_df, client, base_date
+            )
 
         output_df = self._filter_duplicated_rows(output_df)
 
