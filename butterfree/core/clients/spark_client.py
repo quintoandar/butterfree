@@ -35,8 +35,8 @@ class SparkClient:
                 hadoop_conf.set("fs.s3a.proxy.port", "4572")
                 hadoop_conf.set("fs.s3a.path.style.access", "true")
                 hadoop_conf.set("fs.s3a.connection.ssl.enabled", "false")
-                hadoop_conf.set("fs.s3a.access.key", "mock")
-                hadoop_conf.set("fs.s3a.secret.key", "mock")
+                # hadoop_conf.set("fs.s3a.access.key", "mock")
+                # hadoop_conf.set("fs.s3a.secret.key", "mock")
         return self._session
 
     def read(self, format: str, options: dict, stream: bool = False) -> DataFrame:

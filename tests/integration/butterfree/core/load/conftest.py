@@ -53,9 +53,9 @@ def feature_set():
         Feature(name="feature", description="Description"),
     ]
     return FeatureSet(
-        "test_sink_feature_set",
-        "test_sink_entity",
-        "description",
+        name="test_sink_feature_set",
+        entity="test_sink_entity",
+        description="description",
         keys=key_features,
         timestamp=ts_feature,
         features=features,
