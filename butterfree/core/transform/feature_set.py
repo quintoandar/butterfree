@@ -3,8 +3,11 @@ import itertools
 from functools import reduce
 from typing import List
 
+from pyspark.sql import Window
+from pyspark.sql import functions as F
 from pyspark.sql.dataframe import DataFrame
 
+from butterfree.core.constants.columns import TIMESTAMP_COLUMN
 from butterfree.core.transform.features import Feature, KeyFeature, TimestampFeature
 from butterfree.core.transform.transformations import AggregatedTransform
 
@@ -225,6 +228,24 @@ class FeatureSet:
         """
         return self.keys_columns + [self.timestamp_column] + self.features_columns
 
+    def _filter_duplicated_lines(self, df):
+
+        window_id = Window.partitionBy(self.keys_columns).orderBy(TIMESTAMP_COLUMN)
+        window_all = Window.partitionBy(self.keys_columns + self.features_columns).orderBy(
+            TIMESTAMP_COLUMN
+        )
+
+        df = (
+            df.withColumn("rn_by_id", F.row_number().over(window_id))
+            .withColumn("rn_by_all", F.row_number().over(window_all))
+            .withColumn("lag_rn_by_id", F.lag("rn_by_id", 1).over(window_all))
+            .withColumn("diff", F.col("rn_by_id") - F.col("lag_rn_by_id"))
+        )
+        # df = df.withColumn("rn_by_all", F.row_number().over(window_all))
+        # df = df.withColumn("lag_rn_by_id", F.lag("rn_by_id", 1).over(window_all))
+        # df = df.withColumn("diff", F.col("rn_by_id") - F.col("lag_rn_by_id"))
+        return df.filter("rn_by_all = 1 or diff > 1")
+
     def construct(self, dataframe: DataFrame) -> DataFrame:
         """Use all the features to build the feature set dataframe.
 
@@ -245,6 +266,8 @@ class FeatureSet:
             self.keys + [self.timestamp] + self.features,
             dataframe,
         ).select(*self.columns)
+
+        output_df = self._filter_duplicated_lines(output_df)
 
         output_df.cache().count()
 
