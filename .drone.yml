@@ -16,6 +16,7 @@ services:
     environment:
       - HOSTNAME_EXTERNAL=localstack
       - SERVICES=s3
+      - DEFAULT_REGION=us-east-1
 
 pipeline:
   install: &install
