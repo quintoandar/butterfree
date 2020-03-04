@@ -1,5 +1,6 @@
 from pyspark.sql import functions as F
 
+from butterfree.core.clients import SparkClient
 from butterfree.core.transform import FeatureSet
 from butterfree.core.transform.features import Feature, KeyFeature, TimestampFeature
 from butterfree.core.transform.transformations import (
@@ -16,6 +17,10 @@ def divide(df, fs, column1, column2):
 
 class TestFeatureSet:
     def test_construct(self, feature_set_dataframe):
+        # given
+
+        spark_client = SparkClient()
+
         # arrange
 
         feature_set = FeatureSet(
@@ -46,7 +51,7 @@ class TestFeatureSet:
         )
 
         # act
-        df = feature_set.construct(feature_set_dataframe).collect()
+        df = feature_set.construct(feature_set_dataframe, client=spark_client).collect()
 
         # assert
         assert df[0]["feature1__avg_over_2_minutes_fixed_windows"] == 200
@@ -71,6 +76,10 @@ class TestFeatureSet:
         assert df[3]["divided_feature"] == 1
 
     def test_construct_rolling_windows_with_base_date(self, feature_set_dataframe):
+        # given
+
+        spark_client = SparkClient()
+
         # arrange
 
         feature_set = FeatureSet(
@@ -91,11 +100,16 @@ class TestFeatureSet:
             ],
             keys=[KeyFeature(name="id", description="The user's Main ID or device ID")],
             timestamp=TimestampFeature(),
-            base_date="2016-04-18",
         )
 
         # act
-        df = feature_set.construct(feature_set_dataframe).orderBy("timestamp").collect()
+        df = (
+            feature_set.construct(
+                feature_set_dataframe, client=spark_client, base_date="2016-04-18"
+            )
+            .orderBy("timestamp")
+            .collect()
+        )
 
         # assert
         assert df[0]["feature1__avg_over_1_day_rolling_windows"] == 350
@@ -117,6 +131,10 @@ class TestFeatureSet:
         )
 
     def test_construct_rolling_windows_without_base_date(self, feature_set_dataframe):
+        # given
+
+        spark_client = SparkClient()
+
         # arrange
 
         feature_set = FeatureSet(
@@ -140,7 +158,11 @@ class TestFeatureSet:
         )
 
         # act
-        df = feature_set.construct(feature_set_dataframe).orderBy("timestamp").collect()
+        df = (
+            feature_set.construct(feature_set_dataframe, client=spark_client)
+            .orderBy("timestamp")
+            .collect()
+        )
 
         # assert
         assert df[0]["feature1__avg_over_1_day_rolling_windows"] is None
