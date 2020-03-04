@@ -164,7 +164,7 @@ class FeatureSetPipeline:
         if not isinstance(self._spark_client, SparkClient):
             raise ValueError("spark_client must be a SparkClient instance")
 
-    def run(self):
+    def run(self, base_date: str = None):
         """Runs the defined feature set pipeline.
 
         The pipeline consists in the following steps:
@@ -174,7 +174,9 @@ class FeatureSetPipeline:
 
         """
         dataframe = self.source.construct(client=self.spark_client)
-        dataframe = self.feature_set.construct(dataframe=dataframe)
+        dataframe = self.feature_set.construct(
+            dataframe=dataframe, client=self.spark_client, base_date=base_date
+        )
         self.sink.flush(
             dataframe=dataframe,
             feature_set=self.feature_set,
