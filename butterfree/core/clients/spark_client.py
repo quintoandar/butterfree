@@ -30,7 +30,7 @@ class SparkClient:
             if environment.get_variable("ENVIRONMENT", "dev"):
                 hadoop_conf = self._session.sparkContext._jsc.hadoopConfiguration()
                 hadoop_conf.set("fs.s3.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem")
-                # hadoop_conf.set("fs.s3a.endpoint", "http://127.0.0.1:4572")
+                hadoop_conf.set("fs.s3a.endpoint", "s3.us-east-1.amazonaws.com")
                 hadoop_conf.set("fs.s3a.proxy.host", "localstack")
                 hadoop_conf.set("fs.s3a.proxy.port", "4572")
                 hadoop_conf.set("fs.s3a.path.style.access", "true")
