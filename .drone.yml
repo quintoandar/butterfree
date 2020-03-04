@@ -12,7 +12,7 @@ services:
       - CASSANDRA_PASSWORD=pwd
 
   localstack:
-    image: localstack/localstack:latest
+    image: localstack/localstack
     environment:
       - HOSTNAME_EXTERNAL=localstack
       - SERVICES=s3
