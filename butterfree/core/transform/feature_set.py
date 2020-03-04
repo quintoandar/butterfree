@@ -275,11 +275,11 @@ class FeatureSet:
             ]
         )
         start_date, end_date = date_df.first()
-        return client.conn.range(start_date, end_date + step, step).select(
+        return client.conn.range(start_date, end_date + day_in_seconds, step).select(
             F.col("id").cast(DataType.TIMESTAMP.value).alias(TIMESTAMP_COLUMN)
         )
 
-    def _get_unique_values(self, output_df):
+    def _get_unique_keys(self, output_df):
         """Get key columns unique values.
 
         Create a Spark DataFrame with unique key columns values.
@@ -292,7 +292,11 @@ class FeatureSet:
         )
 
     @staticmethod
-    def _cross_join_df(client: SparkClient, first_df, second_df):
+    def _set_cross_join_confs(client, state):
+        client.conn.conf.set("spark.sql.crossJoin.enabled", state)
+        client.conn.conf.set("spark.sql.autoBroadcastJoinThreshold", int(state))
+
+    def _cross_join_df(self, client: SparkClient, first_df, second_df):
         """Cross join between desired dataframes.
 
         Returns a cross join between the date daframe and transformed
@@ -305,12 +309,14 @@ class FeatureSet:
             first_df: a generic dataframe.
             second_df: another generic dataframe.
         """
-        client.conn.conf.set("spark.sql.crossJoin.enabled", "True")
-        client.conn.conf.set("spark.sql.autoBroadcastJoinThreshold", "0")
+        self._set_cross_join_confs(client, True)
         first_df.cache().take(
             1
         ) if second_df.count() >= first_df.count() else second_df.cache().take(1)
-        return first_df.join(second_df)
+        cross_join_df = first_df.join(second_df)
+        cross_join_df.cache().take(1)
+        self._set_cross_join_confs(client, False)
+        return cross_join_df
 
     def _rolling_window_joins(
         self, dataframe, output_df, client: SparkClient, base_date
@@ -335,7 +341,7 @@ class FeatureSet:
             base_date if isinstance(base_date, str) else base_date.strftime("%Y-%m-%d"),
         ]
         date_df = self._generate_dates(client, date_range)
-        unique_df = self._get_unique_values(output_df)
+        unique_df = self._get_unique_keys(output_df)
         cross_join_df = self._cross_join_df(client, date_df, unique_df)
         output_df = cross_join_df.join(
             output_df, on=self.keys_columns + [self.timestamp_column], how="left"
