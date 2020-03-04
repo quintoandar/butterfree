@@ -8,6 +8,7 @@ from tests.unit.butterfree.core.transform.conftest import (
     timestamp_c,
 )
 
+from butterfree.core.clients import SparkClient
 from butterfree.core.transform import FeatureSet
 from butterfree.core.transform.features import Feature
 from butterfree.core.transform.transformations import AggregatedTransform
@@ -179,6 +180,8 @@ class TestFeatureSet:
         feature_add,
         feature_divide,
     ):
+        spark_client = Mock()
+
         # arrange
         feature_set = FeatureSet(
             "name",
@@ -190,7 +193,7 @@ class TestFeatureSet:
         )
 
         # act
-        result_df = feature_set.construct(dataframe)
+        result_df = feature_set.construct(dataframe, spark_client)
         result_columns = result_df.columns
 
         # assert
@@ -207,6 +210,8 @@ class TestFeatureSet:
     def test_construct_invalid_df(
         self, key_id, timestamp_c, feature_add, feature_divide
     ):
+        spark_client = Mock()
+
         # arrange
         feature_set = FeatureSet(
             "name",
@@ -219,7 +224,7 @@ class TestFeatureSet:
 
         # act and assert
         with pytest.raises(ValueError):
-            _ = feature_set.construct("not a dataframe")
+            _ = feature_set.construct("not a dataframe", spark_client)
 
     def test_construct_transformations(
         self,
@@ -230,6 +235,8 @@ class TestFeatureSet:
         feature_add,
         feature_divide,
     ):
+        spark_client = Mock()
+
         # arrange
         feature_set = FeatureSet(
             "name",
@@ -241,7 +248,7 @@ class TestFeatureSet:
         )
 
         # act
-        result_df = feature_set.construct(dataframe)
+        result_df = feature_set.construct(dataframe, spark_client)
 
         # assert
         assert result_df.collect() == feature_set_dataframe.collect()
@@ -249,6 +256,8 @@ class TestFeatureSet:
     def test_construct_rolling_agg(
         self, dataframe, feature_set_dataframe, key_id, timestamp_c,
     ):
+        spark_client = SparkClient()
+
         feature_set = FeatureSet(
             name="name",
             entity="entity",
@@ -270,7 +279,7 @@ class TestFeatureSet:
         )
 
         # act
-        result_df = feature_set.construct(dataframe).collect()
+        result_df = feature_set.construct(dataframe, spark_client).collect()
 
         # assert
         assert result_df[0]["feature1__avg_over_1_week_rolling_windows"] is None
@@ -285,6 +294,8 @@ class TestFeatureSet:
     def test_construct_rolling_agg_with_base_date(
         self, dataframe, feature_set_dataframe, key_id, timestamp_c,
     ):
+        spark_client = SparkClient()
+
         feature_set = FeatureSet(
             name="name",
             entity="entity",
@@ -303,11 +314,12 @@ class TestFeatureSet:
             ],
             keys=[key_id],
             timestamp=timestamp_c,
-            base_date="2016-04-18",
         )
 
         # act
-        result_df = feature_set.construct(dataframe).collect()
+        result_df = feature_set.construct(
+            dataframe, spark_client, "2016-04-18"
+        ).collect()
 
         # assert
         assert result_df[0]["feature1__avg_over_1_week_rolling_windows"] is None
