@@ -265,3 +265,38 @@ class TestFeatureSet:
 
         # assert
         assert target_features_columns == result_features_columns
+
+    def test_filtering(
+        self, filtering_dataframe, key_id, timestamp_c, feature1, feature2, feature3,
+    ):
+        # arrange
+        feature_set = FeatureSet(
+            "name",
+            "entity",
+            "description",
+            [key_id],
+            timestamp_c,
+            [feature1, feature2, feature3],
+        )
+
+        # act
+        result_df = (
+            feature_set.construct(filtering_dataframe).orderBy("timestamp").collect()
+        )
+
+        # assert
+        assert result_df[0]["feature1"] == 0
+        assert result_df[1]["feature1"] == 0
+        assert result_df[2]["feature1"] is None
+        assert result_df[3]["feature1"] == 0
+        assert result_df[4]["feature1"] is None
+        assert result_df[0]["feature2"] is None
+        assert result_df[1]["feature2"] == 1
+        assert result_df[2]["feature2"] is None
+        assert result_df[3]["feature2"] == 1
+        assert result_df[4]["feature2"] is None
+        assert result_df[0]["feature3"] == 1
+        assert result_df[1]["feature3"] == 1
+        assert result_df[2]["feature3"] is None
+        assert result_df[3]["feature3"] == 1
+        assert result_df[4]["feature3"] is None
