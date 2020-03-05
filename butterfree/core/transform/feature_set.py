@@ -3,8 +3,11 @@ import itertools
 from functools import reduce
 from typing import List
 
+from pyspark.sql import Window
+from pyspark.sql import functions as F
 from pyspark.sql.dataframe import DataFrame
 
+from butterfree.core.constants.columns import TIMESTAMP_COLUMN
 from butterfree.core.transform.features import Feature, KeyFeature, TimestampFeature
 from butterfree.core.transform.transformations import AggregatedTransform
 
@@ -27,7 +30,7 @@ class FeatureSet:
     Example:
         This an example regarding the feature set definition. All features
         and its transformations are defined.
-    >>> from butterfree.core.feature_set_pipeline import FeatureSet
+    >>> from butterfree.core.transform import FeatureSet
     >>> from butterfree.core.transform.features import (
     ...     Feature,
     ...     KeyFeature,
@@ -72,9 +75,14 @@ class FeatureSet:
 
     >>> feature_set.construct(dataframe=dataframe)
 
-        This last method (construct) will execute the feature set,
-        computing all the defined transformations.
+    This last method (construct) will execute the feature set, computing all the
+    defined transformations.
 
+    There's also a functionality regarding the construct method within the scope
+    of FeatureSet called filter_duplicated_rows. We drop rows that have repeated
+    values over key columns and timestamp column, we do this in order to reduce
+    our dataframe (regarding the number of rows). A detailed explation of this
+    method can be found at filter_duplicated_rows docstring.
     """
 
     def __init__(
@@ -225,6 +233,88 @@ class FeatureSet:
         """
         return self.keys_columns + [self.timestamp_column] + self.features_columns
 
+    def _filter_duplicated_rows(self, df):
+        """Filter dataframe duplicated rows.
+
+        Attributes:
+            df: transformed dataframe.
+
+        Returns:
+            Spark dataframe with filtered rows.
+
+        Example:
+            Suppose, for instance, that the transformed dataframe received
+            by the construct method has the following rows:
+
+            +---+----------+--------+--------+--------+
+            | id| timestamp|feature1|feature2|feature3|
+            +---+----------+--------+--------+--------+
+            |  1|         1|       0|    null|       1|
+            |  1|         2|       0|       1|       1|
+            |  1|         3|    null|    null|    null|
+            |  1|         4|       0|       1|       1|
+            |  1|         5|       0|       1|       1|
+            |  1|         6|    null|    null|    null|
+            |  1|         7|    null|    null|    null|
+            +---+-------------------+--------+--------+
+
+            We will then create four columns, the first one, rn_by_key_columns
+            (rn1) is the row number over a key columns partition ordered by timestamp.
+            The second, rn_by_all_columns (rn2), is the row number over all columns
+            partition (also ordered by timestamp). The third column,
+            lag_rn_by_key_columns (lag_rn1), returns the last occurrence of the
+            rn_by_key_columns over all columns partition. The last column, diff, is
+            the difference between rn_by_key_columns and lag_rn_by_key_columns:
+
+            +---+----------+--------+--------+--------+----+----+--------+-----+
+            | id| timestamp|feature1|feature2|feature3| rn1| rn2| lag_rn1| diff|
+            +---+----------+--------+--------+--------+----+----+--------+-----+
+            |  1|         1|       0|    null|       1|   1|   1|    null| null|
+            |  1|         2|       0|       1|       1|   2|   1|    null| null|
+            |  1|         3|    null|    null|    null|   3|   1|    null| null|
+            |  1|         4|       0|       1|       1|   4|   2|       2|    2|
+            |  1|         5|       0|       1|       1|   5|   3|       4|    1|
+            |  1|         6|    null|    null|    null|   6|   2|       3|    3|
+            |  1|         7|    null|    null|    null|   7|   3|       6|    1|
+            +---+----------+--------+--------+--------+----+----+--------+-----+
+
+            Finally, this dataframe will then be filtered with the following condition:
+            rn_by_all_columns = 1 or diff > 1 and only the original columns will be
+            returned:
+
+            +---+----------+--------+--------+--------+
+            | id| timestamp|feature1|feature2|feature3|
+            +---+----------+--------+--------+--------+
+            |  1|         1|       0|    null|       1|
+            |  1|         2|       0|       1|       1|
+            |  1|         3|    null|    null|    null|
+            |  1|         4|       0|       1|       1|
+            |  1|         6|    null|    null|    null|
+            +---+----------+--------+--------+--------+
+
+        """
+        window_key_columns = Window.partitionBy(self.keys_columns).orderBy(
+            TIMESTAMP_COLUMN
+        )
+        window_all_columns = Window.partitionBy(
+            self.keys_columns + self.features_columns
+        ).orderBy(TIMESTAMP_COLUMN)
+
+        df = (
+            df.withColumn("rn_by_key_columns", F.row_number().over(window_key_columns))
+            .withColumn("rn_by_all_columns", F.row_number().over(window_all_columns))
+            .withColumn(
+                "lag_rn_by_key_columns",
+                F.lag("rn_by_key_columns", 1).over(window_all_columns),
+            )
+            .withColumn(
+                "diff", F.col("rn_by_key_columns") - F.col("lag_rn_by_key_columns")
+            )
+        )
+        df = df.filter("rn_by_all_columns = 1 or diff > 1")
+
+        return df.select([column for column in self.columns])
+
     def construct(self, dataframe: DataFrame) -> DataFrame:
         """Use all the features to build the feature set dataframe.
 
@@ -245,6 +335,8 @@ class FeatureSet:
             self.keys + [self.timestamp] + self.features,
             dataframe,
         ).select(*self.columns)
+
+        output_df = self._filter_duplicated_rows(output_df)
 
         output_df.cache().count()
 
