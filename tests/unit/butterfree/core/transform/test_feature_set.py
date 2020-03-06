@@ -367,7 +367,14 @@ class TestFeatureSet:
         assert target_features_columns == result_features_columns
 
     def test_filtering(
-        self, filtering_dataframe, key_id, timestamp_c, feature1, feature2, feature3, output_filtering_dataframe,
+        self,
+        filtering_dataframe,
+        key_id,
+        timestamp_c,
+        feature1,
+        feature2,
+        feature3,
+        output_filtering_dataframe,
     ):
         spark_client = Mock()
 
@@ -383,7 +390,9 @@ class TestFeatureSet:
 
         # act
         result_df = (
-            feature_set.construct(filtering_dataframe, spark_client).orderBy("timestamp").collect()
+            feature_set.construct(filtering_dataframe, spark_client)
+            .orderBy("timestamp")
+            .collect()
         )
 
         # assert
