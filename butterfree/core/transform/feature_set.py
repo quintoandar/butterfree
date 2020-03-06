@@ -5,6 +5,7 @@ from functools import reduce
 from typing import List
 
 import pyspark.sql.functions as F
+from pyspark.sql import Window
 from pyspark.sql.dataframe import DataFrame
 
 from butterfree.core.clients import SparkClient
