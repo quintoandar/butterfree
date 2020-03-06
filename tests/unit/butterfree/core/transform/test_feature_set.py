@@ -288,7 +288,7 @@ class TestFeatureSet:
             feature_set.construct(dataframe, spark_client)
             .orderBy(feature_set.timestamp_column)
             .select(feature_set.columns)
-            .take(9)
+            .collect()
         )
 
         # assert
@@ -334,7 +334,7 @@ class TestFeatureSet:
             feature_set.construct(dataframe, spark_client, "2016-04-19")
             .orderBy(feature_set.timestamp_column)
             .select(feature_set.columns)
-            .take(9)
+            .collect()
         )
 
         # assert
@@ -367,8 +367,10 @@ class TestFeatureSet:
         assert target_features_columns == result_features_columns
 
     def test_filtering(
-        self, filtering_dataframe, key_id, timestamp_c, feature1, feature2, feature3,
+        self, filtering_dataframe, key_id, timestamp_c, feature1, feature2, feature3, output_filtering_dataframe,
     ):
+        spark_client = Mock()
+
         # arrange
         feature_set = FeatureSet(
             "name",
@@ -381,22 +383,13 @@ class TestFeatureSet:
 
         # act
         result_df = (
-            feature_set.construct(filtering_dataframe).orderBy("timestamp").collect()
+            feature_set.construct(filtering_dataframe, spark_client).orderBy("timestamp").collect()
         )
 
         # assert
-        assert result_df[0]["feature1"] == 0
-        assert result_df[1]["feature1"] == 0
-        assert result_df[2]["feature1"] is None
-        assert result_df[3]["feature1"] == 0
-        assert result_df[4]["feature1"] is None
-        assert result_df[0]["feature2"] is None
-        assert result_df[1]["feature2"] == 1
-        assert result_df[2]["feature2"] is None
-        assert result_df[3]["feature2"] == 1
-        assert result_df[4]["feature2"] is None
-        assert result_df[0]["feature3"] == 1
-        assert result_df[1]["feature3"] == 1
-        assert result_df[2]["feature3"] is None
-        assert result_df[3]["feature3"] == 1
-        assert result_df[4]["feature3"] is None
+        assert (
+            result_df
+            == output_filtering_dataframe.orderBy("timestamp")
+            .select(feature_set.columns)
+            .collect()
+        )
