@@ -16,7 +16,9 @@ def divide(df, fs, column1, column2):
 
 
 class TestFeatureSet:
-    def test_construct(self, feature_set_dataframe):
+    def test_construct(
+        self, feature_set_dataframe, fixed_windows_output_feature_set_dataframe
+    ):
         # given
 
         spark_client = SparkClient()
@@ -50,32 +52,28 @@ class TestFeatureSet:
             timestamp=TimestampFeature(),
         )
 
-        # act
-        df = feature_set.construct(feature_set_dataframe, client=spark_client).collect()
+        result_df = (
+            feature_set.construct(feature_set_dataframe, client=spark_client)
+            .orderBy(feature_set.timestamp_column)
+            .select(feature_set.columns)
+            .collect()
+        )
 
         # assert
-        assert df[0]["feature1__avg_over_2_minutes_fixed_windows"] == 200
-        assert df[1]["feature1__avg_over_2_minutes_fixed_windows"] == 300
-        assert df[2]["feature1__avg_over_2_minutes_fixed_windows"] == 400
-        assert df[3]["feature1__avg_over_2_minutes_fixed_windows"] == 500
-        assert df[0]["feature1__stddev_pop_over_2_minutes_fixed_windows"] == 0
-        assert df[1]["feature1__stddev_pop_over_2_minutes_fixed_windows"] == 0
-        assert df[2]["feature1__stddev_pop_over_2_minutes_fixed_windows"] == 0
-        assert df[3]["feature1__stddev_pop_over_2_minutes_fixed_windows"] == 0
-        assert df[0]["feature1__avg_over_15_minutes_fixed_windows"] == 200
-        assert df[1]["feature1__avg_over_15_minutes_fixed_windows"] == 250
-        assert df[2]["feature1__avg_over_15_minutes_fixed_windows"] == 350
-        assert df[3]["feature1__avg_over_15_minutes_fixed_windows"] == 500
-        assert df[0]["feature1__stddev_pop_over_15_minutes_fixed_windows"] == 0
-        assert df[1]["feature1__stddev_pop_over_15_minutes_fixed_windows"] == 50
-        assert df[2]["feature1__stddev_pop_over_15_minutes_fixed_windows"] == 50
-        assert df[3]["feature1__stddev_pop_over_15_minutes_fixed_windows"] == 0
-        assert df[0]["divided_feature"] == 1
-        assert df[1]["divided_feature"] == 1
-        assert df[2]["divided_feature"] == 1
-        assert df[3]["divided_feature"] == 1
+        assert (
+            result_df
+            == fixed_windows_output_feature_set_dataframe.orderBy(
+                feature_set.timestamp_column
+            )
+            .select(feature_set.columns)
+            .collect()
+        )
 
-    def test_construct_rolling_windows_with_base_date(self, feature_set_dataframe):
+    def test_construct_rolling_windows_with_base_date(
+        self,
+        feature_set_dataframe,
+        rolling_windows_output_feature_set_dataframe_base_date,
+    ):
         # given
 
         spark_client = SparkClient()
@@ -103,7 +101,7 @@ class TestFeatureSet:
         )
 
         # act
-        df = (
+        result_df = (
             feature_set.construct(
                 feature_set_dataframe, client=spark_client, base_date="2016-04-18"
             )
@@ -112,25 +110,18 @@ class TestFeatureSet:
         )
 
         # assert
-        assert df[0]["feature1__avg_over_1_day_rolling_windows"] == 350
-        assert df[1]["feature1__avg_over_1_day_rolling_windows"] is None
         assert (
-            df[1]["feature1__stddev_pop_over_1_day_rolling_windows"]
-            == 111.80339887498948
-        )
-        assert df[1]["feature1__stddev_pop_over_1_day_rolling_windows"] is None
-        assert df[0]["feature1__avg_over_1_week_rolling_windows"] == 350
-        assert df[1]["feature1__avg_over_1_week_rolling_windows"] == 350
-        assert (
-            df[0]["feature1__stddev_pop_over_1_week_rolling_windows"]
-            == 111.80339887498948
-        )
-        assert (
-            df[1]["feature1__stddev_pop_over_1_week_rolling_windows"]
-            == 111.80339887498948
+            result_df
+            == rolling_windows_output_feature_set_dataframe_base_date.orderBy(
+                feature_set.timestamp_column
+            )
+            .select(feature_set.columns)
+            .collect()
         )
 
-    def test_construct_rolling_windows_without_base_date(self, feature_set_dataframe):
+    def test_construct_rolling_windows_without_base_date(
+        self, feature_set_dataframe, rolling_windows_output_feature_set_dataframe
+    ):
         # given
 
         spark_client = SparkClient()
@@ -158,66 +149,18 @@ class TestFeatureSet:
         )
 
         # act
-        df = (
+        result_df = (
             feature_set.construct(feature_set_dataframe, client=spark_client)
             .orderBy("timestamp")
             .collect()
         )
 
         # assert
-        assert df[0]["feature1__avg_over_1_day_rolling_windows"] is None
-        assert df[1]["feature1__avg_over_1_day_rolling_windows"] == 350
-        assert df[2]["feature1__avg_over_1_day_rolling_windows"] is None
-        assert df[3]["feature1__avg_over_1_day_rolling_windows"] is None
-        assert df[4]["feature1__avg_over_1_day_rolling_windows"] is None
-        assert df[5]["feature1__avg_over_1_day_rolling_windows"] is None
-        assert df[6]["feature1__avg_over_1_day_rolling_windows"] is None
-        assert df[7]["feature1__avg_over_1_day_rolling_windows"] is None
-        assert df[0]["feature1__stddev_pop_over_1_day_rolling_windows"] is None
         assert (
-            df[1]["feature1__stddev_pop_over_1_day_rolling_windows"]
-            == 111.80339887498948
-        )
-        assert df[2]["feature1__stddev_pop_over_1_day_rolling_windows"] is None
-        assert df[3]["feature1__stddev_pop_over_1_day_rolling_windows"] is None
-        assert df[4]["feature1__stddev_pop_over_1_day_rolling_windows"] is None
-        assert df[5]["feature1__stddev_pop_over_1_day_rolling_windows"] is None
-        assert df[6]["feature1__stddev_pop_over_1_day_rolling_windows"] is None
-        assert df[7]["feature1__stddev_pop_over_1_day_rolling_windows"] is None
-        assert df[0]["feature1__avg_over_1_week_rolling_windows"] is None
-        assert df[1]["feature1__avg_over_1_week_rolling_windows"] == 350
-        assert df[2]["feature1__avg_over_1_week_rolling_windows"] == 350
-        assert df[3]["feature1__avg_over_1_week_rolling_windows"] == 350
-        assert df[4]["feature1__avg_over_1_week_rolling_windows"] == 350
-        assert df[5]["feature1__avg_over_1_week_rolling_windows"] == 350
-        assert df[6]["feature1__avg_over_1_week_rolling_windows"] == 350
-        assert df[7]["feature1__avg_over_1_week_rolling_windows"] == 350
-        assert df[0]["feature1__stddev_pop_over_1_week_rolling_windows"] is None
-        assert (
-            df[1]["feature1__stddev_pop_over_1_week_rolling_windows"]
-            == 111.80339887498948
-        )
-        assert (
-            df[2]["feature1__stddev_pop_over_1_week_rolling_windows"]
-            == 111.80339887498948
-        )
-        assert (
-            df[3]["feature1__stddev_pop_over_1_week_rolling_windows"]
-            == 111.80339887498948
-        )
-        assert (
-            df[4]["feature1__stddev_pop_over_1_week_rolling_windows"]
-            == 111.80339887498948
-        )
-        assert (
-            df[5]["feature1__stddev_pop_over_1_week_rolling_windows"]
-            == 111.80339887498948
-        )
-        assert (
-            df[6]["feature1__stddev_pop_over_1_week_rolling_windows"]
-            == 111.80339887498948
-        )
-        assert (
-            df[7]["feature1__stddev_pop_over_1_week_rolling_windows"]
-            == 111.80339887498948
+            result_df
+            == rolling_windows_output_feature_set_dataframe.orderBy(
+                feature_set.timestamp_column
+            )
+            .select(feature_set.columns)
+            .collect()
         )
