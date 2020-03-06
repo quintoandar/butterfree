@@ -293,6 +293,7 @@ class FeatureSet:
 
     @staticmethod
     def _set_cross_join_confs(client, state):
+        """Defines spark configuration."""
         client.conn.conf.set("spark.sql.crossJoin.enabled", state)
         client.conn.conf.set("spark.sql.autoBroadcastJoinThreshold", int(state))
 
