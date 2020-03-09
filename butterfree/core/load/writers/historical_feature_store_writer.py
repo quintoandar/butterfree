@@ -155,6 +155,5 @@ class HistoricalFeatureStoreWriter(Writer):
         dataframe = dataframe.withColumn(
             columns.PARTITION_DAY, dayofmonth(dataframe[columns.TIMESTAMP_COLUMN])
         )
-        dataframe.repartition(*self.PARTITION_BY)
 
-        return dataframe
+        return dataframe.repartition(*self.PARTITION_BY)

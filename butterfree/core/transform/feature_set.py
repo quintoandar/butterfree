@@ -1,10 +1,16 @@
 """FeatureSet entity."""
 import itertools
+from datetime import datetime
 from functools import reduce
 from typing import List
 
+import pyspark.sql.functions as F
+from pyspark.sql import Window
 from pyspark.sql.dataframe import DataFrame
 
+from butterfree.core.clients import SparkClient
+from butterfree.core.constants.columns import TIMESTAMP_COLUMN
+from butterfree.core.constants.data_type import DataType
 from butterfree.core.transform.features import Feature, KeyFeature, TimestampFeature
 from butterfree.core.transform.transformations import AggregatedTransform
 
@@ -27,7 +33,7 @@ class FeatureSet:
     Example:
         This an example regarding the feature set definition. All features
         and its transformations are defined.
-    >>> from butterfree.core.feature_set_pipeline import FeatureSet
+    >>> from butterfree.core.transform import FeatureSet
     >>> from butterfree.core.transform.features import (
     ...     Feature,
     ...     KeyFeature,
@@ -72,9 +78,14 @@ class FeatureSet:
 
     >>> feature_set.construct(dataframe=dataframe)
 
-        This last method (construct) will execute the feature set,
-        computing all the defined transformations.
+    This last method (construct) will execute the feature set, computing all the
+    defined transformations.
 
+    There's also a functionality regarding the construct method within the scope
+    of FeatureSet called filter_duplicated_rows. We drop rows that have repeated
+    values over key columns and timestamp column, we do this in order to reduce
+    our dataframe (regarding the number of rows). A detailed explation of this
+    method can be found at filter_duplicated_rows docstring.
     """
 
     def __init__(
@@ -184,16 +195,13 @@ class FeatureSet:
         if len(feature_columns) != len(set(feature_columns)):
             raise KeyError("feature columns will have duplicates.")
 
-        for feature in value:
-            if isinstance(feature.transformation, AggregatedTransform) and (
-                feature.transformation.mode[0] == "rolling_windows" and len(value) > 1
-            ):
-                raise ValueError(
-                    "You can define only one feature within the scope of the "
-                    "rolling windows aggregated transform, since the output "
-                    "dataframe will only contain features related to this "
-                    "transformation."
-                )
+        if self._has_rolling_windows_only(value) and len(value) > 1:
+            raise ValueError(
+                "You can define only one feature within the scope of the "
+                "rolling windows aggregated transform, since the output "
+                "dataframe will only contain features related to this "
+                "transformation."
+            )
 
         self.__features = value
 
@@ -225,7 +233,208 @@ class FeatureSet:
         """
         return self.keys_columns + [self.timestamp_column] + self.features_columns
 
-    def construct(self, dataframe: DataFrame) -> DataFrame:
+    @staticmethod
+    def _has_rolling_windows_only(features):
+        """Aggregated Transform mode check.
+
+        Checks if there's a rolling window mode within the scope of the
+        AggregatedTransform.
+
+        Returns:
+            True if there's a rolling window aggregation mode.
+
+        """
+        for feature in features:
+            if isinstance(feature.transformation, AggregatedTransform) and (
+                feature.transformation.mode[0] == "rolling_windows"
+            ):
+                return True
+            return False
+
+    @staticmethod
+    def _generate_dates(client: SparkClient, date_range, step=None):
+        """Generate date dataframe.
+
+        Create a Spark DataFrame with a single column named timestamp and a
+        range of dates within the desired interval (start and end dates included).
+        It's also possible to provide a step argument.
+
+        Attributes:
+            client:  spark client used to create the dataframe.
+            date_range: list of the desired date interval.
+            step: time step.
+        """
+        day_in_seconds = 60 * 60 * 24
+        start_date, end_date = date_range
+        step = step or day_in_seconds
+        date_df = client.conn.createDataFrame(
+            [(start_date, end_date)], ("start_date", "end_date")
+        ).select(
+            [
+                F.col(c).cast(DataType.TIMESTAMP.value).cast(DataType.BIGINT.value)
+                for c in ("start_date", "end_date")
+            ]
+        )
+        start_date, end_date = date_df.first()
+        return client.conn.range(start_date, end_date + day_in_seconds, step).select(
+            F.col("id").cast(DataType.TIMESTAMP.value).alias(TIMESTAMP_COLUMN)
+        )
+
+    def _get_unique_keys(self, output_df):
+        """Get key columns unique values.
+
+        Create a Spark DataFrame with unique key columns values.
+
+        Attributes:
+            output_df:  dataframe to get unique key values.
+        """
+        return output_df.dropDuplicates(subset=self.keys_columns).select(
+            self.keys_columns
+        )
+
+    @staticmethod
+    def _set_cross_join_confs(client, state):
+        """Defines spark configuration."""
+        client.conn.conf.set("spark.sql.crossJoin.enabled", state)
+        client.conn.conf.set("spark.sql.autoBroadcastJoinThreshold", int(state))
+
+    def _cross_join_df(self, client: SparkClient, first_df, second_df):
+        """Cross join between desired dataframes.
+
+        Returns a cross join between the date daframe and transformed
+        dataframe. In order to make this operation faster, the smaller
+        dataframe is cached and autoBroadcastJoinThreshold conf is
+        setted to False.
+
+        Attributes:
+            client:  spark client used to create the dataframe.
+            first_df: a generic dataframe.
+            second_df: another generic dataframe.
+        """
+        self._set_cross_join_confs(client, True)
+        first_df.cache().take(
+            1
+        ) if second_df.count() >= first_df.count() else second_df.cache().take(1)
+        cross_join_df = first_df.join(second_df)
+        cross_join_df.cache().take(1)
+        self._set_cross_join_confs(client, False)
+        return cross_join_df
+
+    def _rolling_window_joins(
+        self, dataframe, output_df, client: SparkClient, base_date
+    ):
+        """Performs a join between dataframes.
+
+        Performs a join between the transformed dataframe and the date
+        dataframe.
+
+        Attributes:
+            dataframe:  source dataframe.
+            output_df: transformed dataframe.
+            client: client responsible for connecting to Spark session.
+        """
+        base_date = base_date or datetime.now()
+        date_range = [
+            (
+                dataframe.select(F.min(TIMESTAMP_COLUMN))
+                .collect()[0][0]
+                .strftime("%Y-%m-%d")
+            ),
+            base_date if isinstance(base_date, str) else base_date.strftime("%Y-%m-%d"),
+        ]
+        date_df = self._generate_dates(client, date_range)
+        unique_df = self._get_unique_keys(output_df)
+        cross_join_df = self._cross_join_df(client, date_df, unique_df)
+        output_df = cross_join_df.join(
+            output_df, on=self.keys_columns + [self.timestamp_column], how="left"
+        )
+        return output_df
+
+    def _filter_duplicated_rows(self, df):
+        """Filter dataframe duplicated rows.
+
+        Attributes:
+            df: transformed dataframe.
+
+        Returns:
+            Spark dataframe with filtered rows.
+
+        Example:
+            Suppose, for instance, that the transformed dataframe received
+            by the construct method has the following rows:
+
+            +---+----------+--------+--------+--------+
+            | id| timestamp|feature1|feature2|feature3|
+            +---+----------+--------+--------+--------+
+            |  1|         1|       0|    null|       1|
+            |  1|         2|       0|       1|       1|
+            |  1|         3|    null|    null|    null|
+            |  1|         4|       0|       1|       1|
+            |  1|         5|       0|       1|       1|
+            |  1|         6|    null|    null|    null|
+            |  1|         7|    null|    null|    null|
+            +---+-------------------+--------+--------+
+
+            We will then create four columns, the first one, rn_by_key_columns
+            (rn1) is the row number over a key columns partition ordered by timestamp.
+            The second, rn_by_all_columns (rn2), is the row number over all columns
+            partition (also ordered by timestamp). The third column,
+            lag_rn_by_key_columns (lag_rn1), returns the last occurrence of the
+            rn_by_key_columns over all columns partition. The last column, diff, is
+            the difference between rn_by_key_columns and lag_rn_by_key_columns:
+
+            +---+----------+--------+--------+--------+----+----+--------+-----+
+            | id| timestamp|feature1|feature2|feature3| rn1| rn2| lag_rn1| diff|
+            +---+----------+--------+--------+--------+----+----+--------+-----+
+            |  1|         1|       0|    null|       1|   1|   1|    null| null|
+            |  1|         2|       0|       1|       1|   2|   1|    null| null|
+            |  1|         3|    null|    null|    null|   3|   1|    null| null|
+            |  1|         4|       0|       1|       1|   4|   2|       2|    2|
+            |  1|         5|       0|       1|       1|   5|   3|       4|    1|
+            |  1|         6|    null|    null|    null|   6|   2|       3|    3|
+            |  1|         7|    null|    null|    null|   7|   3|       6|    1|
+            +---+----------+--------+--------+--------+----+----+--------+-----+
+
+            Finally, this dataframe will then be filtered with the following condition:
+            rn_by_all_columns = 1 or diff > 1 and only the original columns will be
+            returned:
+
+            +---+----------+--------+--------+--------+
+            | id| timestamp|feature1|feature2|feature3|
+            +---+----------+--------+--------+--------+
+            |  1|         1|       0|    null|       1|
+            |  1|         2|       0|       1|       1|
+            |  1|         3|    null|    null|    null|
+            |  1|         4|       0|       1|       1|
+            |  1|         6|    null|    null|    null|
+            +---+----------+--------+--------+--------+
+
+        """
+        window_key_columns = Window.partitionBy(self.keys_columns).orderBy(
+            TIMESTAMP_COLUMN
+        )
+        window_all_columns = Window.partitionBy(
+            self.keys_columns + self.features_columns
+        ).orderBy(TIMESTAMP_COLUMN)
+
+        df = (
+            df.withColumn("rn_by_key_columns", F.row_number().over(window_key_columns))
+            .withColumn("rn_by_all_columns", F.row_number().over(window_all_columns))
+            .withColumn(
+                "lag_rn_by_key_columns",
+                F.lag("rn_by_key_columns", 1).over(window_all_columns),
+            )
+            .withColumn(
+                "diff", F.col("rn_by_key_columns") - F.col("lag_rn_by_key_columns")
+            )
+        )
+        df = df.filter("rn_by_all_columns = 1 or diff > 1")
+
+        return df.select([column for column in self.columns])
+
+    def construct(
+        self, dataframe: DataFrame, client: SparkClient, base_date: str = None
+    ) -> DataFrame:
         """Use all the features to build the feature set dataframe.
 
         After that, there's the caching of the dataframe, however since cache()
@@ -233,6 +442,8 @@ class FeatureSet:
 
         Args:
             dataframe: input dataframe to be transformed by the features.
+            client: client responsible for connecting to Spark session.
+            base_date: user defined base date.
 
         Returns:
             Spark dataframe with all the feature columns.
@@ -240,11 +451,19 @@ class FeatureSet:
         """
         if not isinstance(dataframe, DataFrame):
             raise ValueError("source_df must be a dataframe")
+
         output_df = reduce(
             lambda df, feature: feature.transform(df),
             self.keys + [self.timestamp] + self.features,
             dataframe,
         ).select(*self.columns)
+
+        if self._has_rolling_windows_only(self.features):
+            output_df = self._rolling_window_joins(
+                dataframe, output_df, client, base_date
+            )
+
+        output_df = self._filter_duplicated_rows(output_df)
 
         if not output_df.isStreaming:
             output_df.cache().count()
