@@ -1,4 +1,10 @@
-from pyspark.sql.types import ArrayType, IntegerType, StringType, StructField, StructType
+from pyspark.sql.types import (
+    ArrayType,
+    IntegerType,
+    StringType,
+    StructField,
+    StructType,
+)
 
 from butterfree.core.extract.pre_processing import explode_json_column
 from butterfree.testing.dataframe import (
