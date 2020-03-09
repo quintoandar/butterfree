@@ -1,5 +1,5 @@
 """Pre Processing Components regarding Readers."""
-from butterfree.core.extract.pre_processing.explode_json_column import (
+from butterfree.core.extract.pre_processing.explode_json_column_transform import (
     explode_json_column,
 )
 from butterfree.core.extract.pre_processing.filter_transform import filter
