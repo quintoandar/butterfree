@@ -73,7 +73,11 @@ class Sink:
             spark_client: client used to run a query.
 
         """
+        if not isinstance(dataframe, DataFrame):
+            raise ValueError("dataframe need to be a DataFrame instance.")
+
         for writer in self.writers:
-            writer.write(
+            write = writer.write_stream if dataframe.isStreaming else writer.write
+            write(
                 feature_set=feature_set, dataframe=dataframe, spark_client=spark_client
             )

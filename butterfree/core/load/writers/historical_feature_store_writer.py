@@ -4,6 +4,7 @@ import os
 
 from pyspark.sql.dataframe import DataFrame
 from pyspark.sql.functions import dayofmonth, month, year
+from pyspark.sql.streaming import StreamingQuery
 
 from butterfree.core.clients import SparkClient
 from butterfree.core.configs import environment
@@ -100,6 +101,22 @@ class HistoricalFeatureStoreWriter(Writer):
             partition_by=self.PARTITION_BY,
             **self.db_config.get_options(s3_key),
         )
+
+    def write_stream(
+        self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient
+    ) -> StreamingQuery:
+        """Loads the streaming data into the Historical Feature Store.
+
+        Args:
+            feature_set: object processed with feature set metadata.
+            dataframe: Spark dataframe containing data from a feature set.
+            spark_client: client for Spark connections with external services.
+
+        Returns:
+            Streaming handler.
+
+        """
+        raise NotImplementedError()
 
     def validate(
         self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient

@@ -246,6 +246,7 @@ class FeatureSet:
             dataframe,
         ).select(*self.columns)
 
-        output_df.cache().count()
+        if not output_df.isStreaming:
+            output_df.cache().count()
 
         return output_df
