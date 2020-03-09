@@ -8,8 +8,10 @@ from tests.unit.butterfree.core.transform.conftest import (
     timestamp_c,
 )
 
+from butterfree.core.clients import SparkClient
 from butterfree.core.transform import FeatureSet
-from butterfree.core.transform.features import Feature
+from butterfree.core.transform.features import Feature, TimestampFeature
+from butterfree.core.transform.transformations import AggregatedTransform
 
 
 class TestFeatureSet:
@@ -178,6 +180,8 @@ class TestFeatureSet:
         feature_add,
         feature_divide,
     ):
+        spark_client = Mock()
+
         # arrange
         feature_set = FeatureSet(
             "name",
@@ -189,7 +193,7 @@ class TestFeatureSet:
         )
 
         # act
-        result_df = feature_set.construct(dataframe)
+        result_df = feature_set.construct(dataframe, spark_client)
         result_columns = result_df.columns
 
         # assert
@@ -206,6 +210,8 @@ class TestFeatureSet:
     def test_construct_invalid_df(
         self, key_id, timestamp_c, feature_add, feature_divide
     ):
+        spark_client = Mock()
+
         # arrange
         feature_set = FeatureSet(
             "name",
@@ -218,7 +224,7 @@ class TestFeatureSet:
 
         # act and assert
         with pytest.raises(ValueError):
-            _ = feature_set.construct("not a dataframe")
+            _ = feature_set.construct("not a dataframe", spark_client)
 
     def test_construct_transformations(
         self,
@@ -229,6 +235,8 @@ class TestFeatureSet:
         feature_add,
         feature_divide,
     ):
+        spark_client = Mock()
+
         # arrange
         feature_set = FeatureSet(
             "name",
@@ -240,10 +248,102 @@ class TestFeatureSet:
         )
 
         # act
-        result_df = feature_set.construct(dataframe)
+        result_df = feature_set.construct(dataframe, spark_client)
 
         # assert
         assert result_df.collect() == feature_set_dataframe.collect()
+
+    def test_construct_rolling_agg(
+        self,
+        dataframe,
+        feature_set_dataframe,
+        key_id,
+        timestamp_c,
+        rolling_windows_agg_dataframe,
+    ):
+        spark_client = SparkClient()
+
+        feature_set = FeatureSet(
+            name="name",
+            entity="entity",
+            description="description",
+            features=[
+                Feature(
+                    name="feature1",
+                    description="test",
+                    transformation=AggregatedTransform(
+                        aggregations=["avg"],
+                        partition="id",
+                        windows=["1 week"],
+                        mode=["rolling_windows"],
+                    ),
+                ),
+            ],
+            keys=[key_id],
+            timestamp=TimestampFeature(from_column="ts"),
+        )
+
+        # act
+        result_df = (
+            feature_set.construct(dataframe, spark_client)
+            .orderBy(feature_set.timestamp_column)
+            .select(feature_set.columns)
+            .collect()
+        )
+
+        # assert
+        assert (
+            result_df
+            == rolling_windows_agg_dataframe.orderBy(feature_set.timestamp_column)
+            .select(feature_set.columns)
+            .collect()
+        )
+
+    def test_construct_rolling_agg_with_base_date(
+        self,
+        dataframe,
+        feature_set_dataframe,
+        key_id,
+        timestamp_c,
+        rolling_windows_agg_dataframe,
+    ):
+        spark_client = SparkClient()
+
+        feature_set = FeatureSet(
+            name="name",
+            entity="entity",
+            description="description",
+            features=[
+                Feature(
+                    name="feature1",
+                    description="test",
+                    transformation=AggregatedTransform(
+                        aggregations=["avg"],
+                        partition="id",
+                        windows=["1 week"],
+                        mode=["rolling_windows"],
+                    ),
+                ),
+            ],
+            keys=[key_id],
+            timestamp=timestamp_c,
+        )
+
+        # act
+        result_df = (
+            feature_set.construct(dataframe, spark_client, "2016-04-19")
+            .orderBy(feature_set.timestamp_column)
+            .select(feature_set.columns)
+            .collect()
+        )
+
+        # assert
+        assert (
+            result_df
+            == rolling_windows_agg_dataframe.orderBy(feature_set.timestamp_column)
+            .select(feature_set.columns)
+            .collect()
+        )
 
     def test__get_features_columns(self):
         # arrange
@@ -267,8 +367,17 @@ class TestFeatureSet:
         assert target_features_columns == result_features_columns
 
     def test_filtering(
-        self, filtering_dataframe, key_id, timestamp_c, feature1, feature2, feature3,
+        self,
+        filtering_dataframe,
+        key_id,
+        timestamp_c,
+        feature1,
+        feature2,
+        feature3,
+        output_filtering_dataframe,
     ):
+        spark_client = Mock()
+
         # arrange
         feature_set = FeatureSet(
             "name",
@@ -281,22 +390,15 @@ class TestFeatureSet:
 
         # act
         result_df = (
-            feature_set.construct(filtering_dataframe).orderBy("timestamp").collect()
+            feature_set.construct(filtering_dataframe, spark_client)
+            .orderBy("timestamp")
+            .collect()
         )
 
         # assert
-        assert result_df[0]["feature1"] == 0
-        assert result_df[1]["feature1"] == 0
-        assert result_df[2]["feature1"] is None
-        assert result_df[3]["feature1"] == 0
-        assert result_df[4]["feature1"] is None
-        assert result_df[0]["feature2"] is None
-        assert result_df[1]["feature2"] == 1
-        assert result_df[2]["feature2"] is None
-        assert result_df[3]["feature2"] == 1
-        assert result_df[4]["feature2"] is None
-        assert result_df[0]["feature3"] == 1
-        assert result_df[1]["feature3"] == 1
-        assert result_df[2]["feature3"] is None
-        assert result_df[3]["feature3"] == 1
-        assert result_df[4]["feature3"] is None
+        assert (
+            result_df
+            == output_filtering_dataframe.orderBy("timestamp")
+            .select(feature_set.columns)
+            .collect()
+        )
