@@ -3,6 +3,7 @@
 from pyspark.sql import DataFrame
 
 from butterfree.core.clients import SparkClient
+from butterfree.core.configs import environment
 from butterfree.core.extract.readers.reader import Reader
 
 
@@ -47,8 +48,8 @@ class KafkaReader(Reader):
     def __init__(
         self,
         id: str,
-        connection_string: str,
         topic: str,
+        connection_string: str = None,
         topic_options: dict = None,
         stream: bool = True,
     ):
@@ -59,8 +60,10 @@ class KafkaReader(Reader):
             )
         if not isinstance(topic, str):
             raise ValueError("topic must be a string with the topic name")
-        self.connection_string = connection_string
         self.topic = topic
+        self.connection_string = connection_string or environment.get_variable(
+            "KAFKA_CONNECTION_STRING"
+        )
         self.options = dict(
             {
                 "kafka.bootstrap.servers": self.connection_string,

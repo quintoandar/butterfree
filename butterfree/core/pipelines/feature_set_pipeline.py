@@ -180,7 +180,6 @@ class FeatureSetPipeline:
             feature_set=self.feature_set,
             spark_client=self.spark_client,
         )
-        print(">>>>>>> df.isStreaming: ", dataframe.isStreaming)
 
         if not dataframe.isStreaming:
             self.sink.validate(

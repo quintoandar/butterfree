@@ -49,7 +49,7 @@ class TestKafkaReader:
 
         spark_client.read.return_value = raw_stream_df
         kafka_reader = KafkaReader(
-            "test", connection_string, topic, topic_options, stream
+            "test", topic, connection_string, topic_options, stream
         )
 
         # act
