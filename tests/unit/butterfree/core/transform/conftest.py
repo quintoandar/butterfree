@@ -63,6 +63,48 @@ def make_filtering_dataframe(spark_context, spark_session):
     return df
 
 
+def make_output_filtering_dataframe(spark_context, spark_session):
+    data = [
+        {"id": 1, "ts": 1, "feature1": 0, "feature2": None, "feature3": 1},
+        {"id": 1, "ts": 2, "feature1": 0, "feature2": 1, "feature3": 1},
+        {"id": 1, "ts": 3, "feature1": None, "feature2": None, "feature3": None},
+        {"id": 1, "ts": 4, "feature1": 0, "feature2": 1, "feature3": 1},
+        {"id": 1, "ts": 6, "feature1": None, "feature2": None, "feature3": None},
+    ]
+    df = spark_session.read.json(
+        spark_context.parallelize(data).map(lambda x: json.dumps(x))
+    )
+    df = df.withColumn(TIMESTAMP_COLUMN, df.ts.cast(DataType.TIMESTAMP.value))
+
+    return df
+
+
+def make_rolling_windows_agg_dataframe(spark_context, spark_session):
+    data = [
+        {
+            "id": 1,
+            "timestamp": "2016-04-11 00:00:00",
+            "feature1__avg_over_1_week_rolling_windows": None,
+        },
+        {
+            "id": 1,
+            "timestamp": "2016-04-12 00:00:00",
+            "feature1__avg_over_1_week_rolling_windows": 350.0,
+        },
+        {
+            "id": 1,
+            "timestamp": "2016-04-19 00:00:00",
+            "feature1__avg_over_1_week_rolling_windows": None,
+        },
+    ]
+    df = spark_session.read.json(
+        spark_context.parallelize(data).map(lambda x: json.dumps(x))
+    )
+    df = df.withColumn("timestamp", df.timestamp.cast(DataType.TIMESTAMP.value))
+
+    return df
+
+
 def make_fs(spark_context, spark_session):
     df = make_dataframe(spark_context, spark_session)
     df = (
@@ -87,6 +129,16 @@ def feature_set_dataframe(spark_context, spark_session):
 @fixture
 def filtering_dataframe(spark_context, spark_session):
     return make_filtering_dataframe(spark_context, spark_session)
+
+
+@fixture
+def output_filtering_dataframe(spark_context, spark_session):
+    return make_output_filtering_dataframe(spark_context, spark_session)
+
+
+@fixture
+def rolling_windows_agg_dataframe(spark_context, spark_session):
+    return make_rolling_windows_agg_dataframe(spark_context, spark_session)
 
 
 @fixture

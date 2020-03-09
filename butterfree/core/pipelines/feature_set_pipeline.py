@@ -19,10 +19,10 @@ class FeatureSetPipeline:
         sources, feature set (and its features) and writers are defined.
         >>> import os
 
-        >>> from butterfree.core.pipeline import FeatureSetPipeline
+        >>> from butterfree.core.pipelines import FeatureSetPipeline
         >>> from butterfree.core.configs.db import S3Config
         >>> from butterfree.core.extract import Source
-        >>> from butterfree.core.extract.reader import TableReader
+        >>> from butterfree.core.extract.readers import TableReader
         >>> from butterfree.core.transform import FeatureSet
         >>> from butterfree.core.transform.features import (
         ...     Feature,
@@ -34,7 +34,7 @@ class FeatureSetPipeline:
         ...     CustomTransform,
         ... )
         >>> from butterfree.core.load import Sink
-        >>> from butterfree.core.load.writer import HistoricalFeatureStoreWriter
+        >>> from butterfree.core.load.writers import HistoricalFeatureStoreWriter
         >>> import pyspark.sql.functions as F
 
         >>> def divide(df, fs, column1, column2):
@@ -164,7 +164,7 @@ class FeatureSetPipeline:
         if not isinstance(self._spark_client, SparkClient):
             raise ValueError("spark_client must be a SparkClient instance")
 
-    def run(self):
+    def run(self, base_date: str = None):
         """Runs the defined feature set pipeline.
 
         The pipeline consists in the following steps:
@@ -174,7 +174,9 @@ class FeatureSetPipeline:
 
         """
         dataframe = self.source.construct(client=self.spark_client)
-        dataframe = self.feature_set.construct(dataframe=dataframe)
+        dataframe = self.feature_set.construct(
+            dataframe=dataframe, client=self.spark_client, base_date=base_date
+        )
         self.sink.flush(
             dataframe=dataframe,
             feature_set=self.feature_set,

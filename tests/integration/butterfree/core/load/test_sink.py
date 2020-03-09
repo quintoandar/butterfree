@@ -12,7 +12,7 @@ from butterfree.core.load.writers import (
 def test_sink(input_dataframe, feature_set):
     # arrange
     client = SparkClient()
-    feature_set_df = feature_set.construct(input_dataframe)
+    feature_set_df = feature_set.construct(input_dataframe, client)
     target_latest_df = OnlineFeatureStoreWriter.filter_latest(
         feature_set_df, id_columns=[key.name for key in feature_set.keys]
     )
