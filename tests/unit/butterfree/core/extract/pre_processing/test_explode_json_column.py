@@ -1,4 +1,4 @@
-from pyspark.sql.types import IntegerType, StringType, StructField, StructType
+from pyspark.sql.types import ArrayType, IntegerType, StringType, StructField, StructType
 
 from butterfree.core.extract.pre_processing import explode_json_column
 from butterfree.testing.dataframe import (
@@ -9,13 +9,14 @@ from butterfree.testing.dataframe import (
 
 def test_explode_json_column(spark_context, spark_session):
     # arrange
-    input_data = [{"json_column": '{"a": 123, "b": "abc", "c": "123"}'}]
+    input_data = [{"json_column": '{"a": 123, "b": "abc", "c": "123", "d": [1, 2, 3]}'}]
     target_data = [
         {
-            "json_column": '{"a": 123, "b": "abc", "c": "123"}',
+            "json_column": '{"a": 123, "b": "abc", "c": "123", "d": [1, 2, 3]}',
             "a": 123,
             "b": "abc",
             "c": 123,
+            "d": [1, 2, 3]
         }
     ]
 
@@ -27,6 +28,7 @@ def test_explode_json_column(spark_context, spark_session):
             StructField("a", IntegerType()),
             StructField("b", StringType()),
             StructField("c", IntegerType()),
+            StructField("d", ArrayType(IntegerType())),
         ]
     )
 
