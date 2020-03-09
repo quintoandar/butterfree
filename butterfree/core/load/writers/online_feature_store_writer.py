@@ -127,7 +127,7 @@ class OnlineFeatureStoreWriter(Writer):
             dataframe.writeStream.trigger(processingTime="10 seconds")
             .outputMode("update")
             .foreachBatch(
-                lambda batch_df, _: self.write(feature_set, dataframe, spark_client)
+                lambda batch_df, _: self.write(feature_set, batch_df, spark_client)
             )
             .start()
         )
