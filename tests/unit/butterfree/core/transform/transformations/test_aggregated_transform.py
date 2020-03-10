@@ -1,8 +1,12 @@
+import json
+
 import pytest
 
 from butterfree.core.constants.columns import TIMESTAMP_COLUMN
+from butterfree.core.constants.data_type import DataType
 from butterfree.core.transform.features import Feature
 from butterfree.core.transform.transformations import AggregatedTransform
+from butterfree.testing.dataframe import assert_dataframe_equality
 
 
 class TestAggregatedTransform:
@@ -324,3 +328,48 @@ class TestAggregatedTransform:
                     mode=["rolling_windows"],
                 ),
             )
+
+    def test_feature_transform_collect_set_fixed_windows(
+        self, with_house_ids_dataframe, spark_context, spark_session
+    ):
+        # given
+        data = [
+            {
+                "user_id": 1,
+                "timestamp": "2016-04-12 00:00:00",
+                "house_id__collect_set_over_1_day_rolling_windows": [123, 400],
+            },
+            {
+                "user_id": 1,
+                "timestamp": "2016-04-13 00:00:00",
+                "house_id__collect_set_over_1_day_rolling_windows": [192],
+            },
+            {
+                "user_id": 1,
+                "timestamp": "2016-04-16 00:00:00",
+                "house_id__collect_set_over_1_day_rolling_windows": [715],
+            },
+        ]
+        expected_df = spark_session.read.json(
+            spark_context.parallelize(data).map(lambda x: json.dumps(x))
+        )
+        expected_df = expected_df.withColumn(
+            TIMESTAMP_COLUMN, expected_df.timestamp.cast(DataType.TIMESTAMP.value)
+        )
+
+        # when
+        test_feature = Feature(
+            name="house_id",
+            description="unit test",
+            transformation=AggregatedTransform(
+                aggregations=["collect_set"],
+                partition="user_id",
+                windows=["1 day"],
+                mode=["rolling_windows"],
+            ),
+        )
+
+        df = test_feature.transform(with_house_ids_dataframe)
+
+        # then
+        assert_dataframe_equality(df, expected_df)
