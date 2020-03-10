@@ -1,11 +1,13 @@
-import pytest
 import json
+
+import pytest
 
 from butterfree.core.constants.columns import TIMESTAMP_COLUMN
 from butterfree.core.constants.data_type import DataType
 from butterfree.core.transform.features import Feature
 from butterfree.core.transform.transformations import AggregatedTransform
 from butterfree.testing.dataframe import assert_dataframe_equality
+
 
 class TestAggregatedTransform:
     def test_feature_transform(self, feature_set_dataframe):
@@ -335,23 +337,25 @@ class TestAggregatedTransform:
             {
                 "user_id": 1,
                 "ts": "2016-04-11 00:00:00",
-                "housze_id__collect_set_over_1_day_rolling_windows": [123, 400]
+                "housze_id__collect_set_over_1_day_rolling_windows": [123, 400],
             },
             {
                 "user_id": 1,
                 "ts": "2016-04-12 00:00:00",
-                "house_id__collect_set_over_1_day_rolling_windows": [192]
+                "house_id__collect_set_over_1_day_rolling_windows": [192],
             },
             {
                 "user_id": 1,
                 "ts": "2016-04-15 00:00:00",
-                "house_id__collect_set_over_1_day_rolling_windows": [715]
+                "house_id__collect_set_over_1_day_rolling_windows": [715],
             },
         ]
         expected_df = spark_session.read.json(
             spark_context.parallelize(data).map(lambda x: json.dumps(x))
         )
-        expected_df = expected_df.withColumn(TIMESTAMP_COLUMN, expected_df.ts.cast(DataType.TIMESTAMP.value))
+        expected_df = expected_df.withColumn(
+            TIMESTAMP_COLUMN, expected_df.ts.cast(DataType.TIMESTAMP.value)
+        )
 
         # when
         test_feature = Feature(
