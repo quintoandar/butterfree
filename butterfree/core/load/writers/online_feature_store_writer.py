@@ -114,9 +114,8 @@ class OnlineFeatureStoreWriter(Writer):
             dataframe: Spark dataframe containing data from a feature set.
             spark_client: client for Spark connections with external services.
 
-        Returns:
-            False: fail validation.
-            True: success validation.
+        Raises:
+            AssertionError: if validation fails.
 
         """
         # validation with online feature store can be done right now, since
