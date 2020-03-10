@@ -1,5 +1,4 @@
 """Holds the Sink class."""
-from collections import namedtuple
 from typing import List
 
 from pyspark.sql.dataframe import DataFrame
@@ -42,20 +41,16 @@ class Sink:
             RuntimeError: if any on the Writers returns a failed validation.
 
         """
-        Validation = namedtuple("Validation", ["writer", "result"])
-
-        validations = [
-            Validation(
-                writer,
+        failures = []
+        for writer in self.writers:
+            try:
                 writer.validate(
                     feature_set=feature_set,
                     dataframe=dataframe,
                     spark_client=spark_client,
-                ),
-            )
-            for writer in self.writers
-        ]
-        failures = [validation for validation in validations if not validation.result]
+                )
+            except AssertionError as e:
+                failures.append(e)
 
         if failures:
             raise RuntimeError(
