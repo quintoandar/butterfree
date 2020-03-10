@@ -12,7 +12,6 @@ from butterfree.core.configs.db import S3Config
 from butterfree.core.constants import columns
 from butterfree.core.load.writers.writer import Writer
 from butterfree.core.transform import FeatureSet
-from butterfree.core.validations.validate_dataframe import ValidateDataframe
 
 
 class HistoricalFeatureStoreWriter(Writer):
@@ -89,9 +88,6 @@ class HistoricalFeatureStoreWriter(Writer):
 
         """
         s3_key = os.path.join("historical", feature_set.entity, feature_set.name)
-
-        validate_dataframe = ValidateDataframe(dataframe)
-        validate_dataframe.checks()
         dataframe = self._create_partitions(dataframe)
 
         spark_client.write_table(

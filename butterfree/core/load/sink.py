@@ -7,6 +7,7 @@ from pyspark.sql.dataframe import DataFrame
 from butterfree.core.clients import SparkClient
 from butterfree.core.load.writers.writer import Writer
 from butterfree.core.transform import FeatureSet
+from butterfree.core.validations.validate_dataframe import ValidateDataframe
 
 
 class Sink:
@@ -73,8 +74,8 @@ class Sink:
             spark_client: client used to run a query.
 
         """
-        if not isinstance(dataframe, DataFrame):
-            raise ValueError("dataframe need to be a DataFrame instance.")
+        validate_dataframe = ValidateDataframe(dataframe)
+        validate_dataframe.checks()
 
         for writer in self.writers:
             write = writer.write_stream if dataframe.isStreaming else writer.write

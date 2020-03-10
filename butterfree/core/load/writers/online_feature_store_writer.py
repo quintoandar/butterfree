@@ -57,7 +57,9 @@ class OnlineFeatureStoreWriter(Writer):
         according to OnlineFeatureStoreWriter class arguments.
     """
 
-    def __init__(self, db_config=None):
+    def __init__(
+        self, db_config=None,
+    ):
         self.db_config = db_config or CassandraConfig()
 
     @staticmethod
@@ -88,7 +90,9 @@ class OnlineFeatureStoreWriter(Writer):
             .drop("rn")
         )
 
-    def write(self, feature_set: FeatureSet, dataframe, spark_client: SparkClient):
+    def write(
+        self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient
+    ):
         """Loads the latest data from a feature set into the Feature Store.
 
         Args:
@@ -110,7 +114,12 @@ class OnlineFeatureStoreWriter(Writer):
         )
 
     def write_stream(
-        self, feature_set: FeatureSet, dataframe, spark_client: SparkClient
+        self,
+        feature_set: FeatureSet,
+        dataframe: DataFrame,
+        spark_client: SparkClient,
+        output_mode: str = "update",
+        processing_time: str = "0 seconds",
     ) -> StreamingQuery:
         """Loads the streaming data into the Online Feature Store.
 
@@ -124,8 +133,8 @@ class OnlineFeatureStoreWriter(Writer):
 
         """
         stream = (
-            dataframe.writeStream.trigger(processingTime="10 seconds")
-            .outputMode("update")
+            dataframe.writeStream.trigger(processingTime=processing_time)
+            .outputMode(output_mode)
             .foreachBatch(
                 lambda batch_df, _: self.write(feature_set, batch_df, spark_client)
             )

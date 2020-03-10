@@ -1,35 +1,64 @@
 import pytest
+from pyspark.sql.types import LongType, StringType, StructField, StructType
 
+from butterfree.core.configs.environment import specification
 from butterfree.core.extract.readers import KafkaReader
+from butterfree.testing.dataframe import (
+    assert_dataframe_equality,
+    create_df_from_collection,
+)
 
 
 class TestKafkaReader:
-    @pytest.mark.parametrize(
-        "connection_string, topic",
-        [(None, "topic"), ("host1:port,host2:port", 123), (123, None)],
-    )
-    def test_init_invalid_params(self, connection_string, topic):
-        # act and assert
-        with pytest.raises(ValueError):
-            KafkaReader("id", connection_string, topic)
+
+    RAW_DATA = [
+        {
+            "key": "123",
+            "value": '{"a": 123, "b": "abc", "c": "123"}',
+            "topic": "topic",
+            "partition": 1,
+            "offset": 1,
+            "timestamp": "2020-03-09T12:00:00+00:00",
+            "timestampType": 1,
+        }
+    ]
+
+    TARGET_DATA = [
+        {
+            "kafka_metadata": {
+                "key": "123",
+                "value": '{"a": 123, "b": "abc", "c": "123"}',
+                "topic": "topic",
+                "partition": 1,
+                "offset": 1,
+                "timestamp": "2020-03-09T12:00:00+00:00",
+                "timestampType": 1,
+            },
+            "a": 123,
+            "b": "abc",
+            "c": 123,
+        }
+    ]
 
     @pytest.mark.parametrize(
-        "connection_string, topic, topic_options, stream",
+        "topic, values_schema",
+        [("topic", None), (None, StructType([StructField("id", LongType())]))],
+    )
+    def test_init_invalid_params(self, topic, values_schema):
+        # act and assert
+        with pytest.raises(ValueError):
+            KafkaReader("id", topic, values_schema)
+
+    @pytest.mark.parametrize(
+        "topic, topic_options, stream",
         [
-            ("host1:port,host2:port", "topic", None, True),
-            ("host1:port,host2:port", "topic", None, False),
-            ("host1:port,host2:port", "topic", {"startingOffsets": "earliest"}, True),
+            ("topic", None, True),
+            ("topic", None, False),
+            ("topic", {"startingOffsets": "earliest"}, True),
         ],
     )
     def test_consume(
-        self,
-        connection_string,
-        topic,
-        topic_options,
-        stream,
-        spark_client,
-        spark_context,
-        spark_session,
+        self, topic, topic_options, stream, spark_client, spark_context, spark_session,
     ):
         """Test for consume method in KafkaReader class.
 
@@ -38,24 +67,35 @@ class TestKafkaReader:
         that are in binary. The raw_data and target_data defined in the method are
         used to assert if the consume method is casting the data types correctly,
         besides check if method is been called with the correct args.
+
         """
         # arrange
-        raw_data = [
-            {"key": 10101111, "value": 10101111}
-        ]  # data gets in binary to spark
-        target_data = [{"key": "10101111", "value": "10101111"}]
-        raw_stream_df = spark_session.read.json(spark_context.parallelize(raw_data, 1))
-        target_df = spark_session.read.json(spark_context.parallelize(target_data, 1))
+        raw_stream_df = create_df_from_collection(
+            self.RAW_DATA, spark_context, spark_session
+        )
+        target_df = create_df_from_collection(
+            self.TARGET_DATA, spark_context, spark_session
+        )
 
         spark_client.read.return_value = raw_stream_df
+        value_json_schema = StructType(
+            [
+                StructField("a", LongType()),
+                StructField("b", StringType()),
+                StructField("c", LongType()),
+            ]
+        )
         kafka_reader = KafkaReader(
-            "test", topic, connection_string, topic_options, stream
+            "test", topic, value_json_schema, topic_options=topic_options, stream=stream
         )
 
         # act
         output_df = kafka_reader.consume(spark_client)
         options = dict(
-            {"kafka.bootstrap.servers": connection_string, "subscribe": topic},
+            {
+                "kafka.bootstrap.servers": specification["KAFKA_CONNECTION_STRING"],
+                "subscribe": topic,
+            },
             **topic_options if topic_options else {},
         )
 
@@ -63,4 +103,27 @@ class TestKafkaReader:
         spark_client.read.assert_called_once_with(
             format="kafka", options=options, stream=kafka_reader.stream
         )
-        assert target_df.collect() == output_df.collect()
+        assert_dataframe_equality(target_df, output_df)
+
+    def test__struct_df(self, spark_context, spark_session):
+        # arrange
+        input_df = create_df_from_collection(
+            self.RAW_DATA, spark_context, spark_session
+        )
+        target_df = create_df_from_collection(
+            self.TARGET_DATA, spark_context, spark_session
+        )
+        value_schema = StructType(
+            [
+                StructField("a", LongType()),
+                StructField("b", StringType()),
+                StructField("c", LongType()),
+            ]
+        )
+        kafka_reader = KafkaReader("id", "topic", value_schema)
+
+        # act
+        output_df = kafka_reader._struct_df(input_df)
+
+        # arrange
+        assert_dataframe_equality(target_df, output_df)
