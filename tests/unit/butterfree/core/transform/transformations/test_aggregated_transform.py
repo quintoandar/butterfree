@@ -336,17 +336,17 @@ class TestAggregatedTransform:
         data = [
             {
                 "user_id": 1,
-                "ts": "2016-04-11 00:00:00",
-                "housze_id__collect_set_over_1_day_rolling_windows": [123, 400],
+                "timestamp": "2016-04-12 00:00:00",
+                "house_id__collect_set_over_1_day_rolling_windows": [123, 400],
             },
             {
                 "user_id": 1,
-                "ts": "2016-04-12 00:00:00",
+                "timestamp": "2016-04-13 00:00:00",
                 "house_id__collect_set_over_1_day_rolling_windows": [192],
             },
             {
                 "user_id": 1,
-                "ts": "2016-04-15 00:00:00",
+                "timestamp": "2016-04-16 00:00:00",
                 "house_id__collect_set_over_1_day_rolling_windows": [715],
             },
         ]
@@ -354,7 +354,7 @@ class TestAggregatedTransform:
             spark_context.parallelize(data).map(lambda x: json.dumps(x))
         )
         expected_df = expected_df.withColumn(
-            TIMESTAMP_COLUMN, expected_df.ts.cast(DataType.TIMESTAMP.value)
+            TIMESTAMP_COLUMN, expected_df.timestamp.cast(DataType.TIMESTAMP.value)
         )
 
         # when
@@ -372,4 +372,4 @@ class TestAggregatedTransform:
         df = test_feature.transform(with_house_ids_dataframe)
 
         # then
-        assert_dataframe_equality(expected_df, df)
+        assert_dataframe_equality(df, expected_df)
