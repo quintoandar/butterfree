@@ -22,7 +22,7 @@ def test_explode_json_column(spark_context, spark_session):
             "a": 123,
             "b": "abc",
             "c": 123,
-            "d": [1, 2, 3]
+            "d": [1, 2, 3],
         }
     ]
 
