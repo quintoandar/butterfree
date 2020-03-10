@@ -44,7 +44,7 @@ class TestSink:
 
         for w in writer:
             w.validate = mocker.stub("validate")
-            w.validate.return_value = False
+            w.validate.side_effect = AssertionError("test")
 
         feature_set = mocker.stub("feature_set")
 
