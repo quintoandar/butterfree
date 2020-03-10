@@ -105,6 +105,7 @@ class AggregatedTransform(TransformComponent):
         "avg": functions.avg,
         "stddev_pop": functions.stddev_pop,
         "count": functions.count,
+        "collect_set": functions.collect_set,
     }
     __ALLOWED_WINDOWS = {
         ("second", "seconds"): 1,
@@ -276,6 +277,7 @@ class AggregatedTransform(TransformComponent):
                 window_unit=window.split()[1], window_size=int(window.split()[0]),
             ),
         )
+
         dataframe = dataframe.withColumn(
             feature_name,
             self.__ALLOWED_AGGREGATIONS[aggregation](f"{self._parent.name}").over(w),
