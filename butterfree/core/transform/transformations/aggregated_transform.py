@@ -93,12 +93,10 @@ class AggregatedTransform(TransformComponent):
         windows: non_blank(List[str]),
         partition: non_blank(str) = None,
         time_column: str = None,
-        aggregate_by: list = None,
     ):
         super().__init__()
         self.mode = mode
         self.aggregations = aggregations
-        self.aggregate_by = aggregate_by
         self.windows = windows
         self.partition = partition
         self.time_column = time_column or TIMESTAMP_COLUMN
@@ -109,7 +107,6 @@ class AggregatedTransform(TransformComponent):
         "count": functions.count,
         "collect_set": functions.collect_set,
     }
-    __REQUIRES_COLUMN_AGGREGTION = ["collect_set"]
     __ALLOWED_WINDOWS = {
         ("second", "seconds"): 1,
         ("minute", "minutes"): 60,
@@ -281,30 +278,15 @@ class AggregatedTransform(TransformComponent):
             ),
         )
 
-        if aggregation in self.__REQUIRES_COLUMN_AGGREGTION:
-            if not self.aggregate_by:
-                raise Exception(f"{aggregation} requires aggregate_by param to be defined")
+        dataframe = dataframe.withColumn(
+            feature_name,
+            self.__ALLOWED_AGGREGATIONS[aggregation](f"{self._parent.name}").over(w),
+        )
 
-            aggregate_over, *group_by_over = self.aggregate_by
-            dataframe = dataframe.groupBy(
-                aggregate_over, self.time_column, *group_by_over
-            ).agg(
-                self.__ALLOWED_AGGREGATIONS[aggregation](aggregate_over)
-                .over(w)
-                .alias(feature_name)
-            )
-        else:
+        if self._parent.dtype:
             dataframe = dataframe.withColumn(
-                feature_name,
-                self.__ALLOWED_AGGREGATIONS[aggregation](f"{self._parent.name}").over(
-                    w
-                ),
+                feature_name, functions.col(feature_name).cast(self._parent.dtype),
             )
-
-            if self._parent.dtype:
-                dataframe = dataframe.withColumn(
-                    feature_name, functions.col(feature_name).cast(self._parent.dtype),
-                )
 
         return dataframe
 

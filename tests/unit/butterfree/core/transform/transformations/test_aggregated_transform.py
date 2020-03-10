@@ -325,22 +325,22 @@ class TestAggregatedTransform:
                 ),
             )
 
-    def test_feature_transform_collect_set_fixed_windows(self, with_house_ids_dataframe):
+    def test_feature_transform_collect_set_fixed_windows(
+        self, with_house_ids_dataframe
+    ):
         test_feature = Feature(
-            name="feature1",
+            name="house_id",
             description="unit test",
             transformation=AggregatedTransform(
                 aggregations=["collect_set"],
-                partition="id",
-                windows=["15 minutes"],
-                mode=["fixed_windows"],
-                aggregate_by=["house_id", "id"],
+                partition="user_id",
+                windows=["1 day"],
+                mode=["rolling_windows"],
             ),
         )
 
         df = test_feature.transform(with_house_ids_dataframe).collect()
 
-        assert df[0]["feature1__collect_set_over_15_minutes_fixed_windows"] == [123]
-        assert df[1]["feature1__collect_set_over_15_minutes_fixed_windows"] == [123, 400]
-        assert df[2]["feature1__collect_set_over_15_minutes_fixed_windows"] == [123, 192, 400]
-        assert df[3]["feature1__collect_set_over_15_minutes_fixed_windows"] == [715]
+        assert df[0]["house_id__collect_set_over_1_day_rolling_windows"] == [123, 400]
+        assert df[1]["house_id__collect_set_over_1_day_rolling_windows"] == [192]
+        assert df[2]["house_id__collect_set_over_1_day_rolling_windows"] == [715]

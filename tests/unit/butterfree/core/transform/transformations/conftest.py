@@ -37,37 +37,37 @@ def h3_dataframe(spark_context, spark_session):
 def with_house_ids_dataframe(spark_context, spark_session):
     data = [
         {
-            "id": 1,
+            "user_id": 1,
             "house_id": 123,
-            "ts": "2016-04-11 11:31:11",
+            "ts": "2016-04-11 00:00:00",
             "feature1": 200,
             "feature2": 200,
             "nonfeature": 0,
         },
         {
-            "id": 1,
+            "user_id": 1,
             "house_id": 400,
-            "ts": "2016-04-11 11:44:12",
+            "ts": "2016-04-11 00:00:05",
             "feature1": 300,
             "feature2": 300,
             "nonfeature": 0,
         },
         {
-            "id": 1,
+            "user_id": 1,
             "house_id": 192,
-            "ts": "2016-04-11 11:46:00",
+            "ts": "2016-04-12 00:00:00",
             "feature1": 400,
             "feature2": 400,
             "nonfeature": 0,
         },
         {
-            "id": 1,
+            "user_id": 1,
             "house_id": 715,
-            "ts": "2016-04-11 12:03:21",
+            "ts": "2016-04-15 00:00:00",
             "feature1": 500,
             "feature2": 500,
             "nonfeature": 0,
-        }
+        },
     ]
     df = spark_session.read.json(
         spark_context.parallelize(data).map(lambda x: json.dumps(x))
