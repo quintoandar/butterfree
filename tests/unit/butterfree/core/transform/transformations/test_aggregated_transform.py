@@ -1,9 +1,11 @@
 import pytest
+import json
 
 from butterfree.core.constants.columns import TIMESTAMP_COLUMN
+from butterfree.core.constants.data_type import DataType
 from butterfree.core.transform.features import Feature
 from butterfree.core.transform.transformations import AggregatedTransform
-
+from butterfree.testing.dataframe import assert_dataframe_equality
 
 class TestAggregatedTransform:
     def test_feature_transform(self, feature_set_dataframe):
@@ -326,8 +328,32 @@ class TestAggregatedTransform:
             )
 
     def test_feature_transform_collect_set_fixed_windows(
-        self, with_house_ids_dataframe
+        self, with_house_ids_dataframe, spark_context, spark_session
     ):
+        # given
+        data = [
+            {
+                "user_id": 1,
+                "ts": "2016-04-11 00:00:00",
+                "housze_id__collect_set_over_1_day_rolling_windows": [123, 400]
+            },
+            {
+                "user_id": 1,
+                "ts": "2016-04-12 00:00:00",
+                "house_id__collect_set_over_1_day_rolling_windows": [192]
+            },
+            {
+                "user_id": 1,
+                "ts": "2016-04-15 00:00:00",
+                "house_id__collect_set_over_1_day_rolling_windows": [715]
+            },
+        ]
+        expected_df = spark_session.read.json(
+            spark_context.parallelize(data).map(lambda x: json.dumps(x))
+        )
+        expected_df = expected_df.withColumn(TIMESTAMP_COLUMN, expected_df.ts.cast(DataType.TIMESTAMP.value))
+
+        # when
         test_feature = Feature(
             name="house_id",
             description="unit test",
@@ -339,8 +365,7 @@ class TestAggregatedTransform:
             ),
         )
 
-        df = test_feature.transform(with_house_ids_dataframe).collect()
+        df = test_feature.transform(with_house_ids_dataframe)
 
-        assert df[0]["house_id__collect_set_over_1_day_rolling_windows"] == [123, 400]
-        assert df[1]["house_id__collect_set_over_1_day_rolling_windows"] == [192]
-        assert df[2]["house_id__collect_set_over_1_day_rolling_windows"] == [715]
+        # then
+        assert_dataframe_equality(expected_df, df)
