@@ -336,7 +336,9 @@ class FeatureSet:
         start_date = dataframe.select(F.min(TIMESTAMP_COLUMN)).collect()[0][0]
         end_date = end_date or datetime.now()
         date_range = [
-            start_date if isinstance(start_date, str) else start_date.strftime("%Y-%m-%d"),
+            start_date
+            if isinstance(start_date, str)
+            else start_date.strftime("%Y-%m-%d"),
             end_date if isinstance(end_date, str) else end_date.strftime("%Y-%m-%d"),
         ]
         date_df = self._generate_dates(client, date_range)
