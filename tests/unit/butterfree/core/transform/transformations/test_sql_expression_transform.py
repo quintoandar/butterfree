@@ -23,7 +23,6 @@ class TestSQLExpressionTransform:
                         "feature1",
                         "feature2",
                         "id",
-                        "origin_ts",
                         "timestamp",
                         "feature1_over_feature2",
                     ],
