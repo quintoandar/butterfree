@@ -1,3 +1,5 @@
+import pytest
+
 from butterfree.core.load.writers import HistoricalFeatureStoreWriter
 
 
