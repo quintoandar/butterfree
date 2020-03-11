@@ -78,7 +78,6 @@ class Sink:
         validate_dataframe.checks()
 
         for writer in self.writers:
-            write = writer.write_stream if dataframe.isStreaming else writer.write
-            write(
+            writer.write(
                 feature_set=feature_set, dataframe=dataframe, spark_client=spark_client
             )

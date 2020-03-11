@@ -35,11 +35,11 @@ class KafkaReader(Reader):
         timestamp:timestamp
         timestampType:integer
 
-    But using this reader and passing the desired schema unde value_schema we would
+    But using this reader and passing the desired schema under value_schema we would
     have the following result:
 
     With value_schema declared as:
-    >>> value_json_schema = StructType(
+    >>> value_schema = StructType(
     ...     [
     ...         StructField("ts", LongType(), nullable=True),
     ...         StructField("id", LongType(), nullable=True),
@@ -166,7 +166,7 @@ class KafkaReader(Reader):
             client: client responsible for connecting to Spark session.
 
         Returns:
-            Dataframe with
+            Dataframe with data from topic.
 
         """
         # read using client and cast key and value columns from binary to string

@@ -1,5 +1,10 @@
-import pytest
+from unittest.mock import Mock
 
+import pytest
+from pyspark.sql import DataFrame
+from pyspark.sql.streaming import StreamingQuery
+
+from butterfree.core.clients import SparkClient
 from butterfree.core.load.writers import OnlineFeatureStoreWriter
 
 
@@ -82,6 +87,38 @@ class TestOnlineFeatureStoreWriter:
             item in spark_client.write_dataframe.call_args[1].items()
             for item in writer.db_config.get_options(table=feature_set.name).items()
         )
+
+    def test_write_stream(
+        self, cassandra_config, feature_set,
+    ):
+        # arrange
+        spark_client = SparkClient()
+        spark_client.write_stream = Mock()
+        spark_client.write_dataframe = Mock()
+        spark_client.write_stream.return_value = Mock(spec=StreamingQuery)
+
+        dataframe = Mock(spec=DataFrame)
+        dataframe.isStreaming = True
+
+        writer = OnlineFeatureStoreWriter(cassandra_config)
+        writer.filter_latest = Mock()
+
+        # act
+        stream_handler = writer.write(feature_set, dataframe, spark_client)
+
+        # assert
+        assert isinstance(stream_handler, StreamingQuery)
+        spark_client.write_stream.assert_called_with(
+            dataframe,
+            processing_time=cassandra_config.stream_processing_time,
+            output_mode=cassandra_config.stream_output_mode,
+            checkpoint_path=cassandra_config.stream_checkpoint_path,
+            format_=cassandra_config.format_,
+            mode=cassandra_config.mode,
+            **cassandra_config.get_options(table=feature_set.name)
+        )
+        writer.filter_latest.assert_not_called()
+        spark_client.write_dataframe.assert_not_called()
 
     def test_validate(
         self, feature_set_dataframe, cassandra_config, mocker, feature_set

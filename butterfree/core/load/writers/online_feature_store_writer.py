@@ -1,6 +1,6 @@
 """Holds the Online Feature Store writer class."""
 
-from typing import Any, List
+from typing import Any, List, Optional
 
 from pyspark.sql import DataFrame, Window
 from pyspark.sql.functions import col, row_number
@@ -92,7 +92,7 @@ class OnlineFeatureStoreWriter(Writer):
 
     def write(
         self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient
-    ):
+    ) -> Optional[StreamingQuery]:
         """Loads the latest data from a feature set into the Feature Store.
 
         Args:
@@ -100,11 +100,25 @@ class OnlineFeatureStoreWriter(Writer):
             dataframe: Spark dataframe containing data from a feature set.
             spark_client: client for Spark connections with external services.
 
+        Returns:
+            Streaming handler if writing streaming df, None otherwise.
+
         """
-        if not dataframe.isStreaming:
-            dataframe = self.filter_latest(
-                dataframe=dataframe, id_columns=feature_set.keys_columns
+        if dataframe.isStreaming:
+            streaming_handler = spark_client.write_stream(
+                dataframe,
+                processing_time=self.db_config.stream_processing_time,
+                output_mode=self.db_config.stream_output_mode,
+                checkpoint_path=self.db_config.stream_checkpoint_path,
+                format_=self.db_config.format_,
+                mode=self.db_config.mode,
+                **self.db_config.get_options(table=feature_set.name),
             )
+            return streaming_handler
+
+        dataframe = self.filter_latest(
+            dataframe=dataframe, id_columns=feature_set.keys_columns
+        )
 
         spark_client.write_dataframe(
             dataframe=dataframe,
@@ -112,35 +126,6 @@ class OnlineFeatureStoreWriter(Writer):
             mode=self.db_config.mode,
             **self.db_config.get_options(table=feature_set.name),
         )
-
-    def write_stream(
-        self,
-        feature_set: FeatureSet,
-        dataframe: DataFrame,
-        spark_client: SparkClient,
-        output_mode: str = "update",
-        processing_time: str = "0 seconds",
-    ) -> StreamingQuery:
-        """Loads the streaming data into the Online Feature Store.
-
-        Args:
-            feature_set: object processed with feature set metadata.
-            dataframe: Spark dataframe containing data from a feature set.
-            spark_client: client for Spark connections with external services.
-
-        Returns:
-            Streaming handler.
-
-        """
-        stream = (
-            dataframe.writeStream.trigger(processingTime=processing_time)
-            .outputMode(output_mode)
-            .foreachBatch(
-                lambda batch_df, _: self.write(feature_set, batch_df, spark_client)
-            )
-            .start()
-        )
-        return stream
 
     def validate(self, feature_set: FeatureSet, dataframe, spark_client: SparkClient):
         """Calculate dataframe rows to validate data into Feature Store.
