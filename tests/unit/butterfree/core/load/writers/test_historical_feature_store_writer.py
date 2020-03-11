@@ -84,7 +84,7 @@ class TestHistoricalFeatureStoreWriter:
         # then
         spark_client.sql.assert_called_once()
         assert query_count == spark_client.sql.call_args[1]["query"]
-        assert result is True
+        assert result is None
 
     def test_validate_false(
         self, feature_set_dataframe, count_feature_set_dataframe, mocker, feature_set
@@ -99,7 +99,5 @@ class TestHistoricalFeatureStoreWriter:
         writer = HistoricalFeatureStoreWriter()
 
         # when
-        result = writer.validate(feature_set, feature_set_dataframe, spark_client)
-
-        # then
-        assert result is False
+        with pytest.raises(AssertionError):
+            _ = writer.validate(feature_set, feature_set_dataframe, spark_client)
