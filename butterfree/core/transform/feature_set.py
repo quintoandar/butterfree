@@ -321,7 +321,7 @@ class FeatureSet:
         return cross_join_df
 
     def _rolling_window_joins(
-        self, dataframe, output_df, client: SparkClient, base_date
+        self, dataframe, output_df, client: SparkClient, end_date
     ):
         """Performs a join between dataframes.
 
@@ -333,14 +333,11 @@ class FeatureSet:
             output_df: transformed dataframe.
             client: client responsible for connecting to Spark session.
         """
-        base_date = base_date or datetime.now()
+        start_date = dataframe.select(F.min(TIMESTAMP_COLUMN)).collect()[0][0]
+        end_date = end_date or datetime.now()
         date_range = [
-            (
-                dataframe.select(F.min(TIMESTAMP_COLUMN))
-                .collect()[0][0]
-                .strftime("%Y-%m-%d")
-            ),
-            base_date if isinstance(base_date, str) else base_date.strftime("%Y-%m-%d"),
+            start_date if isinstance(start_date, str) else start_date.strftime("%Y-%m-%d"),
+            end_date if isinstance(end_date, str) else end_date.strftime("%Y-%m-%d"),
         ]
         date_df = self._generate_dates(client, date_range)
         unique_df = self._get_unique_keys(output_df)
