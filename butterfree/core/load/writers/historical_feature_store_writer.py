@@ -111,9 +111,9 @@ class HistoricalFeatureStoreWriter(Writer):
             dataframe: spark dataframe containing data from a feature set.
             spark_client: client for spark connections with external services.
 
-        Returns:
-            Boolean indicating count of written data matches count in current feature
-                set dataframe.
+        Raises:
+            AssertionError: if count of written data doesn't match count in current
+                feature set dataframe.
 
         """
         table_name = "{}.{}".format(self.database, feature_set.name)
@@ -123,7 +123,12 @@ class HistoricalFeatureStoreWriter(Writer):
         written_count = spark_client.sql(query=query_count).collect().pop()["row"]
         dataframe_count = dataframe.count()
 
-        return written_count == dataframe_count
+        assert written_count == dataframe_count, (
+            "Data written to the Historical Feature Store and read back "
+            f"from {table_name} has a different count than the feature set dataframe. "
+            f"\nNumber of rows in {table_name}: {written_count}."
+            f"\nNumber of rows in the dataframe: {dataframe_count}."
+        )
 
     def _create_partitions(self, dataframe):
         # create year partition column

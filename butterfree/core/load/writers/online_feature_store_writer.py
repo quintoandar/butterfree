@@ -114,25 +114,13 @@ class OnlineFeatureStoreWriter(Writer):
             dataframe: Spark dataframe containing data from a feature set.
             spark_client: client for Spark connections with external services.
 
-        Returns:
-            False: fail validation.
-            True: success validation.
+        Raises:
+            AssertionError: if validation fails.
 
         """
-        if not isinstance(self.db_config.format_, str):
-            raise ValueError("format needs to be a string with the desired read format")
-
-        if not isinstance(feature_set.name, str):
-            raise ValueError("table_name needs to be a string with table name")
-
-        dataframe = self.filter_latest(
-            dataframe=dataframe, id_columns=feature_set.keys_columns
-        )
-        dataframe = dataframe.count()
-
-        feature_store = spark_client.read(
-            format=self.db_config.format_,
-            options=self.db_config.get_options(table=feature_set.name),
-        ).count()
-
-        return True if feature_store == dataframe else False
+        # validation with online feature store can be done right now, since
+        # this database can be updated by an streaming job while our ETL is running
+        # therefore, creating in consistencies between this ETL feature set count and
+        # the data already written to the FS.
+        # TODO how to run data validations when a database has concurrent writes.
+        pass
