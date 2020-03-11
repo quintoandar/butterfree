@@ -179,25 +179,26 @@ class AggregatedTransform(TransformComponent):
         if len(windows) == 0:
             raise KeyError(f"Windows must have one item at least.")
         if self.mode[0] not in ["row_windows"]:
-            for window in windows:
-                if window.split()[1] not in self.allowed_windows:
-                    raise KeyError(
-                        f"{window.split()[1]} is not supported. These are the allowed "
-                        f"time windows that you can use: "
-                        f"{self.allowed_windows}."
-                    )
-                if int(window.split()[0]) <= 0:
-                    raise KeyError(f"{window} have negative element.")
-                if self.mode[
-                    0
-                ] == "rolling_windows" and self._rolling_windows_allowed_duration(
-                    window
-                ):
-                    raise ValueError(
-                        "Window duration has to be greater or equal than 1 day"
-                        " in rolling_windows mode."
-                    )
+            self._check_windows(windows)
         self._windows = windows
+
+    def _check_windows(self, windows):
+        for window in windows:
+            if window.split()[1] not in self.allowed_windows:
+                raise KeyError(
+                    f"{window.split()[1]} is not supported. These are the allowed "
+                    f"time windows that you can use: "
+                    f"{self.allowed_windows}."
+                )
+            if int(window.split()[0]) <= 0:
+                raise KeyError(f"{window} have negative element.")
+            if self.mode[
+                0
+            ] == "rolling_windows" and self._rolling_windows_allowed_duration(window):
+                raise ValueError(
+                    "Window duration has to be greater or equal than 1 day"
+                    " in rolling_windows mode."
+                )
 
     def _rolling_windows_allowed_duration(self, window):
         """Allowed rolling windows durations regarding the slide duration."""
