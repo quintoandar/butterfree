@@ -5,6 +5,7 @@ from pyspark.sql import DataFrame
 from pyspark.sql.streaming import StreamingQuery
 
 from butterfree.core.clients import SparkClient
+from butterfree.core.configs.db import CassandraConfig
 from butterfree.core.load.writers import OnlineFeatureStoreWriter
 
 
@@ -88,9 +89,8 @@ class TestOnlineFeatureStoreWriter:
             for item in writer.db_config.get_options(table=feature_set.name).items()
         )
 
-    def test_write_stream(
-        self, cassandra_config, feature_set,
-    ):
+    @pytest.mark.parametrize("has_checkpoint", [True, False])
+    def test_write_stream(self, feature_set, has_checkpoint, monkeypatch):
         # arrange
         spark_client = SparkClient()
         spark_client.write_stream = Mock()
@@ -99,6 +99,16 @@ class TestOnlineFeatureStoreWriter:
 
         dataframe = Mock(spec=DataFrame)
         dataframe.isStreaming = True
+
+        if has_checkpoint:
+            monkeypatch.setenv("STREAM_CHECKPOINT_PATH", "test")
+
+        cassandra_config = CassandraConfig(keyspace="feature_set")
+        target_checkpoint_path = (
+            "test/entity/feature_set"
+            if cassandra_config.stream_checkpoint_path
+            else None
+        )
 
         writer = OnlineFeatureStoreWriter(cassandra_config)
         writer.filter_latest = Mock()
@@ -112,7 +122,7 @@ class TestOnlineFeatureStoreWriter:
             dataframe,
             processing_time=cassandra_config.stream_processing_time,
             output_mode=cassandra_config.stream_output_mode,
-            checkpoint_path=cassandra_config.stream_checkpoint_path,
+            checkpoint_path=target_checkpoint_path,
             format_=cassandra_config.format_,
             mode=cassandra_config.mode,
             **cassandra_config.get_options(table=feature_set.name),
