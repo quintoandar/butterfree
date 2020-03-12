@@ -17,6 +17,14 @@ class CassandraConfig(AbstractWriteConfig):
         username: username to use in connection.
         password: password to use in connection.
         host: host to use in connection.
+        stream_processing_time: processing time interval for streaming jobs.
+        stream_output_mode: specify the mode from writing streaming data.
+        stream_checkpoint_path: path on S3 to save checkpoints for the stream job.
+
+    More information about processing_time, output_mode and checkpoint_path
+    can be found in Spark documentation:
+    [here](https://spark.apache.org/docs/latest/structured-streaming-programming-guide.html)
+
     """
 
     def __init__(
@@ -103,7 +111,7 @@ class CassandraConfig(AbstractWriteConfig):
 
     @property
     def stream_processing_time(self) -> str:
-        """Host used in connection to Cassandra DB."""
+        """Processing time interval for streaming jobs."""
         return self.__stream_processing_time
 
     @stream_processing_time.setter
@@ -114,7 +122,7 @@ class CassandraConfig(AbstractWriteConfig):
 
     @property
     def stream_output_mode(self) -> str:
-        """Host used in connection to Cassandra DB."""
+        """Specify the mode from writing streaming data."""
         return self.__stream_output_mode
 
     @stream_output_mode.setter
@@ -123,7 +131,7 @@ class CassandraConfig(AbstractWriteConfig):
 
     @property
     def stream_checkpoint_path(self) -> str:
-        """Host used in connection to Cassandra DB."""
+        """Path on S3 to save checkpoints for the stream job."""
         return self.__stream_checkpoint_path
 
     @stream_checkpoint_path.setter
