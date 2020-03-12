@@ -115,7 +115,7 @@ class TestOnlineFeatureStoreWriter:
             checkpoint_path=cassandra_config.stream_checkpoint_path,
             format_=cassandra_config.format_,
             mode=cassandra_config.mode,
-            **cassandra_config.get_options(table=feature_set.name)
+            **cassandra_config.get_options(table=feature_set.name),
         )
         writer.filter_latest.assert_not_called()
         spark_client.write_dataframe.assert_not_called()
