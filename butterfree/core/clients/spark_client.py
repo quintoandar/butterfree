@@ -53,7 +53,7 @@ class SparkClient:
         """Use the SparkSession.read interface to read a metastore table.
 
         Args:
-            database: name of the metastore databse/schema
+            database: name of the metastore database/schema
             table: name of the table in metastore
 
         Returns:
@@ -89,8 +89,8 @@ class SparkClient:
         Args:
             dataframe: dataframe containing data from a feature set.
             format_: format used to save the dataframe.
-            mode: writting modem can be "error", "append", "overwrite" or
-                "ignore". For more informations:
+            mode: writing modem can be "error", "append", "overwrite" or
+                "ignore". For more information:
                 [here](https://spark.apache.org/docs/2.3.0/sql-programming-guide.html#save-modes).
             **options: all other options that can be used in a DataFrameWriter.
 
@@ -100,6 +100,60 @@ class SparkClient:
         if not isinstance(mode, str):
             raise ValueError("mode needs to be a string")
         dataframe.write.save(format=format_, mode=mode, **options)
+
+    def write_stream(
+        self,
+        dataframe: DataFrame,
+        processing_time: str,
+        output_mode: str,
+        checkpoint_path: str,
+        format_: str,
+        mode: str,
+        **options,
+    ):
+        """Starts streaming data writing job.
+
+        Args:
+            dataframe: Spark dataframe containing data from a feature set.
+            processing_time: a processing time interval as a string.
+                E.g. '5 seconds', '1 minute'. Set a trigger that runs the
+                mini-batch periodically based on the processing time. If the
+                effect of processing data as soon as the data arrives, without
+                having to wait for the time frame, is desired, the value
+                '0 seconds' can be set.
+            output_mode: specifies how data of a streaming DataFrame/Dataset is
+                written to a streaming sink destination.
+            checkpoint_path: path on S3 to save checkpoints for the stream job.
+                These checkpoint can be used on the the job re-start to return
+                from where it stops.
+            format_: format used to save the dataframe.
+            mode: writing modem can be "error", "append", "overwrite" or
+                "ignore". For more information:
+                [here](https://spark.apache.org/docs/2.3.0/sql-programming-guide.html#save-modes).
+            **options: all other options that can be used in a DataFrameWriter.
+
+        More information about processing_time, output_mode and checkpoint_path
+        can be found in Spark documentation:
+        [here](https://spark.apache.org/docs/latest/structured-streaming-programming-guide.html)
+
+        Returns:
+            Streaming handler.
+
+        """
+        if not dataframe.isStreaming:
+            raise ValueError("A stream df is needed to start a streaming job.")
+
+        return (
+            dataframe.writeStream.trigger(processingTime=processing_time)
+            .outputMode(output_mode)
+            .option("checkpointLocation", checkpoint_path)
+            .foreachBatch(
+                lambda batch_df, _: self.write_dataframe(
+                    batch_df, format_, mode, **options
+                )
+            )
+            .start()
+        )
 
     @staticmethod
     def write_table(

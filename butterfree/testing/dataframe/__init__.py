@@ -1,6 +1,9 @@
 """Methods to assert properties regarding Apache Spark Dataframes."""
+from json import dumps
+from typing import List
 
-from pyspark.sql import Column, DataFrame
+from pyspark import SparkContext
+from pyspark.sql import Column, DataFrame, SparkSession
 from pyspark.sql.functions import col
 
 
@@ -19,8 +22,13 @@ def assert_dataframe_equality(output_df: DataFrame, target_df: DataFrame):
         )
 
     select_cols = [col(c) for c in output_df.schema.fieldNames()]
+
     output_data = sorted(output_df.select(*select_cols).collect())
+    output_data = [row.asDict(recursive=True) for row in output_data]
+
     target_data = sorted(target_df.select(*select_cols).collect())
+    target_data = [row.asDict(recursive=True) for row in target_data]
+
     if not output_data == target_data:
         raise AssertionError(
             "DataFrames have different values:\n"
@@ -35,7 +43,7 @@ def assert_column_equality(
     output_column: Column,
     target_column: Column,
 ):
-    """Dataframe comparison method."""
+    """Columns comparison method."""
     if not (
         output_df.select(output_column).count()
         == target_df.select(target_column).count()
@@ -57,3 +65,15 @@ def assert_column_equality(
             f"output_column records: {output_data}\n"
             f"target_column records: {target_data}."
         )
+
+
+def create_df_from_collection(
+    data: List[dict],
+    spark_context: SparkContext,
+    spark_session: SparkSession,
+    schema=None,
+):
+    """Creates a dataframe from a list of dicts."""
+    return spark_session.read.json(
+        spark_context.parallelize(data, 1).map(lambda x: dumps(x)), schema=schema
+    )

@@ -73,6 +73,8 @@ class Source:
             reader.build(client)  # create temporary views for each reader
 
         dataframe = client.sql(self.query)
-        dataframe.cache().count()
+
+        if not dataframe.isStreaming:
+            dataframe.cache().count()
 
         return dataframe

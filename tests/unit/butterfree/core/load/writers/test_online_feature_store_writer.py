@@ -1,5 +1,11 @@
-import pytest
+from unittest.mock import Mock
 
+import pytest
+from pyspark.sql import DataFrame
+from pyspark.sql.streaming import StreamingQuery
+
+from butterfree.core.clients import SparkClient
+from butterfree.core.configs.db import CassandraConfig
 from butterfree.core.load.writers import OnlineFeatureStoreWriter
 
 
@@ -82,3 +88,44 @@ class TestOnlineFeatureStoreWriter:
             item in spark_client.write_dataframe.call_args[1].items()
             for item in writer.db_config.get_options(table=feature_set.name).items()
         )
+
+    @pytest.mark.parametrize("has_checkpoint", [True, False])
+    def test_write_stream(self, feature_set, has_checkpoint, monkeypatch):
+        # arrange
+        spark_client = SparkClient()
+        spark_client.write_stream = Mock()
+        spark_client.write_dataframe = Mock()
+        spark_client.write_stream.return_value = Mock(spec=StreamingQuery)
+
+        dataframe = Mock(spec=DataFrame)
+        dataframe.isStreaming = True
+
+        if has_checkpoint:
+            monkeypatch.setenv("STREAM_CHECKPOINT_PATH", "test")
+
+        cassandra_config = CassandraConfig(keyspace="feature_set")
+        target_checkpoint_path = (
+            "test/entity/feature_set"
+            if cassandra_config.stream_checkpoint_path
+            else None
+        )
+
+        writer = OnlineFeatureStoreWriter(cassandra_config)
+        writer.filter_latest = Mock()
+
+        # act
+        stream_handler = writer.write(feature_set, dataframe, spark_client)
+
+        # assert
+        assert isinstance(stream_handler, StreamingQuery)
+        spark_client.write_stream.assert_called_with(
+            dataframe,
+            processing_time=cassandra_config.stream_processing_time,
+            output_mode=cassandra_config.stream_output_mode,
+            checkpoint_path=target_checkpoint_path,
+            format_=cassandra_config.format_,
+            mode=cassandra_config.mode,
+            **cassandra_config.get_options(table=feature_set.name),
+        )
+        writer.filter_latest.assert_not_called()
+        spark_client.write_dataframe.assert_not_called()

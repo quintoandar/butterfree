@@ -48,24 +48,6 @@ class TestHistoricalFeatureStoreWriter:
         )
         assert feature_set.name == spark_client.write_table.call_args[1]["table_name"]
 
-    def test_write_with_df_invalid(self, not_feature_set_dataframe, mocker):
-        # given
-        spark_client = mocker.stub("spark_client")
-        spark_client.write_table = mocker.stub("write_table")
-        feature_set = mocker.stub("feature set")
-        feature_set.entity = "house"
-        feature_set.name = "test"
-
-        writer = HistoricalFeatureStoreWriter()
-
-        # then
-        with pytest.raises(ValueError):
-            writer.write(
-                feature_set=feature_set,
-                dataframe=not_feature_set_dataframe,
-                spark_client=spark_client,
-            )
-
     def test_validate(
         self, feature_set_dataframe, count_feature_set_dataframe, mocker, feature_set
     ):

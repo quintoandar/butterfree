@@ -87,7 +87,7 @@ class TestFeatureSetPipeline:
         assert len(pipeline.sink.writers) == 2
         assert all(isinstance(writer, Writer) for writer in pipeline.sink.writers)
 
-    def test_run(self):
+    def test_run(self, spark_session):
         test_pipeline = FeatureSetPipeline(
             spark_client=SparkClient(),
             source=Mock(
@@ -123,6 +123,11 @@ class TestFeatureSetPipeline:
                 spec=Sink, writers=[HistoricalFeatureStoreWriter(db_config=None)],
             ),
         )
+
+        # feature_set need to return a real df for streaming validation
+        sample_df = spark_session.createDataFrame([{"a": "x", "b": "y", "c": "3"}])
+        test_pipeline.feature_set.construct.return_value = sample_df
+
         test_pipeline.run()
 
         test_pipeline.source.construct.assert_called_once()

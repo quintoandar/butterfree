@@ -1,7 +1,10 @@
 import pytest
 from pyspark.sql.functions import col, from_unixtime
 
-from butterfree.testing.dataframe import assert_dataframe_equality
+from butterfree.testing.dataframe import (
+    assert_dataframe_equality,
+    create_df_from_collection,
+)
 
 
 def test_assert_dataframe_equality(spark_context, spark_session):
@@ -70,3 +73,18 @@ def test_assert_dataframe_equality_different_shapes(spark_context, spark_session
     # act and assert
     with pytest.raises(AssertionError, match="DataFrame shape mismatch:"):
         assert_dataframe_equality(df1, df2)
+
+
+def test_create_df_from_collection(spark_context, spark_session):
+    # arrange
+    input_data = [{"json_column": '{"abc": 123}', "a": 123, "b": "abc"}]
+
+    # act
+    output_df = create_df_from_collection(input_data, spark_context, spark_session)
+    target_df = spark_session.sql(
+        "select 123 as a, 'abc' as b, replace("
+        "to_json(named_struct('abc', 123)), ':', ': ') as json_column"
+    )  # generate the same data but with SparkSQL directly to df
+
+    # arrange
+    assert_dataframe_equality(target_df, output_df)
