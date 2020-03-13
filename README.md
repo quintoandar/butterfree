@@ -1,5 +1,7 @@
 ## Butterfree Python Library
 
+![](https://media.giphy.com/media/mfpxonwzG1WCI/giphy.gif)
+
 _This library is part of the QuintoAndar-specific libraries._
 
 This library supports Python version 3.6+ and meant to provide tools for
@@ -10,7 +12,8 @@ example) that can be created easily from a small set of sources.
 
 More about this idea later :smile:
 
-![](https://i.imgur.com/IRugOsa.png)
+You can follow how Butterfree evolves [here](https://drive.google.com/open?id=11T6_VRbjouT_QbWBXDomYVR9R2ffnlQZ).
+This will be a living class diagram of this tool!
 
 ## Creating your first feature set
 
@@ -264,18 +267,10 @@ You can check Flake 8 and Black by running the following within the project root
 make checks
 ```
 
-## Release
+## Git Flow
 
-TL;DR: Merge your Pull Request to `master` and everything will be taken
-care of. **Just make sure you update the lib version in [`setup.py`](https://github.com/quintoandar/butterfree/tree/master/setup.py)**.
-
-Drone pipeline will generate a new tag whenever there is a push to
-`master` titled with the version number specified by [`__version__` in
-`setup.py`](https://github.com/quintoandar/butterfree/tree/master/setup.py).
-
-The link to this tag will be automatically pushed to this module's index
-in [QuintoAndar's Python Package Index](https://quintoandar.github.io/python-package-server/tree/master/quintoandar-butterfree/index.html)
-and will be ready to consume.
+Releasing is pretty easy with our CI/CD. But make sure to follow our git flow
+[guidelines](GITFLOW.md).
 
 ## Contributing
 
@@ -283,4 +278,4 @@ Any contributions are welcome! Feel free to open Pull Requests and
 posting them to [our
 **#data-products-reviews** slack channel](https://quintoandar.slack.com/messages/data-products-reviews/).
 
-Please **follow the guidelines** described [here](https://github.com/quintoandar/butterfree/tree/master/CONTRIBUTING.md)
+Please **follow the guidelines** described [here](CONTRIBUTING.md).
