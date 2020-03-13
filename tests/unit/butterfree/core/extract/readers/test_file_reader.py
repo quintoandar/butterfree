@@ -1,5 +1,7 @@
 import pytest
+from pyspark.sql.types import DoubleType, LongType, StringType, StructField, StructType
 
+from butterfree.core.clients import SparkClient
 from butterfree.core.extract.readers import FileReader
 
 
@@ -13,26 +15,65 @@ class TestFileReader:
             FileReader("id", path, format)
 
     @pytest.mark.parametrize(
-        "path, format, format_options",
+        "path, format, schema, format_options",
         [
-            ("path/to/file.parquet", "parquet", None),
-            ("path/to/file.json", "json", None),
+            ("path/to/file.parquet", "parquet", None, None),
+            ("path/to/file.json", "json", None, None),
             (
                 "path/to/file.json",
                 "csv",
+                None,
                 {"sep": ",", "header": False, "inferSchema": True},
             ),
         ],
     )
-    def test_consume(self, path, format, format_options, spark_client, target_df):
+    def test_consume(
+        self, path, format, schema, format_options, spark_client, target_df
+    ):
         # arrange
         spark_client.read.return_value = target_df
-        file_reader = FileReader("test", path, format, format_options)
+        file_reader = FileReader("test", path, format, schema, format_options)
 
         # act
         output_df = file_reader.consume(spark_client)
         options = dict({"path": path}, **format_options if format_options else {})
 
         # assert
-        spark_client.read.assert_called_once_with(format, options)
+        spark_client.read.assert_called_once_with(format, options, schema)
         assert target_df.collect() == output_df.collect()
+
+    def test_json_file_with_schema(self):
+        spark_client = SparkClient()
+        schema_json = StructType(
+            [
+                StructField("A", StringType()),
+                StructField("B", DoubleType()),
+                StructField("C", StringType()),
+            ]
+        )
+
+        file = "tests/unit/butterfree/core/extract/readers/file-reader-test.json"
+        file_reader = FileReader(id="id", path=file, format="json", schema=schema_json)
+        df = file_reader.consume(spark_client)
+        assert schema_json == df.schema
+
+    def test_csv_file_with_schema_and_header(self):
+        spark_client = SparkClient()
+        schema_csv = StructType(
+            [
+                StructField("A", LongType()),
+                StructField("B", DoubleType()),
+                StructField("C", StringType()),
+            ]
+        )
+
+        file = "tests/unit/butterfree/core/extract/readers/file-reader-test.csv"
+        file_reader = FileReader(
+            id="id",
+            path=file,
+            format="csv",
+            schema=schema_csv,
+            format_options={"header": True},
+        )
+        df = file_reader.consume(spark_client)
+        assert schema_csv == df.schema

@@ -3,6 +3,7 @@
 from typing import List
 
 from pyspark.sql import DataFrame, SparkSession
+from pyspark.sql.types import StructType
 
 
 class SparkClient:
@@ -27,7 +28,13 @@ class SparkClient:
             self._session = SparkSession.builder.getOrCreate()
         return self._session
 
-    def read(self, format: str, options: dict, stream: bool = False) -> DataFrame:
+    def read(
+        self,
+        format: str,
+        options: dict,
+        schema: StructType = None,
+        stream: bool = False,
+    ) -> DataFrame:
         """Use the SparkSession.read interface to load data into a dataframe.
 
         Check docs for more information:
@@ -37,6 +44,7 @@ class SparkClient:
             format: string with the format to be used by the DataframeReader.
             options: options to setup the DataframeReader.
             stream:  flag to indicate if data must be read in stream mode.
+            schema: an optional pyspark.sql.types.StructType for the input schema.
 
         Returns:
             Dataframe
@@ -46,7 +54,9 @@ class SparkClient:
             raise ValueError("format needs to be a string with the desired read format")
         if not isinstance(options, dict):
             raise ValueError("options needs to be a dict with the setup configurations")
+
         df_reader = self.conn.readStream if stream else self.conn.read
+        df_reader = df_reader.schema(schema) if schema else df_reader
         return df_reader.format(format).options(**options).load()
 
     def read_table(self, database: str, table: str) -> DataFrame:
