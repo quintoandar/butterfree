@@ -59,6 +59,6 @@ class CassandraConfig(AbstractWriteConfig):
 
 More examples of documentation for classes, methods, properties and more [here](https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html).
 
-## Pull Requests
-TBD
+## GitFlow
+Please **follow the guidelines** described [here](GITFLOW.md).
 
