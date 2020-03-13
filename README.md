@@ -1,6 +1,6 @@
 ## Butterfree Python Library
 
-![](https://media.giphy.com/media/mfpxonwzG1WCI/giphy.gif)
+![butterfree's evolution](https://i.imgur.com/wJzsBaK.gif)
 
 _This library is part of the QuintoAndar-specific libraries._
 
