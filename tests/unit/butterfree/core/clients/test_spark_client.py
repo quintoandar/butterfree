@@ -1,5 +1,6 @@
 import pytest
 from pyspark.sql import DataFrame
+from pyspark.sql.streaming import StreamingQuery
 
 from butterfree.core.clients import SparkClient
 
@@ -101,7 +102,7 @@ class TestSparkClient:
         mocked_spark_write.save.assert_called_with(format=format, mode=mode)
 
     @pytest.mark.parametrize(
-        "format, mode", [(None, "append"), (1, 1)],
+        "format, mode", [(None, "append"), ("parquet", 1)],
     )
     def test_write_dataframe_invalid_params(self, target_df, format, mode):
         # arrange
@@ -153,4 +154,48 @@ class TestSparkClient:
         with pytest.raises(ValueError):
             SparkClient.write_table(
                 dataframe=df_writer, database=database, table_name=table_name, path=path
+            )
+
+    def test_write_stream(self, mocked_stream_df):
+        # arrange
+        spark_client = SparkClient()
+
+        processing_time = "0 seconds"
+        output_mode = "update"
+        checkpoint_path = "s3://path/to/checkpoint"
+
+        # act
+        stream_handler = spark_client.write_stream(
+            mocked_stream_df,
+            processing_time,
+            output_mode,
+            checkpoint_path,
+            format_="parquet",
+            mode="append",
+        )
+
+        # assert
+        assert isinstance(stream_handler, StreamingQuery)
+        mocked_stream_df.trigger.assert_called_with(processingTime=processing_time)
+        mocked_stream_df.outputMode.assert_called_with(output_mode)
+        mocked_stream_df.option.assert_called_with(
+            "checkpointLocation", checkpoint_path
+        )
+        mocked_stream_df.foreachBatch.assert_called_once()
+        mocked_stream_df.start.assert_called_once()
+
+    def test_write_stream_invalid_params(self, mocked_stream_df):
+        # arrange
+        spark_client = SparkClient()
+        mocked_stream_df.isStreaming = False
+
+        # act and assert
+        with pytest.raises(ValueError):
+            spark_client.write_stream(
+                mocked_stream_df,
+                processing_time="0 seconds",
+                output_mode="update",
+                checkpoint_path="s3://path/to/checkpoint",
+                format_="parquet",
+                mode="append",
             )

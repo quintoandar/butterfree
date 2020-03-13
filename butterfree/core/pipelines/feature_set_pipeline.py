@@ -182,8 +182,10 @@ class FeatureSetPipeline:
             feature_set=self.feature_set,
             spark_client=self.spark_client,
         )
-        self.sink.validate(
-            dataframe=dataframe,
-            feature_set=self.feature_set,
-            spark_client=self.spark_client,
-        )
+
+        if not dataframe.isStreaming:
+            self.sink.validate(
+                dataframe=dataframe,
+                feature_set=self.feature_set,
+                spark_client=self.spark_client,
+            )

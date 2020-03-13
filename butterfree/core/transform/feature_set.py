@@ -462,8 +462,8 @@ class FeatureSet:
                 dataframe, output_df, client, base_date
             )
 
-        output_df = self._filter_duplicated_rows(output_df)
-
-        output_df.cache().count()
+        if not output_df.isStreaming:
+            output_df = self._filter_duplicated_rows(output_df)
+            output_df.cache().count()
 
         return output_df

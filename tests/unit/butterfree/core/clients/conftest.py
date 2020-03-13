@@ -1,6 +1,7 @@
 from unittest.mock import Mock
 
 import pytest
+from pyspark.sql.streaming import StreamingQuery
 
 
 @pytest.fixture()
@@ -24,4 +25,17 @@ def mocked_spark_write():
     mock = Mock()
     mock.dataframe = mock
     mock.write = mock
+    return mock
+
+
+@pytest.fixture()
+def mocked_stream_df():
+    mock = Mock()
+    mock.isStreaming = True
+    mock.writeStream = mock
+    mock.trigger.return_value = mock
+    mock.outputMode.return_value = mock
+    mock.option.return_value = mock
+    mock.foreachBatch.return_value = mock
+    mock.start.return_value = Mock(spec=StreamingQuery)
     return mock
