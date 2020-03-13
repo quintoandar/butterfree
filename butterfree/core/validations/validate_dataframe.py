@@ -40,10 +40,10 @@ class ValidateDataframe:
         """Check dataframe emptiness.
 
         Raises:
-            ValueError: if dataframe is empty
+            ValueError: if dataframe is empty and is not streaming.
 
         """
-        if self.dataframe.rdd.isEmpty():
+        if (not self.dataframe.isStreaming) and self.dataframe.rdd.isEmpty():
             raise ValueError("DataFrame can't be empty.")
 
     def validate_df_is_spark_df(self):

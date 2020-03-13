@@ -1,9 +1,11 @@
 """Holds the Online Feature Store writer class."""
 
-from typing import Any, List
+import os
+from typing import Any, List, Optional
 
 from pyspark.sql import DataFrame, Window
 from pyspark.sql.functions import col, row_number
+from pyspark.sql.streaming import StreamingQuery
 
 from butterfree.core.clients import SparkClient
 from butterfree.core.configs.db import CassandraConfig
@@ -56,7 +58,9 @@ class OnlineFeatureStoreWriter(Writer):
         according to OnlineFeatureStoreWriter class arguments.
     """
 
-    def __init__(self, db_config=None):
+    def __init__(
+        self, db_config=None,
+    ):
         self.db_config = db_config or CassandraConfig()
 
     @staticmethod
@@ -87,7 +91,9 @@ class OnlineFeatureStoreWriter(Writer):
             .drop("rn")
         )
 
-    def write(self, feature_set: FeatureSet, dataframe, spark_client: SparkClient):
+    def write(
+        self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient
+    ) -> Optional[StreamingQuery]:
         """Loads the latest data from a feature set into the Feature Store.
 
         Args:
@@ -95,10 +101,35 @@ class OnlineFeatureStoreWriter(Writer):
             dataframe: Spark dataframe containing data from a feature set.
             spark_client: client for Spark connections with external services.
 
+        Returns:
+            Streaming handler if writing streaming df, None otherwise.
+
         """
+        if dataframe.isStreaming:
+            checkpoint_path = (
+                os.path.join(
+                    self.db_config.stream_checkpoint_path,
+                    feature_set.entity,
+                    feature_set.name,
+                )
+                if self.db_config.stream_checkpoint_path
+                else None
+            )
+            streaming_handler = spark_client.write_stream(
+                dataframe,
+                processing_time=self.db_config.stream_processing_time,
+                output_mode=self.db_config.stream_output_mode,
+                checkpoint_path=checkpoint_path,
+                format_=self.db_config.format_,
+                mode=self.db_config.mode,
+                **self.db_config.get_options(table=feature_set.name),
+            )
+            return streaming_handler
+
         dataframe = self.filter_latest(
             dataframe=dataframe, id_columns=feature_set.keys_columns
         )
+
         spark_client.write_dataframe(
             dataframe=dataframe,
             format_=self.db_config.format_,

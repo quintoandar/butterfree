@@ -17,15 +17,34 @@ class CassandraConfig(AbstractWriteConfig):
         username: username to use in connection.
         password: password to use in connection.
         host: host to use in connection.
+        stream_processing_time: processing time interval for streaming jobs.
+        stream_output_mode: specify the mode from writing streaming data.
+        stream_checkpoint_path: path on S3 to save checkpoints for the stream job.
+
+    More information about processing_time, output_mode and checkpoint_path
+    can be found in Spark documentation:
+    [here](https://spark.apache.org/docs/latest/structured-streaming-programming-guide.html)
+
     """
 
-    def __init__(self, mode: str = None, format_: str = None, keyspace: str = None):
+    def __init__(
+        self,
+        mode: str = None,
+        format_: str = None,
+        keyspace: str = None,
+        stream_processing_time: str = None,
+        stream_output_mode: str = None,
+        stream_checkpoint_path: str = None,
+    ):
         self.mode = mode
         self.format_ = format_
         self.keyspace = keyspace
         self.username = environment.get_variable("CASSANDRA_USERNAME")
         self.password = environment.get_variable("CASSANDRA_PASSWORD")
         self.host = environment.get_variable("CASSANDRA_HOST")
+        self.stream_processing_time = stream_processing_time
+        self.stream_output_mode = stream_output_mode
+        self.stream_checkpoint_path = stream_checkpoint_path
 
     @property
     def format_(self) -> str:
@@ -89,6 +108,37 @@ class CassandraConfig(AbstractWriteConfig):
         if value is None:
             raise ValueError("Config 'host' cannot be empty.")
         self.__host = value
+
+    @property
+    def stream_processing_time(self) -> str:
+        """Processing time interval for streaming jobs."""
+        return self.__stream_processing_time
+
+    @stream_processing_time.setter
+    def stream_processing_time(self, value: str):
+        self.__stream_processing_time = value or environment.get_variable(
+            "STREAM_PROCESSING_TIME"
+        )
+
+    @property
+    def stream_output_mode(self) -> str:
+        """Specify the mode from writing streaming data."""
+        return self.__stream_output_mode
+
+    @stream_output_mode.setter
+    def stream_output_mode(self, value: str):
+        self.__stream_output_mode = value or "update"
+
+    @property
+    def stream_checkpoint_path(self) -> str:
+        """Path on S3 to save checkpoints for the stream job."""
+        return self.__stream_checkpoint_path
+
+    @stream_checkpoint_path.setter
+    def stream_checkpoint_path(self, value: str):
+        self.__stream_checkpoint_path = value or environment.get_variable(
+            "STREAM_CHECKPOINT_PATH"
+        )
 
     def get_options(self, table: str) -> dict:
         """Get options for connect to Cassandra DB.

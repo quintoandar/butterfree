@@ -125,3 +125,42 @@ class TestCassandraConfig:
 
         # then
         assert cassandra_config.keyspace == value
+
+    def test_stream_processing_time(self, cassandra_config):
+        # expecting
+        default = "0 seconds"
+        assert cassandra_config.stream_processing_time == default
+
+    def test_stream_processing_time_custom(self, cassandra_config):
+        # given
+        value = "10 seconds"
+        cassandra_config.stream_processing_time = value
+
+        # then
+        assert cassandra_config.stream_processing_time == value
+
+    def test_stream_output_mode(self, cassandra_config):
+        # expecting
+        default = "update"
+        assert cassandra_config.stream_output_mode == default
+
+    def test_stream_output_mode_custom(self, cassandra_config):
+        # given
+        value = "complete"
+        cassandra_config.stream_output_mode = value
+
+        # then
+        assert cassandra_config.stream_output_mode == value
+
+    def test_stream_checkpoint_path(self, cassandra_config):
+        # expecting
+        default = None
+        assert cassandra_config.stream_checkpoint_path == default
+
+    def test_stream_checkpoint_path_custom(self, cassandra_config):
+        # given
+        value = "s3://path/to/checkpoint"
+        cassandra_config.stream_checkpoint_path = value
+
+        # then
+        assert cassandra_config.stream_checkpoint_path == value
