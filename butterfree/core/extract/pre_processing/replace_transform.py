@@ -18,7 +18,9 @@ def replace(dataframe: DataFrame, column, replace_dict):
     >>> from pyspark.sql import session
     >>> spark_context = SparkContext.getOrCreate()
     >>> spark_session = session.SparkSession(spark_context)
-    >>> input_data = [{"id":1, "type": "a"}, {"id":2, "type": "b"}, {"id":3, "type": "c"}]
+    >>> input_data = [
+    ...     {"id":1, "type": "a"}, {"id":2, "type": "b"}, {"id":3, "type": "c"}
+    ... ]
     >>> input_df = create_df_from_collection(input_data, spark_context, spark_session)
     >>> input_df.collect()
     [Row(id=1, type='a'), Row(id=2, type='b'), Row(id=3, type='c')]
