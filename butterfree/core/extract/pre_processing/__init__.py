@@ -7,10 +7,4 @@ from butterfree.core.extract.pre_processing.forward_fill_transform import forwar
 from butterfree.core.extract.pre_processing.pivot_transform import pivot
 from butterfree.core.extract.pre_processing.replace_transform import replace
 
-__all__ = [
-    "explode_json_column",
-    "filter",
-    "forward_fill",
-    "pivot",
-    "replace"
-]
+__all__ = ["explode_json_column", "filter", "forward_fill", "pivot", "replace"]

@@ -1,43 +1,57 @@
 import pytest
 
-from butterfree.core.constants.columns import TIMESTAMP_COLUMN
 from butterfree.core.extract.pre_processing import replace
-from butterfree.core.extract.readers import FileReader
+from butterfree.testing.dataframe import (
+    assert_dataframe_equality,
+    create_df_from_collection,
+)
 
 
 class TestReplaceTransform:
-    def test_replace(self, feature_set_dataframe, spark_context, spark_session):
+    def test_replace(self, spark_context, spark_session):
         # arrange
-        file_reader = FileReader("test", "path/to/file", "format")
-
-        file_reader.with_(
-            transformer=filter,
-            condition="test not in ('fail') and feature in (110, 120)",
-        )
+        input_data = [
+            {"id": 1, "type": "a"},
+            {"id": 2, "type": "b"},
+            {"id": 3, "type": "c"},
+        ]
+        target_data = [
+            {"id": 1, "type": "type_a"},
+            {"id": 2, "type": "type_b"},
+            {"id": 3, "type": "c"},
+        ]
+        input_df = create_df_from_collection(input_data, spark_context, spark_session)
+        target_df = create_df_from_collection(target_data, spark_context, spark_session)
+        replace_dict = {"a": "type_a", "b": "type_b"}
 
         # act
-        result_df = file_reader._apply_transformations(feature_set_dataframe)
-
-        target_data = [
-            {"id": 1, TIMESTAMP_COLUMN: 1, "feature": 110, "test": "pass"},
-            {"id": 1, TIMESTAMP_COLUMN: 2, "feature": 120, "test": "pass"},
-        ]
-        target_df = spark_session.read.json(spark_context.parallelize(target_data, 1))
+        result_df = replace(input_df, "type", replace_dict)
 
         # assert
-        assert result_df.collect() == target_df.collect()
+        assert_dataframe_equality(target_df, result_df)
 
     @pytest.mark.parametrize(
-        "condition", [None, 100],
+        "input_data, column, replace_dict",
+        [
+            ([{"column": "a"}], "not_column", {"a": "type_a"}),
+            ([{"column": 123}], "column", {"a": "type_a"}),
+            ([{"column": "a"}], "column", "not dict"),
+            ([{"column": "a"}], "column", {"a": 1}),
+        ],
     )
-    def test_replace_with_invalidations(
-        self, feature_set_dataframe, condition, spark_context, spark_session
+    def test_replace_with_invalid_args(
+        self, input_data, column, replace_dict, spark_context, spark_session
     ):
-        # given
-        file_reader = FileReader("test", "path/to/file", "format")
+        # arrange
+        input_df = create_df_from_collection(input_data, spark_context, spark_session)
 
-        file_reader.with_(transformer=filter, condition=condition)
+        # act and assert
+        with pytest.raises(ValueError):
+            replace(input_df, column, replace_dict)
 
-        # then
-        with pytest.raises(TypeError):
-            file_reader._apply_transformations(feature_set_dataframe)
+    def test_replace_with_invalid_df(self):
+        # act and assert
+        with pytest.raises(
+            ValueError, match="dataframe needs to be a Pyspark DataFrame type"
+        ):
+            replace(None, "col", {"a": "b"})
