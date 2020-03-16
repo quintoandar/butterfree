@@ -88,7 +88,7 @@ class AggregatedTransform(TransformComponent):
 
     def __init__(
         self,
-        mode: non_blank(str),
+        mode: non_blank(List[str]),
         aggregations: non_blank(List[str]),
         windows: non_blank(List[str]),
         partition: non_blank(str) = None,
@@ -273,26 +273,30 @@ class AggregatedTransform(TransformComponent):
         return output_columns
 
     @staticmethod
-    def _time_window_definition(partition: str, time_column: str, window_span: int):
-        """Defines windows based on passed criteria."""
+    def _common_window_definition(partition: str, time_column: str):
+        """Defines a common window to be used both in time and rows windows."""
         w = (
             Window()
             .partitionBy(functions.col(partition))
             .orderBy(functions.col(time_column).cast("long"))
-            .rangeBetween(-window_span, 0)
         )
         return w
 
-    @staticmethod
-    def _row_window_definition(partition: str, time_column: str, window_span: int):
-        """Defines windows based on passed criteria."""
-        w = (
-            Window()
-            .partitionBy(functions.col(partition))
-            .orderBy(functions.col(time_column).cast("long"))
-            .rowsBetween(-window_span, 0)
-        )
-        return w
+    def _time_window_definition(
+        self, partition: str, time_column: str, window_span: int
+    ):
+        """Defines time windows in seconds (rangeBetween) based on passed criteria."""
+        w = self._common_window_definition(partition, time_column)
+
+        return w.rangeBetween(-window_span, 0)
+
+    def _row_window_definition(
+        self, partition: str, time_column: str, window_span: int
+    ):
+        """Defines row windows (rowsBetween) based on passed criteria."""
+        w = self._common_window_definition(partition, time_column)
+
+        return w.rowsBetween(-window_span, 0)
 
     def _get_window_span(self, window_unit: str, window_size: int):
         """Returns window span."""
