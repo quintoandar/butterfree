@@ -43,6 +43,7 @@ class TestFileReader:
         assert target_df.collect() == output_df.collect()
 
     def test_json_file_with_schema(self):
+        # given
         spark_client = SparkClient()
         schema_json = StructType(
             [
@@ -53,11 +54,16 @@ class TestFileReader:
         )
 
         file = "tests/unit/butterfree/core/extract/readers/file-reader-test.json"
+
+        # when
         file_reader = FileReader(id="id", path=file, format="json", schema=schema_json)
         df = file_reader.consume(spark_client)
+
+        # assert
         assert schema_json == df.schema
 
     def test_csv_file_with_schema_and_header(self):
+        # given
         spark_client = SparkClient()
         schema_csv = StructType(
             [
@@ -68,6 +74,8 @@ class TestFileReader:
         )
 
         file = "tests/unit/butterfree/core/extract/readers/file-reader-test.csv"
+
+        # when
         file_reader = FileReader(
             id="id",
             path=file,
@@ -76,4 +84,7 @@ class TestFileReader:
             format_options={"header": True},
         )
         df = file_reader.consume(spark_client)
+
+        # assert
         assert schema_csv == df.schema
+        assert df.columns == ["A", "B", "C"]
