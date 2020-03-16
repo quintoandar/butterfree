@@ -33,7 +33,6 @@ class TestAggregatedTransform:
                         "feature1",
                         "feature2",
                         "id",
-                        "origin_ts",
                         TIMESTAMP_COLUMN,
                         "feature1__avg_over_7_days_fixed_windows",
                         "feature1__avg_over_2_weeks_fixed_windows",
@@ -373,3 +372,21 @@ class TestAggregatedTransform:
 
         # then
         assert_dataframe_equality(df, expected_df)
+
+    def test_feature_transform_output_fixed_windows_rows_agg(
+        self, feature_set_dataframe, target_df_rows_agg
+    ):
+        test_feature = Feature(
+            name="feature1",
+            description="unit test",
+            transformation=AggregatedTransform(
+                aggregations=["avg", "stddev_pop", "count"],
+                partition="id",
+                windows=["2 events"],
+                mode=["row_windows"],
+            ),
+        )
+
+        output_df = test_feature.transform(feature_set_dataframe)
+
+        assert_dataframe_equality(output_df, target_df_rows_agg)
