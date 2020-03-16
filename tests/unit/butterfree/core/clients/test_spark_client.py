@@ -24,21 +24,21 @@ class TestSparkClient:
         assert get_conn1 == get_conn2
 
     @pytest.mark.parametrize(
-        "format, options, stream",
+        "format, options, stream, schema",
         [
-            ("parquet", {"path": "path/to/file"}, False),
-            ("csv", {"path": "path/to/file", "header": True}, False),
-            ("json", {"path": "path/to/file"}, True),
+            ("parquet", {"path": "path/to/file"}, False, None),
+            ("csv", {"path": "path/to/file", "header": True}, False, None),
+            ("json", {"path": "path/to/file"}, True, None),
         ],
     )
-    def test_read(self, format, options, stream, target_df, mocked_spark_read):
+    def test_read(self, format, options, stream, schema, target_df, mocked_spark_read):
         # arrange
         spark_client = SparkClient()
         mocked_spark_read.load.return_value = target_df
         spark_client._session = mocked_spark_read
 
         # act
-        result_df = spark_client.read(format, options, stream)
+        result_df = spark_client.read(format, options, schema, stream)
 
         # assert
         mocked_spark_read.format.assert_called_once_with(format)
