@@ -88,7 +88,7 @@ class AggregatedTransform(TransformComponent):
 
     def __init__(
         self,
-        mode: non_blank(str),
+        mode: non_blank(List[str]),
         aggregations: non_blank(List[str]),
         windows: non_blank(List[str]),
         partition: non_blank(str) = None,
@@ -136,7 +136,7 @@ class AggregatedTransform(TransformComponent):
         ("month", "months"): 2419200,
         ("year", "years"): 29030400,
     }
-    __ALLOWED_MODES = ["fixed_windows", "rolling_windows"]
+    __ALLOWED_MODES = ["fixed_windows", "rolling_windows", "row_windows"]
 
     @property
     def aggregations(self) -> List[str]:
@@ -178,6 +178,12 @@ class AggregatedTransform(TransformComponent):
             raise KeyError(f"Windows must be a list.")
         if len(windows) == 0:
             raise KeyError(f"Windows must have one item at least.")
+        # TODO: accept multiple modes in the same feature.
+        if self.mode[0] not in ["row_windows"]:
+            self._check_windows(windows)
+        self._windows = windows
+
+    def _check_windows(self, windows):
         for window in windows:
             if window.split()[1] not in self.allowed_windows:
                 raise KeyError(
@@ -194,7 +200,6 @@ class AggregatedTransform(TransformComponent):
                     "Window duration has to be greater or equal than 1 day"
                     " in rolling_windows mode."
                 )
-        self._windows = windows
 
     def _rolling_windows_allowed_duration(self, window):
         """Allowed rolling windows durations regarding the slide duration."""
@@ -269,16 +274,30 @@ class AggregatedTransform(TransformComponent):
         return output_columns
 
     @staticmethod
-    def _window_definition(partition: str, time_column: str, window_span: int):
-        """Defines windows based on passed criteria."""
+    def _common_window_definition(partition: str, time_column: str):
+        """Defines a common window to be used both in time and rows windows."""
         w = (
             Window()
             .partitionBy(functions.col(partition))
             .orderBy(functions.col(time_column).cast("long"))
-            .rangeBetween(-window_span, 0)
         )
-
         return w
+
+    def _time_window_definition(
+        self, partition: str, time_column: str, window_span: int
+    ):
+        """Defines time windows in seconds (rangeBetween) based on passed criteria."""
+        w = self._common_window_definition(partition, time_column)
+
+        return w.rangeBetween(-window_span, 0)
+
+    def _row_window_definition(
+        self, partition: str, time_column: str, window_span: int
+    ):
+        """Defines row windows (rowsBetween) based on passed criteria."""
+        w = self._common_window_definition(partition, time_column)
+
+        return w.rowsBetween(-window_span, 0)
 
     def _get_window_span(self, window_unit: str, window_size: int):
         """Returns window span."""
@@ -286,21 +305,38 @@ class AggregatedTransform(TransformComponent):
             if window_unit in key:
                 return self.__ALLOWED_WINDOWS[key] * window_size
 
-    def _fixed_windows_agg(
-        self, dataframe: DataFrame, window, feature_name, aggregation
+    def _time_fixed_window(
+        self, window,
     ):
         """Returns aggregations for fixed_windows mode."""
-        w = self._window_definition(
+        w = self._time_window_definition(
             partition=f"{self.partition}",
             time_column=f"{self.time_column}",
             window_span=self._get_window_span(
                 window_unit=window.split()[1], window_size=int(window.split()[0]),
             ),
         )
+        return w
 
+    def _row_window(
+        self, window,
+    ):
+        """Returns aggregations for row_windows mode."""
+        w = self._row_window_definition(
+            partition=f"{self.partition}",
+            time_column=f"{self.time_column}",
+            window_span=int(window.split()[0]) - 1,
+        )
+
+        return w
+
+    def _compute_agg(self, dataframe, feature_name, aggregation, window):
+        """Returns dataframe given a aggregation type."""
         dataframe = dataframe.withColumn(
             feature_name,
-            self.__ALLOWED_AGGREGATIONS[aggregation](f"{self._parent.name}").over(w),
+            self.__ALLOWED_AGGREGATIONS[aggregation](f"{self._parent.name}").over(
+                window
+            ),
         )
 
         if self._parent.dtype:
@@ -358,11 +394,20 @@ class AggregatedTransform(TransformComponent):
                     window_size=window.split()[0],
                 )
                 if self.mode[0] in ["fixed_windows"]:
-                    dataframe = self._fixed_windows_agg(
+                    time_window = self._time_fixed_window(window=window,)
+                    dataframe = self._compute_agg(
                         dataframe=dataframe,
-                        window=window,
                         feature_name=feature_name,
                         aggregation=aggregation,
+                        window=time_window,
+                    )
+                if self.mode[0] in ["row_windows"]:
+                    row_window = self._row_window(window=window,)
+                    dataframe = self._compute_agg(
+                        dataframe=dataframe,
+                        feature_name=feature_name,
+                        aggregation=aggregation,
+                        window=row_window,
                     )
                 elif self.mode[0] in ["rolling_windows"]:
                     df_list = self._rolling_windows_agg(
