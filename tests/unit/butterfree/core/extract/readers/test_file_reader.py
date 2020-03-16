@@ -88,3 +88,5 @@ class TestFileReader:
         # assert
         assert schema_csv == df.schema
         assert df.columns == ["A", "B", "C"]
+        for value in range(3):
+            assert df.first()[value] != ["A", "B", "C"][value]
