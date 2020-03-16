@@ -178,6 +178,7 @@ class AggregatedTransform(TransformComponent):
             raise KeyError(f"Windows must be a list.")
         if len(windows) == 0:
             raise KeyError(f"Windows must have one item at least.")
+        # TODO: accept multiple modes in the same feature.
         if self.mode[0] not in ["row_windows"]:
             self._check_windows(windows)
         self._windows = windows
