@@ -35,6 +35,7 @@ class AggregatedTransform(TransformComponent):
         >>> from butterfree.core.transform.features import Feature
         >>> from pyspark import SparkContext
         >>> from pyspark.sql import session
+        >>> from pyspark.sql.types import TimestampType
         >>> sc = SparkContext.getOrCreate()
         >>> spark = session.SparkSession(sc)
         >>> df = spark.createDataFrame([(1, "2016-04-11 11:31:11", 200),
@@ -42,6 +43,7 @@ class AggregatedTransform(TransformComponent):
         ...                             (1, "2016-04-11 11:46:24", 400),
         ...                             (1, "2016-04-11 12:03:21", 500)]
         ...                           ).toDF("id", "timestamp", "feature")
+        >>> df = df.withColumn("timestamp", df.timestamp.cast(TimestampType()))
         >>> feature_fixed_windows = Feature(
         ...    name="feature",
         ...    description="aggregated transform with fixed windows usage example",
