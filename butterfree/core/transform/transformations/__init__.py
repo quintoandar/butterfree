@@ -8,6 +8,9 @@ from butterfree.core.transform.transformations.aggregated_transform import (
     AggregatedTransform,
 )
 from butterfree.core.transform.transformations.custom_transform import CustomTransform
+from butterfree.core.transform.transformations.pivot_agg_transform import (
+    PivotAggTransform,
+)
 from butterfree.core.transform.transformations.sql_expression_transform import (
     SQLExpressionTransform,
 )
@@ -20,4 +23,5 @@ __all__ = [
     "CustomTransform",
     "SQLExpressionTransform",
     "TransformComponent",
+    "PivotAggTransform",
 ]
