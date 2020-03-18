@@ -121,3 +121,143 @@ def with_house_ids_dataframe(spark_context, spark_session):
     df = df.withColumn(TIMESTAMP_COLUMN, df.ts.cast(DataType.TIMESTAMP.value))
 
     return df
+
+
+@fixture()
+def input_df(spark_context, spark_session):
+    data = [
+        {
+            "id": 1,
+            TIMESTAMP_COLUMN: "2016-04-11 11:31:11",
+            "pivot_column": 1,
+            "has_feature": True,
+        },
+        {
+            "id": 1,
+            TIMESTAMP_COLUMN: "2016-04-11 11:44:12",
+            "pivot_column": 2,
+            "has_feature": True,
+        },
+        {
+            "id": 1,
+            TIMESTAMP_COLUMN: "2016-04-11 11:46:24",
+            "pivot_column": 3,
+            "has_feature": True,
+        },
+        {
+            "id": 1,
+            TIMESTAMP_COLUMN: "2016-04-11 12:03:21",
+            "pivot_column": 4,
+            "has_feature": True,
+        },
+        {
+            "id": 2,
+            TIMESTAMP_COLUMN: "2016-04-11 12:03:21",
+            "pivot_column": 4,
+            "has_feature": True,
+        },
+    ]
+    df = spark_session.read.json(
+        spark_context.parallelize(data).map(lambda x: json.dumps(x))
+    )
+    return df
+
+
+@fixture()
+def pivot_df(spark_context, spark_session):
+    data = [
+        {
+            "id": 1,
+            TIMESTAMP_COLUMN: "2016-04-11 11:31:11",
+            "1__count": 1,
+            "2__count": None,
+            "3__count": None,
+            "4__count": None,
+        },
+        {
+            "id": 1,
+            TIMESTAMP_COLUMN: "2016-04-11 11:44:12",
+            "1__count": None,
+            "2__count": 1,
+            "3__count": None,
+            "4__count": None,
+        },
+        {
+            "id": 1,
+            TIMESTAMP_COLUMN: "2016-04-11 11:46:24",
+            "1__count": None,
+            "2__count": None,
+            "3__count": 1,
+            "4__count": None,
+        },
+        {
+            "id": 1,
+            TIMESTAMP_COLUMN: "2016-04-11 12:03:21",
+            "1__count": None,
+            "2__count": None,
+            "3__count": None,
+            "4__count": 1,
+        },
+        {
+            "id": 2,
+            TIMESTAMP_COLUMN: "2016-04-11 12:03:21",
+            "1__count": None,
+            "2__count": None,
+            "3__count": None,
+            "4__count": 1,
+        },
+    ]
+    df = spark_session.read.json(
+        spark_context.parallelize(data).map(lambda x: json.dumps(x))
+    )
+    return df.orderBy(TIMESTAMP_COLUMN)
+
+
+@fixture()
+def pivot_ffill_df(spark_context, spark_session):
+    data = [
+        {
+            "id": 1,
+            TIMESTAMP_COLUMN: "2016-04-11 11:31:11",
+            "1__count": 1,
+            "2__count": None,
+            "3__count": None,
+            "4__count": None,
+        },
+        {
+            "id": 1,
+            TIMESTAMP_COLUMN: "2016-04-11 11:44:12",
+            "1__count": 1,
+            "2__count": 1,
+            "3__count": None,
+            "4__count": None,
+        },
+        {
+            "id": 1,
+            TIMESTAMP_COLUMN: "2016-04-11 11:46:24",
+            "1__count": 1,
+            "2__count": 1,
+            "3__count": 1,
+            "4__count": None,
+        },
+        {
+            "id": 1,
+            TIMESTAMP_COLUMN: "2016-04-11 12:03:21",
+            "1__count": 1,
+            "2__count": 1,
+            "3__count": 1,
+            "4__count": 1,
+        },
+        {
+            "id": 2,
+            TIMESTAMP_COLUMN: "2016-04-11 12:03:21",
+            "1__count": None,
+            "2__count": None,
+            "3__count": None,
+            "4__count": 1,
+        },
+    ]
+    df = spark_session.read.json(
+        spark_context.parallelize(data).map(lambda x: json.dumps(x))
+    )
+    return df.orderBy(TIMESTAMP_COLUMN)
