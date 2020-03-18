@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each release or unreleased log for a better organization.
 ## Unreleased
 
+## [0.5.0](https://github.com/quintoandar/butterfree/releases/tag/0.5.0)
+### Added
+* [MLOP-177] Aggregate by rows (rowsBetween window) ([#86](https://github.com/quintoandar/butterfree/pull/86))
+* [MLOP-186] New aggregations to ALLOWED_AGGREGATIONS enum ([#88](https://github.com/quintoandar/butterfree/pull/88))
+* [MLOP-181] FileReader update docstring with schema usage ([#93](https://github.com/quintoandar/butterfree/pull/93))
+* [MLOP-189] Replace (map values) as a pre_processing function ([#92](https://github.com/quintoandar/butterfree/pull/92))
+
 ## [0.4.0](https://github.com/quintoandar/butterfree/releases/tag/0.4.0)
 ### Added
 * [MLOP-169] Enable Stream Pipelines in Butterfree ([#81](https://github.com/quintoandar/butterfree/pull/81))
