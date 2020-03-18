@@ -7,6 +7,7 @@ from parameters_validation import non_blank
 from pyspark.sql import DataFrame, functions
 from pyspark.sql.window import Window
 
+from butterfree.core.constants.aggregations_type import ALLOWED_AGGREGATIONS
 from butterfree.core.constants.columns import TIMESTAMP_COLUMN
 from butterfree.core.transform.transformations.transform_component import (
     TransformComponent,
@@ -103,25 +104,6 @@ class AggregatedTransform(TransformComponent):
         self.partition = partition
         self.time_column = time_column or TIMESTAMP_COLUMN
 
-    __ALLOWED_AGGREGATIONS = {
-        "approx_count_distinct": functions.approx_count_distinct,
-        "avg": functions.avg,
-        "collect_list": functions.collect_list,
-        "collect_set": functions.collect_set,
-        "count": functions.count,
-        "first": functions.first,
-        "kurtosis": functions.kurtosis,
-        "last": functions.first,
-        "max": functions.max,
-        "min": functions.min,
-        "skewness": functions.skewness,
-        "stddev": functions.stddev,
-        "stddev_pop": functions.stddev_pop,
-        "sum": functions.sum,
-        "sum_distinct": functions.sumDistinct,
-        "variance": functions.variance,
-        "var_pop": functions.var_pop,
-    }
     __ALLOWED_WINDOWS = {
         ("second", "seconds"): 1,
         ("minute", "minutes"): 60,
@@ -157,7 +139,7 @@ class AggregatedTransform(TransformComponent):
     @property
     def allowed_aggregations(self) -> List[str]:
         """Allowed aggregations to be used in the windows."""
-        return list(self.__ALLOWED_AGGREGATIONS.keys())
+        return list(ALLOWED_AGGREGATIONS.keys())
 
     @property
     def windows(self) -> List[str]:
@@ -329,9 +311,7 @@ class AggregatedTransform(TransformComponent):
         """Returns dataframe given a aggregation type."""
         dataframe = dataframe.withColumn(
             feature_name,
-            self.__ALLOWED_AGGREGATIONS[aggregation](f"{self._parent.name}").over(
-                window
-            ),
+            ALLOWED_AGGREGATIONS[aggregation](f"{self._parent.name}").over(window),
         )
 
         if self._parent.dtype:
@@ -359,7 +339,7 @@ class AggregatedTransform(TransformComponent):
                     windowDuration=f"{window.split()[0]} {window.split()[1]}",
                     slideDuration=self.SLIDE_DURATION,
                 ),
-            ).agg(self.__ALLOWED_AGGREGATIONS[aggregation](f"{self._parent.name}"),)
+            ).agg(ALLOWED_AGGREGATIONS[aggregation](f"{self._parent.name}"),)
         ).select(
             functions.col(f"{self.partition}"),
             functions.col(f"{aggregation}({self._parent.name})").alias(feature_name),

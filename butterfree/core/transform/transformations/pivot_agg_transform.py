@@ -3,7 +3,7 @@
 from typing import List
 
 from parameters_validation import non_blank, non_null
-from pyspark.sql import DataFrame, functions
+from pyspark.sql import DataFrame
 
 from butterfree.core.constants.aggregations_type import ALLOWED_AGGREGATIONS
 from butterfree.core.extract.pre_processing import forward_fill
@@ -36,8 +36,6 @@ class PivotAggTransform(TransformComponent):
         pivot_column: non_blank(str),
         agg_column: non_blank(str),
         aggregations: non_blank(List[str]),
-        mock_value: non_null(object) = None,
-        mock_type: non_null(object) = None,
         with_forward_fill: non_null(bool) = False,
     ):
         super().__init__()
@@ -45,8 +43,6 @@ class PivotAggTransform(TransformComponent):
         self.pivot_column = pivot_column
         self.agg_column = agg_column
         self.aggregations = aggregations
-        self.mock_value = mock_value
-        self.mock_type = mock_type
         self.with_forward_fill = with_forward_fill
 
     @property
@@ -68,18 +64,8 @@ class PivotAggTransform(TransformComponent):
             Transformed dataframe.
 
         """
-        agg_column_type = None
-        if self.mock_value is not None:
-            if self.mock_type is None:
-                raise AttributeError(
-                    "When proving a mock value, users must inform the data type,"
-                    " which should be supported by Spark."
-                )
-            agg_column_type = dict(dataframe.dtypes).get(self.agg_column)
-            dataframe = dataframe.withColumn(
-                self.agg_column, functions.col(self.agg_column).cast(self.mock_type)
-            ).fillna({self.agg_column: self.mock_value})
-
+        if not self.aggregations:
+            raise ValueError("Aggregations must not be empty.")
         pivoted = (
             dataframe.groupBy(*self.group_by_columns)
             .pivot(self.pivot_column)
@@ -102,15 +88,6 @@ class PivotAggTransform(TransformComponent):
                     partition_by=self.group_by_columns[:-1],
                     order_by=self.group_by_columns[-1],
                     fill_column=c,
-                )
-
-        if self.mock_value is not None:
-            for c in new_columns:
-                pivoted = pivoted.withColumn(
-                    c,
-                    functions.when(
-                        functions.col(c) != self.mock_value, functions.col(c)
-                    ).cast(agg_column_type),
                 )
 
         if len(self.aggregations) == 1:
