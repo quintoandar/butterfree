@@ -86,8 +86,10 @@ class TestHistoricalFeatureStoreWriter:
             (
                 lambda: start
                 + datetime.timedelta(
-                    seconds=random.randint(0, int((end - start).total_seconds()))
-                )  # noqa: S311
+                    seconds=random.randint(  # noqa: S311
+                        0, int((end - start).total_seconds())
+                    )
+                )
             )()
             .date()
             .isoformat()
