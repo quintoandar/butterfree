@@ -18,7 +18,7 @@ class TestAggregatedTransform:
             transformation=AggregatedTransform(
                 aggregations=["avg", "stddev_pop"],
                 partition="id",
-                windows=["7 days", "2 weeks"],
+                windows_agg=["7 days", "2 weeks"],
                 mode=["fixed_windows"],
             ),
         )
@@ -52,7 +52,7 @@ class TestAggregatedTransform:
             transformation=AggregatedTransform(
                 aggregations=["avg", "stddev_pop"],
                 partition="id",
-                windows=["7 days", "2 weeks"],
+                windows_agg=["7 days", "2 weeks"],
                 mode=["fixed_windows"],
             ),
         )
@@ -83,7 +83,7 @@ class TestAggregatedTransform:
                 transformation=AggregatedTransform(
                     aggregations=["median"],
                     partition="id",
-                    windows=["7 days", "2 weeks"],
+                    windows_agg=["7 days", "2 weeks"],
                     mode=["fixed_windows"],
                 ),
             )
@@ -97,7 +97,7 @@ class TestAggregatedTransform:
                 transformation=AggregatedTransform(
                     aggregations=[],
                     partition="id",
-                    windows=["7 days", "2 weeks"],
+                    windows_agg=["7 days", "2 weeks"],
                     mode=["fixed_windows"],
                 ),
             )
@@ -111,7 +111,7 @@ class TestAggregatedTransform:
                 transformation=AggregatedTransform(
                     aggregations=["avg", "stddev_pop"],
                     partition="id",
-                    windows=["7 daily", "2 weeks"],
+                    windows_agg=["7 daily", "2 weeks"],
                     mode=["fixed_windows"],
                 ),
             )
@@ -125,7 +125,7 @@ class TestAggregatedTransform:
                 transformation=AggregatedTransform(
                     aggregations=["avg", "stddev_pop"],
                     partition="id",
-                    windows=[],
+                    windows_agg=[],
                     mode=["fixed_windows"],
                 ),
             )
@@ -139,7 +139,7 @@ class TestAggregatedTransform:
                 transformation=AggregatedTransform(
                     aggregations=["avg", "stddev_pop"],
                     partition="id",
-                    windows={"2 weeks"},
+                    windows_agg={"2 weeks"},
                     mode=["fixed_windows"],
                 ),
             )
@@ -153,7 +153,7 @@ class TestAggregatedTransform:
                 transformation=AggregatedTransform(
                     aggregations=["avg", "stddev_pop"],
                     partition="id",
-                    windows=["-2 weeks"],
+                    windows_agg=["-2 weeks"],
                     mode=["fixed_windows"],
                 ),
             )
@@ -166,7 +166,7 @@ class TestAggregatedTransform:
             transformation=AggregatedTransform(
                 aggregations=["avg", "stddev_pop", "count"],
                 partition="id",
-                windows=["2 minutes", "15 minutes"],
+                windows_agg=["2 minutes", "15 minutes"],
                 mode=["fixed_windows"],
             ),
         )
@@ -206,7 +206,7 @@ class TestAggregatedTransform:
             transformation=AggregatedTransform(
                 aggregations=["avg", "stddev_pop", "count"],
                 partition="id",
-                windows=["1 day", "1 week"],
+                windows_agg=["1 day", "1 week"],
                 mode=["rolling_windows"],
             ),
         )
@@ -291,7 +291,7 @@ class TestAggregatedTransform:
                 transformation=AggregatedTransform(
                     aggregations=["avg", "stddev_pop"],
                     partition="id",
-                    windows=["25 minutes", "15 minutes"],
+                    windows_agg=["25 minutes", "15 minutes"],
                     mode=[],
                 ),
             )
@@ -307,7 +307,7 @@ class TestAggregatedTransform:
                 transformation=AggregatedTransform(
                     aggregations=["avg", "stddev_pop"],
                     partition="id",
-                    windows=["25 minutes", "15 minutes"],
+                    windows_agg=["25 minutes", "15 minutes"],
                     mode=["fixed_windows", "rolling_windows"],
                 ),
             )
@@ -321,7 +321,7 @@ class TestAggregatedTransform:
                 transformation=AggregatedTransform(
                     aggregations=["avg", "stddev_pop"],
                     partition="id",
-                    windows=["25 minutes", "15 minutes"],
+                    windows_agg=["25 minutes", "15 minutes"],
                     mode=["rolling_stones"],
                 ),
             )
@@ -337,7 +337,7 @@ class TestAggregatedTransform:
                 transformation=AggregatedTransform(
                     aggregations=["avg", "stddev_pop"],
                     partition="id",
-                    windows=["25 minutes", "15 minutes"],
+                    windows_agg=["25 minutes", "15 minutes"],
                     mode=["rolling_windows"],
                 ),
             )
@@ -378,7 +378,7 @@ class TestAggregatedTransform:
             transformation=AggregatedTransform(
                 aggregations=["collect_set"],
                 partition="user_id",
-                windows=["1 day"],
+                windows_agg=["1 day"],
                 mode=["rolling_windows"],
             ),
         )
@@ -398,7 +398,7 @@ class TestAggregatedTransform:
             transformation=AggregatedTransform(
                 aggregations=["avg"],
                 partition="id",
-                windows=["2 events"],
+                windows_agg=["2 events"],
                 mode=["row_windows"],
             ),
         )
