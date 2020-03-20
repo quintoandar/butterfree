@@ -91,7 +91,7 @@ class TestFeature:
         self, feature_set_dataframe
     ):
         some_transformation = Mock()
-        some_transformation.transform.return_value = feature_set_dataframe
+        some_transformation.build_transform.return_value = feature_set_dataframe
 
         test_feature = Feature(
             name="feature", description="unit test", transformation=some_transformation,
@@ -112,7 +112,7 @@ class TestFeature:
         self, feature_set_dataframe
     ):
         some_transformation = Mock()
-        some_transformation.transform.return_value = feature_set_dataframe
+        some_transformation.build_transform.return_value = feature_set_dataframe
 
         test_feature = Feature(
             name="feature",
@@ -145,7 +145,9 @@ class TestFeature:
     ):
 
         some_transformation = Mock()
-        some_transformation.output_columns = feature_set_dataframe.columns
+        some_transformation.build_output_columns.return_value = (
+            feature_set_dataframe.columns
+        )
 
         test_feature = Feature(
             name="feature",

@@ -83,7 +83,7 @@ class TestFeatureSetPipeline:
                         transformation=AggregatedTransform(
                             aggregations=["avg", "stddev_pop"],
                             partition="id",
-                            windows=["2 minutes", "15 minutes"],
+                            windows_agg=["2 minutes", "15 minutes"],
                             mode=["fixed_windows"],
                         ),
                     ),

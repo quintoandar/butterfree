@@ -274,7 +274,7 @@ class TestFeatureSet:
                     transformation=AggregatedTransform(
                         aggregations=["avg"],
                         partition="id",
-                        windows=["1 week"],
+                        windows_agg=["1 week"],
                         mode=["rolling_windows"],
                     ),
                 ),
@@ -320,7 +320,7 @@ class TestFeatureSet:
                     transformation=AggregatedTransform(
                         aggregations=["avg"],
                         partition="id",
-                        windows=["1 week"],
+                        windows_agg=["1 week"],
                         mode=["rolling_windows"],
                     ),
                 ),
