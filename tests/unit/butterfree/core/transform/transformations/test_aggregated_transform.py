@@ -390,3 +390,21 @@ class TestAggregatedTransform:
         output_df = test_feature.transform(feature_set_dataframe)
 
         assert_dataframe_equality(output_df, target_df_rows_agg)
+
+    def test_feature_transform_output_most_common(
+        self, most_common_dataframe, most_common_output_dataframe
+    ):
+        test_feature = Feature(
+            name="feature1",
+            description="unit test",
+            transformation=AggregatedTransform(
+                aggregations=["avg", "most_common"],
+                partition="id",
+                windows=["4 events"],
+                mode=["row_windows"],
+            ),
+        )
+
+        output_df = test_feature.transform(most_common_dataframe)
+
+        assert_dataframe_equality(output_df, most_common_output_dataframe)
