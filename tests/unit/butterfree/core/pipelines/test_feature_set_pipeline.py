@@ -57,7 +57,7 @@ class TestFeatureSetPipeline:
                         transformation=AggregatedTransform(
                             aggregations=["avg", "stddev_pop"],
                             partition="user_id",
-                            windows_agg=["7 days", "2 weeks"],
+                            windows=["7 days", "2 weeks"],
                             mode=["fixed_windows"],
                         ),
                     ),
@@ -116,7 +116,7 @@ class TestFeatureSetPipeline:
                         transformation=AggregatedTransform(
                             aggregations=["avg", "stddev_pop"],
                             partition="user_id",
-                            windows_agg=["7 days", "2 weeks"],
+                            windows=["7 days", "2 weeks"],
                             mode=["fixed_windows"],
                         ),
                     ),
@@ -169,7 +169,7 @@ class TestFeatureSetPipeline:
                             transformation=AggregatedTransform(
                                 aggregations=["avg", "stddev_pop"],
                                 partition="user_id",
-                                windows_agg=["7 days", "2 weeks"],
+                                windows=["7 days", "2 weeks"],
                                 mode=["fixed_windows"],
                             ),
                         ),
@@ -212,7 +212,7 @@ class TestFeatureSetPipeline:
                             transformation=AggregatedTransform(
                                 aggregations=["avg", "stddev_pop"],
                                 partition="user_id",
-                                windows_agg=["7 days", "2 weeks"],
+                                windows=["7 days", "2 weeks"],
                                 mode=["fixed_windows"],
                             ),
                         ),

@@ -38,7 +38,7 @@ class TestFeatureSet:
                     transformation=AggregatedTransform(
                         aggregations=["avg", "stddev_pop"],
                         partition="id",
-                        windows_agg=["2 minutes", "15 minutes"],
+                        windows=["2 minutes", "15 minutes"],
                         mode=["fixed_windows"],
                     ),
                 ),
@@ -95,7 +95,7 @@ class TestFeatureSet:
                     transformation=AggregatedTransform(
                         aggregations=["avg", "stddev_pop"],
                         partition="id",
-                        windows_agg=["1 day", "1 week"],
+                        windows=["1 day", "1 week"],
                         mode=["rolling_windows"],
                     ),
                 ),
@@ -146,7 +146,7 @@ class TestFeatureSet:
                     transformation=AggregatedTransform(
                         aggregations=["avg", "stddev_pop"],
                         partition="id",
-                        windows_agg=["1 day", "1 week"],
+                        windows=["1 day", "1 week"],
                         mode=["rolling_windows"],
                     ),
                 ),
