@@ -1,28 +1,30 @@
 """Spark Function Transform entity."""
 from typing import List
 
-from pyspark.sql.functions import lit
-
-from butterfree.core.constants.aggregated_type import ALLOWED_AGGREGATIONS
 from butterfree.core.transform.transformations.transform_component import (
     TransformComponent,
 )
+from butterfree.core.transform.utils import Window
 
 
 class SparkFunctionTransform(TransformComponent):
     """Defines an Spark Function.
 
     Attributes:
-        functions: spark functions to be used, it can be avg, std, count and others.
+        function: spark functions to be used.
+         For more information check functions:
+         'https://spark.apache.org/docs/2.3.1/api/python/_modules/pyspark/sql/functions.html'.
 
     Example:
         It's necessary to declare the function method, (average,
         standard deviation and count are currently supported).
         >>> from butterfree.core.transform.transformations import SparkFunctionTransform
+        >>> from butterfree.core.constants.columns import TIMESTAMP_COLUMN
         >>> from butterfree.core.transform.features import Feature
         >>> from pyspark import SparkContext
         >>> from pyspark.sql import session
         >>> from pyspark.sql.types import TimestampType
+        >>> from pyspark.sql import functions
         >>> sc = SparkContext.getOrCreate()
         >>> spark = session.SparkSession(sc)
         >>> df = spark.createDataFrame([(1, "2016-04-11 11:31:11", 200),
@@ -34,85 +36,77 @@ class SparkFunctionTransform(TransformComponent):
         >>> feature = Feature(
         ...    name="feature",
         ...    description="spark function transform",
-        ...    transformation=SparkFunctionTransform(functions=["avg"],)
+        ...    transformation=SparkFunctionTransform(function=functions.ceil,)
         ...)
         >>> feature.transform(df).orderBy("timestamp").show()
-        +--------+-----------------------+------------+
-        |feature | id|          timestamp| feature_avg|
-        +--------+---+-------------------+------------+
-        |     200|  1|2016-04-11 11:31:11|       350.0|
-        |     300|  1|2016-04-11 11:44:12|       350.0|
-        |     400|  1|2016-04-11 11:46:24|       350.0|
-        |     500|  1|2016-04-11 12:03:21|       350.0|
-        +--------+---+-------------------+------------+
+        +---+-------------------+-------+------------+
+        | id|          timestamp|feature|feature_ceil|
+        +---+-------------------+-------+------------+
+        |  1|2016-04-11 11:31:11|    200|         200|
+        |  1|2016-04-11 11:44:12|    300|         300|
+        |  1|2016-04-11 11:46:24|    400|         400|
+        |  1|2016-04-11 12:03:21|    500|         500|
+        +---+-------------------+-------+------------+
+
 
         We can use this transformation with windows.
-        >>> feature_rolling_windows = Feature(
+        >>> feature_row_windows = Feature(
         ...    name="feature",
         ...    description="spark function transform with windows",
-        ...    transformation=SparkFunctionTransform(functions=["avg"],).with_(
-        ...        function=with_window,
+        ...    transformation=SparkFunctionTransform(functions.avg,).with_window(
         ...        partition_by="id",
         ...        order_by=TIMESTAMP_COLUMN,
         ...        mode="row_windows",
         ...        window_definition=["2 events"],
         ...   )
         ...)
-        >>> feature_rolling_windows.transform(df).orderBy("timestamp").show()
+        >>> feature_row_windows.transform(df).orderBy("timestamp").show()
         +--------+-----------------------+---------------------------------------+
-        |feature | id|          timestamp| feature__avg_over_2_events_row_windows|
-        +--------+---+-------------------+---------------------------------------+
-        |     200|  1|2016-04-11 11:31:11|                                  200.0|
-        |     300|  1|2016-04-11 11:44:12|                                  250.0|
-        |     400|  1|2016-04-11 11:46:24|                                  350.0|
-        |     500|  1|2016-04-11 12:03:21|                                  450.0|
-        +--------+---+-------------------+---------------------------------------+
+        |feature | id|          timestamp| feature_avg_over_2_events_row_windows|
+        +--------+---+-------------------+--------------------------------------+
+        |     200|  1|2016-04-11 11:31:11|                                 200.0|
+        |     300|  1|2016-04-11 11:44:12|                                 250.0|
+        |     400|  1|2016-04-11 11:46:24|                                 350.0|
+        |     500|  1|2016-04-11 12:03:21|                                 450.0|
+        +--------+---+-------------------+--------------------------------------+
 
         It's important to notice that transformation doesn't affect the
         dataframe granularity.
 
     """
 
-    def __init__(self, functions):
+    def __init__(self, function):
         super().__init__()
-        self.functions = functions
+        self.function = function
+        self._windows = []
 
-    @property
-    def functions(self) -> List[str]:
-        """Functions to be used in this transformation."""
-        return self._functions
+    def with_window(self, partition_by, order_by, mode=None, window_definition=None):
+        """Create a list with windows defined."""
+        windows = []
+        if mode is not None:
+            for definition in window_definition:
+                windows.append(Window(partition_by, order_by, mode, definition))
 
-    @functions.setter
-    def functions(self, value: List[str]):
-        """Functions definitions to be used in this transformation."""
-        functions = []
-        if not value:
-            raise ValueError("Functions must not be empty.")
-        for f in value:
-            if f not in ALLOWED_AGGREGATIONS:
-                raise KeyError(
-                    f"{f} is not supported. These are the allowed "
-                    f"functions that you can use: "
-                    f"{ALLOWED_AGGREGATIONS}"
-                )
-            functions.append(f)
-        self._functions = functions
+        self._windows = windows
+        return self
 
-    def _get_name(self, function, window=None):
-        if window:
-            return "_".join([self._parent.name, function, window.get_name()])
+    def _get_name_with_window(self, window):
+        if hasattr(self.function, "__name__"):
+            return "_".join(
+                [self._parent.name, self.function.__name__, window.get_name()]
+            )
 
-        return "_".join([self._parent.name, function])
+        return "_".join([self._parent.name, window.get_name()])
 
     @property
     def output_columns(self) -> List[str]:
         """Columns generated by the transformation."""
+        name = self._parent.name
         output_columns = []
-        for function in self.functions:
-            for window in self._windows:
-                output_columns.append(self._get_name(function, window))
+        for window in self._windows:
+            output_columns.append(self._get_name_with_window(window))
 
-        return output_columns
+        return output_columns or [name]
 
     def transform(self, dataframe):
         """Performs a transformation to the feature pipeline.
@@ -123,24 +117,17 @@ class SparkFunctionTransform(TransformComponent):
         Returns:
             Transformed dataframe.
         """
-        for f in self.functions:
-            if self._windows:
-                for window in self._windows:
-                    dataframe = dataframe.withColumn(
-                        self._get_name(f, window),
-                        ALLOWED_AGGREGATIONS[f](
-                            self._parent.from_column or self._parent.name
-                        ).over(window.get()),
-                    )
-            else:
+        if self._windows:
+            for window in self._windows:
                 dataframe = dataframe.withColumn(
-                    self._get_name(f),
-                    lit(
-                        dataframe.select(
-                            ALLOWED_AGGREGATIONS[f](
-                                self._parent.from_column or self._parent.name
-                            )
-                        ).first()[0]
+                    self._get_name_with_window(window),
+                    self.function(self._parent.from_column or self._parent.name).over(
+                        window.get()
                     ),
                 )
-        return dataframe
+            return dataframe
+
+        return dataframe.withColumn(
+            self._parent.name,
+            self.function(self._parent.from_column or self._parent.name),
+        )

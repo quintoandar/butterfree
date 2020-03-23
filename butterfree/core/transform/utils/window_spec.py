@@ -5,16 +5,6 @@ from pyspark.sql import functions
 from butterfree.core.constants.columns import TIMESTAMP_COLUMN
 
 
-def with_window(self, partition_by, order_by, mode=None, window_definition=None):
-    """Create a list with windows defined."""
-    windows = []
-    if mode is not None:
-        for definition in window_definition:
-            windows.append(Window(partition_by, order_by, mode, definition))
-
-    return windows
-
-
 class FrameBoundaries:
     """Utility functions for defining the frame boundaries.
 
