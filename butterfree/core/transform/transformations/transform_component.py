@@ -1,8 +1,7 @@
 """Transform Abstract Class."""
 
 from abc import ABC, abstractmethod
-from functools import reduce
-from typing import Callable, List
+from typing import List
 
 from pyspark.sql import DataFrame
 
@@ -16,8 +15,6 @@ class TransformComponent(ABC):
 
     def __init__(self):
         self._parent = None
-        self.func_transform = []
-        self._windows = []
 
     @property
     def parent(self) -> "TransformComponent":
@@ -27,37 +24,6 @@ class TransformComponent(ABC):
     @parent.setter
     def parent(self, parent):
         self._parent = parent
-
-    def with_(self, function: Callable, *args, **kwargs):
-        """Define a new function for the Transformation.
-
-        All the transformations are used when the method consume is called.
-
-        Args:
-            function: method that receives a function.
-            *args: args for the function.
-            **kwargs: kwargs for the function.
-
-        Returns:
-            Transform object with new function.
-
-        """
-        new_function = {
-            "transformer": function,
-            "args": args if args else (),
-            "kwargs": kwargs if kwargs else {},
-        }
-        self.func_transform.append(new_function)
-        return self
-
-    def _apply_transformations(self, list: List[str]) -> List[str]:
-        return reduce(
-            lambda result_list, function: function["transformer"](
-                result_list, *function["args"], **function["kwargs"]
-            ),
-            self.func_transform,
-            list,
-        )
 
     @property
     @abstractmethod
@@ -74,23 +40,3 @@ class TransformComponent(ABC):
         Returns:
             Transformed dataframe.
         """
-
-    def build_transform(self, dataframe: DataFrame):
-        """Register the function got from the transform on the Transformations.
-
-        Args:
-            dataframe: input dataframe.
-
-        """
-        function_list = []
-        transformed_df = self._apply_transformations(function_list)
-        self._windows = transformed_df
-        dataframe = self.transform(dataframe)
-        return dataframe
-
-    def build_output_columns(self):
-        """Register the function got from the transform columns."""
-        function_list = []
-        transformed_df = self._apply_transformations(function_list)
-        self._windows = transformed_df
-        return self.output_columns

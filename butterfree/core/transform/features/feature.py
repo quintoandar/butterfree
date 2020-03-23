@@ -66,7 +66,7 @@ class Feature:
             Output columns names.
         """
         if self.transformation is not None:
-            return self.transformation.build_output_columns()
+            return self.transformation.output_columns
         return [self.name]
 
     def transform(self, dataframe: DataFrame) -> DataFrame:
@@ -79,7 +79,7 @@ class Feature:
             Transformed dataframe.
         """
         if self.transformation:
-            return self.transformation.build_transform(dataframe)
+            return self.transformation.transform(dataframe)
 
         if self.from_column:
             if self.name in dataframe.columns:
