@@ -21,6 +21,107 @@ def feature_set_dataframe(spark_context, spark_session):
 
 
 @fixture
+def most_common_dataframe(spark_context, spark_session):
+    data = [
+        {"id": 1, "timestamp": "2016-04-11 11:31:11", "feature1": 200, "feature2": 200},
+        {"id": 1, "timestamp": "2016-04-11 11:44:12", "feature1": 200, "feature2": 300},
+        {"id": 1, "timestamp": "2016-04-11 11:46:24", "feature1": 200, "feature2": 400},
+        {"id": 1, "timestamp": "2016-04-11 12:03:21", "feature1": 300, "feature2": 500},
+        {"id": 1, "timestamp": "2016-04-11 12:06:21", "feature1": 300, "feature2": 500},
+        {"id": 1, "timestamp": "2016-04-11 12:09:21", "feature1": 300, "feature2": 500},
+        {"id": 1, "timestamp": "2016-04-11 12:23:21", "feature1": 300, "feature2": 500},
+        {"id": 1, "timestamp": "2016-04-11 12:45:21", "feature1": 300, "feature2": 500},
+        {"id": 1, "timestamp": "2016-04-11 12:56:21", "feature1": 300, "feature2": 500},
+    ]
+    df = spark_session.read.json(spark_context.parallelize(data, 1))
+    df = df.withColumn(TIMESTAMP_COLUMN, df.timestamp.cast(DataType.TIMESTAMP.value))
+
+    return df
+
+
+@fixture
+def most_common_output_dataframe(spark_context, spark_session):
+    data = [
+        {
+            "id": 1,
+            "timestamp": "2016-04-11 11:31:11",
+            "feature1": 200,
+            "feature2": 200,
+            "feature1__avg_over_4_events_row_windows": 200,
+            "feature1__most_common_over_4_events_row_windows": [200],
+        },
+        {
+            "id": 1,
+            "timestamp": "2016-04-11 11:44:12",
+            "feature1": 200,
+            "feature2": 300,
+            "feature1__avg_over_4_events_row_windows": 200,
+            "feature1__most_common_over_4_events_row_windows": [200],
+        },
+        {
+            "id": 1,
+            "timestamp": "2016-04-11 11:46:24",
+            "feature1": 200,
+            "feature2": 400,
+            "feature1__avg_over_4_events_row_windows": 200,
+            "feature1__most_common_over_4_events_row_windows": [200],
+        },
+        {
+            "id": 1,
+            "timestamp": "2016-04-11 12:03:21",
+            "feature1": 300,
+            "feature2": 500,
+            "feature1__avg_over_4_events_row_windows": 225,
+            "feature1__most_common_over_4_events_row_windows": [200],
+        },
+        {
+            "id": 1,
+            "timestamp": "2016-04-11 12:06:21",
+            "feature1": 300,
+            "feature2": 500,
+            "feature1__avg_over_4_events_row_windows": 250,
+            "feature1__most_common_over_4_events_row_windows": [200],
+        },
+        {
+            "id": 1,
+            "timestamp": "2016-04-11 12:09:21",
+            "feature1": 300,
+            "feature2": 500,
+            "feature1__avg_over_4_events_row_windows": 275,
+            "feature1__most_common_over_4_events_row_windows": [300],
+        },
+        {
+            "id": 1,
+            "timestamp": "2016-04-11 12:23:21",
+            "feature1": 300,
+            "feature2": 500,
+            "feature1__avg_over_4_events_row_windows": 300,
+            "feature1__most_common_over_4_events_row_windows": [300],
+        },
+        {
+            "id": 1,
+            "timestamp": "2016-04-11 12:45:21",
+            "feature1": 300,
+            "feature2": 500,
+            "feature1__avg_over_4_events_row_windows": 300,
+            "feature1__most_common_over_4_events_row_windows": [300],
+        },
+        {
+            "id": 1,
+            "timestamp": "2016-04-11 12:56:21",
+            "feature1": 300,
+            "feature2": 500,
+            "feature1__avg_over_4_events_row_windows": 300,
+            "feature1__most_common_over_4_events_row_windows": [300],
+        },
+    ]
+    df = spark_session.read.json(spark_context.parallelize(data, 1))
+    df = df.withColumn(TIMESTAMP_COLUMN, df.timestamp.cast(DataType.TIMESTAMP.value))
+
+    return df
+
+
+@fixture
 def target_df_rows_agg(spark_context, spark_session):
     data = [
         {
