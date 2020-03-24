@@ -1,6 +1,12 @@
+import datetime
+import random
+from unittest.mock import Mock
+
 import pytest
+from pyspark.sql import DataFrame
 
 from butterfree.core.load.writers import HistoricalFeatureStoreWriter
+from butterfree.testing.dataframe import assert_dataframe_equality
 
 
 class TestHistoricalFeatureStoreWriter:
@@ -22,23 +28,11 @@ class TestHistoricalFeatureStoreWriter:
             dataframe=feature_set_dataframe,
             spark_client=spark_client,
         )
+        result_df = spark_client.write_table.call_args[1]["dataframe"]
 
         # then
-        spark_client.write_table.assert_called_once()
+        assert_dataframe_equality(historical_feature_set_dataframe, result_df)
 
-        sort_columns = spark_client.write_table.call_args[1][
-            "dataframe"
-        ].schema.fieldNames()
-        actual_df = (
-            spark_client.write_table.call_args[1]["dataframe"]
-            .select(sort_columns)
-            .collect()
-        )
-        output_feature_set_dataframe = historical_feature_set_dataframe.select(
-            sort_columns
-        ).collect()
-
-        assert sorted(output_feature_set_dataframe) == sorted(actual_df)
         assert (
             writer.db_config.format_ == spark_client.write_table.call_args[1]["format_"]
         )
@@ -83,3 +77,46 @@ class TestHistoricalFeatureStoreWriter:
         # when
         with pytest.raises(AssertionError):
             _ = writer.validate(feature_set, feature_set_dataframe, spark_client)
+
+    def test__create_partitions(self, spark_session, spark_context):
+        # arrange
+        start = datetime.datetime(year=1970, month=1, day=1)
+        end = datetime.datetime(year=2020, month=12, day=31)
+        random_dates = [
+            (
+                lambda: start
+                + datetime.timedelta(
+                    seconds=random.randint(  # noqa: S311
+                        0, int((end - start).total_seconds())
+                    )
+                )
+            )()
+            .date()
+            .isoformat()
+            for _ in range(10000)
+        ]
+        data = [{"timestamp": date} for date in random_dates]
+        input_df = spark_session.read.json(
+            spark_context.parallelize(data, 1), schema="timestamp timestamp"
+        )
+
+        writer = HistoricalFeatureStoreWriter()
+
+        # act
+        result_df = writer._create_partitions(input_df)
+
+        # assert
+        assert result_df.select("year", "month", "day").distinct().count() == len(
+            set(random_dates)
+        )
+
+    def test__repartition_df(self):
+        # arrange
+        writer = HistoricalFeatureStoreWriter(num_partitions=10)
+        dataframe = Mock(spec=DataFrame)
+
+        # act
+        writer._repartition_df(dataframe)
+
+        # assert
+        dataframe.repartition.assert_called_with(10, *writer.PARTITION_BY)
