@@ -65,12 +65,14 @@ class StackTransform(TransformComponent):
     def __init__(self, columns_names: List[str] = None, columns_prefix: str = None):
         if columns_names is None and columns_prefix is None:
             raise ValueError(
-                "At least one of the args columns_names or columns_prefix should be set, both can't be None."
+                "At least one of the args columns_names or columns_prefix should"
+                " be set, both can't be None."
             )
 
         if columns_names is not None and columns_prefix is not None:
             raise ValueError(
-                "Just one of the args columns_names or columns_prefix should be set, not both."
+                "Just one of the args columns_names or columns_prefix should be "
+                "set, not both."
             )
 
         super().__init__()
@@ -96,7 +98,8 @@ class StackTransform(TransformComponent):
             columns = self.columns_names
             if not all(c in dataframe.columns for c in columns):
                 raise ValueError(
-                    "Not all columns found, columns in df: {}, target columns: {}".format(
+                    "Not all columns found, columns in df: {}, "
+                    "target columns: {}".format(
                         dataframe.columns, columns
                     )
                 )
@@ -109,7 +112,8 @@ class StackTransform(TransformComponent):
             ]
             if not columns:
                 raise ValueError(
-                    "Columns not found, columns in df: {}, target columns prefix: '{}'".format(
+                    "Columns not found, columns in df: {}, "
+                    "target columns prefix: '{}'".format(
                         dataframe.columns, self.columns_prefix
                     )
                 )

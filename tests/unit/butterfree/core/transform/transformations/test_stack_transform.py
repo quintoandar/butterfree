@@ -48,11 +48,6 @@ class TestSQLExpressionTransform:
         assert_dataframe_equality(target_df, result_df_2)
 
     def test_invalid_init_args(self, spark_context, spark_session):
-        # arrange
-        input_df = create_df_from_collection(
-            self.input_data, spark_context, spark_session
-        )
-
         # act and assert
         with pytest.raises(ValueError, match="both can't be None"):
             Feature(
