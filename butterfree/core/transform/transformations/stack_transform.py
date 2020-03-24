@@ -99,9 +99,7 @@ class StackTransform(TransformComponent):
             if not all(c in dataframe.columns for c in columns):
                 raise ValueError(
                     "Not all columns found, columns in df: {}, "
-                    "target columns: {}".format(
-                        dataframe.columns, columns
-                    )
+                    "target columns: {}".format(dataframe.columns, columns)
                 )
 
         if self.columns_prefix:
