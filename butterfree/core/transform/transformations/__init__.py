@@ -11,6 +11,7 @@ from butterfree.core.transform.transformations.custom_transform import CustomTra
 from butterfree.core.transform.transformations.sql_expression_transform import (
     SQLExpressionTransform,
 )
+from butterfree.core.transform.transformations.stack_transform import StackTransform
 from butterfree.core.transform.transformations.transform_component import (
     TransformComponent,
 )
@@ -19,5 +20,6 @@ __all__ = [
     "AggregatedTransform",
     "CustomTransform",
     "SQLExpressionTransform",
+    "StackTransform",
     "TransformComponent",
 ]
