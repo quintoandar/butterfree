@@ -19,6 +19,9 @@ class HistoricalFeatureStoreWriter(Writer):
     Attributes:
         db_config: configuration with spark for databases or AWS S3 (default).
             For more information check module 'butterfree.core.db.configs'.
+        database: database to use in Spark metastore.
+            By default FEATURE_STORE_HISTORICAL_DATABASE environment variable.
+        num_partitions: value to use in repartition df before save.
 
     Example:
         Simple example regarding HistoricalFeatureStoreWriter class instantiation.
@@ -69,11 +72,15 @@ class HistoricalFeatureStoreWriter(Writer):
         columns.PARTITION_DAY,
     ]
 
-    def __init__(self, db_config=None, database=None):
+    # from spark.sql.shuffle.partitions default value
+    DEFAULT_NUM_PARTITIONS = 200
+
+    def __init__(self, db_config=None, database=None, num_partitions=None):
         self.db_config = db_config or S3Config()
         self.database = database or environment.get_variable(
             "FEATURE_STORE_HISTORICAL_DATABASE"
         )
+        self.num_partitions = num_partitions or self.DEFAULT_NUM_PARTITIONS
 
     def write(
         self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient
@@ -126,6 +133,9 @@ class HistoricalFeatureStoreWriter(Writer):
             f"\nNumber of rows in the dataframe: {dataframe_count}."
         )
 
+    def _repartition_df(self, dataframe):
+        return dataframe.repartition(self.num_partitions, *self.PARTITION_BY)
+
     def _create_partitions(self, dataframe):
         # create year partition column
         dataframe = dataframe.withColumn(
@@ -139,5 +149,4 @@ class HistoricalFeatureStoreWriter(Writer):
         dataframe = dataframe.withColumn(
             columns.PARTITION_DAY, dayofmonth(dataframe[columns.TIMESTAMP_COLUMN])
         )
-
-        return dataframe.repartition(*self.PARTITION_BY)
+        return self._repartition_df(dataframe)
