@@ -11,6 +11,7 @@ from butterfree.core.constants.columns import TIMESTAMP_COLUMN
 from butterfree.core.transform.transformations.transform_component import (
     TransformComponent,
 )
+from butterfree.core.transform.transformations.user_defined_functions import mode
 
 
 class AggregatedTransform(TransformComponent):
@@ -114,6 +115,7 @@ class AggregatedTransform(TransformComponent):
         "last": functions.first,
         "max": functions.max,
         "min": functions.min,
+        "mode": mode,
         "skewness": functions.skewness,
         "stddev": functions.stddev,
         "stddev_pop": functions.stddev_pop,
@@ -335,9 +337,7 @@ class AggregatedTransform(TransformComponent):
         )
 
         if self._parent.dtype:
-            dataframe = dataframe.withColumn(
-                feature_name, functions.col(feature_name).cast(self._parent.dtype),
-            )
+            dataframe = self._cast_parent_type(dataframe, feature_name)
 
         return dataframe
 
@@ -366,9 +366,17 @@ class AggregatedTransform(TransformComponent):
             functions.col("window.end").alias(self.time_column),
         )
 
+        if self._parent.dtype:
+            df = self._cast_parent_type(df, feature_name)
+
         df_list.append(df)
 
         return df_list
+
+    def _cast_parent_type(self, dataframe, feature_name):
+        return dataframe.withColumn(
+            feature_name, functions.col(feature_name).cast(self._parent.dtype.value),
+        )
 
     def transform(self, dataframe: DataFrame) -> DataFrame:
         """Performs a transformation to the feature pipeline.
