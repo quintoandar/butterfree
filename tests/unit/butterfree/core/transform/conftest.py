@@ -40,7 +40,7 @@ def make_dataframe(spark_context, spark_session):
         },
     ]
     df = spark_session.read.json(spark_context.parallelize(data, 1))
-    df = df.withColumn(TIMESTAMP_COLUMN, df.ts.cast(DataType.TIMESTAMP.value))
+    df = df.withColumn(TIMESTAMP_COLUMN, df.ts.cast(DataType.TIMESTAMP.spark_mapping))
 
     return df
 
@@ -58,7 +58,7 @@ def make_filtering_dataframe(spark_context, spark_session):
     df = spark_session.read.json(
         spark_context.parallelize(data).map(lambda x: json.dumps(x))
     )
-    df = df.withColumn(TIMESTAMP_COLUMN, df.ts.cast(DataType.TIMESTAMP.value))
+    df = df.withColumn(TIMESTAMP_COLUMN, df.ts.cast(DataType.TIMESTAMP.spark_mapping))
 
     return df
 
@@ -74,7 +74,7 @@ def make_output_filtering_dataframe(spark_context, spark_session):
     df = spark_session.read.json(
         spark_context.parallelize(data).map(lambda x: json.dumps(x))
     )
-    df = df.withColumn(TIMESTAMP_COLUMN, df.ts.cast(DataType.TIMESTAMP.value))
+    df = df.withColumn(TIMESTAMP_COLUMN, df.ts.cast(DataType.TIMESTAMP.spark_mapping))
 
     return df
 
@@ -100,7 +100,7 @@ def make_rolling_windows_agg_dataframe(spark_context, spark_session):
     df = spark_session.read.json(
         spark_context.parallelize(data).map(lambda x: json.dumps(x))
     )
-    df = df.withColumn("timestamp", df.timestamp.cast(DataType.TIMESTAMP.value))
+    df = df.withColumn("timestamp", df.timestamp.cast(DataType.TIMESTAMP.spark_mapping))
 
     return df
 
