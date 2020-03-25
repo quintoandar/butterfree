@@ -31,39 +31,14 @@ class TestSQLExpressionTransform:
         feature_using_names = KeyFeature(
             name="id",
             description="id_a and id_b stacked in a single column.",
-            transformation=StackTransform(columns_names=["id_a", "id_b"]),
-        )
-        feature_using_prefix = KeyFeature(
-            name="id",
-            description="id_a and id_b stacked in a single column.",
-            transformation=StackTransform(columns_prefix="id_"),
+            transformation=StackTransform("id_*"),
         )
 
         # act
         result_df_1 = feature_using_names.transform(input_df)
-        result_df_2 = feature_using_prefix.transform(input_df)
 
         # assert
         assert_dataframe_equality(target_df, result_df_1)
-        assert_dataframe_equality(target_df, result_df_2)
-
-    def test_invalid_init_args(self, spark_context, spark_session):
-        # act and assert
-        with pytest.raises(ValueError, match="both can't be None"):
-            Feature(
-                name="id",
-                description="id_a and id_b stacked in a single column.",
-                transformation=StackTransform(),
-            )
-
-        with pytest.raises(ValueError, match="not both"):
-            Feature(
-                name="id",
-                description="id_a and id_b stacked in a single column.",
-                transformation=StackTransform(
-                    columns_names=["id_a", "id_b"], columns_prefix="id_"
-                ),
-            )
 
     def test_columns_not_in_dataframe(self, spark_context, spark_session):
         # arrange
@@ -71,20 +46,34 @@ class TestSQLExpressionTransform:
             self.input_data, spark_context, spark_session
         )
 
-        feature_without_args = Feature(
+        feature = Feature(
             name="id",
-            description="id_a and id_b stacked in a single column.",
-            transformation=StackTransform(columns_names=["col_not_in_df"]),
-        )
-        feature_with_both_args = Feature(
-            name="id",
-            description="id_a and id_b stacked in a single column.",
-            transformation=StackTransform(columns_prefix="wrong_prefix"),
+            description="stack transformation",
+            transformation=StackTransform("id_c", "id_d"),
         )
 
         # act and assert
-        with pytest.raises(ValueError, match="target columns: "):
-            feature_without_args.transform(input_df)
+        with pytest.raises(ValueError, match="Columns not found, columns in df: "):
+            feature.transform(input_df)
 
-        with pytest.raises(ValueError, match="target columns prefix: "):
-            feature_with_both_args.transform(input_df)
+    @pytest.mark.parametrize(
+        "is_regex, pattern, column",
+        [
+            (False, "id_a", "id_a"),
+            (False, "id_*", "id_a"),
+            (False, "*_a", "id_a"),
+            (False, "id*a", "id_a"),
+            (False, "!id_b", "id_a"),
+            (True, "id.*", "id_a"),
+            (True, "id_[a-z]*", "id_column"),
+        ],
+    )
+    def test__matches_pattern(self, is_regex, pattern, column):
+        # arrange
+        transform = StackTransform(is_regex=is_regex)
+
+        # act
+        result = transform._matches_pattern(pattern, column)
+
+        # assert
+        assert result
