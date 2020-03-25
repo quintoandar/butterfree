@@ -48,7 +48,7 @@ class TimestampFeature(Feature):
             name=TIMESTAMP_COLUMN,
             description=description,
             from_column=from_column,
-            dtype=DataType.TIMESTAMP.spark_mapping,
+            dtype=DataType.TIMESTAMP,
             transformation=transformation,
         )
         self.from_ms = from_ms
