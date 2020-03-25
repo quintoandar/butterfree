@@ -21,8 +21,16 @@ class StackTransform(TransformComponent):
     Attributes:
         columns_names: full names or patterns to search for target columns on
             the dataframe.
+            By default a single `*` character is considered a wildcard and can
+            be anywhere in the string, multiple wildcards are not supported.
+            Strings can also start with an `!` (exclamation mark), it indicates
+            a negation, be it a regular string or simple pattern.
+            When parameter :param is_regex: is `True`, simple patterns wildcards
+            and negation are disabled and all strings are interpreted as regular
+            expressions.
+
         is_regex: boolean flag to indicate if columns_names passed are a Python
-            regex string pattern.
+            regex string patterns.
 
     Example:
         >>> from pyspark import SparkContext
@@ -62,7 +70,7 @@ class StackTransform(TransformComponent):
 
     """
 
-    def __init__(self, *columns_names: str, is_regex: str = False):
+    def __init__(self, *columns_names: str, is_regex: bool = False):
         super().__init__()
         self.columns_names = columns_names
         self.regex_enabled = is_regex
