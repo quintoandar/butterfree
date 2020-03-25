@@ -3,16 +3,15 @@
 from enum import Enum
 
 from pyspark.sql.types import (
+    ArrayType,
     BinaryType,
     BooleanType,
-    ByteType,
     DateType,
     DecimalType,
     DoubleType,
     FloatType,
     IntegerType,
     LongType,
-    ShortType,
     StringType,
     TimestampType,
 )
@@ -21,15 +20,20 @@ from pyspark.sql.types import (
 class DataType(Enum):
     """Holds constants for data types within Butterfree."""
 
-    TIMESTAMP = TimestampType()
-    BINARY = BinaryType()
-    BOOLEAN = BooleanType()
-    BYTE = ByteType()
-    DATE = DateType()
-    DECIMAL = DecimalType()
-    DOUBLE = DoubleType()
-    FLOAT = FloatType()
-    INTEGER = IntegerType()
-    BIGINT = LongType()
-    SMALLINT = ShortType()
-    STRING = StringType()
+    TIMESTAMP = (TimestampType(), "timestamp")
+    BINARY = (BinaryType(), "boolean")
+    BOOLEAN = (BooleanType(), "boolean")
+    DATE = (DateType(), "timestamp")
+    DECIMAL = (DecimalType(), "decimal")
+    DOUBLE = (DoubleType(), "double")
+    FLOAT = (FloatType(), "float")
+    INTEGER = (IntegerType(), "int")
+    BIGINT = (LongType(), "bigint")
+    STRING = (StringType(), "text")
+    ARRAY_BIGINT = (ArrayType(LongType()), "frozen<list<bigint>>")
+    ARRAY_STRING = (ArrayType(StringType()), "frozen<list<text>>")
+    ARRAY_FLOAT = (ArrayType(FloatType()), "frozen<list<float>>")
+
+    def __init__(self, spark_mapping, cassandra_mapping):
+        self.spark_mapping = spark_mapping
+        self.cassandra_mapping = cassandra_mapping
