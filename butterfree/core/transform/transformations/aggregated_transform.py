@@ -375,7 +375,8 @@ class AggregatedTransform(TransformComponent):
 
     def _cast_parent_type(self, dataframe, feature_name):
         return dataframe.withColumn(
-            feature_name, functions.col(feature_name).cast(self._parent.dtype.value),
+            feature_name,
+            functions.col(feature_name).cast(self._parent.dtype.spark_mapping),
         )
 
     def transform(self, dataframe: DataFrame) -> DataFrame:
