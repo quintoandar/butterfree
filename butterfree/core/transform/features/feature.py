@@ -2,7 +2,7 @@
 import warnings
 from typing import List
 
-from parameters_validation import non_blank
+from parameters_validation import non_blank, non_null
 from pyspark.sql import DataFrame
 from pyspark.sql.functions import col
 
@@ -34,9 +34,9 @@ class Feature:
         self,
         name: non_blank(str),
         description: non_blank(str),
-        dtype: non_blank(DataType),
+        dtype: non_null(DataType),
         from_column: non_blank(str) = None,
-        transformation: non_blank(TransformComponent) = None,
+        transformation: non_null(TransformComponent) = None,
     ) -> None:
         self.name = name
         self.description = description
