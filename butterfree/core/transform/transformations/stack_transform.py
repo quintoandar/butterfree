@@ -14,8 +14,8 @@ from butterfree.core.transform.transformations.transform_component import (
 class StackTransform(TransformComponent):
     """Defines a Stack transformation.
 
-    For instantiation needs the name of the columns or a prefix string to use to
-    find the columns that need to be stacked. This transform generates just
+    For instantiation  it is needed the name of the columns or a pattern to use
+    to find the columns that need to be stacked. This transform generates just
     one column as output.
 
     Attributes:
@@ -52,8 +52,8 @@ class StackTransform(TransformComponent):
             Row(feature=120, id_a=3, id_b=4, stack_ids=4)
         ]
 
-        The StackTransform can be instantiated using a column prefix instead of
-        columns full names. Like this way:
+        The StackTransform can be instantiated using a column pattern instead of
+        the columns full names. Like this way:
         >>> feature = Feature(
         ...     name="stack_ids",
         ...     description="id_a and id_b stacked in a single column.",
