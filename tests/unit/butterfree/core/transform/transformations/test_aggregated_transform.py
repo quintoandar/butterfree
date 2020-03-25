@@ -391,20 +391,20 @@ class TestAggregatedTransform:
 
         assert_dataframe_equality(output_df, target_df_rows_agg)
 
-    def test_feature_transform_output_most_common(
-        self, most_common_dataframe, most_common_output_dataframe
+    def test_feature_transform_rolling_windows_mode(
+        self, mode_dataframe, mode_target_dataframe
     ):
         test_feature = Feature(
             name="feature1",
             description="unit test",
             transformation=AggregatedTransform(
-                aggregations=["avg", "most_common"],
+                aggregations=["mode"],
                 partition="id",
-                windows=["4 events"],
-                mode=["row_windows"],
+                windows=["1 day"],
+                mode=["rolling_windows"],
             ),
         )
 
-        output_df = test_feature.transform(most_common_dataframe)
+        output_df = test_feature.transform(mode_dataframe)
 
-        assert_dataframe_equality(output_df, most_common_output_dataframe)
+        assert_dataframe_equality(output_df, mode_target_dataframe)
