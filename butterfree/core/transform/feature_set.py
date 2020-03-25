@@ -271,7 +271,9 @@ class FeatureSet:
             [(start_date, end_date)], ("start_date", "end_date")
         ).select(
             [
-                F.col(c).cast(DataType.TIMESTAMP.spark_mapping).cast(DataType.BIGINT.spark_mapping)
+                F.col(c)
+                .cast(DataType.TIMESTAMP.spark_mapping)
+                .cast(DataType.BIGINT.spark_mapping)
                 for c in ("start_date", "end_date")
             ]
         )

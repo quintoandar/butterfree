@@ -91,7 +91,5 @@ class Feature:
             dataframe = dataframe.withColumn(self.name, col(self.from_column))
 
         if self.dtype:
-            dataframe = dataframe.withColumn(
-                self.name, col(self.name).cast(self.dtype)
-            )
+            dataframe = dataframe.withColumn(self.name, col(self.name).cast(self.dtype))
         return dataframe
