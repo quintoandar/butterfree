@@ -1,18 +1,17 @@
 """Aggregated Transform entity."""
 import warnings
-from collections import Counter
 from functools import reduce
 from typing import List
 
 from parameters_validation import non_blank
 from pyspark.sql import DataFrame, functions
-from pyspark.sql.types import ArrayType, IntegerType
 from pyspark.sql.window import Window
 
 from butterfree.core.constants.columns import TIMESTAMP_COLUMN
 from butterfree.core.transform.transformations.transform_component import (
     TransformComponent,
 )
+from butterfree.core.transform.transformations.user_defined_functions import mode
 
 
 class AggregatedTransform(TransformComponent):
@@ -116,7 +115,7 @@ class AggregatedTransform(TransformComponent):
         "last": functions.first,
         "max": functions.max,
         "min": functions.min,
-        "most_common": "udf",
+        "mode": mode,
         "skewness": functions.skewness,
         "stddev": functions.stddev,
         "stddev_pop": functions.stddev_pop,
@@ -328,27 +327,14 @@ class AggregatedTransform(TransformComponent):
 
         return w
 
-    def _compute_most_common(self, dataframe, feature_name, window):
-        @functions.udf(returnType=ArrayType(IntegerType()))
-        def most_common(array):
-            return [item[0] for item in Counter(array).most_common(n=1)]
-
-        dataframe = dataframe.withColumn(
-            feature_name, functions.collect_list(f"{self._parent.name}").over(window)
-        )
-        return dataframe.withColumn(feature_name, most_common(dataframe[feature_name]))
-
     def _compute_agg(self, dataframe, feature_name, aggregation, window):
         """Returns dataframe given a aggregation type."""
-        if aggregation == "most_common":
-            dataframe = self._compute_most_common(dataframe, feature_name, window)
-        else:
-            dataframe = dataframe.withColumn(
-                feature_name,
-                self.__ALLOWED_AGGREGATIONS[aggregation](f"{self._parent.name}").over(
-                    window
-                ),
-            )
+        dataframe = dataframe.withColumn(
+            feature_name,
+            self.__ALLOWED_AGGREGATIONS[aggregation](f"{self._parent.name}").over(
+                window
+            ),
+        )
 
         if self._parent.dtype:
             dataframe = dataframe.withColumn(
