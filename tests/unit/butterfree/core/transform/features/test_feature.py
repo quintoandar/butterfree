@@ -81,9 +81,7 @@ class TestFeature:
     def test_feature_transform_with_dtype(self, feature_set_dataframe):
 
         test_feature = Feature(
-            name="feature",
-            description="unit test",
-            dtype=DataType.TIMESTAMP.spark_mapping,
+            name="feature", description="unit test", dtype=DataType.TIMESTAMP,
         )
         df = test_feature.transform(feature_set_dataframe)
 

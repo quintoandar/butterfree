@@ -12,7 +12,7 @@ class TestTimestampFeature:
 
         assert test_key.name == TIMESTAMP_COLUMN
         assert test_key.from_column == "ts"
-        assert test_key.dtype == DataType.TIMESTAMP.spark_mapping
+        assert test_key.dtype == DataType.TIMESTAMP
 
     def test_transform(self, feature_set_dataframe):
 
