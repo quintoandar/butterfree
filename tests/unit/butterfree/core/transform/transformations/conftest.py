@@ -243,7 +243,7 @@ def mode_dataframe(spark_context, spark_session):
 
 
 @fixture
-def mode_target_dataframe(spark_context, spark_session):
+def mode_str_target_dataframe(spark_context, spark_session):
     data = [
         {
             "id": 1,
@@ -254,6 +254,26 @@ def mode_target_dataframe(spark_context, spark_session):
             "id": 1,
             "timestamp": "2016-04-13 00:00:00",
             "feature1__mode_over_1_day_rolling_windows": "300",
+        },
+    ]
+    df = spark_session.read.json(spark_context.parallelize(data, 1))
+    df = df.withColumn(TIMESTAMP_COLUMN, df.timestamp.cast(DataType.TIMESTAMP.value))
+
+    return df
+
+
+@fixture
+def mode_num_target_dataframe(spark_context, spark_session):
+    data = [
+        {
+            "id": 1,
+            "timestamp": "2016-04-12 00:00:00",
+            "feature1__mode_over_1_day_rolling_windows": 200,
+        },
+        {
+            "id": 1,
+            "timestamp": "2016-04-13 00:00:00",
+            "feature1__mode_over_1_day_rolling_windows": 300,
         },
     ]
     df = spark_session.read.json(spark_context.parallelize(data, 1))

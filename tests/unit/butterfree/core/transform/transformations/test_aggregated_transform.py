@@ -392,7 +392,7 @@ class TestAggregatedTransform:
         assert_dataframe_equality(output_df, target_df_rows_agg)
 
     def test_feature_transform_rolling_windows_mode(
-        self, mode_dataframe, mode_target_dataframe
+        self, mode_dataframe, mode_str_target_dataframe
     ):
         test_feature = Feature(
             name="feature1",
@@ -407,4 +407,23 @@ class TestAggregatedTransform:
 
         output_df = test_feature.transform(mode_dataframe)
 
-        assert_dataframe_equality(output_df, mode_target_dataframe)
+        assert_dataframe_equality(output_df, mode_str_target_dataframe)
+
+    def test_feature_transform_rolling_windows_mode_float(
+        self, mode_dataframe, mode_num_target_dataframe
+    ):
+        test_feature = Feature(
+            name="feature1",
+            description="unit test",
+            dtype=DataType.BIGINT,
+            transformation=AggregatedTransform(
+                aggregations=["mode"],
+                partition="id",
+                windows=["1 day"],
+                mode=["rolling_windows"],
+            ),
+        )
+
+        output_df = test_feature.transform(mode_dataframe)
+
+        assert_dataframe_equality(output_df, mode_num_target_dataframe)
