@@ -78,9 +78,9 @@ class Window:
     Use the static methods in :class:`Window` to create a :class:`WindowSpec`.
     """
 
-    def __init__(self, partition_by, order_by, mode=None, window_definition=None):
+    def __init__(self, partition_by, order_by=None, mode=None, window_definition=None):
         self.partition_by = partition_by
-        self.order_by = order_by
+        self.order_by = order_by or TIMESTAMP_COLUMN
         self.frame_boundaries = FrameBoundaries(mode, window_definition)
 
     def get_name(self):

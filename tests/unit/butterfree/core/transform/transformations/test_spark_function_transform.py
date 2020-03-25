@@ -10,9 +10,9 @@ from butterfree.testing.dataframe import assert_dataframe_equality
 class TestSparkFunctionTransform:
     def test_feature_transform(self, feature_set_dataframe):
         test_feature = Feature(
-            name="feature_cos",
+            name="feature",
             description="unit test",
-            transformation=SparkFunctionTransform(function=functions.cos,),
+            transformation=SparkFunctionTransform(functions=[functions.cos],),
             from_column="feature1",
         )
 
@@ -23,7 +23,7 @@ class TestSparkFunctionTransform:
                 a == b
                 for a, b in zip(
                     df.columns,
-                    ["feature1", "feature2", "id", TIMESTAMP_COLUMN, "feature_cos"],
+                    ["feature1", "feature2", "id", TIMESTAMP_COLUMN, "feature__cos"],
                 )
             ]
         )
@@ -32,9 +32,10 @@ class TestSparkFunctionTransform:
         test_feature = Feature(
             name="feature1",
             description="unit test",
-            transformation=SparkFunctionTransform(function=functions.avg,).with_window(
+            transformation=SparkFunctionTransform(
+                functions=[functions.avg],
+            ).with_window(
                 partition_by="id",
-                order_by=TIMESTAMP_COLUMN,
                 mode="row_windows",
                 window_definition=["2 events", "3 events"],
             ),
@@ -52,8 +53,8 @@ class TestSparkFunctionTransform:
                         "feature2",
                         "id",
                         TIMESTAMP_COLUMN,
-                        "feature1_avg_over_2_events_row_windows",
-                        "feature1_avg_over_3_events_row_windows",
+                        "feature1__avg_over_2_events_row_windows",
+                        "feature1__avg_over_3_events_row_windows",
                     ],
                 )
             ]
@@ -63,9 +64,10 @@ class TestSparkFunctionTransform:
         test_feature = Feature(
             name="feature1",
             description="unit test",
-            transformation=SparkFunctionTransform(function=functions.avg,).with_window(
+            transformation=SparkFunctionTransform(
+                functions=[functions.avg],
+            ).with_window(
                 partition_by="id",
-                order_by=TIMESTAMP_COLUMN,
                 mode="fixed_windows",
                 window_definition=["7 days", "2 weeks"],
             ),
@@ -79,8 +81,8 @@ class TestSparkFunctionTransform:
                 for a, b in zip(
                     df_columns,
                     [
-                        "feature1_avg_over_7_days_fixed_windows",
-                        "feature1_avg_over_2_weeks_fixed_windows",
+                        "feature1__avg_over_7_days_fixed_windows",
+                        "feature1__avg_over_2_weeks_fixed_windows",
                     ],
                 )
             ]
@@ -92,10 +94,9 @@ class TestSparkFunctionTransform:
                 name="feature1",
                 description="unit test",
                 transformation=SparkFunctionTransform(
-                    function=functions.avg,
+                    functions=[functions.avg],
                 ).with_window(
                     partition_by="id",
-                    order_by=TIMESTAMP_COLUMN,
                     mode="fixed_windows",
                     window_definition=["7 daily"],
                 ),
@@ -107,10 +108,9 @@ class TestSparkFunctionTransform:
                 name="feature1",
                 description="unit test",
                 transformation=SparkFunctionTransform(
-                    function=functions.avg,
+                    functions=[functions.avg],
                 ).with_window(
                     partition_by="id",
-                    order_by=TIMESTAMP_COLUMN,
                     mode="fixed_windows",
                     window_definition=["-2 weeks"],
                 ),
@@ -120,9 +120,10 @@ class TestSparkFunctionTransform:
         test_feature = Feature(
             name="feature1",
             description="unit test",
-            transformation=SparkFunctionTransform(function=functions.avg,).with_window(
+            transformation=SparkFunctionTransform(
+                functions=[functions.avg],
+            ).with_window(
                 partition_by="id",
-                order_by=TIMESTAMP_COLUMN,
                 mode="fixed_windows",
                 window_definition=["2 minutes", "15 minutes"],
             ),
@@ -130,14 +131,14 @@ class TestSparkFunctionTransform:
 
         df = test_feature.transform(feature_set_dataframe).collect()
 
-        assert df[0]["feature1_avg_over_2_minutes_fixed_windows"] == 200
-        assert df[1]["feature1_avg_over_2_minutes_fixed_windows"] == 300
-        assert df[2]["feature1_avg_over_2_minutes_fixed_windows"] == 400
-        assert df[3]["feature1_avg_over_2_minutes_fixed_windows"] == 500
-        assert df[0]["feature1_avg_over_15_minutes_fixed_windows"] == 200
-        assert df[1]["feature1_avg_over_15_minutes_fixed_windows"] == 250
-        assert df[2]["feature1_avg_over_15_minutes_fixed_windows"] == 350
-        assert df[3]["feature1_avg_over_15_minutes_fixed_windows"] == 500
+        assert df[0]["feature1__avg_over_2_minutes_fixed_windows"] == 200
+        assert df[1]["feature1__avg_over_2_minutes_fixed_windows"] == 300
+        assert df[2]["feature1__avg_over_2_minutes_fixed_windows"] == 400
+        assert df[3]["feature1__avg_over_2_minutes_fixed_windows"] == 500
+        assert df[0]["feature1__avg_over_15_minutes_fixed_windows"] == 200
+        assert df[1]["feature1__avg_over_15_minutes_fixed_windows"] == 250
+        assert df[2]["feature1__avg_over_15_minutes_fixed_windows"] == 350
+        assert df[3]["feature1__avg_over_15_minutes_fixed_windows"] == 500
 
     def test_feature_transform_output_row_windows(
         self, feature_set_dataframe, target_df_rows_agg_2
@@ -145,11 +146,10 @@ class TestSparkFunctionTransform:
         test_feature = Feature(
             name="feature1",
             description="unit test",
-            transformation=SparkFunctionTransform(function=functions.avg,).with_window(
-                partition_by="id",
-                order_by=TIMESTAMP_COLUMN,
-                mode="row_windows",
-                window_definition=["2 events"],
+            transformation=SparkFunctionTransform(
+                functions=[functions.avg],
+            ).with_window(
+                partition_by="id", mode="row_windows", window_definition=["2 events"],
             ),
         )
 
