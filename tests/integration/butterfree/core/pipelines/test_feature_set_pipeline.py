@@ -6,7 +6,6 @@ from pyspark.sql import functions as F
 
 from butterfree.core.configs import environment
 from butterfree.core.constants.columns import TIMESTAMP_COLUMN
-from butterfree.core.constants.data_type import DataType
 from butterfree.core.extract import Source
 from butterfree.core.extract.readers import TableReader
 from butterfree.core.load import Sink
@@ -15,8 +14,8 @@ from butterfree.core.pipelines.feature_set_pipeline import FeatureSetPipeline
 from butterfree.core.transform import FeatureSet
 from butterfree.core.transform.features import Feature, KeyFeature, TimestampFeature
 from butterfree.core.transform.transformations import (
-    AggregatedTransform,
     CustomTransform,
+    SparkFunctionTransform,
 )
 
 
@@ -82,11 +81,13 @@ class TestFeatureSetPipeline:
                         name="feature1",
                         description="test",
                         dtype=DataType.FLOAT,
-                        transformation=AggregatedTransform(
-                            aggregations=["avg", "stddev_pop"],
-                            partition="id",
-                            windows=["2 minutes", "15 minutes"],
-                            mode=["fixed_windows"],
+                        transformation=SparkFunctionTransform(
+                            functions=[F.avg, F.stddev_pop],
+                        ).with_window(
+                            partition_by="id",
+                            order_by=TIMESTAMP_COLUMN,
+                            mode="fixed_windows",
+                            window_definition=["2 minutes", "15 minutes"],
                         ),
                     ),
                     Feature(
@@ -111,22 +112,22 @@ class TestFeatureSetPipeline:
         path = dbconfig.get_options("historical/entity/feature_set").get("path")
         df = spark_session.read.parquet(path).orderBy(TIMESTAMP_COLUMN).collect()
 
-        assert df[0]["feature1__avg_over_2_minutes_fixed_windows"] == 200
-        assert df[1]["feature1__avg_over_2_minutes_fixed_windows"] == 300
-        assert df[2]["feature1__avg_over_2_minutes_fixed_windows"] == 400
-        assert df[3]["feature1__avg_over_2_minutes_fixed_windows"] == 500
-        assert df[0]["feature1__stddev_pop_over_2_minutes_fixed_windows"] == 0
-        assert df[1]["feature1__stddev_pop_over_2_minutes_fixed_windows"] == 0
-        assert df[2]["feature1__stddev_pop_over_2_minutes_fixed_windows"] == 0
-        assert df[3]["feature1__stddev_pop_over_2_minutes_fixed_windows"] == 0
-        assert df[0]["feature1__avg_over_15_minutes_fixed_windows"] == 200
-        assert df[1]["feature1__avg_over_15_minutes_fixed_windows"] == 250
-        assert df[2]["feature1__avg_over_15_minutes_fixed_windows"] == 350
-        assert df[3]["feature1__avg_over_15_minutes_fixed_windows"] == 500
-        assert df[0]["feature1__stddev_pop_over_15_minutes_fixed_windows"] == 0
-        assert df[1]["feature1__stddev_pop_over_15_minutes_fixed_windows"] == 50
-        assert df[2]["feature1__stddev_pop_over_15_minutes_fixed_windows"] == 50
-        assert df[3]["feature1__stddev_pop_over_15_minutes_fixed_windows"] == 0
+        assert df[0]["feature1_avg_over_2_minutes_fixed_windows"] == 200
+        assert df[1]["feature1_avg_over_2_minutes_fixed_windows"] == 300
+        assert df[2]["feature1_avg_over_2_minutes_fixed_windows"] == 400
+        assert df[3]["feature1_avg_over_2_minutes_fixed_windows"] == 500
+        assert df[0]["feature1_stddev_pop_over_2_minutes_fixed_windows"] == 0
+        assert df[1]["feature1_stddev_pop_over_2_minutes_fixed_windows"] == 0
+        assert df[2]["feature1_stddev_pop_over_2_minutes_fixed_windows"] == 0
+        assert df[3]["feature1_stddev_pop_over_2_minutes_fixed_windows"] == 0
+        assert df[0]["feature1_avg_over_15_minutes_fixed_windows"] == 200
+        assert df[1]["feature1_avg_over_15_minutes_fixed_windows"] == 250
+        assert df[2]["feature1_avg_over_15_minutes_fixed_windows"] == 350
+        assert df[3]["feature1_avg_over_15_minutes_fixed_windows"] == 500
+        assert df[0]["feature1_stddev_pop_over_15_minutes_fixed_windows"] == 0
+        assert df[1]["feature1_stddev_pop_over_15_minutes_fixed_windows"] == 50
+        assert df[2]["feature1_stddev_pop_over_15_minutes_fixed_windows"] == 50
+        assert df[3]["feature1_stddev_pop_over_15_minutes_fixed_windows"] == 0
         assert df[0]["divided_feature"] == 1
         assert df[1]["divided_feature"] == 1
         assert df[2]["divided_feature"] == 1

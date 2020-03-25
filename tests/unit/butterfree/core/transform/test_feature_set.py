@@ -11,6 +11,7 @@ from tests.unit.butterfree.core.transform.conftest import (
 from butterfree.core.clients import SparkClient
 from butterfree.core.constants.data_type import DataType
 from butterfree.core.transform import FeatureSet
+from butterfree.core.transform.aggregated_feature_set import AggregatedFeatureSet
 from butterfree.core.transform.features import Feature, TimestampFeature
 from butterfree.core.transform.transformations import AggregatedTransform
 
@@ -264,7 +265,7 @@ class TestFeatureSet:
     ):
         spark_client = SparkClient()
 
-        feature_set = FeatureSet(
+        feature_set = AggregatedFeatureSet(
             name="name",
             entity="entity",
             description="description",
@@ -274,11 +275,8 @@ class TestFeatureSet:
                     description="test",
                     dtype=DataType.FLOAT,
                     transformation=AggregatedTransform(
-                        aggregations=["avg"],
-                        partition="id",
-                        windows=["1 week"],
-                        mode=["rolling_windows"],
-                    ),
+                        functions=["avg"], group_by="id", column="feature1",
+                    ).with_window(window_definition=["1 week"],),
                 ),
             ],
             keys=[key_id],
@@ -311,7 +309,7 @@ class TestFeatureSet:
     ):
         spark_client = SparkClient()
 
-        feature_set = FeatureSet(
+        feature_set = AggregatedFeatureSet(
             name="name",
             entity="entity",
             description="description",
@@ -321,11 +319,8 @@ class TestFeatureSet:
                     description="test",
                     dtype=DataType.FLOAT,
                     transformation=AggregatedTransform(
-                        aggregations=["avg"],
-                        partition="id",
-                        windows=["1 week"],
-                        mode=["rolling_windows"],
-                    ),
+                        functions=["avg"], group_by="id", column="feature1",
+                    ).with_window(window_definition=["1 week"],),
                 ),
             ],
             keys=[key_id],
