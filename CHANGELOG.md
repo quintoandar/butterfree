@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each release or unreleased log for a better organization.
 ## Unreleased
+
+### Added
+* [MLOP-185] StackTransform ([#105](https://github.com/quintoandar/butterfree/pull/105))
+
 ### Changed
 * [MLOP-168] HistoricalFeatureStoreWriter Create Partitions Tests and Refactoring ([#102](https://github.com/quintoandar/butterfree/pull/102))
 
