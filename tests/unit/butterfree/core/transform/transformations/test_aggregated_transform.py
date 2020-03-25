@@ -162,7 +162,7 @@ class TestAggregatedTransform:
         test_feature = Feature(
             name="feature1",
             description="unit test",
-            dtype=DataType.BIGINT,
+            dtype=DataType.DOUBLE,
             transformation=AggregatedTransform(
                 aggregations=["avg", "stddev_pop", "count"],
                 partition="id",
@@ -202,7 +202,7 @@ class TestAggregatedTransform:
         test_feature = Feature(
             name="feature1",
             description="unit test",
-            dtype=DataType.BIGINT,
+            dtype=DataType.DOUBLE,
             transformation=AggregatedTransform(
                 aggregations=["avg", "stddev_pop", "count"],
                 partition="id",
@@ -287,7 +287,7 @@ class TestAggregatedTransform:
             Feature(
                 name="feature1",
                 description="unit test",
-                dtype=DataType.BIGINT,
+                dtype=DataType.DOUBLE,
                 transformation=AggregatedTransform(
                     aggregations=["avg", "stddev_pop"],
                     partition="id",
@@ -303,7 +303,7 @@ class TestAggregatedTransform:
             Feature(
                 name="feature1",
                 description="unit test",
-                dtype=DataType.BIGINT,
+                dtype=DataType.DOUBLE,
                 transformation=AggregatedTransform(
                     aggregations=["avg", "stddev_pop"],
                     partition="id",
@@ -317,7 +317,7 @@ class TestAggregatedTransform:
             Feature(
                 name="feature1",
                 description="unit test",
-                dtype=DataType.BIGINT,
+                dtype=DataType.DOUBLE,
                 transformation=AggregatedTransform(
                     aggregations=["avg", "stddev_pop"],
                     partition="id",
@@ -333,7 +333,7 @@ class TestAggregatedTransform:
             Feature(
                 name="feature1",
                 description="unit test",
-                dtype=DataType.BIGINT,
+                dtype=DataType.DOUBLE,
                 transformation=AggregatedTransform(
                     aggregations=["avg", "stddev_pop"],
                     partition="id",
@@ -413,6 +413,7 @@ class TestAggregatedTransform:
         test_feature = Feature(
             name="feature1",
             description="unit test",
+            dtype=DataType.STRING,
             transformation=AggregatedTransform(
                 aggregations=["mode"],
                 partition="id",
@@ -431,7 +432,7 @@ class TestAggregatedTransform:
         test_feature = Feature(
             name="feature1",
             description="unit test",
-            dtype=DataType.BIGINT,
+            dtype=DataType.FLOAT,
             transformation=AggregatedTransform(
                 aggregations=["mode"],
                 partition="id",

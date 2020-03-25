@@ -91,7 +91,7 @@ class TestFeatureSet:
                 Feature(
                     name="feature1",
                     description="test",
-                    dtype=DataType.FLOAT,
+                    dtype=DataType.DOUBLE,
                     transformation=AggregatedTransform(
                         aggregations=["avg", "stddev_pop"],
                         partition="id",
@@ -112,6 +112,8 @@ class TestFeatureSet:
             .orderBy("timestamp")
             .collect()
         )
+
+        result_df = result_df
 
         # assert
         assert (
@@ -140,7 +142,7 @@ class TestFeatureSet:
                 Feature(
                     name="feature1",
                     description="test",
-                    dtype=DataType.FLOAT,
+                    dtype=DataType.DOUBLE,
                     transformation=AggregatedTransform(
                         aggregations=["avg", "stddev_pop"],
                         partition="id",
