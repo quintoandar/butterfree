@@ -14,7 +14,7 @@ from butterfree.core.transform.transformations.transform_component import (
 class StackTransform(TransformComponent):
     """Defines a Stack transformation.
 
-    For instantiation  it is needed the name of the columns or a pattern to use
+    For instantiation it is needed the name of the columns or a pattern to use
     to find the columns that need to be stacked. This transform generates just
     one column as output.
 
