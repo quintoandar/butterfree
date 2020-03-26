@@ -9,6 +9,7 @@ from butterfree.core.clients import SparkClient
 from butterfree.core.configs import environment
 from butterfree.core.configs.db import S3Config
 from butterfree.core.constants import columns
+from butterfree.core.constants.numerical_constants import DEFAULT_NUM_PARTITIONS
 from butterfree.core.load.writers.writer import Writer
 from butterfree.core.transform import FeatureSet
 
@@ -72,15 +73,12 @@ class HistoricalFeatureStoreWriter(Writer):
         columns.PARTITION_DAY,
     ]
 
-    # from spark.sql.shuffle.partitions default value
-    DEFAULT_NUM_PARTITIONS = 200
-
     def __init__(self, db_config=None, database=None, num_partitions=None):
         self.db_config = db_config or S3Config()
         self.database = database or environment.get_variable(
             "FEATURE_STORE_HISTORICAL_DATABASE"
         )
-        self.num_partitions = num_partitions or self.DEFAULT_NUM_PARTITIONS
+        self.num_partitions = num_partitions or DEFAULT_NUM_PARTITIONS
 
     def write(
         self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient
