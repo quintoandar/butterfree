@@ -87,9 +87,13 @@ class Window:
 
     def get_name(self):
         """Return window suffix name based on passed criteria."""
-        return (
-            f"over_{self.frame_boundaries.window_size}_"
-            f"{self.frame_boundaries.window_unit}_{self.frame_boundaries.mode}"
+        return "_".join(
+            [
+                "over",
+                f"{self.frame_boundaries.window_size}",
+                f"{self.frame_boundaries.window_unit}",
+                self.frame_boundaries.mode,
+            ]
         )
 
     def get(self):

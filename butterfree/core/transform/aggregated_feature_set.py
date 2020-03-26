@@ -14,7 +14,16 @@ from butterfree.core.transform.transformations import AggregatedTransform
 
 
 class AggregatedFeatureSet(FeatureSet):
-    """Holds metadata about the aggregated feature set ."""
+    """Holds metadata about the aggregated feature set.
+
+    This class overrides some methods of the ancestor FeatureSet class
+    and has specific methods for aggregations.
+
+    The AggregatedTransform can only be used on AggregatedFeatureSets and vice-versa.
+
+    The construct method will execute the feature set, computing all the
+    defined aggregated transformations.
+    """
 
     @property
     def features(self) -> List[Feature]:
@@ -51,14 +60,16 @@ class AggregatedFeatureSet(FeatureSet):
             True if there's a rolling window aggregation mode.
 
         """
-        for feature in features:
-            if not isinstance(feature.transformation, AggregatedTransform):
-                return False
-        return True
+        return any(
+            [
+                isinstance(feature.transformation, AggregatedTransform)
+                for feature in features
+            ]
+        )
 
     @staticmethod
-    def _generate_dates(client: SparkClient, date_range, step=None):
-        """Generate date dataframe.
+    def _generate_date_sequence_df(client: SparkClient, date_range, step=None):
+        """Generates a date sequence dataframe from a given date range.
 
         Create a Spark DataFrame with a single column named timestamp and a
         range of dates within the desired interval (start and end dates included).
@@ -76,7 +87,9 @@ class AggregatedFeatureSet(FeatureSet):
             [(start_date, end_date)], ("start_date", "end_date")
         ).select(
             [
-                functions.col(c).cast(DataType.TIMESTAMP.value).cast(DataType.BIGINT.value)
+                functions.col(c)
+                .cast(DataType.TIMESTAMP.value)
+                .cast(DataType.BIGINT.value)
                 for c in ("start_date", "end_date")
             ]
         )
@@ -138,7 +151,7 @@ class AggregatedFeatureSet(FeatureSet):
             output_df: transformed dataframe.
             client: client responsible for connecting to Spark session.
         """
-        start_date = dataframe.select(F.min(TIMESTAMP_COLUMN)).collect()[0][0]
+        start_date = dataframe.select(functions.min(TIMESTAMP_COLUMN)).collect()[0][0]
         end_date = end_date or datetime.now()
         date_range = [
             start_date
@@ -146,7 +159,7 @@ class AggregatedFeatureSet(FeatureSet):
             else start_date.strftime("%Y-%m-%d"),
             end_date if isinstance(end_date, str) else end_date.strftime("%Y-%m-%d"),
         ]
-        date_df = self._generate_dates(client, date_range)
+        date_df = self._generate_date_sequence_df(client, date_range)
         unique_df = self._get_unique_keys(output_df)
         cross_join_df = self._cross_join_df(client, date_df, unique_df)
         output_df = cross_join_df.join(
@@ -165,7 +178,8 @@ class AggregatedFeatureSet(FeatureSet):
         """Use all the features to build the feature set dataframe.
 
         After that, there's the caching of the dataframe, however since cache()
-        in Spark is lazy, an action is triggered in order to force persistence.
+        in Spark is lazy, an action is triggered in order to force persistence,
+        but we only cache if it is not a streaming spark dataframe.
 
         Args:
             dataframe: input dataframe to be transformed by the features.

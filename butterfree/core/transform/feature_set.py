@@ -240,10 +240,12 @@ class FeatureSet:
             True if there's a rolling window aggregation mode.
 
         """
-        for feature in features:
-            if isinstance(feature.transformation, AggregatedTransform):
-                return True
-        return False
+        return any(
+            [
+                isinstance(feature.transformation, AggregatedTransform)
+                for feature in features
+            ]
+        )
 
     def _filter_duplicated_rows(self, df):
         """Filter dataframe duplicated rows.
