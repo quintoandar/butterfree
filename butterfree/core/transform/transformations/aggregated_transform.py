@@ -132,22 +132,24 @@ class AggregatedTransform(TransformComponent):
 
     def with_window(self, window_definition):
         """Create a list with windows defined."""
-        windows = []
-        for definition in window_definition:
-            windows.append(
-                Window(
-                    partition_by=None,
-                    order_by=None,
-                    mode="rolling_windows",
-                    window_definition=definition,
-                )
+        self._windows = [
+            Window(
+                partition_by=None,
+                order_by=None,
+                mode="rolling_windows",
+                window_definition=definition,
             )
-
-        self._windows = windows
+            for definition in window_definition
+        ]
         return self
 
-    def _get_name_with_window(self, window, function):
-        return "_".join([f"{self._parent.name}__{function}", window.get_name()])
+    def _get_output_name(self, function, window=None):
+        base_name = "__".join([self._parent.name, function])
+
+        if self._windows:
+            return "_".join([base_name, window.get_name()])
+
+        return base_name
 
     def _dataframe_list_join(self, df_base, df):
         if self._windows:
@@ -163,7 +165,7 @@ class AggregatedTransform(TransformComponent):
         for function in self.functions:
             if self._windows:
                 for window in self._windows:
-                    output_columns.append(self._get_name_with_window(window, function))
+                    output_columns.append(self._get_output_name(function, window))
             else:
                 output_columns.append("_".join([self._parent.name, function]))
 
@@ -188,7 +190,7 @@ class AggregatedTransform(TransformComponent):
                         .select(
                             self.group_by,
                             functions.col(f"{function}({self.column})").alias(
-                                self._get_name_with_window(window, function)
+                                self._get_output_name(function, window)
                             ),
                             functions.col("window.end").alias(TIMESTAMP_COLUMN),
                         )
@@ -199,8 +201,7 @@ class AggregatedTransform(TransformComponent):
                     dataframe.groupBy(self.group_by)
                     .agg(self.__ALLOWED_AGGREGATIONS[function](self.column))
                     .withColumnRenamed(
-                        f"{function}({self.column})",
-                        "__".join([self._parent.name, function]),
+                        f"{function}({self.column})", self._get_output_name(function),
                     )
                 )
                 df_list.append(df)

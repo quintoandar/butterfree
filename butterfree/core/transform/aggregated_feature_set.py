@@ -3,8 +3,7 @@ from datetime import datetime
 from functools import reduce
 from typing import List
 
-import pyspark.sql.functions as F
-from pyspark.sql import DataFrame
+from pyspark.sql import DataFrame, functions
 
 from butterfree.core.clients import SparkClient
 from butterfree.core.constants.columns import TIMESTAMP_COLUMN
@@ -77,13 +76,13 @@ class AggregatedFeatureSet(FeatureSet):
             [(start_date, end_date)], ("start_date", "end_date")
         ).select(
             [
-                F.col(c).cast(DataType.TIMESTAMP.value).cast(DataType.BIGINT.value)
+                functions.col(c).cast(DataType.TIMESTAMP.value).cast(DataType.BIGINT.value)
                 for c in ("start_date", "end_date")
             ]
         )
         start_date, end_date = date_df.first()
         return client.conn.range(start_date, end_date + day_in_seconds, step).select(
-            F.col("id").cast(DataType.TIMESTAMP.value).alias(TIMESTAMP_COLUMN)
+            functions.col("id").cast(DataType.TIMESTAMP.value).alias(TIMESTAMP_COLUMN)
         )
 
     def _get_unique_keys(self, output_df):
