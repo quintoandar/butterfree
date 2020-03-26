@@ -130,12 +130,13 @@ class OnlineFeatureStoreWriter(Writer):
             dataframe=dataframe, id_columns=feature_set.keys_columns
         )
 
-        spark_client.write_dataframe(
-            dataframe=dataframe,
-            format_=self.db_config.format_,
-            mode=self.db_config.mode,
-            **self.db_config.get_options(table=feature_set.name),
-        )
+        for table in [feature_set.name, feature_set.entity]:
+            spark_client.write_dataframe(
+                dataframe=dataframe,
+                format_=self.db_config.format_,
+                mode=self.db_config.mode,
+                **self.db_config.get_options(table=table),
+            )
 
     def validate(self, feature_set: FeatureSet, dataframe, spark_client: SparkClient):
         """Calculate dataframe rows to validate data into Feature Store.
