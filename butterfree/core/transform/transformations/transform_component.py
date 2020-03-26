@@ -11,7 +11,6 @@ class TransformComponent(ABC):
 
     Attributes:
         parent: parent transform component.
-
     """
 
     def __init__(self):
@@ -40,5 +39,4 @@ class TransformComponent(ABC):
 
         Returns:
             Transformed dataframe.
-
         """

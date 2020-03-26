@@ -21,6 +21,44 @@ def feature_set_dataframe(spark_context, spark_session):
 
 
 @fixture
+def target_df_spark(spark_context, spark_session):
+    data = [
+        {
+            "id": 1,
+            "timestamp": "2016-04-11 11:31:11",
+            "feature1": 200,
+            "feature2": 200,
+            "feature__cos": 0.4871876750070059,
+        },
+        {
+            "id": 1,
+            "timestamp": "2016-04-11 11:44:12",
+            "feature1": 300,
+            "feature2": 300,
+            "feature__cos": -0.022096619278683942,
+        },
+        {
+            "id": 1,
+            "timestamp": "2016-04-11 11:46:24",
+            "feature1": 400,
+            "feature2": 400,
+            "feature__cos": -0.525296338642536,
+        },
+        {
+            "id": 1,
+            "timestamp": "2016-04-11 12:03:21",
+            "feature1": 500,
+            "feature2": 500,
+            "feature__cos": -0.883849273431478,
+        },
+    ]
+    df = spark_session.read.json(spark_context.parallelize(data, 1))
+    df = df.withColumn(TIMESTAMP_COLUMN, df.timestamp.cast(DataType.TIMESTAMP.value))
+
+    return df
+
+
+@fixture
 def most_common_dataframe(spark_context, spark_session):
     data = [
         {"id": 1, "timestamp": "2016-04-11 11:31:11", "feature1": 200, "feature2": 200},
@@ -130,8 +168,7 @@ def target_df_rows_agg(spark_context, spark_session):
             "feature1": 200,
             "feature2": 200,
             "feature1__avg_over_2_events_row_windows": 200,
-            "feature1__stddev_pop_over_2_events_row_windows": 0,
-            "feature1__count_over_2_events_row_windows": 1,
+            "feature1__avg_over_3_events_row_windows": 200,
         },
         {
             "id": 1,
@@ -139,8 +176,7 @@ def target_df_rows_agg(spark_context, spark_session):
             "feature1": 300,
             "feature2": 300,
             "feature1__avg_over_2_events_row_windows": 250,
-            "feature1__stddev_pop_over_2_events_row_windows": 50,
-            "feature1__count_over_2_events_row_windows": 2,
+            "feature1__avg_over_3_events_row_windows": 250,
         },
         {
             "id": 1,
@@ -148,8 +184,7 @@ def target_df_rows_agg(spark_context, spark_session):
             "feature1": 400,
             "feature2": 400,
             "feature1__avg_over_2_events_row_windows": 350,
-            "feature1__stddev_pop_over_2_events_row_windows": 50,
-            "feature1__count_over_2_events_row_windows": 2,
+            "feature1__avg_over_3_events_row_windows": 300,
         },
         {
             "id": 1,
@@ -157,8 +192,87 @@ def target_df_rows_agg(spark_context, spark_session):
             "feature1": 500,
             "feature2": 500,
             "feature1__avg_over_2_events_row_windows": 450,
-            "feature1__stddev_pop_over_2_events_row_windows": 50,
-            "feature1__count_over_2_events_row_windows": 2,
+            "feature1__avg_over_3_events_row_windows": 400,
+        },
+    ]
+    df = spark_session.read.json(spark_context.parallelize(data, 1))
+    df = df.withColumn(TIMESTAMP_COLUMN, df.timestamp.cast(DataType.TIMESTAMP.value))
+
+    return df
+
+
+@fixture
+def target_df_rows_agg_2(spark_context, spark_session):
+    data = [
+        {
+            "id": 1,
+            "timestamp": "2016-04-11 11:31:11",
+            "feature1": 200,
+            "feature2": 200,
+            "feature1__avg_over_2_events_row_windows": 200,
+        },
+        {
+            "id": 1,
+            "timestamp": "2016-04-11 11:44:12",
+            "feature1": 300,
+            "feature2": 300,
+            "feature1__avg_over_2_events_row_windows": 250,
+        },
+        {
+            "id": 1,
+            "timestamp": "2016-04-11 11:46:24",
+            "feature1": 400,
+            "feature2": 400,
+            "feature1__avg_over_2_events_row_windows": 350,
+        },
+        {
+            "id": 1,
+            "timestamp": "2016-04-11 12:03:21",
+            "feature1": 500,
+            "feature2": 500,
+            "feature1__avg_over_2_events_row_windows": 450,
+        },
+    ]
+    df = spark_session.read.json(spark_context.parallelize(data, 1))
+    df = df.withColumn(TIMESTAMP_COLUMN, df.timestamp.cast(DataType.TIMESTAMP.value))
+
+    return df
+
+
+@fixture
+def target_df_fixed_agg(spark_context, spark_session):
+    data = [
+        {
+            "id": 1,
+            "timestamp": "2016-04-11 11:31:11",
+            "feature1": 200,
+            "feature2": 200,
+            "feature1__avg_over_2_minutes_fixed_windows": 200,
+            "feature1__avg_over_15_minutes_fixed_windows": 200,
+        },
+        {
+            "id": 1,
+            "timestamp": "2016-04-11 11:44:12",
+            "feature1": 300,
+            "feature2": 300,
+            "feature1__avg_over_2_minutes_fixed_windows": 300,
+            "feature1__avg_over_15_minutes_fixed_windows": 250,
+        },
+        {
+            "id": 1,
+            "timestamp": "2016-04-11 11:46:24",
+            "feature1": 400,
+            "feature2": 400,
+            "feature1__avg_over_2_minutes_fixed_windows": 400,
+            "feature1__avg_over_15_minutes_fixed_windows": 350,
+        },
+        {
+            "id": 1,
+            "timestamp": "2016-04-11 12:03:21",
+            "feature1": 500,
+            "feature2": 500,
+            "feature1__avg_over_2_minutes_fixed_windows": 500,
+            "feature1__avg_over_15_minutes_fixed_windows": 500,
         },
     ]
     df = spark_session.read.json(spark_context.parallelize(data, 1))

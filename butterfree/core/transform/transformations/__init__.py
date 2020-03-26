@@ -8,6 +8,9 @@ from butterfree.core.transform.transformations.aggregated_transform import (
     AggregatedTransform,
 )
 from butterfree.core.transform.transformations.custom_transform import CustomTransform
+from butterfree.core.transform.transformations.spark_function_transform import (
+    SparkFunctionTransform,
+)
 from butterfree.core.transform.transformations.sql_expression_transform import (
     SQLExpressionTransform,
 )
@@ -19,6 +22,7 @@ from butterfree.core.transform.transformations.transform_component import (
 __all__ = [
     "AggregatedTransform",
     "CustomTransform",
+    "SparkFunctionTransform",
     "SQLExpressionTransform",
     "StackTransform",
     "TransformComponent",
