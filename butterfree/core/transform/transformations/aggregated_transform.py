@@ -80,11 +80,9 @@ class AggregatedTransform(TransformComponent):
         +---+-------------------+---------------------------------------+
         |  1|2016-04-11 21:00:00|                                  350.0|
         +---+-------------------+---------------------------------------+
-
         It's important to notice that rolling_windows mode affects the
         dataframe granularity and, as it's possible to see, returns only
         columns related to its transformation.
-
     """
 
     SLIDE_DURATION = "1 day"
@@ -386,7 +384,6 @@ class AggregatedTransform(TransformComponent):
 
         Returns:
             Transformed dataframe.
-
         """
         df_list = []
         for aggregation in self._aggregations:
