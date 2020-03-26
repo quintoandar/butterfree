@@ -1,9 +1,7 @@
 import datetime
 import random
-from unittest.mock import Mock
 
 import pytest
-from pyspark.sql import DataFrame
 
 from butterfree.core.load.writers import HistoricalFeatureStoreWriter
 from butterfree.testing.dataframe import assert_dataframe_equality
@@ -109,14 +107,3 @@ class TestHistoricalFeatureStoreWriter:
         assert result_df.select("year", "month", "day").distinct().count() == len(
             set(random_dates)
         )
-
-    def test__repartition_df(self):
-        # arrange
-        writer = HistoricalFeatureStoreWriter(num_partitions=10)
-        dataframe = Mock(spec=DataFrame)
-
-        # act
-        writer._repartition_df(dataframe)
-
-        # assert
-        dataframe.repartition.assert_called_with(10, *writer.PARTITION_BY)
