@@ -92,13 +92,17 @@ class SparkFunctionTransform(TransformComponent):
         self._windows = windows
         return self
 
-    def _get_name_with_window(self, window, function):
-        if hasattr(function, "__name__"):
-            return "_".join(
-                [f"{self._parent.name}__{function.__name__}", window.get_name()]
-            )
+    def _get_output_name(self, function, window=None):
+        base_name = (
+            "__".join([self._parent.name, function.__name__])
+            if hasattr(function, "__name__")
+            else self._parent_name
+        )
 
-        return "__".join([self._parent.name, window.get_name()])
+        if self._windows:
+            return "_".join([base_name, window.get_name()])
+
+        return base_name
 
     @property
     def output_columns(self) -> List[str]:
@@ -107,11 +111,9 @@ class SparkFunctionTransform(TransformComponent):
         for function in self.functions:
             if self._windows:
                 for window in self._windows:
-                    output_columns.append(self._get_name_with_window(window, function))
-            elif hasattr(function, "__name__"):
-                output_columns.append("__".join([self._parent.name, function.__name__]))
+                    output_columns.append(self._get_output_name(function, window))
             else:
-                output_columns.append(self._parent.name)
+                output_columns.append(self._get_output_name(function))
 
         return output_columns
 
@@ -128,19 +130,14 @@ class SparkFunctionTransform(TransformComponent):
             if self._windows:
                 for window in self._windows:
                     dataframe = dataframe.withColumn(
-                        self._get_name_with_window(window, function),
+                        self._get_output_name(function, window),
                         function(self._parent.from_column or self._parent.name).over(
                             window.get()
                         ),
                     )
-            elif hasattr(function, "__name__"):
-                dataframe = dataframe.withColumn(
-                    "__".join([self._parent.name, function.__name__]),
-                    function(self._parent.from_column or self._parent.name),
-                )
             else:
                 dataframe = dataframe.withColumn(
-                    self._parent.name,
+                    self._get_output_name(function),
                     function(self._parent.from_column or self._parent.name),
                 )
 

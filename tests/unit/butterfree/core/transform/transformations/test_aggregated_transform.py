@@ -374,13 +374,13 @@ class TestAggregatedTransform:
         assert_dataframe_equality(df, expected_df)
 
     def test_feature_transform_output_fixed_windows_rows_agg(
-        self, feature_set_dataframe, target_df_rows_agg
+        self, feature_set_dataframe, target_df_rows_agg2
     ):
         test_feature = Feature(
             name="feature1",
             description="unit test",
             transformation=AggregatedTransform(
-                aggregations=["avg", "stddev_pop", "count"],
+                aggregations=["avg"],
                 partition="id",
                 windows=["2 events"],
                 mode=["row_windows"],
@@ -389,7 +389,7 @@ class TestAggregatedTransform:
 
         output_df = test_feature.transform(feature_set_dataframe)
 
-        assert_dataframe_equality(output_df, target_df_rows_agg)
+        assert_dataframe_equality(output_df, target_df_rows_agg2)
 
     def test_feature_transform_rolling_windows_mode(
         self, mode_dataframe, mode_str_target_dataframe
