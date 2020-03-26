@@ -5,6 +5,7 @@ from typing import List
 from pyspark.sql import DataFrame
 
 from butterfree.core.clients import SparkClient
+from butterfree.core.constants.numerical_constants import DEFAULT_NUM_PARTITIONS
 from butterfree.core.extract.readers.reader import Reader
 
 
@@ -49,9 +50,17 @@ class Source:
 
     """
 
-    def __init__(self, readers: List[Reader], query: str) -> None:
+    def __init__(
+        self,
+        readers: List[Reader],
+        query: str,
+        partition_by: List[str] = None,
+        num_partitions=None,
+    ) -> None:
         self.readers = readers
         self.query = query
+        self.partition_by = partition_by
+        self.num_partitions = num_partitions or DEFAULT_NUM_PARTITIONS
 
     def construct(self, client: SparkClient) -> DataFrame:
         """Construct an entry point dataframe for a feature set.
@@ -73,6 +82,11 @@ class Source:
             reader.build(client)  # create temporary views for each reader
 
         dataframe = client.sql(self.query)
+
+        if self.partition_by:
+            dataframe = dataframe.repartition(
+                self.num_partitions, *self.partition_by
+            ).sortWithinPartitions(*self.partition_by)
 
         if not dataframe.isStreaming:
             dataframe.cache().count()
