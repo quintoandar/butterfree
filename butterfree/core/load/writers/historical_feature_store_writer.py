@@ -12,6 +12,7 @@ from butterfree.core.constants import columns
 from butterfree.core.constants.numerical_constants import DEFAULT_NUM_PARTITIONS
 from butterfree.core.load.writers.writer import Writer
 from butterfree.core.transform import FeatureSet
+from butterfree.core.utils import repartition_df
 
 
 class HistoricalFeatureStoreWriter(Writer):
@@ -131,9 +132,6 @@ class HistoricalFeatureStoreWriter(Writer):
             f"\nNumber of rows in the dataframe: {dataframe_count}."
         )
 
-    def _repartition_df(self, dataframe):
-        return dataframe.repartition(self.num_partitions, *self.PARTITION_BY)
-
     def _create_partitions(self, dataframe):
         # create year partition column
         dataframe = dataframe.withColumn(
@@ -147,4 +145,4 @@ class HistoricalFeatureStoreWriter(Writer):
         dataframe = dataframe.withColumn(
             columns.PARTITION_DAY, dayofmonth(dataframe[columns.TIMESTAMP_COLUMN])
         )
-        return self._repartition_df(dataframe)
+        return repartition_df(dataframe, self.num_partitions, self.PARTITION_BY)
