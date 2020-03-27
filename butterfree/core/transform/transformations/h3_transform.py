@@ -7,6 +7,7 @@ from pyspark.sql import DataFrame
 from pyspark.sql.functions import lit, udf
 from pyspark.sql.types import StringType
 
+from butterfree.core.transform.transformations.stack_transform import StackTransform
 from butterfree.core.transform.transformations.transform_component import (
     TransformComponent,
 )
@@ -92,6 +93,7 @@ class H3HashTransform(TransformComponent):
         self.h3_resolutions = h3_resolutions
         self.lat_column = lat_column
         self.lng_column = lng_column
+        self.stack_transform = None
 
     @property
     def output_columns(self) -> List[str]:
@@ -99,6 +101,9 @@ class H3HashTransform(TransformComponent):
         output_columns = []
         for h3_resolution in self.h3_resolutions:
             output_columns.append(f"lat_lng__h3_hash__{h3_resolution}")
+
+        if self.stack_transform:
+            return self._parent.name + output_columns
 
         return output_columns
 
@@ -117,4 +122,11 @@ class H3HashTransform(TransformComponent):
                 f"lat_lng__h3_hash__{h3_resolution}",
                 define_h3(self.lat_column, self.lng_column, lit(h3_resolution)),
             )
+        if self.stack_transform:
+            self.stack_transform._parent = self._parent
+            return self.stack_transform.transform(dataframe)
         return dataframe
+
+    def with_stack(self):
+        self.stack_transform = StackTransform(*self.output_columns)
+        return self

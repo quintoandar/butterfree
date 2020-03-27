@@ -282,16 +282,44 @@ def target_df_fixed_agg(spark_context, spark_session):
 
 
 @fixture
-def h3_dataframe(spark_context, spark_session):
+def h3_input_df(spark_context, spark_session):
     data = [
-        {"id": 1, "feature": 200, "lat": -23.554190, "lng": -46.670723},
-        {"id": 1, "feature": 300, "lat": -23.554190, "lng": -46.670723},
-        {"id": 1, "feature": 400, "lat": -23.554190, "lng": -46.670723},
-        {"id": 1, "feature": 500, "lat": -23.554190, "lng": -46.670723},
+        {"lat": -23.554190, "lng": -46.670723},
     ]
-    df = spark_session.read.json(spark_context.parallelize(data, 1))
+    return spark_session.read.json(spark_context.parallelize(data, 1))
 
-    return df
+
+@fixture
+def h3_target_data():
+    return [
+        {
+            "lat": -23.554190,
+            "lng": -46.670723,
+            "lat_lng__h3_hash__6": "86a8100efffffff",
+            "lat_lng__h3_hash__7": "87a8100eaffffff",
+            "lat_lng__h3_hash__8": "88a8100ea1fffff",
+            "lat_lng__h3_hash__9": "89a8100ea0fffff",
+            "lat_lng__h3_hash__10": "8aa8100ea0d7fff",
+            "lat_lng__h3_hash__11": "8ba8100ea0d5fff",
+            "lat_lng__h3_hash__12": "8ca8100ea0d57ff",
+        },
+    ]
+
+
+@fixture
+def h3_target_df(h3_target_data, spark_context, spark_session):
+    return spark_session.read.json(spark_context.parallelize(h3_target_data, 1))
+
+
+@fixture()
+def h3_with_stack_target_df(h3_target_data, spark_context, spark_session):
+    resolutions = [f"lat_lng__h3_hash__{r}" for r in range(6, 13)]
+    h3_target_data_dict = h3_target_data.pop()
+    data_with_stack = [
+        {"id": h3_target_data_dict[resolution], **h3_target_data_dict}
+        for resolution in resolutions
+    ]
+    return spark_session.read.json(spark_context.parallelize(data_with_stack, 1))
 
 
 @fixture
