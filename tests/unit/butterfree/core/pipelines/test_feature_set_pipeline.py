@@ -3,6 +3,7 @@ from unittest.mock import Mock
 import pytest
 
 from butterfree.core.clients import SparkClient
+from butterfree.core.constants.data_type import DataType
 from butterfree.core.extract import Source
 from butterfree.core.extract.readers import FileReader, TableReader
 from butterfree.core.extract.readers.reader import Reader
@@ -52,6 +53,7 @@ class TestFeatureSetPipeline:
                     Feature(
                         name="listing_page_viewed__rent_per_month",
                         description="Average of something.",
+                        dtype=DataType.FLOAT,
                         transformation=AggregatedTransform(
                             aggregations=["avg", "stddev_pop"],
                             partition="user_id",
@@ -110,6 +112,7 @@ class TestFeatureSetPipeline:
                     Feature(
                         name="listing_page_viewed__rent_per_month",
                         description="Average of something.",
+                        dtype=DataType.FLOAT,
                         transformation=AggregatedTransform(
                             aggregations=["avg", "stddev_pop"],
                             partition="user_id",
@@ -162,6 +165,7 @@ class TestFeatureSetPipeline:
                         Feature(
                             name="listing_page_viewed__rent_per_month",
                             description="Average of something.",
+                            dtype=DataType.FLOAT,
                             transformation=AggregatedTransform(
                                 aggregations=["avg", "stddev_pop"],
                                 partition="user_id",
@@ -204,6 +208,7 @@ class TestFeatureSetPipeline:
                         Feature(
                             name="listing_page_viewed__rent_per_month",
                             description="Average of something.",
+                            dtype=DataType.FLOAT,
                             transformation=AggregatedTransform(
                                 aggregations=["avg", "stddev_pop"],
                                 partition="user_id",
@@ -238,8 +243,13 @@ class TestFeatureSetPipeline:
                         Feature(
                             name="user_id",
                             description="The user's Main ID or device ID",
+                            dtype=DataType.FLOAT,
                         ),
-                        Feature(name="ts", description="The timestamp feature",),
+                        Feature(
+                            name="ts",
+                            description="The timestamp feature",
+                            dtype=DataType.TIMESTAMP,
+                        ),
                     ],
                     key_columns=["user_id"],
                     timestamp_column="ts",
