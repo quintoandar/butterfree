@@ -20,7 +20,7 @@ class TestTimestampFeature:
 
         df = test_key.transform(feature_set_dataframe)
 
-        assert df.schema[TIMESTAMP_COLUMN].dataType == DataType.TIMESTAMP.value
+        assert df.schema[TIMESTAMP_COLUMN].dataType == DataType.TIMESTAMP.spark
 
     def test_transform_ms_from_column(self, feature_set_dataframe_ms_from_column):
 
