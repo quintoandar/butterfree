@@ -1,6 +1,7 @@
 import pytest
 from pyspark.sql import functions
 
+from butterfree.core.constants.data_type import DataType
 from butterfree.core.transform.features import Feature
 from butterfree.core.transform.transformations import SparkFunctionTransform
 from butterfree.testing.dataframe import assert_dataframe_equality
@@ -11,6 +12,7 @@ class TestSparkFunctionTransform:
         test_feature = Feature(
             name="feature",
             description="unit test",
+            dtype=DataType.DOUBLE,
             transformation=SparkFunctionTransform(functions=[functions.cos],),
             from_column="feature1",
         )
@@ -25,6 +27,7 @@ class TestSparkFunctionTransform:
         test_feature = Feature(
             name="feature1",
             description="unit test",
+            dtype=DataType.DOUBLE,
             transformation=SparkFunctionTransform(
                 functions=[functions.avg],
             ).with_window(
@@ -42,6 +45,7 @@ class TestSparkFunctionTransform:
         test_feature = Feature(
             name="feature1",
             description="unit test",
+            dtype=DataType.DOUBLE,
             transformation=SparkFunctionTransform(
                 functions=[functions.avg],
             ).with_window(
@@ -71,6 +75,7 @@ class TestSparkFunctionTransform:
             Feature(
                 name="feature1",
                 description="unit test",
+                dtype=DataType.DOUBLE,
                 transformation=SparkFunctionTransform(
                     functions=[functions.avg],
                 ).with_window(
@@ -85,6 +90,7 @@ class TestSparkFunctionTransform:
             Feature(
                 name="feature1",
                 description="unit test",
+                dtype=DataType.DOUBLE,
                 transformation=SparkFunctionTransform(
                     functions=[functions.avg],
                 ).with_window(
@@ -100,6 +106,7 @@ class TestSparkFunctionTransform:
         test_feature = Feature(
             name="feature1",
             description="unit test",
+            dtype=DataType.DOUBLE,
             transformation=SparkFunctionTransform(
                 functions=[functions.avg],
             ).with_window(
@@ -119,6 +126,7 @@ class TestSparkFunctionTransform:
         test_feature = Feature(
             name="feature1",
             description="unit test",
+            dtype=DataType.DOUBLE,
             transformation=SparkFunctionTransform(
                 functions=[functions.avg],
             ).with_window(

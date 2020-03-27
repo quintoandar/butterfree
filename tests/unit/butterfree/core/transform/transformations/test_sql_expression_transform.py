@@ -1,5 +1,6 @@
 import pytest
 
+from butterfree.core.constants.data_type import DataType
 from butterfree.core.transform.features import Feature
 from butterfree.core.transform.transformations import SQLExpressionTransform
 
@@ -9,6 +10,7 @@ class TestSQLExpressionTransform:
         test_feature = Feature(
             name="feature1_over_feature2",
             description="unit test",
+            dtype=DataType.FLOAT,
             transformation=SQLExpressionTransform(expression="feature1/feature2"),
         )
 
@@ -34,6 +36,7 @@ class TestSQLExpressionTransform:
         test_feature = Feature(
             name="feature1_over_feature2",
             description="unit test",
+            dtype=DataType.FLOAT,
             transformation=SQLExpressionTransform(expression="feature1/feature2"),
         )
 
@@ -45,6 +48,7 @@ class TestSQLExpressionTransform:
         test_feature = Feature(
             name="feature1_over_feature2",
             description="unit test",
+            dtype=DataType.FLOAT,
             transformation=SQLExpressionTransform(expression="feature1/feature2"),
         )
 
@@ -60,6 +64,7 @@ class TestSQLExpressionTransform:
             test_feature = Feature(
                 name="feature1_plus_a",
                 description="unit test",
+                dtype=DataType.FLOAT,
                 transformation=SQLExpressionTransform(expression="feature2 + a"),
             )
 

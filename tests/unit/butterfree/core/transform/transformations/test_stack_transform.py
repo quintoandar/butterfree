@@ -1,5 +1,6 @@
 import pytest
 
+from butterfree.core.constants.data_type import DataType
 from butterfree.core.transform.features import Feature, KeyFeature
 from butterfree.core.transform.transformations import StackTransform
 from butterfree.testing.dataframe import (
@@ -49,6 +50,7 @@ class TestSQLExpressionTransform:
         feature = Feature(
             name="id",
             description="stack transformation",
+            dtype=DataType.STRING,
             transformation=StackTransform("id_c", "id_d"),
         )
 

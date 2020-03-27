@@ -1,6 +1,7 @@
 from pyspark.sql import functions as F
 
 from butterfree.core.clients import SparkClient
+from butterfree.core.constants.data_type import DataType
 from butterfree.core.transform import FeatureSet
 from butterfree.core.transform.features import Feature, KeyFeature, TimestampFeature
 from butterfree.core.transform.transformations import (
@@ -33,6 +34,7 @@ class TestFeatureSet:
                 Feature(
                     name="feature1",
                     description="test",
+                    dtype=DataType.FLOAT,
                     transformation=AggregatedTransform(
                         aggregations=["avg", "stddev_pop"],
                         partition="id",
@@ -43,6 +45,7 @@ class TestFeatureSet:
                 Feature(
                     name="divided_feature",
                     description="unit test",
+                    dtype=DataType.FLOAT,
                     transformation=CustomTransform(
                         transformer=divide, column1="feature1", column2="feature2",
                     ),
@@ -88,6 +91,7 @@ class TestFeatureSet:
                 Feature(
                     name="feature1",
                     description="test",
+                    dtype=DataType.DOUBLE,
                     transformation=AggregatedTransform(
                         aggregations=["avg", "stddev_pop"],
                         partition="id",
@@ -108,6 +112,8 @@ class TestFeatureSet:
             .orderBy("timestamp")
             .collect()
         )
+
+        result_df = result_df
 
         # assert
         assert (
@@ -136,6 +142,7 @@ class TestFeatureSet:
                 Feature(
                     name="feature1",
                     description="test",
+                    dtype=DataType.DOUBLE,
                     transformation=AggregatedTransform(
                         aggregations=["avg", "stddev_pop"],
                         partition="id",

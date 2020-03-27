@@ -2,6 +2,7 @@ import pytest
 from pyspark.sql import functions as F
 
 from butterfree.core.constants.columns import TIMESTAMP_COLUMN
+from butterfree.core.constants.data_type import DataType
 from butterfree.core.transform.features import Feature
 from butterfree.core.transform.transformations import CustomTransform
 
@@ -18,6 +19,7 @@ class TestCustomTransform:
         test_feature = Feature(
             name="feature",
             description="unit test",
+            dtype=DataType.BIGINT,
             transformation=CustomTransform(
                 transformer=divide, column1="feature1", column2="feature2",
             ),
@@ -40,6 +42,7 @@ class TestCustomTransform:
         test_feature = Feature(
             name="feature",
             description="unit test",
+            dtype=DataType.BIGINT,
             transformation=CustomTransform(
                 transformer=divide, column1="feature1", column2="feature2",
             ),
@@ -54,6 +57,7 @@ class TestCustomTransform:
         test_feature = Feature(
             name="feature",
             description="unit test",
+            dtype=DataType.BIGINT,
             transformation=CustomTransform(
                 transformer=divide, column1="feature1", column2="feature2",
             ),
@@ -71,5 +75,6 @@ class TestCustomTransform:
             Feature(
                 name="feature",
                 description="unit test",
+                dtype=DataType.BIGINT,
                 transformation=CustomTransform(transformer=None),
             )
