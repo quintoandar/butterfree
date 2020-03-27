@@ -15,9 +15,7 @@ def feature_set_dataframe(spark_context, spark_session):
         {"id": 1, "timestamp": "2016-04-11 12:03:21", "feature1": 500, "feature2": 500},
     ]
     df = spark_session.read.json(spark_context.parallelize(data, 1))
-    df = df.withColumn(
-        TIMESTAMP_COLUMN, df.timestamp.cast(DataType.TIMESTAMP.spark_mapping)
-    )
+    df = df.withColumn(TIMESTAMP_COLUMN, df.timestamp.cast(DataType.TIMESTAMP.spark))
 
     return df
 
@@ -36,9 +34,7 @@ def most_common_dataframe(spark_context, spark_session):
         {"id": 1, "timestamp": "2016-04-11 12:56:21", "feature1": 300, "feature2": 500},
     ]
     df = spark_session.read.json(spark_context.parallelize(data, 1))
-    df = df.withColumn(
-        TIMESTAMP_COLUMN, df.timestamp.cast(DataType.TIMESTAMP.spark_mapping)
-    )
+    df = df.withColumn(TIMESTAMP_COLUMN, df.timestamp.cast(DataType.TIMESTAMP.spark))
 
     return df
 
@@ -120,9 +116,7 @@ def most_common_output_dataframe(spark_context, spark_session):
         },
     ]
     df = spark_session.read.json(spark_context.parallelize(data, 1))
-    df = df.withColumn(
-        TIMESTAMP_COLUMN, df.timestamp.cast(DataType.TIMESTAMP.spark_mapping)
-    )
+    df = df.withColumn(TIMESTAMP_COLUMN, df.timestamp.cast(DataType.TIMESTAMP.spark))
 
     return df
 
@@ -168,9 +162,7 @@ def target_df_rows_agg(spark_context, spark_session):
         },
     ]
     df = spark_session.read.json(spark_context.parallelize(data, 1))
-    df = df.withColumn(
-        TIMESTAMP_COLUMN, df.timestamp.cast(DataType.TIMESTAMP.spark_mapping)
-    )
+    df = df.withColumn(TIMESTAMP_COLUMN, df.timestamp.cast(DataType.TIMESTAMP.spark))
 
     return df
 
@@ -227,7 +219,7 @@ def with_house_ids_dataframe(spark_context, spark_session):
     df = spark_session.read.json(
         spark_context.parallelize(data).map(lambda x: json.dumps(x))
     )
-    df = df.withColumn(TIMESTAMP_COLUMN, df.ts.cast(DataType.TIMESTAMP.spark_mapping))
+    df = df.withColumn(TIMESTAMP_COLUMN, df.ts.cast(DataType.TIMESTAMP.spark))
 
     return df
 
@@ -245,9 +237,7 @@ def mode_dataframe(spark_context, spark_session):
         {"id": 1, "timestamp": "2016-04-12 12:03:21", "feature1": 300},
     ]
     df = spark_session.read.json(spark_context.parallelize(data, 1))
-    df = df.withColumn(
-        TIMESTAMP_COLUMN, df.timestamp.cast(DataType.TIMESTAMP.spark_mapping)
-    )
+    df = df.withColumn(TIMESTAMP_COLUMN, df.timestamp.cast(DataType.TIMESTAMP.spark))
 
     return df
 
@@ -267,9 +257,7 @@ def mode_str_target_dataframe(spark_context, spark_session):
         },
     ]
     df = spark_session.read.json(spark_context.parallelize(data, 1))
-    df = df.withColumn(
-        TIMESTAMP_COLUMN, df.timestamp.cast(DataType.TIMESTAMP.spark_mapping)
-    )
+    df = df.withColumn(TIMESTAMP_COLUMN, df.timestamp.cast(DataType.TIMESTAMP.spark))
 
     return df
 
@@ -289,8 +277,6 @@ def mode_num_target_dataframe(spark_context, spark_session):
         },
     ]
     df = spark_session.read.json(spark_context.parallelize(data, 1))
-    df = df.withColumn(
-        TIMESTAMP_COLUMN, df.timestamp.cast(DataType.TIMESTAMP.spark_mapping)
-    )
+    df = df.withColumn(TIMESTAMP_COLUMN, df.timestamp.cast(DataType.TIMESTAMP.spark))
 
     return df

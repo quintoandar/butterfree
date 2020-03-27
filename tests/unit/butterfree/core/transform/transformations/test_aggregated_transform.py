@@ -353,8 +353,7 @@ class TestAggregatedTransform:
             spark_context.parallelize(data).map(lambda x: json.dumps(x))
         )
         expected_df = expected_df.withColumn(
-            TIMESTAMP_COLUMN,
-            expected_df.timestamp.cast(DataType.TIMESTAMP.spark_mapping),
+            TIMESTAMP_COLUMN, expected_df.timestamp.cast(DataType.TIMESTAMP.spark),
         )
 
         # when
