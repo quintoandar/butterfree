@@ -13,6 +13,6 @@ def mocked_df(spark_context, spark_session):
         {"id": 1, "origin_ts": "2016-04-11 12:03:21", "feature1": 500, "feature2": 500},
     ]
     df = spark_session.read.json(spark_context.parallelize(data, 1))
-    df = df.withColumn(TIMESTAMP_COLUMN, df.origin_ts.cast(DataType.TIMESTAMP.value))
+    df = df.withColumn(TIMESTAMP_COLUMN, df.origin_ts.cast(DataType.TIMESTAMP.spark))
 
     return df
