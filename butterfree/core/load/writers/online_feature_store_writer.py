@@ -1,7 +1,7 @@
 """Holds the Online Feature Store writer class."""
 
 import os
-from typing import Any, List, Optional
+from typing import Any, Dict, List, Optional
 
 from pyspark.sql import DataFrame, Window
 from pyspark.sql.functions import col, row_number
@@ -12,6 +12,7 @@ from butterfree.core.configs.db import CassandraConfig
 from butterfree.core.constants.columns import TIMESTAMP_COLUMN
 from butterfree.core.load.writers.writer import Writer
 from butterfree.core.transform import FeatureSet
+from butterfree.core.transform.features import KeyFeature
 
 
 class OnlineFeatureStoreWriter(Writer):
@@ -157,3 +158,25 @@ class OnlineFeatureStoreWriter(Writer):
         # the data already written to the FS.
         # TODO how to run data validations when a database has concurrent writes.
         pass
+
+    @staticmethod
+    def get_feature_set_schema(feature_set: FeatureSet) -> List[Dict]:
+        """Get feature set schema.
+
+        Args:
+            feature_set: object processed with feature set metadata.
+
+        Returns:
+            List of dicts regarding feature set schema.
+
+        """
+        return [
+            {
+                "column_name": feature.name,
+                "type": feature.dtype.value,
+                "primary_key": True if isinstance(feature, KeyFeature) else False,
+            }
+            for feature in feature_set.features
+            + feature_set.keys
+            + [feature_set.timestamp]
+        ]
