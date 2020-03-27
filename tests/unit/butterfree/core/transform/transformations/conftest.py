@@ -21,6 +21,40 @@ def feature_set_dataframe(spark_context, spark_session):
 
 
 @fixture
+def feature_set_df_pivot(spark_context, spark_session):
+    data = [
+        {
+            "id": 1,
+            "timestamp": "2016-04-11 11:31:11",
+            "feature1": 200,
+            "pivot_col": "N",
+        },
+        {
+            "id": 1,
+            "timestamp": "2016-04-11 11:44:12",
+            "feature1": 300,
+            "pivot_col": "N",
+        },
+        {
+            "id": 1,
+            "timestamp": "2016-04-11 11:46:24",
+            "feature1": 400,
+            "pivot_col": "S",
+        },
+        {
+            "id": 1,
+            "timestamp": "2016-04-11 12:03:21",
+            "feature1": 500,
+            "pivot_col": "S",
+        },
+    ]
+    df = spark_session.read.json(spark_context.parallelize(data, 1))
+    df = df.withColumn(TIMESTAMP_COLUMN, df.timestamp.cast(DataType.TIMESTAMP.value))
+
+    return df
+
+
+@fixture
 def target_df_spark(spark_context, spark_session):
     data = [
         {
@@ -287,6 +321,48 @@ def target_df_fixed_agg(spark_context, spark_session):
     ]
     df = spark_session.read.json(spark_context.parallelize(data, 1))
     df = df.withColumn(TIMESTAMP_COLUMN, df.timestamp.cast(DataType.TIMESTAMP.spark))
+
+    return df
+
+
+@fixture
+def target_df_pivot_agg(spark_context, spark_session):
+    data = [
+        {
+            "id": 1,
+            "S__avg": 450,
+            "S__stddev_pop": 50,
+            "N__avg": 250,
+            "N__stddev_pop": 50,
+        },
+    ]
+    df = spark_session.read.json(spark_context.parallelize(data, 1))
+
+    return df
+
+
+@fixture
+def target_df_pivot_agg_window(spark_context, spark_session):
+    data = [
+        {
+            "id": 1,
+            "timestamp": "2016-04-12 00:00:00",
+            "S__avg_over_2_days_rolling_windows": 450,
+            "S__stddev_pop_over_2_days_rolling_windows": 50,
+            "N__avg_over_2_days_rolling_windows": 250,
+            "N__stddev_pop_over_2_days_rolling_windows": 50,
+        },
+        {
+            "id": 1,
+            "timestamp": "2016-04-13 00:00:00",
+            "S__avg_over_2_days_rolling_windows": 450,
+            "S__stddev_pop_over_2_days_rolling_windows": 50,
+            "N__avg_over_2_days_rolling_windows": 250,
+            "N__stddev_pop_over_2_days_rolling_windows": 50,
+        },
+    ]
+    df = spark_session.read.json(spark_context.parallelize(data, 1))
+    df = df.withColumn(TIMESTAMP_COLUMN, df.timestamp.cast(DataType.TIMESTAMP.value))
 
     return df
 
