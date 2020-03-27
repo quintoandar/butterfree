@@ -2,6 +2,7 @@ from unittest.mock import patch
 
 import pytest
 
+from butterfree.core.constants.data_type import DataType
 from butterfree.core.transform.features import Feature
 from butterfree.core.transform.transformations.h3_transform import H3HashTransform
 
@@ -11,6 +12,7 @@ class TestH3Transform:
         test_feature = Feature(
             name="new_feature",
             description="unit test",
+            dtype=DataType.STRING,
             transformation=H3HashTransform(
                 h3_resolutions=[6, 7, 8, 9, 10, 11, 12],
                 lat_column="lat",
@@ -46,6 +48,7 @@ class TestH3Transform:
         test_feature = Feature(
             name="new_feature",
             description="unit test",
+            dtype=DataType.STRING,
             transformation=H3HashTransform(
                 h3_resolutions=[6, 7, 8, 9, 10, 11, 12],
                 lat_column="lat",
@@ -77,6 +80,7 @@ class TestH3Transform:
         test_feature = Feature(
             name="new_feature",
             description="unit test",
+            dtype=DataType.STRING,
             transformation=H3HashTransform(
                 h3_resolutions=[6, 7, 8, 9, 10, 11, 12],
                 lat_column="lat",

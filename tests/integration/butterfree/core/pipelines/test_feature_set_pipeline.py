@@ -6,6 +6,7 @@ from pyspark.sql import functions as F
 
 from butterfree.core.configs import environment
 from butterfree.core.constants.columns import TIMESTAMP_COLUMN
+from butterfree.core.constants.data_type import DataType
 from butterfree.core.extract import Source
 from butterfree.core.extract.readers import TableReader
 from butterfree.core.load import Sink
@@ -80,6 +81,7 @@ class TestFeatureSetPipeline:
                     Feature(
                         name="feature1",
                         description="test",
+                        dtype=DataType.FLOAT,
                         transformation=AggregatedTransform(
                             aggregations=["avg", "stddev_pop"],
                             partition="id",
@@ -90,6 +92,7 @@ class TestFeatureSetPipeline:
                     Feature(
                         name="divided_feature",
                         description="unit test",
+                        dtype=DataType.FLOAT,
                         transformation=CustomTransform(
                             transformer=divide, column1="feature1", column2="feature2",
                         ),
