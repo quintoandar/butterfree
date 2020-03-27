@@ -3,7 +3,7 @@ from unittest.mock import patch
 import pytest
 
 from butterfree.core.transform.features import Feature, KeyFeature
-from butterfree.core.transform.transformations import H3HashTransform, StackTransform
+from butterfree.core.transform.transformations import H3HashTransform
 from butterfree.testing.dataframe import assert_dataframe_equality
 
 
