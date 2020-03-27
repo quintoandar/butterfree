@@ -7,6 +7,7 @@ from butterfree.core.constants.columns import TIMESTAMP_COLUMN
 from butterfree.core.constants.data_type import DataType
 from butterfree.core.transform import FeatureSet
 from butterfree.core.transform.features import Feature, KeyFeature, TimestampFeature
+from butterfree.core.transform.transformations import AggregatedTransform
 
 
 @fixture
@@ -127,3 +128,66 @@ def cassandra_config():
 @fixture(params=["feature_set_empty", "feature_set_without_ts", "feature_set_not_df"])
 def feature_sets(request):
     return request.getfixturevalue(request.param)
+
+
+@fixture
+def test_feature_set():
+    return FeatureSet(
+        name="feature_set",
+        entity="entity",
+        description="description",
+        features=[
+            Feature(
+                name="feature1",
+                description="test",
+                dtype=DataType.DOUBLE,
+                transformation=AggregatedTransform(
+                    aggregations=["avg", "stddev_pop"],
+                    partition="id",
+                    windows=["2 minutes", "15 minutes"],
+                    mode=["fixed_windows"],
+                ),
+            ),
+            Feature(
+                name="feature2",
+                description="test",
+                dtype=DataType.DOUBLE,
+                transformation=AggregatedTransform(
+                    aggregations=["count"],
+                    partition="id",
+                    windows=["2 days"],
+                    mode=["fixed_windows"],
+                ),
+            ),
+        ],
+        keys=[
+            KeyFeature(
+                name="id",
+                description="The user's Main ID or device ID",
+                dtype=DataType.BIGINT,
+            )
+        ],
+        timestamp=TimestampFeature(),
+    )
+
+
+@fixture
+def expected_schema():
+    return [
+        {
+            "column_name": "feature1",
+            "type": DataType.DOUBLE.value,
+            "primary_key": False,
+        },
+        {
+            "column_name": "feature2",
+            "type": DataType.DOUBLE.value,
+            "primary_key": False,
+        },
+        {"column_name": "id", "type": DataType.BIGINT.value, "primary_key": True},
+        {
+            "column_name": "timestamp",
+            "type": DataType.TIMESTAMP.value,
+            "primary_key": False,
+        },
+    ]
