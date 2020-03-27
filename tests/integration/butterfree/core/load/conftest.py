@@ -1,6 +1,7 @@
 from pytest import fixture
 
 from butterfree.core.constants import columns
+from butterfree.core.constants.data_type import DataType
 from butterfree.core.transform import FeatureSet
 from butterfree.core.transform.features import Feature, KeyFeature, TimestampFeature
 
@@ -49,7 +50,7 @@ def feature_set():
     key_features = [KeyFeature(name="id", description="Description")]
     ts_feature = TimestampFeature(from_column="timestamp")
     features = [
-        Feature(name="feature", description="Description"),
+        Feature(name="feature", description="Description", dtype=DataType.FLOAT),
     ]
     return FeatureSet(
         "test_sink_feature_set",
