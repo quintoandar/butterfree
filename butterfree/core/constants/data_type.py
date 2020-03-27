@@ -34,6 +34,6 @@ class DataType(Enum):
     ARRAY_STRING = (ArrayType(StringType()), "frozen<list<text>>")
     ARRAY_FLOAT = (ArrayType(FloatType()), "frozen<list<float>>")
 
-    def __init__(self, spark_mapping, cassandra_mapping):
-        self.spark_mapping = spark_mapping
-        self.cassandra_mapping = cassandra_mapping
+    def __init__(self, spark, cassandra):
+        self.spark_mapping = spark
+        self.cassandra_mapping = cassandra

@@ -271,15 +271,13 @@ class FeatureSet:
             [(start_date, end_date)], ("start_date", "end_date")
         ).select(
             [
-                F.col(c)
-                .cast(DataType.TIMESTAMP.spark_mapping)
-                .cast(DataType.BIGINT.spark_mapping)
+                F.col(c).cast(DataType.TIMESTAMP.spark).cast(DataType.BIGINT.spark)
                 for c in ("start_date", "end_date")
             ]
         )
         start_date, end_date = date_df.first()
         return client.conn.range(start_date, end_date + day_in_seconds, step).select(
-            F.col("id").cast(DataType.TIMESTAMP.spark_mapping).alias(TIMESTAMP_COLUMN)
+            F.col("id").cast(DataType.TIMESTAMP.spark).alias(TIMESTAMP_COLUMN)
         )
 
     def _get_unique_keys(self, output_df):

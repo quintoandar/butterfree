@@ -92,6 +92,6 @@ class Feature:
 
         if self.dtype:
             dataframe = dataframe.withColumn(
-                self.name, col(self.name).cast(self.dtype.spark_mapping)
+                self.name, col(self.name).cast(self.dtype.spark)
             )
         return dataframe
