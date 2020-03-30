@@ -10,12 +10,16 @@ class TestFeature:
     def test_args_without_transformation(self):
 
         test_feature = Feature(
-            name="feature", from_column="origin", description="unit test",
+            name="feature",
+            from_column="origin",
+            description="unit test",
+            dtype=DataType.BIGINT,
         )
 
         assert test_feature.name == "feature"
         assert test_feature.from_column == "origin"
         assert test_feature.description == "unit test"
+        assert test_feature.dtype == DataType.BIGINT
 
     def test_args_with_transformation(self):
 
@@ -23,17 +27,21 @@ class TestFeature:
             name="feature",
             from_column="origin",
             description="unit test",
+            dtype=DataType.BIGINT,
             transformation=Mock(),
         )
         assert test_feature.name == "feature"
         assert test_feature.from_column == "origin"
         assert test_feature.description == "unit test"
+        assert test_feature.dtype == DataType.BIGINT
         assert test_feature.transformation
 
     def test_feature_transform_no_from_column(self, feature_set_dataframe):
 
         test_feature = Feature(
-            name="feature", description="unit test feature without transformation",
+            name="feature",
+            description="unit test feature without transformation",
+            dtype=DataType.BIGINT,
         )
 
         df = test_feature.transform(feature_set_dataframe)
@@ -43,7 +51,10 @@ class TestFeature:
     def test_feature_transform_with_from_column(self, feature_set_dataframe):
 
         test_feature = Feature(
-            name="new_feature", from_column="feature", description="unit test",
+            name="new_feature",
+            from_column="feature",
+            description="unit test",
+            dtype=DataType.BIGINT,
         )
         df = test_feature.transform(feature_set_dataframe)
 
@@ -62,7 +73,10 @@ class TestFeature:
     ):
 
         test_feature = Feature(
-            name="feature", from_column="id", description="unit test",
+            name="feature",
+            from_column="id",
+            description="unit test",
+            dtype=DataType.BIGINT,
         )
 
         df = test_feature.transform(feature_set_dataframe)
@@ -81,7 +95,7 @@ class TestFeature:
     def test_feature_transform_with_dtype(self, feature_set_dataframe):
 
         test_feature = Feature(
-            name="feature", description="unit test", dtype=DataType.TIMESTAMP
+            name="feature", description="unit test", dtype=DataType.TIMESTAMP,
         )
         df = test_feature.transform(feature_set_dataframe)
 
@@ -94,7 +108,10 @@ class TestFeature:
         some_transformation.transform.return_value = feature_set_dataframe
 
         test_feature = Feature(
-            name="feature", description="unit test", transformation=some_transformation,
+            name="feature",
+            description="unit test",
+            transformation=some_transformation,
+            dtype=DataType.BIGINT,
         )
 
         df = test_feature.transform(feature_set_dataframe)
@@ -119,6 +136,7 @@ class TestFeature:
             from_column="origin",
             description="unit test",
             transformation=some_transformation,
+            dtype=DataType.BIGINT,
         )
 
         df = test_feature.transform(feature_set_dataframe)
@@ -135,7 +153,10 @@ class TestFeature:
     def test_feature_get_output_columns_without_transformations(self):
 
         test_feature = Feature(
-            name="feature", from_column="origin", description="unit test",
+            name="feature",
+            from_column="origin",
+            description="unit test",
+            dtype=DataType.BIGINT,
         )
 
         assert test_feature.get_output_columns() == [test_feature.name]
@@ -152,6 +173,7 @@ class TestFeature:
             from_column="origin",
             description="unit test",
             transformation=some_transformation,
+            dtype=DataType.BIGINT,
         )
 
         assert test_feature.get_output_columns() == feature_set_dataframe.columns
