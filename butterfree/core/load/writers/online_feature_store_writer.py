@@ -115,16 +115,17 @@ class OnlineFeatureStoreWriter(Writer):
                 if self.db_config.stream_checkpoint_path
                 else None
             )
-            streaming_handler = spark_client.write_stream(
-                dataframe,
-                processing_time=self.db_config.stream_processing_time,
-                output_mode=self.db_config.stream_output_mode,
-                checkpoint_path=checkpoint_path,
-                format_=self.db_config.format_,
-                mode=self.db_config.mode,
-                **self.db_config.get_options(table=feature_set.name),
-            )
-            return streaming_handler
+            for table in [feature_set.name, feature_set.entity]:
+                streaming_handler = spark_client.write_stream(
+                    dataframe,
+                    processing_time=self.db_config.stream_processing_time,
+                    output_mode=self.db_config.stream_output_mode,
+                    checkpoint_path=checkpoint_path,
+                    format_=self.db_config.format_,
+                    mode=self.db_config.mode,
+                    **self.db_config.get_options(table=table),
+                )
+                return streaming_handler
 
         dataframe = self.filter_latest(
             dataframe=dataframe, id_columns=feature_set.keys_columns
