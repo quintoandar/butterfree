@@ -82,13 +82,14 @@ class AggregatedFeatureSet(FeatureSet):
                 "You need to use Feature Set."
             )
 
-        if not self._has_aggregated_transform_with_window_only(value):
-            if not self._has_aggregated_transform_without_window_only(value):
-                raise ValueError(
-                    "You can only define aggregate transformations with "
-                    "or without windows, so you cannot "
-                    "define with both types."
-                )
+        if not self._has_aggregated_transform_with_window_only(
+            value
+        ) and not self._has_aggregated_transform_without_window_only(value):
+            raise ValueError(
+                "You can only define aggregate transformations with "
+                "or without windows, so you cannot "
+                "define with both types."
+            )
 
         self.__features = value
 
