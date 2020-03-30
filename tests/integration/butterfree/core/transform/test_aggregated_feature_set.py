@@ -4,6 +4,7 @@ from butterfree.core.clients import SparkClient
 from butterfree.core.transform.aggregated_feature_set import AggregatedFeatureSet
 from butterfree.core.transform.features import Feature, KeyFeature, TimestampFeature
 from butterfree.core.transform.transformations import AggregatedTransform
+from butterfree.testing.dataframe import assert_dataframe_equality
 
 
 def divide(df, fs, column1, column2):
@@ -13,7 +14,7 @@ def divide(df, fs, column1, column2):
 
 
 class TestAggregatedFeatureSet:
-    def test_construct_rolling_windows_with_base_date(
+    def test_construct_rolling_windows_with_end_date(
         self,
         feature_set_dataframe,
         rolling_windows_output_feature_set_dataframe_base_date,
@@ -39,12 +40,12 @@ class TestAggregatedFeatureSet:
                     ).with_window(window_definition=["1 day"],),
                 ),
                 Feature(
-                    name="feature1",
+                    name="feature2",
                     description="test",
                     transformation=AggregatedTransform(
                         functions=["avg", "stddev_pop"],
                         group_by="id",
-                        column="feature1",
+                        column="feature2",
                     ).with_window(window_definition=["1 week"],),
                 ),
             ],
@@ -53,25 +54,18 @@ class TestAggregatedFeatureSet:
         )
 
         # act
-        result_df = (
-            feature_set.construct(
-                feature_set_dataframe, client=spark_client, base_date="2016-04-18"
-            )
-            .orderBy("timestamp")
-            .collect()
-        )
+        output_df = feature_set.construct(
+            feature_set_dataframe, client=spark_client, end_date="2016-04-18"
+        ).orderBy("timestamp")
+
+        target_df = rolling_windows_output_feature_set_dataframe_base_date.orderBy(
+            feature_set.timestamp_column
+        ).select(feature_set.columns)
 
         # assert
-        assert (
-            result_df
-            == rolling_windows_output_feature_set_dataframe_base_date.orderBy(
-                feature_set.timestamp_column
-            )
-            .select(feature_set.columns)
-            .collect()
-        )
+        assert_dataframe_equality(output_df, target_df)
 
-    def test_construct_rolling_windows_without_base_date(
+    def test_construct_rolling_windows_without_end_date(
         self, feature_set_dataframe, rolling_windows_output_feature_set_dataframe
     ):
         # given
@@ -100,18 +94,13 @@ class TestAggregatedFeatureSet:
         )
 
         # act
-        result_df = (
-            feature_set.construct(feature_set_dataframe, client=spark_client)
-            .orderBy("timestamp")
-            .collect()
-        )
+        output_df = feature_set.construct(
+            feature_set_dataframe, client=spark_client
+        ).orderBy("timestamp")
+
+        target_df = rolling_windows_output_feature_set_dataframe.orderBy(
+            feature_set.timestamp_column
+        ).select(feature_set.columns)
 
         # assert
-        assert (
-            result_df
-            == rolling_windows_output_feature_set_dataframe.orderBy(
-                feature_set.timestamp_column
-            )
-            .select(feature_set.columns)
-            .collect()
-        )
+        assert_dataframe_equality(output_df, target_df)

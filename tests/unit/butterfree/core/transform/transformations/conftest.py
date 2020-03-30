@@ -59,6 +59,16 @@ def target_df_spark(spark_context, spark_session):
 
 
 @fixture
+def target_df_agg(spark_context, spark_session):
+    data = [
+        {"id": 1, "feature1__avg": 350, "feature1__stddev_pop": 111.80339887498948},
+    ]
+    df = spark_session.read.json(spark_context.parallelize(data, 1))
+
+    return df
+
+
+@fixture
 def most_common_dataframe(spark_context, spark_session):
     data = [
         {"id": 1, "timestamp": "2016-04-11 11:31:11", "feature1": 200, "feature2": 200},
@@ -276,6 +286,89 @@ def target_df_fixed_agg(spark_context, spark_session):
         },
     ]
     df = spark_session.read.json(spark_context.parallelize(data, 1))
+    df = df.withColumn(TIMESTAMP_COLUMN, df.timestamp.cast(DataType.TIMESTAMP.spark))
+
+    return df
+
+
+@fixture
+def target_df_rolling_agg(spark_context, spark_session):
+    data = [
+        {
+            "id": 1,
+            "timestamp": "2016-04-12",
+            "feature1__avg_over_1_day_rolling_windows": 350,
+            "feature1__avg_over_1_week_rolling_windows": 350,
+            "feature1__stddev_pop_over_1_day_rolling_windows": 111.80339887498948,
+            "feature1__stddev_pop_over_1_week_rolling_windows": 111.80339887498948,
+            "feature1__count_over_1_day_rolling_windows": 4,
+            "feature1__count_over_1_week_rolling_windows": 4,
+        },
+        {
+            "id": 1,
+            "timestamp": "2016-04-13",
+            "feature1__avg_over_1_day_rolling_windows": None,
+            "feature1__avg_over_1_week_rolling_windows": 350,
+            "feature1__stddev_pop_over_1_day_rolling_windows": None,
+            "feature1__stddev_pop_over_1_week_rolling_windows": 111.80339887498948,
+            "feature1__count_over_1_day_rolling_windows": None,
+            "feature1__count_over_1_week_rolling_windows": 4,
+        },
+        {
+            "id": 1,
+            "timestamp": "2016-04-14",
+            "feature1__avg_over_1_day_rolling_windows": None,
+            "feature1__avg_over_1_week_rolling_windows": 350,
+            "feature1__stddev_pop_over_1_day_rolling_windows": None,
+            "feature1__stddev_pop_over_1_week_rolling_windows": 111.80339887498948,
+            "feature1__count_over_1_day_rolling_windows": None,
+            "feature1__count_over_1_week_rolling_windows": 4,
+        },
+        {
+            "id": 1,
+            "timestamp": "2016-04-15",
+            "feature1__avg_over_1_day_rolling_windows": None,
+            "feature1__avg_over_1_week_rolling_windows": 350,
+            "feature1__stddev_pop_over_1_day_rolling_windows": None,
+            "feature1__stddev_pop_over_1_week_rolling_windows": 111.80339887498948,
+            "feature1__count_over_1_day_rolling_windows": None,
+            "feature1__count_over_1_week_rolling_windows": 4,
+        },
+        {
+            "id": 1,
+            "timestamp": "2016-04-16",
+            "feature1__avg_over_1_day_rolling_windows": None,
+            "feature1__avg_over_1_week_rolling_windows": 350,
+            "feature1__stddev_pop_over_1_day_rolling_windows": None,
+            "feature1__stddev_pop_over_1_week_rolling_windows": 111.80339887498948,
+            "feature1__count_over_1_day_rolling_windows": None,
+            "feature1__count_over_1_week_rolling_windows": 4,
+        },
+        {
+            "id": 1,
+            "timestamp": "2016-04-17",
+            "feature1__avg_over_1_day_rolling_windows": None,
+            "feature1__avg_over_1_week_rolling_windows": 350,
+            "feature1__stddev_pop_over_1_day_rolling_windows": None,
+            "feature1__stddev_pop_over_1_week_rolling_windows": 111.80339887498948,
+            "feature1__count_over_1_day_rolling_windows": None,
+            "feature1__count_over_1_week_rolling_windows": 4,
+        },
+        {
+            "id": 1,
+            "timestamp": "2016-04-18",
+            "feature1__avg_over_1_day_rolling_windows": None,
+            "feature1__avg_over_1_week_rolling_windows": 350,
+            "feature1__stddev_pop_over_1_day_rolling_windows": None,
+            "feature1__stddev_pop_over_1_week_rolling_windows": 111.80339887498948,
+            "feature1__count_over_1_day_rolling_windows": None,
+            "feature1__count_over_1_week_rolling_windows": 4,
+        },
+    ]
+    df = spark_session.read.json(
+        spark_context.parallelize(data).map(lambda x: json.dumps(x))
+    )
+    df = df.withColumn(TIMESTAMP_COLUMN, df.timestamp.cast(DataType.TIMESTAMP.value))
     df = df.withColumn(TIMESTAMP_COLUMN, df.timestamp.cast(DataType.TIMESTAMP.spark))
 
     return df

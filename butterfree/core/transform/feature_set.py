@@ -38,7 +38,7 @@ class FeatureSet:
     ...     TimestampFeature,
     ...)
     >>> from butterfree.core.transform.transformations import (
-    ...     AggregatedTransform,
+    ...     SparkFunctionTransform,
     ...     CustomTransform,
     ... )
     >>> import pyspark.sql.functions as F
@@ -56,11 +56,14 @@ class FeatureSet:
     ...        Feature(
     ...            name="feature1",
     ...            description="test",
-    ...            transformation=AggregatedTransform(
-    ...                aggregations=["avg", "std"],
-    ...                partition="id",
-    ...                windows=["2 minutes", "15 minutes"],
-    ...            ),
+    ...            transformation=SparkFunctionTransform(
+    ...                 functions=[F.avg, F.stddev_pop]
+    ...             ).with_window(
+    ...                 partition_by="id",
+    ...                 order_by=TIMESTAMP_COLUMN,
+    ...                 mode="fixed_windows",
+    ...                 window_definition=["2 minutes", "15 minutes"],
+    ...             ),
     ...        ),
     ...        Feature(
     ...            name="divided_feature",

@@ -19,7 +19,42 @@ class AggregatedFeatureSet(FeatureSet):
     This class overrides some methods of the ancestor FeatureSet class
     and has specific methods for aggregations.
 
-    The AggregatedTransform can only be used on AggregatedFeatureSets and vice-versa.
+    The AggregatedTransform can only be used on AggregatedFeatureSets.
+
+    Example:
+        This an example regarding the aggregated feature set definition. All features
+        and its transformations are defined.
+    >>> from butterfree.core.transform.aggregated_feature_set import (
+    ...       AggregatedFeatureSet
+    ... )
+    >>> from butterfree.core.transform.features import (
+    ...     Feature,
+    ...     KeyFeature,
+    ...     TimestampFeature,
+    ...)
+    >>> from butterfree.core.transform.transformations import (
+    ...     AggregatedTransform,
+    ... )
+    >>> feature_set = AggregatedFeatureSet(
+    ...    name="aggregated feature_set",
+    ...    entity="entity",
+    ...    description="description",
+    ...    features=[
+    ...        Feature(
+    ...            name="feature1",
+    ...            description="test",
+    ...            transformation=AggregatedTransform(
+    ...                 functions=["avg", "stddev_pop"],
+    ...                 group_by="id",
+    ...                 column="feature1",
+    ...             ).with_window(window_definition=["1 day"],),
+    ...        ),
+    ...    ],
+    ...    keys=[KeyFeature(name="id", description="The user's Main ID or device ID")],
+    ...    timestamp=TimestampFeature(),
+    ...)
+
+    >>> feature_set.construct(dataframe=dataframe)
 
     The construct method will execute the feature set, computing all the
     defined aggregated transformations.
@@ -47,25 +82,59 @@ class AggregatedFeatureSet(FeatureSet):
                 "You need to use Feature Set."
             )
 
+        if not self._has_aggregated_transform_with_window_only(value):
+            if not self._has_aggregated_transform_without_window_only(value):
+                raise ValueError(
+                    "You can only define aggregate transformations with "
+                    "or without windows, so you cannot "
+                    "define with both types."
+                )
+
         self.__features = value
 
     @staticmethod
     def _has_aggregated_transform_only(features):
-        """Aggregated Transform mode check.
+        """Aggregated Transform check.
 
-        Checks if there's a rolling window mode within the scope of the
-        AggregatedTransform.
+        Checks if all transformations are AggregatedTransform within the scope of the
+        AggregatedFeatureSet.
 
         Returns:
-            True if there's a rolling window aggregation mode.
+            True if there's a aggregation transform.
 
         """
-        return any(
+        return all(
             [
                 isinstance(feature.transformation, AggregatedTransform)
                 for feature in features
             ]
         )
+
+    @staticmethod
+    def _has_aggregated_transform_with_window_only(features):
+        """Aggregated Transform window check.
+
+        Checks if there's a window within the scope of the
+        all AggregatedTransform.
+
+        Returns:
+            True if there's a window in all features.
+
+        """
+        return all([feature.transformation.has_windows for feature in features])
+
+    @staticmethod
+    def _has_aggregated_transform_without_window_only(features):
+        """Aggregated Transform without window check.
+
+        Checks if there isn't a window within the scope of the
+        all AggregatedTransform.
+
+        Returns:
+            True if there isn't a window in all features.
+
+        """
+        return all([not feature.transformation.has_windows for feature in features])
 
     @staticmethod
     def _generate_date_sequence_df(client: SparkClient, date_range, step=None):
@@ -138,9 +207,7 @@ class AggregatedFeatureSet(FeatureSet):
         self._set_cross_join_confs(client, False)
         return cross_join_df
 
-    def _rolling_window_joins(
-        self, dataframe, output_df, client: SparkClient, end_date
-    ):
+    def _create_date_range_dataframe(self, client: SparkClient, dataframe, end_date):
         """Performs a join between dataframes.
 
         Performs a join between the transformed dataframe and the date
@@ -160,20 +227,16 @@ class AggregatedFeatureSet(FeatureSet):
             end_date if isinstance(end_date, str) else end_date.strftime("%Y-%m-%d"),
         ]
         date_df = self._generate_date_sequence_df(client, date_range)
-        unique_df = self._get_unique_keys(output_df)
+        unique_df = self._get_unique_keys(dataframe)
         cross_join_df = self._cross_join_df(client, date_df, unique_df)
-        output_df = cross_join_df.join(
-            output_df, on=self.keys_columns + [self.timestamp_column], how="left"
-        )
-        return output_df
 
-    def _dataframe_join(self, df_base, df):
-        return df_base.join(
-            df, on=self.keys_columns + [self.timestamp_column], how="full_outer"
-        )
+        return cross_join_df
+
+    def _dataframe_join(self, left, right, on, how):
+        return left.join(right, on=on, how=how)
 
     def construct(
-        self, dataframe: DataFrame, client: SparkClient, base_date: str = None
+        self, dataframe: DataFrame, client: SparkClient, end_date: str = None
     ) -> DataFrame:
         """Use all the features to build the feature set dataframe.
 
@@ -194,21 +257,45 @@ class AggregatedFeatureSet(FeatureSet):
         if not isinstance(dataframe, DataFrame):
             raise ValueError("source_df must be a dataframe")
 
-        for feature in self.keys + [self.timestamp] + self.features:
-            feature_df = feature.transform(dataframe)
-            if feature.transformation:
-                if feature.transformation.with_window:
-                    df_list.append(
-                        self._rolling_window_joins(
-                            dataframe, feature_df, client, base_date
-                        )
-                    )
-                else:
-                    df_list.append(feature_df)
-            else:
-                df_list.append(feature_df)
+        output_df = reduce(
+            lambda df, feature: feature.transform(df),
+            self.keys + [self.timestamp],
+            dataframe,
+        )
 
-        output_df = reduce(self._dataframe_join, df_list).select(*self.columns)
+        for feature in self.features:
+            feature_df = feature.transform(output_df)
+            df_list.append(feature_df)
+
+        if self._has_aggregated_transform_with_window_only(self.features):
+            range_df = self._create_date_range_dataframe(client, output_df, end_date)
+            output_df = reduce(
+                lambda left, right: self._dataframe_join(
+                    left,
+                    right,
+                    on=self.keys_columns + [self.timestamp_column],
+                    how="left",
+                ),
+                df_list,
+                range_df,
+            )
+
+        elif self._has_aggregated_transform_without_window_only(self.features):
+            if len(df_list) > 1:
+                output_df = reduce(
+                    lambda left, right: self._dataframe_join(
+                        left,
+                        right,
+                        on=self.features[0].transformation.group_by,
+                        how="full_outer",
+                    ),
+                    df_list[0],
+                    df_list,
+                )
+            else:
+                output_df = df_list[0]
+
+        output_df = output_df.select(*self.columns)
 
         if not output_df.isStreaming:
             output_df = self._filter_duplicated_rows(output_df)

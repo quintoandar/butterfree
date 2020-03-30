@@ -7,6 +7,7 @@ from butterfree.core.transform.transformations import (
     CustomTransform,
     SparkFunctionTransform,
 )
+from butterfree.testing.dataframe import assert_dataframe_equality
 
 
 def divide(df, fs, column1, column2):
@@ -56,19 +57,15 @@ class TestFeatureSet:
             timestamp=TimestampFeature(),
         )
 
-        result_df = (
+        output_df = (
             feature_set.construct(feature_set_dataframe, client=spark_client)
             .orderBy(feature_set.timestamp_column)
             .select(feature_set.columns)
-            .collect()
         )
 
+        target_df = fixed_windows_output_feature_set_dataframe.orderBy(
+            feature_set.timestamp_column
+        ).select(feature_set.columns)
+
         # assert
-        assert (
-            result_df
-            == fixed_windows_output_feature_set_dataframe.orderBy(
-                feature_set.timestamp_column
-            )
-            .select(feature_set.columns)
-            .collect()
-        )
+        assert_dataframe_equality(output_df, target_df)

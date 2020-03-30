@@ -9,6 +9,7 @@ from butterfree.core.constants.columns import TIMESTAMP_COLUMN
 from butterfree.core.transform.transformations.transform_component import (
     TransformComponent,
 )
+from butterfree.core.transform.transformations.user_defined_functions import mode
 from butterfree.core.transform.utils import Window
 
 
@@ -77,7 +78,9 @@ class AggregatedTransform(TransformComponent):
         columns related to its transformation.
     """
 
-    def __init__(self, group_by, functions: non_blank(List[str]), column):
+    def __init__(
+        self, group_by, functions: non_blank(List[str]), column: non_blank(str)
+    ):
         super(AggregatedTransform, self).__init__()
         self.group_by = group_by
         self.functions = functions
@@ -95,6 +98,7 @@ class AggregatedTransform(TransformComponent):
         "last": functions.first,
         "max": functions.max,
         "min": functions.min,
+        "mode": mode,
         "skewness": functions.skewness,
         "stddev": functions.stddev,
         "stddev_pop": functions.stddev_pop,
@@ -103,6 +107,19 @@ class AggregatedTransform(TransformComponent):
         "variance": functions.variance,
         "var_pop": functions.var_pop,
     }
+
+    @property
+    def has_windows(self):
+        """Aggregated Transform window check.
+
+        Checks the number of windows within the scope of the
+        all AggregatedTransform.
+
+        Returns:
+            True if the number of windows is greater than zero in all.
+
+        """
+        return len(self._windows) > 0
 
     @property
     def functions(self) -> List[str]:
