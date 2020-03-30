@@ -29,6 +29,9 @@ def fixed_windows_output_feature_set_dataframe(spark_context, spark_session):
             "feature1__stddev_pop_over_2_minutes_fixed_windows": 0,
             "feature1__stddev_pop_over_15_minutes_fixed_windows": 0,
             "divided_feature": 1,
+            "year": 2016,
+            "month": 4,
+            "day": 11,
         },
         {
             "id": 1,
@@ -38,6 +41,9 @@ def fixed_windows_output_feature_set_dataframe(spark_context, spark_session):
             "feature1__stddev_pop_over_2_minutes_fixed_windows": 0,
             "feature1__stddev_pop_over_15_minutes_fixed_windows": 50,
             "divided_feature": 1,
+            "year": 2016,
+            "month": 4,
+            "day": 11,
         },
         {
             "id": 1,
@@ -47,6 +53,9 @@ def fixed_windows_output_feature_set_dataframe(spark_context, spark_session):
             "feature1__stddev_pop_over_2_minutes_fixed_windows": 0,
             "feature1__stddev_pop_over_15_minutes_fixed_windows": 50,
             "divided_feature": 1,
+            "year": 2016,
+            "month": 4,
+            "day": 11,
         },
         {
             "id": 1,
@@ -56,6 +65,9 @@ def fixed_windows_output_feature_set_dataframe(spark_context, spark_session):
             "feature1__stddev_pop_over_2_minutes_fixed_windows": 0,
             "feature1__stddev_pop_over_15_minutes_fixed_windows": 0,
             "divided_feature": 1,
+            "year": 2016,
+            "month": 4,
+            "day": 11,
         },
     ]
     df = spark_session.read.json(spark_context.parallelize(data, 1))
