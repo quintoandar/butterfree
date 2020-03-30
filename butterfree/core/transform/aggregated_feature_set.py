@@ -53,6 +53,7 @@ class AggregatedFeatureSet(FeatureSet):
     ...    keys=[KeyFeature(name="id", description="The user's Main ID or device ID")],
     ...    timestamp=TimestampFeature(),
     ...)
+
     >>> feature_set.construct(dataframe=dataframe)
 
     The construct method will execute the feature set, computing all the
