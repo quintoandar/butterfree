@@ -157,14 +157,14 @@ class AggregatedFeatureSet(FeatureSet):
         ).select(
             [
                 functions.col(c)
-                .cast(DataType.TIMESTAMP.value)
-                .cast(DataType.BIGINT.value)
+                .cast(DataType.TIMESTAMP.spark)
+                .cast(DataType.BIGINT.spark)
                 for c in ("start_date", "end_date")
             ]
         )
         start_date, end_date = date_df.first()
         return client.conn.range(start_date, end_date + day_in_seconds, step).select(
-            functions.col("id").cast(DataType.TIMESTAMP.value).alias(TIMESTAMP_COLUMN)
+            functions.col("id").cast(DataType.TIMESTAMP.spark).alias(TIMESTAMP_COLUMN)
         )
 
     def _get_unique_keys(self, output_df):

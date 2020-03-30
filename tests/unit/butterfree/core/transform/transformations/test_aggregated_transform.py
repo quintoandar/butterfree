@@ -1,6 +1,6 @@
 import pytest
 
-from butterfree.core.constants.columns import TIMESTAMP_COLUMN
+from butterfree.core.constants.data_type import DataType
 from butterfree.core.transform.features import Feature
 from butterfree.core.transform.transformations import AggregatedTransform
 from butterfree.testing.dataframe import assert_dataframe_equality

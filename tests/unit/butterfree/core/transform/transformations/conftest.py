@@ -368,7 +368,6 @@ def target_df_rolling_agg(spark_context, spark_session):
     df = spark_session.read.json(
         spark_context.parallelize(data).map(lambda x: json.dumps(x))
     )
-    df = df.withColumn(TIMESTAMP_COLUMN, df.timestamp.cast(DataType.TIMESTAMP.value))
     df = df.withColumn(TIMESTAMP_COLUMN, df.timestamp.cast(DataType.TIMESTAMP.spark))
 
     return df

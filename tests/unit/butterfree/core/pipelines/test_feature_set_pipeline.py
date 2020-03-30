@@ -5,6 +5,7 @@ from pyspark.sql import functions
 
 from butterfree.core.clients import SparkClient
 from butterfree.core.constants.columns import TIMESTAMP_COLUMN
+from butterfree.core.constants.data_type import DataType
 from butterfree.core.extract import Source
 from butterfree.core.extract.readers import FileReader, TableReader
 from butterfree.core.extract.readers.reader import Reader

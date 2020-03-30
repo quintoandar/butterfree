@@ -1,6 +1,7 @@
 from pyspark.sql import functions as F
 
 from butterfree.core.clients import SparkClient
+from butterfree.core.constants.data_type import DataType
 from butterfree.core.transform.aggregated_feature_set import AggregatedFeatureSet
 from butterfree.core.transform.features import Feature, KeyFeature, TimestampFeature
 from butterfree.core.transform.transformations import AggregatedTransform
@@ -33,6 +34,7 @@ class TestAggregatedFeatureSet:
                 Feature(
                     name="feature1",
                     description="test",
+                    dtype=DataType.FLOAT,
                     transformation=AggregatedTransform(
                         functions=["avg", "stddev_pop"],
                         group_by="id",
@@ -42,6 +44,7 @@ class TestAggregatedFeatureSet:
                 Feature(
                     name="feature2",
                     description="test",
+                    dtype=DataType.FLOAT,
                     transformation=AggregatedTransform(
                         functions=["avg", "stddev_pop"],
                         group_by="id",
@@ -82,6 +85,7 @@ class TestAggregatedFeatureSet:
                 Feature(
                     name="feature1",
                     description="test",
+                    dtype=DataType.FLOAT,
                     transformation=AggregatedTransform(
                         functions=["avg", "stddev_pop"],
                         group_by="id",

@@ -323,6 +323,7 @@ class TestFeatureSet:
                     Feature(
                         name="feature1",
                         description="test",
+                        dtype=DataType.FLOAT,
                         transformation=AggregatedTransform(
                             functions=["avg"], group_by="id", column="feature1",
                         ).with_window(window_definition=["1 week"],),

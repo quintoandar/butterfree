@@ -6,6 +6,7 @@ from pyspark.sql import functions as F
 
 from butterfree.core.configs import environment
 from butterfree.core.constants.columns import TIMESTAMP_COLUMN
+from butterfree.core.constants.data_type import DataType
 from butterfree.core.extract import Source
 from butterfree.core.extract.readers import TableReader
 from butterfree.core.load import Sink
@@ -17,6 +18,7 @@ from butterfree.core.transform.transformations import (
     CustomTransform,
     SparkFunctionTransform,
 )
+from butterfree.testing.dataframe import assert_dataframe_equality
 
 
 def create_temp_view(dataframe: DataFrame, name):
@@ -39,7 +41,9 @@ def divide(df, fs, column1, column2):
 
 
 class TestFeatureSetPipeline:
-    def test_feature_set_pipeline(self, mocked_df, spark_session):
+    def test_feature_set_pipeline(
+        self, mocked_df, spark_session, fixed_windows_output_feature_set_dataframe
+    ):
         # arrange
         table_reader_id = "a_source"
         table_reader_table = "table"
@@ -112,26 +116,8 @@ class TestFeatureSetPipeline:
         path = dbconfig.get_options("historical/entity/feature_set").get("path")
         df = spark_session.read.parquet(path).orderBy(TIMESTAMP_COLUMN).collect()
 
-        assert df[0]["feature1__avg_over_2_minutes_fixed_windows"] == 200
-        assert df[1]["feature1__avg_over_2_minutes_fixed_windows"] == 300
-        assert df[2]["feature1__avg_over_2_minutes_fixed_windows"] == 400
-        assert df[3]["feature1__avg_over_2_minutes_fixed_windows"] == 500
-        assert df[0]["feature1__stddev_pop_over_2_minutes_fixed_windows"] == 0
-        assert df[1]["feature1__stddev_pop_over_2_minutes_fixed_windows"] == 0
-        assert df[2]["feature1__stddev_pop_over_2_minutes_fixed_windows"] == 0
-        assert df[3]["feature1__stddev_pop_over_2_minutes_fixed_windows"] == 0
-        assert df[0]["feature1__avg_over_15_minutes_fixed_windows"] == 200
-        assert df[1]["feature1__avg_over_15_minutes_fixed_windows"] == 250
-        assert df[2]["feature1__avg_over_15_minutes_fixed_windows"] == 350
-        assert df[3]["feature1__avg_over_15_minutes_fixed_windows"] == 500
-        assert df[0]["feature1__stddev_pop_over_15_minutes_fixed_windows"] == 0
-        assert df[1]["feature1__stddev_pop_over_15_minutes_fixed_windows"] == 50
-        assert df[2]["feature1__stddev_pop_over_15_minutes_fixed_windows"] == 50
-        assert df[3]["feature1__stddev_pop_over_15_minutes_fixed_windows"] == 0
-        assert df[0]["divided_feature"] == 1
-        assert df[1]["divided_feature"] == 1
-        assert df[2]["divided_feature"] == 1
-        assert df[3]["divided_feature"] == 1
+        # assert
+        assert_dataframe_equality(df, fixed_windows_output_feature_set_dataframe)
 
         # tear down
         shutil.rmtree("test_folder")

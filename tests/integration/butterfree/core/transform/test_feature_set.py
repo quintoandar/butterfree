@@ -1,6 +1,8 @@
 from pyspark.sql import functions as F
 
 from butterfree.core.clients import SparkClient
+from butterfree.core.constants.columns import TIMESTAMP_COLUMN
+from butterfree.core.constants.data_type import DataType
 from butterfree.core.transform import FeatureSet
 from butterfree.core.transform.features import Feature, KeyFeature, TimestampFeature
 from butterfree.core.transform.transformations import (
