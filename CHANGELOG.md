@@ -6,6 +6,7 @@ Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each 
 
 ### Added
 * [MLOP-185] StackTransform ([#105](https://github.com/quintoandar/butterfree/pull/105))
+* [MLOP-209] with_stack on H3HashTransform ([#114](https://github.com/quintoandar/butterfree/pull/114))
 
 ### Changed
 * [MLOP-168] HistoricalFeatureStoreWriter Create Partitions Tests and Refactoring ([#102](https://github.com/quintoandar/butterfree/pull/102))
