@@ -114,7 +114,7 @@ class TestFeatureSetPipeline:
 
         # assert
         path = dbconfig.get_options("historical/entity/feature_set").get("path")
-        df = spark_session.read.parquet(path).orderBy(TIMESTAMP_COLUMN).collect()
+        df = spark_session.read.parquet(path).orderBy(TIMESTAMP_COLUMN)
 
         target_df = fixed_windows_output_feature_set_dataframe.orderBy(
             test_pipeline.feature_set.timestamp_column
