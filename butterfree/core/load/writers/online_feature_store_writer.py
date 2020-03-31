@@ -160,20 +160,20 @@ class OnlineFeatureStoreWriter(Writer):
         pass
 
     @staticmethod
-    def get_feature_set_schema(feature_set: FeatureSet) -> List[Dict]:
+    def get_feature_set_cassandra_schema(feature_set: FeatureSet) -> List[Dict]:
         """Get feature set schema.
 
         Args:
             feature_set: object processed with feature set metadata.
 
         Returns:
-            List of dicts regarding feature set schema.
+            List of dicts regarding cassandra feature set schema.
 
         """
         return [
             {
                 "column_name": feature.name,
-                "type": feature.dtype.value,
+                "type": feature.dtype.cassandra,
                 "primary_key": True if isinstance(feature, KeyFeature) else False,
             }
             for feature in feature_set.features
