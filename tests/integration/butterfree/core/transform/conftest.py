@@ -21,6 +21,22 @@ def feature_set_dataframe(spark_context, spark_session):
 
 
 @fixture
+def target_df_without_window(spark_context, spark_session):
+    data = [
+        {
+            "id": 1,
+            "timestamp": "2016-04-11 12:03:21",
+            "feature1__avg": 350,
+            "feature2__count": 4,
+        },
+    ]
+    df = spark_session.read.json(spark_context.parallelize(data, 1))
+    df = df.withColumn(TIMESTAMP_COLUMN, df.timestamp.cast(DataType.TIMESTAMP.spark))
+
+    return df
+
+
+@fixture
 def fixed_windows_output_feature_set_dataframe(spark_context, spark_session):
     data = [
         {
@@ -121,25 +137,25 @@ def rolling_windows_output_feature_set_dataframe_base_date(
             "id": 1,
             "origin_ts": "2016-04-11 00:00:00",
             "feature1__avg_over_1_day_rolling_windows": None,
-            "feature1__avg_over_1_week_rolling_windows": None,
+            "feature2__avg_over_1_week_rolling_windows": None,
             "feature1__stddev_pop_over_1_day_rolling_windows": None,
-            "feature1__stddev_pop_over_1_week_rolling_windows": None,
+            "feature2__stddev_pop_over_1_week_rolling_windows": None,
         },
         {
             "id": 1,
             "origin_ts": "2016-04-12 00:00:00",
             "feature1__avg_over_1_day_rolling_windows": 350.0,
-            "feature1__avg_over_1_week_rolling_windows": 350.0,
+            "feature2__avg_over_1_week_rolling_windows": 350.0,
             "feature1__stddev_pop_over_1_day_rolling_windows": 111.80339887498948,
-            "feature1__stddev_pop_over_1_week_rolling_windows": 111.80339887498948,
+            "feature2__stddev_pop_over_1_week_rolling_windows": 111.80339887498948,
         },
         {
             "id": 1,
             "origin_ts": "2016-04-13 00:00:00",
             "feature1__avg_over_1_day_rolling_windows": None,
-            "feature1__avg_over_1_week_rolling_windows": 350.0,
+            "feature2__avg_over_1_week_rolling_windows": 350.0,
             "feature1__stddev_pop_over_1_day_rolling_windows": None,
-            "feature1__stddev_pop_over_1_week_rolling_windows": 111.80339887498948,
+            "feature2__stddev_pop_over_1_week_rolling_windows": 111.80339887498948,
         },
     ]
     df = spark_session.read.json(

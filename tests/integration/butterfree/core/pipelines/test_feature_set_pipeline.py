@@ -15,9 +15,10 @@ from butterfree.core.pipelines.feature_set_pipeline import FeatureSetPipeline
 from butterfree.core.transform import FeatureSet
 from butterfree.core.transform.features import Feature, KeyFeature, TimestampFeature
 from butterfree.core.transform.transformations import (
-    AggregatedTransform,
     CustomTransform,
+    SparkFunctionTransform,
 )
+from butterfree.testing.dataframe import assert_dataframe_equality
 
 
 def create_temp_view(dataframe: DataFrame, name):
@@ -40,7 +41,9 @@ def divide(df, fs, column1, column2):
 
 
 class TestFeatureSetPipeline:
-    def test_feature_set_pipeline(self, mocked_df, spark_session):
+    def test_feature_set_pipeline(
+        self, mocked_df, spark_session, fixed_windows_output_feature_set_dataframe
+    ):
         # arrange
         table_reader_id = "a_source"
         table_reader_table = "table"
@@ -82,11 +85,13 @@ class TestFeatureSetPipeline:
                         name="feature1",
                         description="test",
                         dtype=DataType.FLOAT,
-                        transformation=AggregatedTransform(
-                            aggregations=["avg", "stddev_pop"],
-                            partition="id",
-                            windows=["2 minutes", "15 minutes"],
-                            mode=["fixed_windows"],
+                        transformation=SparkFunctionTransform(
+                            functions=[F.avg, F.stddev_pop],
+                        ).with_window(
+                            partition_by="id",
+                            order_by=TIMESTAMP_COLUMN,
+                            mode="fixed_windows",
+                            window_definition=["2 minutes", "15 minutes"],
                         ),
                     ),
                     Feature(
@@ -109,28 +114,14 @@ class TestFeatureSetPipeline:
 
         # assert
         path = dbconfig.get_options("historical/entity/feature_set").get("path")
-        df = spark_session.read.parquet(path).orderBy(TIMESTAMP_COLUMN).collect()
+        df = spark_session.read.parquet(path).orderBy(TIMESTAMP_COLUMN)
 
-        assert df[0]["feature1__avg_over_2_minutes_fixed_windows"] == 200
-        assert df[1]["feature1__avg_over_2_minutes_fixed_windows"] == 300
-        assert df[2]["feature1__avg_over_2_minutes_fixed_windows"] == 400
-        assert df[3]["feature1__avg_over_2_minutes_fixed_windows"] == 500
-        assert df[0]["feature1__stddev_pop_over_2_minutes_fixed_windows"] == 0
-        assert df[1]["feature1__stddev_pop_over_2_minutes_fixed_windows"] == 0
-        assert df[2]["feature1__stddev_pop_over_2_minutes_fixed_windows"] == 0
-        assert df[3]["feature1__stddev_pop_over_2_minutes_fixed_windows"] == 0
-        assert df[0]["feature1__avg_over_15_minutes_fixed_windows"] == 200
-        assert df[1]["feature1__avg_over_15_minutes_fixed_windows"] == 250
-        assert df[2]["feature1__avg_over_15_minutes_fixed_windows"] == 350
-        assert df[3]["feature1__avg_over_15_minutes_fixed_windows"] == 500
-        assert df[0]["feature1__stddev_pop_over_15_minutes_fixed_windows"] == 0
-        assert df[1]["feature1__stddev_pop_over_15_minutes_fixed_windows"] == 50
-        assert df[2]["feature1__stddev_pop_over_15_minutes_fixed_windows"] == 50
-        assert df[3]["feature1__stddev_pop_over_15_minutes_fixed_windows"] == 0
-        assert df[0]["divided_feature"] == 1
-        assert df[1]["divided_feature"] == 1
-        assert df[2]["divided_feature"] == 1
-        assert df[3]["divided_feature"] == 1
+        target_df = fixed_windows_output_feature_set_dataframe.orderBy(
+            test_pipeline.feature_set.timestamp_column
+        )
+
+        # assert
+        assert_dataframe_equality(df, target_df)
 
         # tear down
         shutil.rmtree("test_folder")

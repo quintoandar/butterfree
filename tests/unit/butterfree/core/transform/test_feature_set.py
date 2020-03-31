@@ -11,7 +11,7 @@ from tests.unit.butterfree.core.transform.conftest import (
 from butterfree.core.clients import SparkClient
 from butterfree.core.constants.data_type import DataType
 from butterfree.core.transform import FeatureSet
-from butterfree.core.transform.features import Feature, TimestampFeature
+from butterfree.core.transform.features import Feature
 from butterfree.core.transform.transformations import AggregatedTransform
 
 
@@ -254,100 +254,6 @@ class TestFeatureSet:
         # assert
         assert result_df.collect() == feature_set_dataframe.collect()
 
-    def test_construct_rolling_agg(
-        self,
-        dataframe,
-        feature_set_dataframe,
-        key_id,
-        timestamp_c,
-        rolling_windows_agg_dataframe,
-    ):
-        spark_client = SparkClient()
-
-        feature_set = FeatureSet(
-            name="name",
-            entity="entity",
-            description="description",
-            features=[
-                Feature(
-                    name="feature1",
-                    description="test",
-                    dtype=DataType.FLOAT,
-                    transformation=AggregatedTransform(
-                        aggregations=["avg"],
-                        partition="id",
-                        windows=["1 week"],
-                        mode=["rolling_windows"],
-                    ),
-                ),
-            ],
-            keys=[key_id],
-            timestamp=TimestampFeature(from_column="ts"),
-        )
-
-        # act
-        result_df = (
-            feature_set.construct(dataframe, spark_client)
-            .orderBy(feature_set.timestamp_column)
-            .select(feature_set.columns)
-            .collect()
-        )
-
-        # assert
-        assert (
-            result_df
-            == rolling_windows_agg_dataframe.orderBy(feature_set.timestamp_column)
-            .select(feature_set.columns)
-            .collect()
-        )
-
-    def test_construct_rolling_agg_with_base_date(
-        self,
-        dataframe,
-        feature_set_dataframe,
-        key_id,
-        timestamp_c,
-        rolling_windows_agg_dataframe,
-    ):
-        spark_client = SparkClient()
-
-        feature_set = FeatureSet(
-            name="name",
-            entity="entity",
-            description="description",
-            features=[
-                Feature(
-                    name="feature1",
-                    description="test",
-                    dtype=DataType.FLOAT,
-                    transformation=AggregatedTransform(
-                        aggregations=["avg"],
-                        partition="id",
-                        windows=["1 week"],
-                        mode=["rolling_windows"],
-                    ),
-                ),
-            ],
-            keys=[key_id],
-            timestamp=timestamp_c,
-        )
-
-        # act
-        result_df = (
-            feature_set.construct(dataframe, spark_client, "2016-04-19")
-            .orderBy(feature_set.timestamp_column)
-            .select(feature_set.columns)
-            .collect()
-        )
-
-        # assert
-        assert (
-            result_df
-            == rolling_windows_agg_dataframe.orderBy(feature_set.timestamp_column)
-            .select(feature_set.columns)
-            .collect()
-        )
-
     def test__get_features_columns(self):
         # arrange
         feature_1 = Feature("feature1", "description", DataType.FLOAT)
@@ -405,3 +311,24 @@ class TestFeatureSet:
             .select(feature_set.columns)
             .collect()
         )
+
+    def test_feature_set_with_invalid_feature(self, key_id, timestamp_c, dataframe):
+        spark_client = SparkClient()
+        with pytest.raises(ValueError):
+            FeatureSet(
+                name="name",
+                entity="entity",
+                description="description",
+                features=[
+                    Feature(
+                        name="feature1",
+                        description="test",
+                        dtype=DataType.FLOAT,
+                        transformation=AggregatedTransform(
+                            functions=["avg"], group_by="id", column="feature1",
+                        ).with_window(window_definition=["1 week"],),
+                    ),
+                ],
+                keys=[key_id],
+                timestamp=timestamp_c,
+            ).construct(dataframe, spark_client)

@@ -1,13 +1,15 @@
 from pyspark.sql import functions as F
 
 from butterfree.core.clients import SparkClient
+from butterfree.core.constants.columns import TIMESTAMP_COLUMN
 from butterfree.core.constants.data_type import DataType
 from butterfree.core.transform import FeatureSet
 from butterfree.core.transform.features import Feature, KeyFeature, TimestampFeature
 from butterfree.core.transform.transformations import (
-    AggregatedTransform,
     CustomTransform,
+    SparkFunctionTransform,
 )
+from butterfree.testing.dataframe import assert_dataframe_equality
 
 
 def divide(df, fs, column1, column2):
@@ -35,11 +37,13 @@ class TestFeatureSet:
                     name="feature1",
                     description="test",
                     dtype=DataType.FLOAT,
-                    transformation=AggregatedTransform(
-                        aggregations=["avg", "stddev_pop"],
-                        partition="id",
-                        windows=["2 minutes", "15 minutes"],
-                        mode=["fixed_windows"],
+                    transformation=SparkFunctionTransform(
+                        functions=[F.avg, F.stddev_pop]
+                    ).with_window(
+                        partition_by="id",
+                        order_by=TIMESTAMP_COLUMN,
+                        mode="fixed_windows",
+                        window_definition=["2 minutes", "15 minutes"],
                     ),
                 ),
                 Feature(
@@ -55,119 +59,15 @@ class TestFeatureSet:
             timestamp=TimestampFeature(),
         )
 
-        result_df = (
+        output_df = (
             feature_set.construct(feature_set_dataframe, client=spark_client)
             .orderBy(feature_set.timestamp_column)
             .select(feature_set.columns)
-            .collect()
         )
+
+        target_df = fixed_windows_output_feature_set_dataframe.orderBy(
+            feature_set.timestamp_column
+        ).select(feature_set.columns)
 
         # assert
-        assert (
-            result_df
-            == fixed_windows_output_feature_set_dataframe.orderBy(
-                feature_set.timestamp_column
-            )
-            .select(feature_set.columns)
-            .collect()
-        )
-
-    def test_construct_rolling_windows_with_base_date(
-        self,
-        feature_set_dataframe,
-        rolling_windows_output_feature_set_dataframe_base_date,
-    ):
-        # given
-
-        spark_client = SparkClient()
-
-        # arrange
-
-        feature_set = FeatureSet(
-            name="feature_set",
-            entity="entity",
-            description="description",
-            features=[
-                Feature(
-                    name="feature1",
-                    description="test",
-                    dtype=DataType.DOUBLE,
-                    transformation=AggregatedTransform(
-                        aggregations=["avg", "stddev_pop"],
-                        partition="id",
-                        windows=["1 day", "1 week"],
-                        mode=["rolling_windows"],
-                    ),
-                ),
-            ],
-            keys=[KeyFeature(name="id", description="The user's Main ID or device ID")],
-            timestamp=TimestampFeature(),
-        )
-
-        # act
-        result_df = (
-            feature_set.construct(
-                feature_set_dataframe, client=spark_client, base_date="2016-04-18"
-            )
-            .orderBy("timestamp")
-            .collect()
-        )
-
-        result_df = result_df
-
-        # assert
-        assert (
-            result_df
-            == rolling_windows_output_feature_set_dataframe_base_date.orderBy(
-                feature_set.timestamp_column
-            )
-            .select(feature_set.columns)
-            .collect()
-        )
-
-    def test_construct_rolling_windows_without_base_date(
-        self, feature_set_dataframe, rolling_windows_output_feature_set_dataframe
-    ):
-        # given
-
-        spark_client = SparkClient()
-
-        # arrange
-
-        feature_set = FeatureSet(
-            name="feature_set",
-            entity="entity",
-            description="description",
-            features=[
-                Feature(
-                    name="feature1",
-                    description="test",
-                    dtype=DataType.DOUBLE,
-                    transformation=AggregatedTransform(
-                        aggregations=["avg", "stddev_pop"],
-                        partition="id",
-                        windows=["1 day", "1 week"],
-                        mode=["rolling_windows"],
-                    ),
-                ),
-            ],
-            keys=[KeyFeature(name="id", description="The user's Main ID or device ID")],
-            timestamp=TimestampFeature(),
-        )
-
-        # act
-        result_df = (
-            feature_set.construct(feature_set_dataframe, client=spark_client)
-            .orderBy("timestamp")
-            .collect()
-        )
-
-        # assert
-        assert (
-            result_df
-            == rolling_windows_output_feature_set_dataframe.orderBy(
-                feature_set.timestamp_column
-            )
-            .select(feature_set.columns)
-            .collect()
-        )
+        assert_dataframe_equality(output_df, target_df)
