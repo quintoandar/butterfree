@@ -5,9 +5,9 @@ from typing import List
 from pyspark.sql import DataFrame
 
 from butterfree.core.clients import SparkClient
-from butterfree.core.constants.numerical_constants import DEFAULT_NUM_PARTITIONS
+from butterfree.core.constants.spark_constants import DEFAULT_NUM_PARTITIONS
+from butterfree.core.dataframe_service import repartition_sort_df
 from butterfree.core.extract.readers.reader import Reader
-from butterfree.core.utils import repartition_sort_df
 
 
 class Source:
@@ -51,19 +51,17 @@ class Source:
 
     """
 
-    def __init__(
-        self,
-        readers: List[Reader],
-        query: str,
-        partition_by: List[str] = None,
-        num_partitions=None,
-    ) -> None:
+    def __init__(self, readers: List[Reader], query: str,) -> None:
         self.readers = readers
         self.query = query
-        self.partition_by = partition_by
-        self.num_partitions = num_partitions or DEFAULT_NUM_PARTITIONS
 
-    def construct(self, client: SparkClient, num_processors: int = None) -> DataFrame:
+    def construct(
+        self,
+        client: SparkClient,
+        partition_by: List[str] = None,
+        num_partitions: int = None,
+        num_processors: int = None,
+    ) -> DataFrame:
         """Construct an entry point dataframe for a feature set.
 
         This method will assemble multiple readers, by building each one and
@@ -74,6 +72,9 @@ class Source:
 
         Args:
             client: client responsible for connecting to Spark session.
+            partition_by: columns to be partitioned.
+            num_partitions: number of partitions.
+            num_processors: number of cluster processors.
 
         Returns:
             DataFrame with the query result against all readers.
@@ -84,13 +85,13 @@ class Source:
 
         dataframe = client.sql(self.query)
 
-        if self.partition_by:
+        if partition_by:
             num_partitions = (
-                num_processors * 40 if num_processors else self.num_partitions
+                num_processors * 40
+                if num_processors
+                else num_partitions or DEFAULT_NUM_PARTITIONS
             )
-            dataframe = repartition_sort_df(
-                dataframe, num_partitions, self.partition_by
-            )
+            dataframe = repartition_sort_df(dataframe, num_partitions, partition_by)
 
         if not dataframe.isStreaming:
             dataframe.cache().count()
