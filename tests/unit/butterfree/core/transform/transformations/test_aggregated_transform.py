@@ -105,6 +105,7 @@ class TestAggregatedTransform:
         test_feature = Feature(
             name="feature1",
             description="unit test",
+            dtype=DataType.DOUBLE,
             transformation=AggregatedTransform(
                 functions=["avg", "stddev_pop"], group_by="id", column="feature1",
             ).with_pivot("pivot_col"),
@@ -120,6 +121,7 @@ class TestAggregatedTransform:
         test_feature = Feature(
             name="feature1",
             description="unit test",
+            dtype=DataType.DOUBLE,
             transformation=AggregatedTransform(
                 functions=["avg", "stddev_pop"], group_by="id", column="feature1",
             )

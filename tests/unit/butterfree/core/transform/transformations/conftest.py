@@ -49,7 +49,7 @@ def feature_set_df_pivot(spark_context, spark_session):
         },
     ]
     df = spark_session.read.json(spark_context.parallelize(data, 1))
-    df = df.withColumn(TIMESTAMP_COLUMN, df.timestamp.cast(DataType.TIMESTAMP.value))
+    df = df.withColumn(TIMESTAMP_COLUMN, df.timestamp.cast(DataType.TIMESTAMP.spark))
 
     return df
 
@@ -362,7 +362,7 @@ def target_df_pivot_agg_window(spark_context, spark_session):
         },
     ]
     df = spark_session.read.json(spark_context.parallelize(data, 1))
-    df = df.withColumn(TIMESTAMP_COLUMN, df.timestamp.cast(DataType.TIMESTAMP.value))
+    df = df.withColumn(TIMESTAMP_COLUMN, df.timestamp.cast(DataType.TIMESTAMP.spark))
 
     return df
 
