@@ -1,4 +1,6 @@
 """FeatureSetPipeline entity."""
+from typing import List
+
 from butterfree.core.clients import SparkClient
 from butterfree.core.extract import Source
 from butterfree.core.load import Sink
@@ -164,7 +166,12 @@ class FeatureSetPipeline:
         if not isinstance(self._spark_client, SparkClient):
             raise ValueError("spark_client must be a SparkClient instance")
 
-    def run(self, base_date: str = None, num_processors: int = None):
+    def run(
+        self,
+        base_date: str = None,
+        partition_by: List[str] = None,
+        num_processors: int = None,
+    ):
         """Runs the defined feature set pipeline.
 
         The pipeline consists in the following steps:
@@ -174,7 +181,9 @@ class FeatureSetPipeline:
 
         """
         dataframe = self.source.construct(
-            client=self.spark_client, num_processors=num_processors
+            client=self.spark_client,
+            partition_by=partition_by,
+            num_processors=num_processors,
         )
         dataframe = self.feature_set.construct(
             dataframe=dataframe, client=self.spark_client, base_date=base_date
