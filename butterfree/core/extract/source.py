@@ -49,11 +49,11 @@ class Source:
 
     """
 
-    def __init__(self, readers: List[Reader], query: str,) -> None:
+    def __init__(self, readers: List[Reader], query: str) -> None:
         self.readers = readers
         self.query = query
 
-    def construct(self, client: SparkClient,) -> DataFrame:
+    def construct(self, client: SparkClient) -> DataFrame:
         """Construct an entry point dataframe for a feature set.
 
         This method will assemble multiple readers, by building each one and
