@@ -5,8 +5,6 @@ from typing import List
 from pyspark.sql import DataFrame
 
 from butterfree.core.clients import SparkClient
-from butterfree.core.constants.spark_constants import DEFAULT_NUM_PARTITIONS
-from butterfree.core.dataframe_service import repartition_sort_df
 from butterfree.core.extract.readers.reader import Reader
 
 
@@ -55,13 +53,7 @@ class Source:
         self.readers = readers
         self.query = query
 
-    def construct(
-        self,
-        client: SparkClient,
-        partition_by: List[str] = None,
-        num_partitions: int = None,
-        num_processors: int = None,
-    ) -> DataFrame:
+    def construct(self, client: SparkClient,) -> DataFrame:
         """Construct an entry point dataframe for a feature set.
 
         This method will assemble multiple readers, by building each one and
@@ -72,9 +64,6 @@ class Source:
 
         Args:
             client: client responsible for connecting to Spark session.
-            partition_by: columns to be partitioned.
-            num_partitions: number of partitions.
-            num_processors: number of cluster processors.
 
         Returns:
             DataFrame with the query result against all readers.
@@ -84,14 +73,6 @@ class Source:
             reader.build(client)  # create temporary views for each reader
 
         dataframe = client.sql(self.query)
-
-        if partition_by:
-            num_partitions = (
-                num_processors * 40
-                if num_processors
-                else num_partitions or DEFAULT_NUM_PARTITIONS
-            )
-            dataframe = repartition_sort_df(dataframe, num_partitions, partition_by)
 
         if not dataframe.isStreaming:
             dataframe.cache().count()

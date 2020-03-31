@@ -145,4 +145,4 @@ class HistoricalFeatureStoreWriter(Writer):
         dataframe = dataframe.withColumn(
             columns.PARTITION_DAY, dayofmonth(dataframe[columns.TIMESTAMP_COLUMN])
         )
-        return repartition_df(dataframe, self.num_partitions, self.PARTITION_BY)
+        return repartition_df(dataframe, self.PARTITION_BY, self.num_partitions)

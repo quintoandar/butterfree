@@ -2,6 +2,7 @@
 from typing import List
 
 from butterfree.core.clients import SparkClient
+from butterfree.core.dataframe_service import repartition_sort_df
 from butterfree.core.extract import Source
 from butterfree.core.load import Sink
 from butterfree.core.transform import FeatureSet
@@ -180,11 +181,9 @@ class FeatureSetPipeline:
         - Load the data to the configured sink locations.
 
         """
-        dataframe = self.source.construct(
-            client=self.spark_client,
-            partition_by=partition_by,
-            num_processors=num_processors,
-        )
+        dataframe = self.source.construct(client=self.spark_client)
+        if partition_by:
+            dataframe = repartition_sort_df(dataframe, partition_by, num_processors)
         dataframe = self.feature_set.construct(
             dataframe=dataframe, client=self.spark_client, base_date=base_date
         )
