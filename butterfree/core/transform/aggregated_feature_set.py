@@ -57,6 +57,9 @@ class AggregatedFeatureSet(FeatureSet):
 
     The construct method will execute the feature set, computing all the
     defined aggregated transformations.
+
+    When you use an AggregatedFeatureSet without window, we defined that
+    the TimestampFeature is the lastest time value in the column.
     """
 
     @property
@@ -281,19 +284,22 @@ class AggregatedFeatureSet(FeatureSet):
             )
 
         elif self._has_aggregated_transform_without_window_only(self.features):
-            if len(df_list) > 1:
-                output_df = reduce(
-                    lambda left, right: self._dataframe_join(
-                        left,
-                        right,
-                        on=self.features[0].transformation.group_by,
-                        how="full_outer",
-                    ),
-                    df_list[0],
-                    df_list,
-                )
-            else:
-                output_df = df_list[0]
+            agg_df = output_df.sort(self.timestamp_column).select(
+                *[
+                    functions.last(column).alias(column)
+                    for column in self.keys_columns + [self.timestamp_column]
+                ]
+            )
+            output_df = reduce(
+                lambda left, right: self._dataframe_join(
+                    left,
+                    right,
+                    on=self.features[0].transformation.group_by,
+                    how="full_outer",
+                ),
+                df_list,
+                agg_df,
+            )
 
         output_df = output_df.select(*self.columns)
 

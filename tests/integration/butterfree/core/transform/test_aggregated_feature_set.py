@@ -15,6 +15,49 @@ def divide(df, fs, column1, column2):
 
 
 class TestAggregatedFeatureSet:
+    def test_construct_without_window(
+        self, feature_set_dataframe, target_df_without_window,
+    ):
+        # given
+
+        spark_client = SparkClient()
+
+        # arrange
+
+        feature_set = AggregatedFeatureSet(
+            name="feature_set",
+            entity="entity",
+            description="description",
+            features=[
+                Feature(
+                    name="feature1",
+                    description="test",
+                    dtype=DataType.DOUBLE,
+                    transformation=AggregatedTransform(
+                        functions=["avg"], group_by="id", column="feature1",
+                    ),
+                ),
+                Feature(
+                    name="feature2",
+                    description="test",
+                    dtype=DataType.BIGINT,
+                    transformation=AggregatedTransform(
+                        functions=["count"], group_by="id", column="feature2",
+                    ),
+                ),
+            ],
+            keys=[KeyFeature(name="id", description="The user's Main ID or device ID")],
+            timestamp=TimestampFeature(),
+        )
+
+        # act
+        output_df = feature_set.construct(feature_set_dataframe, client=spark_client)
+
+        target_df = target_df_without_window
+
+        # assert
+        assert_dataframe_equality(output_df, target_df)
+
     def test_construct_rolling_windows_with_end_date(
         self,
         feature_set_dataframe,

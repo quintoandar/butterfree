@@ -184,7 +184,7 @@ class AggregatedTransform(TransformComponent):
                 for window in self._windows:
                     output_columns.append(self._get_output_name(function, window))
             else:
-                output_columns.append("_".join([self._parent.name, function]))
+                output_columns.append("__".join([self._parent.name, function]))
 
         return output_columns
 

@@ -21,6 +21,22 @@ def feature_set_dataframe(spark_context, spark_session):
 
 
 @fixture
+def target_df_without_window(spark_context, spark_session):
+    data = [
+        {
+            "id": 1,
+            "timestamp": "2016-04-11 12:03:21",
+            "feature1__avg": 350,
+            "feature2__count": 4,
+        },
+    ]
+    df = spark_session.read.json(spark_context.parallelize(data, 1))
+    df = df.withColumn(TIMESTAMP_COLUMN, df.timestamp.cast(DataType.TIMESTAMP.spark))
+
+    return df
+
+
+@fixture
 def fixed_windows_output_feature_set_dataframe(spark_context, spark_session):
     data = [
         {
