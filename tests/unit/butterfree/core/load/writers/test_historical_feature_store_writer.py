@@ -1,15 +1,11 @@
 import datetime
 import random
-from unittest import mock
 
 import pytest
 from pyspark.sql.functions import spark_partition_id
 
-from butterfree.core.dataframe_service import repartition_df
 from butterfree.core.load.writers import HistoricalFeatureStoreWriter
 from butterfree.testing.dataframe import assert_dataframe_equality
-
-repartition_df = mock.create_autospec(repartition_df)
 
 
 class TestHistoricalFeatureStoreWriter:
