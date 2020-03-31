@@ -131,6 +131,6 @@ class TestOnlineFeatureStoreWriter:
         self, cassandra_config, test_feature_set, expected_schema
     ):
         writer = OnlineFeatureStoreWriter(cassandra_config)
-        schema = writer.get_feature_set_schema(test_feature_set)
+        schema = writer.get_feature_set_cassandra_schema(test_feature_set)
 
         assert schema == expected_schema

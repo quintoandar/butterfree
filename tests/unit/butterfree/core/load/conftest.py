@@ -176,18 +176,18 @@ def expected_schema():
     return [
         {
             "column_name": "feature1",
-            "type": DataType.DOUBLE.value,
+            "type": DataType.DOUBLE.cassandra,
             "primary_key": False,
         },
         {
             "column_name": "feature2",
-            "type": DataType.DOUBLE.value,
+            "type": DataType.DOUBLE.cassandra,
             "primary_key": False,
         },
-        {"column_name": "id", "type": DataType.BIGINT.value, "primary_key": True},
+        {"column_name": "id", "type": DataType.BIGINT.cassandra, "primary_key": True},
         {
             "column_name": "timestamp",
-            "type": DataType.TIMESTAMP.value,
+            "type": DataType.TIMESTAMP.cassandra,
             "primary_key": False,
         },
     ]
