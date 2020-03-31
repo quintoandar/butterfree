@@ -284,11 +284,10 @@ class AggregatedFeatureSet(FeatureSet):
             )
 
         elif self._has_aggregated_transform_without_window_only(self.features):
-            agg_df = output_df.sort(self.timestamp_column).select(
-                *[
-                    functions.last(column).alias(column)
-                    for column in self.keys_columns + [self.timestamp_column]
-                ]
+            agg_df = output_df.groupBy(self.keys_columns).agg(
+                functions.max(functions.col(self.timestamp_column)).alias(
+                    self.timestamp_column
+                )
             )
             output_df = reduce(
                 lambda left, right: self._dataframe_join(
