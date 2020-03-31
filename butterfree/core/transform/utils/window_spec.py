@@ -78,21 +78,38 @@ class Window:
     Use the static methods in :class:`Window` to create a :class:`WindowSpec`.
     """
 
-    def __init__(self, partition_by, order_by=None, mode=None, window_definition=None):
+    SLIDE_DURATION = "1 day"
+
+    def __init__(self, partition_by, order_by, mode=None, window_definition=None):
         self.partition_by = partition_by
         self.order_by = order_by or TIMESTAMP_COLUMN
         self.frame_boundaries = FrameBoundaries(mode, window_definition)
 
     def get_name(self):
         """Return window suffix name based on passed criteria."""
-        return (
-            f"over_{self.frame_boundaries.window_size}_"
-            f"{self.frame_boundaries.window_unit}_{self.frame_boundaries.mode}"
+        return "_".join(
+            [
+                "over",
+                f"{self.frame_boundaries.window_size}",
+                f"{self.frame_boundaries.window_unit}",
+                self.frame_boundaries.mode,
+            ]
         )
 
     def get(self):
         """Defines a common window to be used both in time and rows windows."""
-        if self.order_by == TIMESTAMP_COLUMN:
+        if self.frame_boundaries.mode == "rolling_windows":
+            if int(self.frame_boundaries.window_definition.split()[0]) <= 0:
+                raise KeyError(
+                    f"{self.frame_boundaries.window_definition} "
+                    f"have negative element."
+                )
+            return functions.window(
+                TIMESTAMP_COLUMN,
+                self.frame_boundaries.window_definition,
+                slideDuration=self.SLIDE_DURATION,
+            )
+        elif self.order_by == TIMESTAMP_COLUMN:
             w = sql.Window.partitionBy(self.partition_by).orderBy(
                 functions.col(TIMESTAMP_COLUMN).cast("long")
             )

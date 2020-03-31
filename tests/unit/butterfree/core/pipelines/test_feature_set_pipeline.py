@@ -1,8 +1,10 @@
 from unittest.mock import Mock
 
 import pytest
+from pyspark.sql import functions
 
 from butterfree.core.clients import SparkClient
+from butterfree.core.constants.columns import TIMESTAMP_COLUMN
 from butterfree.core.constants.data_type import DataType
 from butterfree.core.extract import Source
 from butterfree.core.extract.readers import FileReader, TableReader
@@ -16,7 +18,7 @@ from butterfree.core.load.writers.writer import Writer
 from butterfree.core.pipelines.feature_set_pipeline import FeatureSetPipeline
 from butterfree.core.transform import FeatureSet
 from butterfree.core.transform.features import Feature, KeyFeature, TimestampFeature
-from butterfree.core.transform.transformations import AggregatedTransform
+from butterfree.core.transform.transformations import SparkFunctionTransform
 
 
 class TestFeatureSetPipeline:
@@ -28,7 +30,9 @@ class TestFeatureSetPipeline:
             "listing_page_viewed__rent_per_month__avg_over_7_days_fixed_windows",
             "listing_page_viewed__rent_per_month__avg_over_2_weeks_fixed_windows",
             "listing_page_viewed__rent_per_month__stddev_pop_over_7_days_fixed_windows",
-            "listing_page_viewed__rent_per_month__stddev_pop_over_2_weeks_fixed_windows",  # noqa
+            "listing_page_viewed__rent_per_month__"
+            "stddev_pop_over_2_weeks_fixed_windows",
+            # noqa
         ]
         pipeline = FeatureSetPipeline(
             source=Source(
@@ -54,11 +58,13 @@ class TestFeatureSetPipeline:
                         name="listing_page_viewed__rent_per_month",
                         description="Average of something.",
                         dtype=DataType.FLOAT,
-                        transformation=AggregatedTransform(
-                            aggregations=["avg", "stddev_pop"],
-                            partition="user_id",
-                            windows=["7 days", "2 weeks"],
-                            mode=["fixed_windows"],
+                        transformation=SparkFunctionTransform(
+                            functions=[functions.avg, functions.stddev_pop],
+                        ).with_window(
+                            partition_by="user_id",
+                            order_by=TIMESTAMP_COLUMN,
+                            window_definition=["7 days", "2 weeks"],
+                            mode="fixed_windows",
                         ),
                     ),
                 ],
@@ -113,11 +119,13 @@ class TestFeatureSetPipeline:
                         name="listing_page_viewed__rent_per_month",
                         description="Average of something.",
                         dtype=DataType.FLOAT,
-                        transformation=AggregatedTransform(
-                            aggregations=["avg", "stddev_pop"],
-                            partition="user_id",
-                            windows=["7 days", "2 weeks"],
-                            mode=["fixed_windows"],
+                        transformation=SparkFunctionTransform(
+                            functions=[functions.avg, functions.stddev_pop],
+                        ).with_window(
+                            partition_by="user_id",
+                            order_by=TIMESTAMP_COLUMN,
+                            window_definition=["7 days", "2 weeks"],
+                            mode="fixed_windows",
                         ),
                     ),
                 ],
@@ -166,11 +174,13 @@ class TestFeatureSetPipeline:
                             name="listing_page_viewed__rent_per_month",
                             description="Average of something.",
                             dtype=DataType.FLOAT,
-                            transformation=AggregatedTransform(
-                                aggregations=["avg", "stddev_pop"],
-                                partition="user_id",
-                                windows=["7 days", "2 weeks"],
-                                mode=["fixed_windows"],
+                            transformation=SparkFunctionTransform(
+                                functions=[functions.avg, functions.stddev_pop],
+                            ).with_window(
+                                partition_by="user_id",
+                                order_by=TIMESTAMP_COLUMN,
+                                window_definition=["7 days", "2 weeks"],
+                                mode="fixed_windows",
                             ),
                         ),
                     ],
@@ -209,11 +219,13 @@ class TestFeatureSetPipeline:
                             name="listing_page_viewed__rent_per_month",
                             description="Average of something.",
                             dtype=DataType.FLOAT,
-                            transformation=AggregatedTransform(
-                                aggregations=["avg", "stddev_pop"],
-                                partition="user_id",
-                                windows=["7 days", "2 weeks"],
-                                mode=["fixed_windows"],
+                            transformation=SparkFunctionTransform(
+                                functions=[functions.avg, functions.stddev_pop],
+                            ).with_window(
+                                partition_by="user_id",
+                                order_by=TIMESTAMP_COLUMN,
+                                window_definition=["7 days", "2 weeks"],
+                                mode="fixed_windows",
                             ),
                         ),
                     ],
