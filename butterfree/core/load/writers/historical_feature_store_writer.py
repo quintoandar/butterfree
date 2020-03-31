@@ -9,10 +9,10 @@ from butterfree.core.clients import SparkClient
 from butterfree.core.configs import environment
 from butterfree.core.configs.db import S3Config
 from butterfree.core.constants import columns
-from butterfree.core.constants.numerical_constants import DEFAULT_NUM_PARTITIONS
+from butterfree.core.constants.spark_constants import DEFAULT_NUM_PARTITIONS
+from butterfree.core.dataframe_service import repartition_df
 from butterfree.core.load.writers.writer import Writer
 from butterfree.core.transform import FeatureSet
-from butterfree.core.utils import repartition_df
 
 
 class HistoricalFeatureStoreWriter(Writer):
