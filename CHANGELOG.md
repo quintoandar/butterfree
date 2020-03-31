@@ -8,6 +8,7 @@ Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each 
 ## [0.6.0](https://github.com/quintoandar/butterfree/releases/tag/0.6.0)
 ### Added
 * [MLOP-209] with_stack on H3HashTransform ([#114](https://github.com/quintoandar/butterfree/pull/114))
+* [MLOP-141] Create client cassandra on butterfree ([#109](https://github.com/quintoandar/butterfree/pull/109))
 * [MLOP-185] StackTransform ([#105](https://github.com/quintoandar/butterfree/pull/105))
 * [MLOP-176] MostFrequent aggregation ([#104](https://github.com/quintoandar/butterfree/pull/104))
 
