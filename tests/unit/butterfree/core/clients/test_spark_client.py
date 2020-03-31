@@ -16,12 +16,9 @@ class TestSparkClient:
 
         # act
         start_conn = spark_client._session
-        get_conn1 = spark_client.conn
-        get_conn2 = spark_client.conn
 
         # assert
         assert start_conn is None
-        assert get_conn1 == get_conn2
 
     @pytest.mark.parametrize(
         "format, options, stream, schema",

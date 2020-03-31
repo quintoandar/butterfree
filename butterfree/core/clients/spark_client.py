@@ -5,8 +5,10 @@ from typing import List
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.types import StructType
 
+from butterfree.core.clients.abstract_client import AbstractClient
 
-class SparkClient:
+
+class SparkClient(AbstractClient):
     """Handle Spark session connection.
 
     Get query results with SQL, reads and writes data on external systems.
