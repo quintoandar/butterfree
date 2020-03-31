@@ -3,6 +3,8 @@ from unittest.mock import Mock
 import pytest
 from pyspark.sql.streaming import StreamingQuery
 
+from butterfree.core.clients import CassandraClient
+
 
 @pytest.fixture()
 def target_df(spark_context, spark_session):
@@ -39,3 +41,18 @@ def mocked_stream_df():
     mock.foreachBatch.return_value = mock
     mock.start.return_value = Mock(spec=StreamingQuery)
     return mock
+
+
+@pytest.fixture
+def cassandra_client():
+    return CassandraClient(
+        cassandra_host=["mock"], cassandra_key_space="dummy_keyspace"
+    )
+
+
+@pytest.fixture
+def cassandra_feature_set():
+    return [
+        {"feature1": "value1", "feature2": 10.5},
+        {"feature1": "value1", "feature2": 10},
+    ]
