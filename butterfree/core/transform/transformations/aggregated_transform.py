@@ -1,37 +1,30 @@
 """Aggregated Transform entity."""
-import warnings
 from functools import reduce
 from typing import List
 
 from parameters_validation import non_blank
 from pyspark.sql import DataFrame, functions
-from pyspark.sql.window import Window
 
 from butterfree.core.constants.columns import TIMESTAMP_COLUMN
 from butterfree.core.transform.transformations.transform_component import (
     TransformComponent,
 )
 from butterfree.core.transform.transformations.user_defined_functions import mode
+from butterfree.core.transform.utils import Window
 
 
 class AggregatedTransform(TransformComponent):
     """Defines an Aggregation.
 
     Attributes:
-        mode: available modes to be used in time aggregations, which are
-        fixed_windows or rolling_windows.
-        aggregations: aggregations to be used in the windows, it can be
-            avg, std and count.
-        windows: time ranges to be used in the windows, it can be second(s),
-            minute(s), hour(s), day(s), week(s), month(s) and year(s).
-        partition: column to be used in window partition.
-        time_column: timestamp column to be use as sorting reference.
+        group_by: list of columns to group by.
+        functions: aggregation functions, such as avg, std, count.
+        column: column to be used in aggregation function.
 
     Example:
         It's necessary to declare the desired aggregation method, (average,
         standard deviation and count are currently supported, as it can be
-        seen in __ALLOWED_AGGREGATIONS), the partition column, choose both
-        window lenght and time unit and, finally, define the mode.
+        seen in __ALLOWED_AGGREGATIONS), the group by column and aggregation column.
         >>> from butterfree.core.transform.transformations import AggregatedTransform
         >>> from butterfree.core.transform.features import Feature
         >>> from pyspark import SparkContext
@@ -45,62 +38,54 @@ class AggregatedTransform(TransformComponent):
         ...                             (1, "2016-04-11 12:03:21", 500)]
         ...                           ).toDF("id", "timestamp", "feature")
         >>> df = df.withColumn("timestamp", df.timestamp.cast(TimestampType()))
-        >>> feature_fixed_windows = Feature(
+        >>> feature = Feature(
         ...    name="feature",
-        ...    description="aggregated transform with fixed windows usage example",
+        ...    description="aggregated transform",
         ...    transformation=AggregatedTransform(
-        ...        aggregations=["avg"],
-        ...        partition="id",
-        ...        windows=["15 minutes"],
-        ...        mode=["fixed_windows"],
+        ...        functions=["avg"],
+        ...        group_by="id",
+        ...        column="feature",
         ...    )
         ...)
-        >>> feature_fixed_windows.transform(df).orderBy("timestamp").show()
-        +--------+-----------------------+-----------------------------+
-        |feature | id|          timestamp| feature__avg_over_15_minutes|
-        +--------+---+-------------------+-----------------------------+
-        |     200|  1|2016-04-11 11:31:11|                        200.0|
-        |     300|  1|2016-04-11 11:44:12|                        250.0|
-        |     400|  1|2016-04-11 11:46:24|                        350.0|
-        |     500|  1|2016-04-11 12:03:21|                        500.0|
-        +--------+---+-------------------+-----------------------------+
+        >>> feature.transform(df).show()
+        +---+-----------+
+        | id|feature_avg|
+        +---+-----------+
+        |  1|      350.0|
+        +---+-----------+
+
+        We can use this transformation with windows.
         >>> feature_rolling_windows = Feature(
         ...    name="feature",
         ...    description="aggregated transform with rolling windows usage example",
         ...    transformation=AggregatedTransform(
-        ...        aggregations=["avg"],
-        ...        partition="id",
-        ...        windows=["1 day"],
-        ...        mode=["rolling_windows"],
-        ...    )
+        ...        functions=["avg"],
+        ...        group_by="id",
+        ...        column="feature",
+        ...    ).with_window(
+        ...        window_definition=["1 day"],
+        ...   )
         ...)
         >>> feature_rolling_windows.transform(df).orderBy("timestamp").show()
         +---+-------------------+---------------------------------------+
-        | id|          timestamp|feature__avg_over_1_day_rolling_windows|
+        | id|          timestamp|feature_avg_over_1_day_rolling_windows|
         +---+-------------------+---------------------------------------+
         |  1|2016-04-11 21:00:00|                                  350.0|
         +---+-------------------+---------------------------------------+
-        It's important to notice that rolling_windows mode affects the
+
+        It's important to notice that transformation affects the
         dataframe granularity and, as it's possible to see, returns only
         columns related to its transformation.
     """
 
-    SLIDE_DURATION = "1 day"
-
     def __init__(
-        self,
-        mode: non_blank(List[str]),
-        aggregations: non_blank(List[str]),
-        windows: non_blank(List[str]),
-        partition: non_blank(str) = None,
-        time_column: str = None,
+        self, group_by, functions: non_blank(List[str]), column: non_blank(str)
     ):
-        super().__init__()
-        self.mode = mode
-        self.aggregations = aggregations
-        self.windows = windows
-        self.partition = partition
-        self.time_column = time_column or TIMESTAMP_COLUMN
+        super(AggregatedTransform, self).__init__()
+        self.group_by = group_by
+        self.functions = functions
+        self.column = column
+        self._windows = []
 
     __ALLOWED_AGGREGATIONS = {
         "approx_count_distinct": functions.approx_count_distinct,
@@ -122,25 +107,28 @@ class AggregatedTransform(TransformComponent):
         "variance": functions.variance,
         "var_pop": functions.var_pop,
     }
-    __ALLOWED_WINDOWS = {
-        ("second", "seconds"): 1,
-        ("minute", "minutes"): 60,
-        ("hour", "hours"): 3600,
-        ("day", "days"): 86400,
-        ("week", "weeks"): 604800,
-        ("month", "months"): 2419200,
-        ("year", "years"): 29030400,
-    }
-    __ALLOWED_MODES = ["fixed_windows", "rolling_windows", "row_windows"]
 
     @property
-    def aggregations(self) -> List[str]:
-        """Aggregations to be used in the windows."""
-        return self._aggregations
+    def has_windows(self):
+        """Aggregated Transform window check.
 
-    @aggregations.setter
-    def aggregations(self, value: List[str]):
-        """Aggregations definitions to be used in the windows."""
+        Checks the number of windows within the scope of the
+        all AggregatedTransform.
+
+        Returns:
+            True if the number of windows is greater than zero in all.
+
+        """
+        return len(self._windows) > 0
+
+    @property
+    def functions(self) -> List[str]:
+        """Aggregated functions to be used in the transformation."""
+        return self._functions
+
+    @functions.setter
+    def functions(self, value: List[str]):
+        """Aggregated definitions to be used in the transformation."""
         aggregations = []
         if not value:
             raise ValueError("Aggregations must not be empty.")
@@ -152,229 +140,53 @@ class AggregatedTransform(TransformComponent):
                     f"{self.allowed_aggregations}"
                 )
             aggregations.append(agg)
-        self._aggregations = aggregations
+        self._functions = aggregations
 
     @property
     def allowed_aggregations(self) -> List[str]:
-        """Allowed aggregations to be used in the windows."""
+        """Allowed aggregations to be used in the transformation."""
         return list(self.__ALLOWED_AGGREGATIONS.keys())
 
-    @property
-    def windows(self) -> List[str]:
-        """Time ranges to be used in the windows."""
-        return self._windows
+    def with_window(self, window_definition):
+        """Create a list with windows defined."""
+        self._windows = [
+            Window(
+                partition_by=None,
+                order_by=None,
+                mode="rolling_windows",
+                window_definition=definition,
+            )
+            for definition in window_definition
+        ]
+        return self
 
-    @windows.setter
-    def windows(self, windows: List[str]):
-        """Time ranges definitions to be used in the windows."""
-        if not windows:
-            raise KeyError("Windows must not be empty.")
-        if not isinstance(windows, List):
-            raise KeyError(f"Windows must be a list.")
-        if len(windows) == 0:
-            raise KeyError(f"Windows must have one item at least.")
-        # TODO: accept multiple modes in the same feature.
-        if self.mode[0] not in ["row_windows"]:
-            self._check_windows(windows)
-        self._windows = windows
+    def _get_output_name(self, function, window=None):
+        base_name = "__".join([self._parent.name, function])
 
-    def _check_windows(self, windows):
-        for window in windows:
-            if window.split()[1] not in self.allowed_windows:
-                raise KeyError(
-                    f"{window.split()[1]} is not supported. These are the allowed "
-                    f"time windows that you can use: "
-                    f"{self.allowed_windows}."
-                )
-            if int(window.split()[0]) <= 0:
-                raise KeyError(f"{window} have negative element.")
-            if self.mode[
-                0
-            ] == "rolling_windows" and self._rolling_windows_allowed_duration(window):
-                raise ValueError(
-                    "Window duration has to be greater or equal than 1 day"
-                    " in rolling_windows mode."
-                )
+        if self._windows:
+            return "_".join([base_name, window.get_name()])
 
-    def _rolling_windows_allowed_duration(self, window):
-        """Allowed rolling windows durations regarding the slide duration."""
-        for key in self.__ALLOWED_WINDOWS.keys():
-            if window.split()[1] in key and (
-                self.__ALLOWED_WINDOWS[key] * int(window.split()[0])
-                < self.__ALLOWED_WINDOWS[("day", "days")]
-            ):
-                return True
-        return
+        return base_name
 
-    @property
-    def allowed_windows(self) -> List[str]:
-        """Allowed time ranges to be used in the windows."""
-        allowed_window_units = []
-        for (i, j) in self.__ALLOWED_WINDOWS.keys():
-            allowed_window_units.extend([i, j])
-        return allowed_window_units
-
-    @property
-    def mode(self) -> List[str]:
-        """Available modes to be used in the windows."""
-        return self._mode
-
-    @mode.setter
-    def mode(self, value: List[str]):
-        """Modes definitions to be used in the windows."""
-        modes = []
-        if not value:
-            raise ValueError("Modes must not be empty.")
-        if len(value) > 1:
-            raise NotImplementedError("We currently accept just one mode per feature.")
-        for mode in value:
-            if mode not in self.allowed_modes:
-                raise KeyError(
-                    f"{mode} is not supported. These are the allowed "
-                    f"modes that you can use: "
-                    f"{self.allowed_modes}"
-                )
-            if mode in ["rolling_windows"]:
-                warnings.warn(
-                    f"{mode} mode will change the dataset granularity! "
-                    f"You cannot perform any other transformation. "
-                )
-            modes.append(mode)
-        self._mode = modes
-
-    @property
-    def allowed_modes(self) -> List[str]:
-        """Allowed modes to be used in the windows."""
-        return self.__ALLOWED_MODES
-
-    def _get_feature_name(self, aggregation, window_unit, window_size):
-        """Construct features name based on passed criteria."""
-        return (
-            f"{self._parent.name}__{aggregation}_over_"
-            f"{str(window_size)}_{window_unit}_{self.mode[0]}"
-        )
+    def _dataframe_list_join(self, df_base, df):
+        if self._windows:
+            return df_base.join(
+                df, on=[f"{self.group_by}", f"{TIMESTAMP_COLUMN}"], how="full_outer"
+            )
+        return df_base.join(df, on=self.group_by, how="full_outer")
 
     @property
     def output_columns(self) -> List[str]:
         """Columns generated by the transformation."""
         output_columns = []
-        for aggregation in self._aggregations:
-            for window in self._windows:
-                output_columns.append(
-                    self._get_feature_name(
-                        aggregation, window.split()[1], window.split()[0]
-                    )
-                )
+        for function in self.functions:
+            if self._windows:
+                for window in self._windows:
+                    output_columns.append(self._get_output_name(function, window))
+            else:
+                output_columns.append("__".join([self._parent.name, function]))
 
         return output_columns
-
-    @staticmethod
-    def _common_window_definition(partition: str, time_column: str):
-        """Defines a common window to be used both in time and rows windows."""
-        w = (
-            Window()
-            .partitionBy(functions.col(partition))
-            .orderBy(functions.col(time_column).cast("long"))
-        )
-        return w
-
-    def _time_window_definition(
-        self, partition: str, time_column: str, window_span: int
-    ):
-        """Defines time windows in seconds (rangeBetween) based on passed criteria."""
-        w = self._common_window_definition(partition, time_column)
-
-        return w.rangeBetween(-window_span, 0)
-
-    def _row_window_definition(
-        self, partition: str, time_column: str, window_span: int
-    ):
-        """Defines row windows (rowsBetween) based on passed criteria."""
-        w = self._common_window_definition(partition, time_column)
-
-        return w.rowsBetween(-window_span, 0)
-
-    def _get_window_span(self, window_unit: str, window_size: int):
-        """Returns window span."""
-        for key in self.__ALLOWED_WINDOWS.keys():
-            if window_unit in key:
-                return self.__ALLOWED_WINDOWS[key] * window_size
-
-    def _time_fixed_window(
-        self, window,
-    ):
-        """Returns aggregations for fixed_windows mode."""
-        w = self._time_window_definition(
-            partition=f"{self.partition}",
-            time_column=f"{self.time_column}",
-            window_span=self._get_window_span(
-                window_unit=window.split()[1], window_size=int(window.split()[0]),
-            ),
-        )
-        return w
-
-    def _row_window(
-        self, window,
-    ):
-        """Returns aggregations for row_windows mode."""
-        w = self._row_window_definition(
-            partition=f"{self.partition}",
-            time_column=f"{self.time_column}",
-            window_span=int(window.split()[0]) - 1,
-        )
-
-        return w
-
-    def _compute_agg(self, dataframe, feature_name, aggregation, window):
-        """Returns dataframe given a aggregation type."""
-        dataframe = dataframe.withColumn(
-            feature_name,
-            self.__ALLOWED_AGGREGATIONS[aggregation](f"{self._parent.name}").over(
-                window
-            ),
-        )
-
-        if self._parent.dtype:
-            dataframe = self._cast_parent_type(dataframe, feature_name)
-
-        return dataframe
-
-    def _dataframe_list_join(self, df_base, df):
-        """Joins a list of passed dataframes base on partition and time columns."""
-        return df_base.join(
-            df, on=[f"{self.partition}", f"{self.time_column}"], how="full_outer"
-        )
-
-    def _rolling_windows_agg(
-        self, dataframe: DataFrame, window, aggregation, feature_name, df_list
-    ):
-        """Returns aggregations for rolling_windows mode."""
-        df = (
-            dataframe.groupBy(
-                f"{self.partition}",
-                functions.window(
-                    timeColumn=f"{self.time_column}",
-                    windowDuration=f"{window.split()[0]} {window.split()[1]}",
-                    slideDuration=self.SLIDE_DURATION,
-                ),
-            ).agg(self.__ALLOWED_AGGREGATIONS[aggregation](f"{self._parent.name}"),)
-        ).select(
-            functions.col(f"{self.partition}"),
-            functions.col(f"{aggregation}({self._parent.name})").alias(feature_name),
-            functions.col("window.end").alias(self.time_column),
-        )
-
-        if self._parent.dtype:
-            df = self._cast_parent_type(df, feature_name)
-
-        df_list.append(df)
-
-        return df_list
-
-    def _cast_parent_type(self, dataframe, feature_name):
-        return dataframe.withColumn(
-            feature_name, functions.col(feature_name).cast(self._parent.dtype.spark),
-        )
 
     def transform(self, dataframe: DataFrame) -> DataFrame:
         """Performs a transformation to the feature pipeline.
@@ -386,37 +198,30 @@ class AggregatedTransform(TransformComponent):
             Transformed dataframe.
         """
         df_list = []
-        for aggregation in self._aggregations:
-            for window in self._windows:
-                feature_name = self._get_feature_name(
-                    aggregation=aggregation,
-                    window_unit=window.split()[1],
-                    window_size=window.split()[0],
+        for function in self.functions:
+            if self._windows:
+                for window in self._windows:
+                    df_window = (
+                        dataframe.groupBy(self.group_by, window.get())
+                        .agg(self.__ALLOWED_AGGREGATIONS[function](self.column))
+                        .select(
+                            self.group_by,
+                            functions.col(f"{function}({self.column})").alias(
+                                self._get_output_name(function, window)
+                            ),
+                            functions.col("window.end").alias(TIMESTAMP_COLUMN),
+                        )
+                    )
+                    df_list.append(df_window)
+            else:
+                df = (
+                    dataframe.groupBy(self.group_by)
+                    .agg(self.__ALLOWED_AGGREGATIONS[function](self.column))
+                    .withColumnRenamed(
+                        f"{function}({self.column})", self._get_output_name(function),
+                    )
                 )
-                if self.mode[0] in ["fixed_windows"]:
-                    time_window = self._time_fixed_window(window=window,)
-                    dataframe = self._compute_agg(
-                        dataframe=dataframe,
-                        feature_name=feature_name,
-                        aggregation=aggregation,
-                        window=time_window,
-                    )
-                if self.mode[0] in ["row_windows"]:
-                    row_window = self._row_window(window=window,)
-                    dataframe = self._compute_agg(
-                        dataframe=dataframe,
-                        feature_name=feature_name,
-                        aggregation=aggregation,
-                        window=row_window,
-                    )
-                elif self.mode[0] in ["rolling_windows"]:
-                    df_list = self._rolling_windows_agg(
-                        dataframe=dataframe,
-                        window=window,
-                        feature_name=feature_name,
-                        aggregation=aggregation,
-                        df_list=df_list,
-                    )
+                df_list.append(df)
 
         if df_list:
             dataframe = reduce(self._dataframe_list_join, df_list)

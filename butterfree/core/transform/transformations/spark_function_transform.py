@@ -84,12 +84,11 @@ class SparkFunctionTransform(TransformComponent):
         self, partition_by, order_by=None, mode=None, window_definition=None
     ):
         """Create a list with windows defined."""
-        windows = []
         if mode is not None:
-            for definition in window_definition:
-                windows.append(Window(partition_by, order_by, mode, definition))
-
-        self._windows = windows
+            self._windows = [
+                Window(partition_by, order_by, mode, definition)
+                for definition in window_definition
+            ]
         return self
 
     def _get_output_name(self, function, window=None):
