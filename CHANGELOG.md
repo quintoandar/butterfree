@@ -21,6 +21,7 @@ Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each 
 
 ### Fixed
 * Fix Types ([#113](https://github.com/quintoandar/butterfree/pull/113))
+* [MLOP-221] H3 and AggregatedFeatureSet bug fix ([#119](https://github.com/quintoandar/butterfree/pull/119))
 
 ## [0.5.0](https://github.com/quintoandar/butterfree/releases/tag/0.5.0)
 ### Added
