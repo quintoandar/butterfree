@@ -169,11 +169,14 @@ class TestFeatureSetPipeline:
                     Feature(
                         name="listing_page_viewed__rent_per_month",
                         description="Average of something.",
-                        transformation=AggregatedTransform(
-                            aggregations=["avg", "stddev_pop"],
-                            partition="user_id",
-                            windows=["7 days", "2 weeks"],
-                            mode=["fixed_windows"],
+                        dtype=DataType.FLOAT,
+                        transformation=SparkFunctionTransform(
+                            functions=[functions.avg, functions.stddev_pop],
+                        ).with_window(
+                            partition_by="user_id",
+                            order_by=TIMESTAMP_COLUMN,
+                            window_definition=["7 days", "2 weeks"],
+                            mode="fixed_windows",
                         ),
                     ),
                 ],
