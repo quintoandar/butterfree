@@ -4,7 +4,10 @@ from butterfree.core.clients import SparkClient
 from butterfree.core.constants.data_type import DataType
 from butterfree.core.transform.aggregated_feature_set import AggregatedFeatureSet
 from butterfree.core.transform.features import Feature, KeyFeature, TimestampFeature
-from butterfree.core.transform.transformations import AggregatedTransform
+from butterfree.core.transform.transformations import (
+    AggregatedTransform,
+    H3HashTransform,
+)
 from butterfree.testing.dataframe import assert_dataframe_equality
 
 
@@ -151,3 +154,38 @@ class TestAggregatedFeatureSet:
 
         # assert
         assert_dataframe_equality(output_df, target_df)
+
+    def test_h3_feature_set(self, h3_input_df, h3_target_df):
+        spark_client = SparkClient()
+
+        feature_set = AggregatedFeatureSet(
+            name="h3_test",
+            entity="h3geolocation",
+            description="Test",
+            keys=[
+                KeyFeature(
+                    name="h3_id",
+                    description="The h3 hash ID",
+                    transformation=H3HashTransform(
+                        h3_resolutions=[6, 7, 8, 9, 10, 11, 12],
+                        lat_column="lat",
+                        lng_column="lng",
+                    ).with_stack(),
+                )
+            ],
+            timestamp=TimestampFeature(),
+            features=[
+                Feature(
+                    name="house_id",
+                    description="Count of house ids over a day.",
+                    dtype=DataType.BIGINT,
+                    transformation=AggregatedTransform(
+                        functions=["count"], group_by="h3_id", column="house_id",
+                    ).with_window(window_definition=["1 day"]),
+                ),
+            ],
+        )
+
+        output_df = feature_set.construct(h3_input_df, client=spark_client)
+
+        assert_dataframe_equality(output_df, h3_target_df)
