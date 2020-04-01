@@ -1,9 +1,8 @@
 import datetime
 import random
-from unittest.mock import Mock
 
 import pytest
-from pyspark.sql import DataFrame
+from pyspark.sql.functions import spark_partition_id
 
 from butterfree.core.load.writers import HistoricalFeatureStoreWriter
 from butterfree.testing.dataframe import assert_dataframe_equality
@@ -110,13 +109,35 @@ class TestHistoricalFeatureStoreWriter:
             set(random_dates)
         )
 
-    def test__repartition_df(self):
+    def test__repartition_df(self, spark_session, spark_context):
         # arrange
-        writer = HistoricalFeatureStoreWriter(num_partitions=10)
-        dataframe = Mock(spec=DataFrame)
+        start = datetime.datetime(year=1970, month=1, day=1)
+        end = datetime.datetime(year=2020, month=12, day=31)
+        random_dates = [
+            (
+                lambda: start
+                + datetime.timedelta(
+                    seconds=random.randint(  # noqa: S311
+                        0, int((end - start).total_seconds())
+                    )
+                )
+            )()
+            .date()
+            .isoformat()
+            for _ in range(10000)
+        ]
+        data = [{"timestamp": date} for date in random_dates]
+        input_df = spark_session.read.json(
+            spark_context.parallelize(data, 1), schema="timestamp timestamp"
+        )
+
+        writer = HistoricalFeatureStoreWriter()
 
         # act
-        writer._repartition_df(dataframe)
+        result_df = writer._create_partitions(input_df)
 
         # assert
-        dataframe.repartition.assert_called_with(10, *writer.PARTITION_BY)
+        # Only one partition id, meaning data is not partitioned
+        assert input_df.select(spark_partition_id()).distinct().count() == 1
+        # Desired number of partitions
+        assert result_df.select(spark_partition_id()).distinct().count() == 200
