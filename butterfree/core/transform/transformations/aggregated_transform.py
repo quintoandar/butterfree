@@ -1,4 +1,5 @@
 """Aggregated Transform entity."""
+import itertools
 from functools import reduce
 from typing import List
 
@@ -202,17 +203,16 @@ class AggregatedTransform(TransformComponent):
     ):
         """Compute aggregates on Grouped Dataframe."""
         if isinstance(aggfunc, list):
-            if window and isinstance(window, list):
-                return [
-                    self.aggregate(dataframe, groupby, f, aggcolumn, w, pivot_on)
-                    for f in aggfunc
-                    for w in window
-                ]
-            else:
-                return [
-                    self.aggregate(dataframe, groupby, f, aggcolumn, window, pivot_on)
-                    for f in aggfunc
-                ]
+            return [
+                self.aggregate(dataframe, groupby, f, aggcolumn, window, pivot_on)
+                for f in aggfunc
+            ]
+
+        if window and isinstance(window, list):
+            return [
+                self.aggregate(dataframe, groupby, aggfunc, aggcolumn, w, pivot_on)
+                for w in window
+            ]
 
         data = (
             dataframe.groupBy(groupby)
@@ -233,44 +233,31 @@ class AggregatedTransform(TransformComponent):
         self, dataframe, groupby, aggfunc, aggcolumn, window=None, pivot_on=None
     ):
         """Renamed the columns of the dataframe."""
-        if window and pivot_on:
-            output_df = dataframe.select(
-                groupby,
-                *[
-                    functions.col(column).alias(
-                        self._get_output_name(aggfunc, window, column)
-                    )
-                    for column in dataframe.columns
-                    if column not in groupby and column != "window"
-                ],
-                functions.col("window.end").alias(TIMESTAMP_COLUMN),
-            )
-            return output_df
+        columns_select = (
+            list(itertools.chain.from_iterable([groupby]))
+            if isinstance(groupby, list)
+            else [groupby]
+        )
 
-        elif pivot_on:
-            for column in dataframe.columns:
-                if column not in groupby:
-                    dataframe = dataframe.withColumnRenamed(
-                        column,
-                        self._get_output_name(function=aggfunc, pivot_column=column),
-                    )
-            return dataframe
+        if window:
+            columns_select.append(functions.col("window.end").alias(TIMESTAMP_COLUMN))
 
-        elif window:
-            output_df = dataframe.select(
-                groupby,
+        if pivot_on:
+            columns_select += [
+                functions.col(column).alias(
+                    self._get_output_name(aggfunc, window, column)
+                )
+                for column in dataframe.columns
+                if column not in groupby and column != "window"
+            ]
+        else:
+            columns_select.append(
                 functions.col(f"{aggfunc}({aggcolumn})").alias(
                     self._get_output_name(function=aggfunc, window=window)
-                ),
-                functions.col("window.end").alias(TIMESTAMP_COLUMN),
+                )
             )
-            return output_df
 
-        else:
-            output_df = dataframe.withColumnRenamed(
-                f"{aggfunc}({aggcolumn})", self._get_output_name(aggfunc),
-            )
-            return output_df
+        return dataframe.select(*columns_select)
 
     def transform(self, dataframe: DataFrame) -> DataFrame:
         """Performs a transformation to the feature pipeline.
@@ -289,6 +276,9 @@ class AggregatedTransform(TransformComponent):
             window=self._windows,
             pivot_on=self._pivot_column,
         )
+
+        if self._windows:
+            agg_df = itertools.chain.from_iterable(agg_df)
 
         dataframe = reduce(self._dataframe_list_join, agg_df)
         return dataframe
