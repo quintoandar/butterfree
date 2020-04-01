@@ -21,6 +21,151 @@ def feature_set_dataframe(spark_context, spark_session):
 
 
 @fixture
+def h3_input_df(spark_context, spark_session):
+    data = [
+        {
+            "id": 1,
+            "origin_ts": "2016-04-11 11:31:11",
+            "feature1": 200,
+            "feature2": 200,
+            "lat": -23.554190,
+            "lng": -46.670723,
+            "house_id": 8921,
+        },
+        {
+            "id": 1,
+            "origin_ts": "2016-04-11 11:44:12",
+            "feature1": 300,
+            "feature2": 300,
+            "lat": -23.554190,
+            "lng": -46.670723,
+            "house_id": 8921,
+        },
+    ]
+    df = spark_session.read.json(spark_context.parallelize(data, 1))
+    df = df.withColumn(TIMESTAMP_COLUMN, df.origin_ts.cast(DataType.TIMESTAMP.spark))
+
+    return df
+
+
+@fixture
+def h3_target_df(spark_context, spark_session):
+    data = [
+        {
+            "h3_id": "8ba8100ea0d5fff",
+            "timestamp": "2016-04-11 00:00:00",
+            "house_id__count_over_1_day_rolling_windows": None,
+        },
+        {
+            "h3_id": "88a8100ea1fffff",
+            "timestamp": "2016-04-11 00:00:00",
+            "house_id__count_over_1_day_rolling_windows": None,
+        },
+        {
+            "h3_id": "8ca8100ea0d57ff",
+            "timestamp": "2016-04-11 00:00:00",
+            "house_id__count_over_1_day_rolling_windows": None,
+        },
+        {
+            "h3_id": "89a8100ea0fffff",
+            "timestamp": "2016-04-11 00:00:00",
+            "house_id__count_over_1_day_rolling_windows": None,
+        },
+        {
+            "h3_id": "86a8100efffffff",
+            "timestamp": "2016-04-11 00:00:00",
+            "house_id__count_over_1_day_rolling_windows": None,
+        },
+        {
+            "h3_id": "87a8100eaffffff",
+            "timestamp": "2016-04-11 00:00:00",
+            "house_id__count_over_1_day_rolling_windows": None,
+        },
+        {
+            "h3_id": "8aa8100ea0d7fff",
+            "timestamp": "2016-04-11 00:00:00",
+            "house_id__count_over_1_day_rolling_windows": None,
+        },
+        {
+            "h3_id": "8ba8100ea0d5fff",
+            "timestamp": "2016-04-12 00:00:00",
+            "house_id__count_over_1_day_rolling_windows": 2,
+        },
+        {
+            "h3_id": "88a8100ea1fffff",
+            "timestamp": "2016-04-12 00:00:00",
+            "house_id__count_over_1_day_rolling_windows": 2,
+        },
+        {
+            "h3_id": "8ca8100ea0d57ff",
+            "timestamp": "2016-04-12 00:00:00",
+            "house_id__count_over_1_day_rolling_windows": 2,
+        },
+        {
+            "h3_id": "89a8100ea0fffff",
+            "timestamp": "2016-04-12 00:00:00",
+            "house_id__count_over_1_day_rolling_windows": 2,
+        },
+        {
+            "h3_id": "86a8100efffffff",
+            "timestamp": "2016-04-12 00:00:00",
+            "house_id__count_over_1_day_rolling_windows": 2,
+        },
+        {
+            "h3_id": "87a8100eaffffff",
+            "timestamp": "2016-04-12 00:00:00",
+            "house_id__count_over_1_day_rolling_windows": 2,
+        },
+        {
+            "h3_id": "8aa8100ea0d7fff",
+            "timestamp": "2016-04-12 00:00:00",
+            "house_id__count_over_1_day_rolling_windows": 2,
+        },
+        {
+            "h3_id": "8ba8100ea0d5fff",
+            "timestamp": "2016-04-13 00:00:00",
+            "house_id__count_over_1_day_rolling_windows": None,
+        },
+        {
+            "h3_id": "88a8100ea1fffff",
+            "timestamp": "2016-04-13 00:00:00",
+            "house_id__count_over_1_day_rolling_windows": None,
+        },
+        {
+            "h3_id": "8ca8100ea0d57ff",
+            "timestamp": "2016-04-13 00:00:00",
+            "house_id__count_over_1_day_rolling_windows": None,
+        },
+        {
+            "h3_id": "89a8100ea0fffff",
+            "timestamp": "2016-04-13 00:00:00",
+            "house_id__count_over_1_day_rolling_windows": None,
+        },
+        {
+            "h3_id": "86a8100efffffff",
+            "timestamp": "2016-04-13 00:00:00",
+            "house_id__count_over_1_day_rolling_windows": None,
+        },
+        {
+            "h3_id": "87a8100eaffffff",
+            "timestamp": "2016-04-13 00:00:00",
+            "house_id__count_over_1_day_rolling_windows": None,
+        },
+        {
+            "h3_id": "8aa8100ea0d7fff",
+            "timestamp": "2016-04-13 00:00:00",
+            "house_id__count_over_1_day_rolling_windows": None,
+        },
+    ]
+    df = spark_session.read.json(
+        spark_context.parallelize(data).map(lambda x: json.dumps(x))
+    )
+    df = df.withColumn(TIMESTAMP_COLUMN, df.timestamp.cast(DataType.TIMESTAMP.spark))
+
+    return df
+
+
+@fixture
 def target_df_without_window(spark_context, spark_session):
     data = [
         {

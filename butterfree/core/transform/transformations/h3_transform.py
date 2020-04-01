@@ -103,7 +103,7 @@ class H3HashTransform(TransformComponent):
             output_columns.append(f"lat_lng__h3_hash__{h3_resolution}")
 
         if self.stack_transform:
-            return self._parent.name + output_columns
+            return [self._parent.name]
 
         return output_columns
 
