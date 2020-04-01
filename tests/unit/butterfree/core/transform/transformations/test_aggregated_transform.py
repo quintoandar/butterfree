@@ -103,7 +103,7 @@ class TestAggregatedTransform:
         self, feature_set_df_pivot, target_df_pivot_agg
     ):
         test_feature = Feature(
-            name="feature1",
+            name="feature",
             description="unit test",
             dtype=DataType.DOUBLE,
             transformation=AggregatedTransform(
@@ -119,7 +119,7 @@ class TestAggregatedTransform:
         self, feature_set_df_pivot, target_df_pivot_agg_window
     ):
         test_feature = Feature(
-            name="feature1",
+            name="feature",
             description="unit test",
             dtype=DataType.DOUBLE,
             transformation=AggregatedTransform(

@@ -86,7 +86,7 @@ class AggregatedTransform(TransformComponent):
         self.functions = functions
         self.column = column
         self._windows = []
-        self._pivot = None
+        self._pivot_column = None
 
     __ALLOWED_AGGREGATIONS = {
         "approx_count_distinct": functions.approx_count_distinct,
@@ -163,11 +163,14 @@ class AggregatedTransform(TransformComponent):
 
     def with_pivot(self, pivot_column):
         """Create a list with windows defined."""
-        self._pivot = pivot_column
+        self._pivot_column = pivot_column
         return self
 
-    def _get_output_name(self, function, window=None, column=None):
-        base_name = "__".join([column or self._parent.name, function])
+    def _get_output_name(self, function, window=None, pivot_column=None):
+        base_name = "__".join([self._parent.name, function])
+
+        if pivot_column:
+            base_name = "_".join([pivot_column, base_name])
 
         if self._windows:
             return "_".join([base_name, window.get_name()])
@@ -194,6 +197,81 @@ class AggregatedTransform(TransformComponent):
 
         return output_columns
 
+    def aggregate(
+        self, dataframe, groupby, aggfunc, aggcolumn, window=None, pivot_on=None
+    ):
+        """Compute aggregates on Grouped Dataframe."""
+        if isinstance(aggfunc, list):
+            if window and isinstance(window, list):
+                return [
+                    self.aggregate(dataframe, groupby, f, aggcolumn, w, pivot_on)
+                    for f in aggfunc
+                    for w in window
+                ]
+            else:
+                return [
+                    self.aggregate(dataframe, groupby, f, aggcolumn, window, pivot_on)
+                    for f in aggfunc
+                ]
+
+        data = (
+            dataframe.groupBy(groupby)
+            if not window
+            else dataframe.groupBy(groupby, window.get())
+        )
+
+        if pivot_on:
+            data = data.pivot(pivot_on)
+
+        df = data.agg(self.__ALLOWED_AGGREGATIONS[aggfunc](aggcolumn))
+
+        return self.with_renamed_columns(
+            df, groupby, aggfunc, aggcolumn, window, pivot_on
+        )
+
+    def with_renamed_columns(
+        self, dataframe, groupby, aggfunc, aggcolumn, window=None, pivot_on=None
+    ):
+        """Renamed the columns of the dataframe."""
+        if window and pivot_on:
+            output_df = dataframe.select(
+                groupby,
+                *[
+                    functions.col(column).alias(
+                        self._get_output_name(aggfunc, window, column)
+                    )
+                    for column in dataframe.columns
+                    if column not in groupby and column != "window"
+                ],
+                functions.col("window.end").alias(TIMESTAMP_COLUMN),
+            )
+            return output_df
+
+        elif pivot_on:
+            for column in dataframe.columns:
+                if column not in groupby:
+                    dataframe = dataframe.withColumnRenamed(
+                        column,
+                        self._get_output_name(function=aggfunc, pivot_column=column),
+                    )
+            return dataframe
+
+        elif window:
+            output_df = dataframe.select(
+                groupby,
+                functions.col(f"{aggfunc}({aggcolumn})").alias(
+                    self._get_output_name(function=aggfunc, window=window)
+                ),
+                functions.col("window.end").alias(TIMESTAMP_COLUMN),
+            )
+            return output_df
+
+        else:
+            output_df = dataframe.withColumnRenamed(
+                f"{aggfunc}({aggcolumn})", self._get_output_name(aggfunc),
+            )
+            return output_df
+
     def transform(self, dataframe: DataFrame) -> DataFrame:
         """Performs a transformation to the feature pipeline.
 
@@ -203,70 +281,14 @@ class AggregatedTransform(TransformComponent):
         Returns:
             Transformed dataframe.
         """
-        df_list = []
-        for function in self.functions:
-            if self._windows:
-                grouped_data = [
-                    dataframe.groupBy(self.group_by, window.get())
-                    for window in self._windows
-                ]
-            else:
-                grouped_data = [dataframe.groupBy(self.group_by)]
+        agg_df = self.aggregate(
+            dataframe=dataframe,
+            groupby=self.group_by,
+            aggfunc=self.functions,
+            aggcolumn=self.column,
+            window=self._windows,
+            pivot_on=self._pivot_column,
+        )
 
-            if self._pivot:
-                grouped_pivot = [df.pivot(self._pivot) for df in grouped_data]
-            else:
-                grouped_pivot = grouped_data
-
-            index_windows = 0
-            for df in grouped_pivot:
-                agg_df = df.agg(self.__ALLOWED_AGGREGATIONS[function](self.column))
-
-                if self._pivot and self._windows:
-                    output_df = agg_df.select(
-                        self.group_by,
-                        *[
-                            functions.col(column).alias(
-                                self._get_output_name(
-                                    function, self._windows[index_windows], column
-                                )
-                            )
-                            for column in agg_df.columns
-                            if column not in self.group_by and column != "window"
-                        ],
-                        functions.col("window.end").alias(TIMESTAMP_COLUMN),
-                    )
-                    df_list.append(output_df)
-                    index_windows += 1
-
-                elif self._pivot:
-                    for column in agg_df.columns:
-                        if column not in self.group_by:
-                            agg_df = agg_df.withColumnRenamed(
-                                column, f"{column}__{function}"
-                            )
-                    df_list.append(agg_df)
-
-                elif self._windows:
-                    output_df = agg_df.select(
-                        self.group_by,
-                        functions.col(f"{function}({self.column})").alias(
-                            self._get_output_name(
-                                function, self._windows[index_windows]
-                            )
-                        ),
-                        functions.col("window.end").alias(TIMESTAMP_COLUMN),
-                    )
-                    df_list.append(output_df)
-                    index_windows += 1
-
-                else:
-                    output_df = agg_df.withColumnRenamed(
-                        f"{function}({self.column})", self._get_output_name(function),
-                    )
-                    df_list.append(output_df)
-
-        if df_list:
-            dataframe = reduce(self._dataframe_list_join, df_list)
-
+        dataframe = reduce(self._dataframe_list_join, agg_df)
         return dataframe

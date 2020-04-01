@@ -330,10 +330,10 @@ def target_df_pivot_agg(spark_context, spark_session):
     data = [
         {
             "id": 1,
-            "S__avg": 450,
-            "S__stddev_pop": 50,
-            "N__avg": 250,
-            "N__stddev_pop": 50,
+            "S_feature__avg": 450,
+            "S_feature__stddev_pop": 50,
+            "N_feature__avg": 250,
+            "N_feature__stddev_pop": 50,
         },
     ]
     df = spark_session.read.json(spark_context.parallelize(data, 1))
@@ -347,18 +347,18 @@ def target_df_pivot_agg_window(spark_context, spark_session):
         {
             "id": 1,
             "timestamp": "2016-04-12 00:00:00",
-            "S__avg_over_2_days_rolling_windows": 450,
-            "S__stddev_pop_over_2_days_rolling_windows": 50,
-            "N__avg_over_2_days_rolling_windows": 250,
-            "N__stddev_pop_over_2_days_rolling_windows": 50,
+            "S_feature__avg_over_2_days_rolling_windows": 450,
+            "S_feature__stddev_pop_over_2_days_rolling_windows": 50,
+            "N_feature__avg_over_2_days_rolling_windows": 250,
+            "N_feature__stddev_pop_over_2_days_rolling_windows": 50,
         },
         {
             "id": 1,
             "timestamp": "2016-04-13 00:00:00",
-            "S__avg_over_2_days_rolling_windows": 450,
-            "S__stddev_pop_over_2_days_rolling_windows": 50,
-            "N__avg_over_2_days_rolling_windows": 250,
-            "N__stddev_pop_over_2_days_rolling_windows": 50,
+            "S_feature__avg_over_2_days_rolling_windows": 450,
+            "S_feature__stddev_pop_over_2_days_rolling_windows": 50,
+            "N_feature__avg_over_2_days_rolling_windows": 250,
+            "N_feature__stddev_pop_over_2_days_rolling_windows": 50,
         },
     ]
     df = spark_session.read.json(spark_context.parallelize(data, 1))
