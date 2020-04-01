@@ -69,9 +69,6 @@ class TestOnlineFeatureStoreWriter:
         # when
         writer.write(feature_set, feature_set_dataframe, spark_client)
 
-        # then
-        spark_client.write_dataframe.assert_called_once()
-
         assert sorted(latest_feature_set_dataframe.collect()) == sorted(
             spark_client.write_dataframe.call_args[1]["dataframe"].collect()
         )
@@ -86,7 +83,7 @@ class TestOnlineFeatureStoreWriter:
         # are in the called args in write_dataframe
         assert all(
             item in spark_client.write_dataframe.call_args[1].items()
-            for item in writer.db_config.get_options(table=feature_set.name).items()
+            for item in writer.db_config.get_options(table=feature_set.entity).items()
         )
 
     @pytest.mark.parametrize("has_checkpoint", [True, False])
