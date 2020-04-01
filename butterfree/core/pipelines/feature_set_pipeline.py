@@ -1,5 +1,8 @@
 """FeatureSetPipeline entity."""
+from typing import List
+
 from butterfree.core.clients import SparkClient
+from butterfree.core.dataframe_service import repartition_sort_df
 from butterfree.core.extract import Source
 from butterfree.core.load import Sink
 from butterfree.core.transform import FeatureSet
@@ -164,7 +167,12 @@ class FeatureSetPipeline:
         if not isinstance(self._spark_client, SparkClient):
             raise ValueError("spark_client must be a SparkClient instance")
 
-    def run(self, base_date: str = None):
+    def run(
+        self,
+        base_date: str = None,
+        partition_by: List[str] = None,
+        num_processors: int = None,
+    ):
         """Runs the defined feature set pipeline.
 
         The pipeline consists in the following steps:
@@ -172,8 +180,14 @@ class FeatureSetPipeline:
         - Construct the feature set dataframe using the defined Features.
         - Load the data to the configured sink locations.
 
+        It's important to notice, however, that both parameters partition_by
+        and num_processors are WIP, we intend to enhance their functionality
+        soon. Use only if strictly necessary.
+
         """
         dataframe = self.source.construct(client=self.spark_client)
+        if partition_by:
+            dataframe = repartition_sort_df(dataframe, partition_by, num_processors)
         dataframe = self.feature_set.construct(
             dataframe=dataframe, client=self.spark_client, base_date=base_date
         )
