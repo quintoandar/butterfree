@@ -180,6 +180,10 @@ class FeatureSetPipeline:
         - Construct the feature set dataframe using the defined Features.
         - Load the data to the configured sink locations.
 
+        It's important to notice, however, that both parameters partition_by
+        and num_processors are WIP, we intend to enhance their functionality
+        soon. Use only if strictly necessary.
+
         """
         dataframe = self.source.construct(client=self.spark_client)
         if partition_by:
