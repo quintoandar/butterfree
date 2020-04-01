@@ -2,14 +2,25 @@
 All notable changes to this project will be documented in this file.
 
 Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each release or unreleased log for a better organization.
+
 ## Unreleased
 
+## [0.6.0](https://github.com/quintoandar/butterfree/releases/tag/0.6.0)
 ### Added
-* [MLOP-185] StackTransform ([#105](https://github.com/quintoandar/butterfree/pull/105))
 * [MLOP-209] with_stack on H3HashTransform ([#114](https://github.com/quintoandar/butterfree/pull/114))
+* [MLOP-141] Create client cassandra on butterfree ([#109](https://github.com/quintoandar/butterfree/pull/109))
+* [MLOP-185] StackTransform ([#105](https://github.com/quintoandar/butterfree/pull/105))
+* [MLOP-176] MostFrequent aggregation ([#104](https://github.com/quintoandar/butterfree/pull/104))
 
 ### Changed
+* [MLOP-202] Refactoring Agg - Create AggregatedFeatureSet and refactor AggregatedTransform ([#108](https://github.com/quintoandar/butterfree/pull/108))
+* [MLOP-137] Make data_type argument mandatory ([#107](https://github.com/quintoandar/butterfree/pull/107))
+* [MLOP-136] Improve DataType with supported spark/cassandra types ([#106](https://github.com/quintoandar/butterfree/pull/106))
+* [MLOP-201] Refactoring Agg - Create FrameBoundaries, Window and SparkFunctionTransform ([#103](https://github.com/quintoandar/butterfree/pull/103))
 * [MLOP-168] HistoricalFeatureStoreWriter Create Partitions Tests and Refactoring ([#102](https://github.com/quintoandar/butterfree/pull/102))
+
+### Fixed
+* Fix Types ([#113](https://github.com/quintoandar/butterfree/pull/113))
 
 ## [0.5.0](https://github.com/quintoandar/butterfree/releases/tag/0.5.0)
 ### Added
