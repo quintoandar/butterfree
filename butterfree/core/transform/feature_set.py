@@ -333,7 +333,7 @@ class FeatureSet:
         return df.select([column for column in self.columns])
 
     def construct(
-        self, dataframe: DataFrame, client: SparkClient, base_date: str = None
+        self, dataframe: DataFrame, client: SparkClient, end_date: str = None
     ) -> DataFrame:
         """Use all the features to build the feature set dataframe.
 
@@ -343,7 +343,7 @@ class FeatureSet:
         Args:
             dataframe: input dataframe to be transformed by the features.
             client: client responsible for connecting to Spark session.
-            base_date: user defined base date.
+            end_date: user defined base date.
 
         Returns:
             Spark dataframe with all the feature columns.
