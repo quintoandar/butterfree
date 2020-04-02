@@ -17,8 +17,12 @@ from butterfree.core.load.writers import (
 from butterfree.core.load.writers.writer import Writer
 from butterfree.core.pipelines.feature_set_pipeline import FeatureSetPipeline
 from butterfree.core.transform import FeatureSet
+from butterfree.core.transform.aggregated_feature_set import AggregatedFeatureSet
 from butterfree.core.transform.features import Feature, KeyFeature, TimestampFeature
-from butterfree.core.transform.transformations import SparkFunctionTransform
+from butterfree.core.transform.transformations import (
+    AggregatedTransform,
+    SparkFunctionTransform,
+)
 
 
 class TestFeatureSetPipeline:
@@ -319,3 +323,51 @@ class TestFeatureSetPipeline:
                 ),
                 sink=Mock(writers=[HistoricalFeatureStoreWriter(db_config=None)],),
             )
+
+    def test_run_agg_with_end_date(self, spark_session):
+        test_pipeline = FeatureSetPipeline(
+            spark_client=SparkClient(),
+            source=Mock(
+                spec=Source,
+                readers=[TableReader(id="source_a", database="db", table="table",)],
+                query="select * from source_a",
+            ),
+            feature_set=Mock(
+                spec=AggregatedFeatureSet,
+                name="feature_set",
+                entity="entity",
+                description="description",
+                keys=[
+                    KeyFeature(
+                        name="user_id", description="The user's Main ID or device ID",
+                    )
+                ],
+                timestamp=TimestampFeature(from_column="ts"),
+                features=[
+                    Feature(
+                        name="listing_page_viewed__rent_per_month",
+                        description="Average of something.",
+                        dtype=DataType.FLOAT,
+                        transformation=AggregatedTransform(
+                            functions=["avg", "stddev_pop"],
+                            group_by="user_id",
+                            column="rent",
+                        ).with_window(window_definition=["7 days", "2 weeks"]),
+                    ),
+                ],
+            ),
+            sink=Mock(
+                spec=Sink, writers=[HistoricalFeatureStoreWriter(db_config=None)],
+            ),
+        )
+
+        # feature_set need to return a real df for streaming validation
+        sample_df = spark_session.createDataFrame([{"a": "x", "b": "y", "c": "3"}])
+        test_pipeline.feature_set.construct.return_value = sample_df
+
+        test_pipeline.run(end_date="2016-04-18")
+
+        test_pipeline.source.construct.assert_called_once()
+        test_pipeline.feature_set.construct.assert_called_once()
+        test_pipeline.sink.flush.assert_called_once()
+        test_pipeline.sink.validate.assert_called_once()

@@ -250,7 +250,7 @@ class AggregatedFeatureSet(FeatureSet):
         Args:
             dataframe: input dataframe to be transformed by the features.
             client: client responsible for connecting to Spark session.
-            base_date: user defined base date.
+            end_date: user defined base date.
 
         Returns:
             Spark dataframe with all the feature columns.
