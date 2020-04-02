@@ -1,11 +1,10 @@
 """FeatureSetPipeline entity."""
-from typing import List
-
 from butterfree.core.clients import SparkClient
 from butterfree.core.dataframe_service import repartition_sort_df
 from butterfree.core.extract import Source
 from butterfree.core.load import Sink
 from butterfree.core.transform import FeatureSet
+from butterfree.core.transform.aggregated_feature_set import AggregatedFeatureSet
 
 
 class FeatureSetPipeline:
@@ -23,6 +22,7 @@ class FeatureSetPipeline:
         >>> import os
 
         >>> from butterfree.core.pipelines import FeatureSetPipeline
+        >>> from butterfree.core.constants.columns import TIMESTAMP_COLUMN
         >>> from butterfree.core.configs.db import S3Config
         >>> from butterfree.core.extract import Source
         >>> from butterfree.core.extract.readers import TableReader
@@ -33,7 +33,7 @@ class FeatureSetPipeline:
         ...     TimestampFeature,
         ...)
         >>> from butterfree.core.transform.transformations import (
-        ...     AggregatedTransform,
+        ...     SparkFunctionTransform,
         ...     CustomTransform,
         ... )
         >>> from butterfree.core.load import Sink
@@ -64,11 +64,14 @@ class FeatureSetPipeline:
         ...            Feature(
         ...                name="feature1",
         ...                description="test",
-        ...                transformation=AggregatedTransform(
-        ...                    aggregations=["avg", "std"],
-        ...                    partition="id",
-        ...                    windows=["2 minutes", "15 minutes"],
-        ...                ),
+        ...            transformation=SparkFunctionTransform(
+        ...                 functions=[F.avg, F.stddev_pop]
+        ...             ).with_window(
+        ...                 partition_by="id",
+        ...                 order_by=TIMESTAMP_COLUMN,
+        ...                 mode="fixed_windows",
+        ...                 window_definition=["2 minutes", "15 minutes"],
+        ...             ),
         ...            ),
         ...            Feature(
         ...                name="divided_feature",
@@ -169,7 +172,7 @@ class FeatureSetPipeline:
 
     def run(
         self,
-        base_date: str = None,
+        end_date: str = None,
         partition_by: List[str] = None,
         num_processors: int = None,
     ):
@@ -186,11 +189,20 @@ class FeatureSetPipeline:
 
         """
         dataframe = self.source.construct(client=self.spark_client)
+
         if partition_by:
             dataframe = repartition_sort_df(dataframe, partition_by, num_processors)
-        dataframe = self.feature_set.construct(
-            dataframe=dataframe, client=self.spark_client, base_date=base_date
-        )
+
+
+        if isinstance(self.feature_set, AggregatedFeatureSet):
+            dataframe = self.feature_set.construct(
+                dataframe=dataframe, client=self.spark_client, end_date=end_date
+            )
+        else:
+            dataframe = self.feature_set.construct(
+                dataframe=dataframe, client=self.spark_client
+            )
+
         self.sink.flush(
             dataframe=dataframe,
             feature_set=self.feature_set,
