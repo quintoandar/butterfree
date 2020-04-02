@@ -1,4 +1,6 @@
 """FeatureSetPipeline entity."""
+from typing import List
+
 from butterfree.core.clients import SparkClient
 from butterfree.core.dataframe_service import repartition_sort_df
 from butterfree.core.extract import Source
@@ -192,7 +194,6 @@ class FeatureSetPipeline:
 
         if partition_by:
             dataframe = repartition_sort_df(dataframe, partition_by, num_processors)
-
 
         if isinstance(self.feature_set, AggregatedFeatureSet):
             dataframe = self.feature_set.construct(
