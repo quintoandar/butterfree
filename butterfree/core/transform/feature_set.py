@@ -332,7 +332,9 @@ class FeatureSet:
 
         return df.select([column for column in self.columns])
 
-    def construct(self, dataframe: DataFrame, client: SparkClient) -> DataFrame:
+    def construct(
+        self, dataframe: DataFrame, client: SparkClient, end_date: str = None
+    ) -> DataFrame:
         """Use all the features to build the feature set dataframe.
 
         After that, there's the caching of the dataframe, however since cache()
@@ -341,6 +343,7 @@ class FeatureSet:
         Args:
             dataframe: input dataframe to be transformed by the features.
             client: client responsible for connecting to Spark session.
+            end_date: user defined base date.
 
         Returns:
             Spark dataframe with all the feature columns.

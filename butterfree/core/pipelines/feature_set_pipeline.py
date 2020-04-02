@@ -6,7 +6,6 @@ from butterfree.core.dataframe_service import repartition_sort_df
 from butterfree.core.extract import Source
 from butterfree.core.load import Sink
 from butterfree.core.transform import FeatureSet
-from butterfree.core.transform.aggregated_feature_set import AggregatedFeatureSet
 
 
 class FeatureSetPipeline:
@@ -195,14 +194,9 @@ class FeatureSetPipeline:
         if partition_by:
             dataframe = repartition_sort_df(dataframe, partition_by, num_processors)
 
-        if isinstance(self.feature_set, AggregatedFeatureSet):
-            dataframe = self.feature_set.construct(
-                dataframe=dataframe, client=self.spark_client, end_date=end_date
-            )
-        else:
-            dataframe = self.feature_set.construct(
-                dataframe=dataframe, client=self.spark_client
-            )
+        dataframe = self.feature_set.construct(
+            dataframe=dataframe, client=self.spark_client, end_date=end_date
+        )
 
         self.sink.flush(
             dataframe=dataframe,
