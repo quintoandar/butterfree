@@ -6,6 +6,7 @@ from butterfree.core.constants import columns
 from butterfree.core.constants.columns import TIMESTAMP_COLUMN
 from butterfree.core.constants.data_type import DataType
 from butterfree.core.transform import FeatureSet
+from butterfree.core.transform.aggregated_feature_set import AggregatedFeatureSet
 from butterfree.core.transform.features import Feature, KeyFeature, TimestampFeature
 from butterfree.core.transform.transformations import AggregatedTransform
 
@@ -132,7 +133,7 @@ def feature_sets(request):
 
 @fixture
 def test_feature_set():
-    return FeatureSet(
+    return AggregatedFeatureSet(
         name="feature_set",
         entity="entity",
         description="description",
@@ -142,22 +143,16 @@ def test_feature_set():
                 description="test",
                 dtype=DataType.DOUBLE,
                 transformation=AggregatedTransform(
-                    aggregations=["avg", "stddev_pop"],
-                    partition="id",
-                    windows=["2 minutes", "15 minutes"],
-                    mode=["fixed_windows"],
-                ),
+                    functions=["avg", "stddev_pop"], group_by="id", column="feature1",
+                ).with_window(window_definition=["1 week"]),
             ),
             Feature(
                 name="feature2",
                 description="test",
                 dtype=DataType.DOUBLE,
                 transformation=AggregatedTransform(
-                    aggregations=["count"],
-                    partition="id",
-                    windows=["2 days"],
-                    mode=["fixed_windows"],
-                ),
+                    functions=["count"], group_by="id", column="feature2",
+                ).with_window(window_definition=["2 days"]),
             ),
         ],
         keys=[
@@ -174,20 +169,25 @@ def test_feature_set():
 @fixture
 def expected_schema():
     return [
-        {
-            "column_name": "feature1",
-            "type": DataType.DOUBLE.cassandra,
-            "primary_key": False,
-        },
-        {
-            "column_name": "feature2",
-            "type": DataType.DOUBLE.cassandra,
-            "primary_key": False,
-        },
         {"column_name": "id", "type": DataType.BIGINT.cassandra, "primary_key": True},
         {
             "column_name": "timestamp",
             "type": DataType.TIMESTAMP.cassandra,
+            "primary_key": False,
+        },
+        {
+            "column_name": "feature1__avg_over_1_week_rolling_windows",
+            "type": DataType.DOUBLE.cassandra,
+            "primary_key": False,
+        },
+        {
+            "column_name": "feature1__stddev_pop_over_1_week_rolling_windows",
+            "type": DataType.DOUBLE.cassandra,
+            "primary_key": False,
+        },
+        {
+            "column_name": "feature2__count_over_2_days_rolling_windows",
+            "type": DataType.DOUBLE.cassandra,
             "primary_key": False,
         },
     ]
