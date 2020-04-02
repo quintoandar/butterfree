@@ -1,5 +1,6 @@
 import pytest
 from pyspark.sql import functions
+from pyspark.sql.types import ArrayType, DoubleType, LongType, StringType, TimestampType
 
 from butterfree.core.clients import SparkClient
 from butterfree.core.constants.data_type import DataType
@@ -72,21 +73,21 @@ class TestFeatureSet:
 
     def test_get_schema(self):
         expected_schema = [
-            {"column_name": "id", "type": "LongType", "primary_key": True},
-            {"column_name": "timestamp", "type": "TimestampType", "primary_key": False},
+            {"column_name": "id", "type": LongType(), "primary_key": True},
+            {"column_name": "timestamp", "type": TimestampType(), "primary_key": False},
             {
                 "column_name": "feature1__avg_over_1_week_rolling_windows",
-                "type": "DoubleType",
+                "type": DoubleType(),
                 "primary_key": False,
             },
             {
                 "column_name": "feature1__stddev_pop_over_1_week_rolling_windows",
-                "type": "DoubleType",
+                "type": DoubleType(),
                 "primary_key": False,
             },
             {
                 "column_name": "feature2__count_over_2_days_rolling_windows",
-                "type": "ArrayType(StringType,true)",
+                "type": ArrayType(StringType(), True),
                 "primary_key": False,
             },
         ]

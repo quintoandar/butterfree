@@ -195,7 +195,7 @@ class CassandraConfig(AbstractWriteConfig):
             cassandra_schema.append(
                 {
                     "column_name": features["column_name"],
-                    "type": cassandra_mapping[features["type"]],
+                    "type": cassandra_mapping[str(features["type"])],
                     "primary_key": features["primary_key"],
                 }
             )

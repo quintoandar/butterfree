@@ -2,6 +2,7 @@ from unittest.mock import Mock
 
 import pytest
 from pyspark.sql import functions as F
+from pyspark.sql.types import FloatType, LongType, TimestampType
 from tests.unit.butterfree.core.transform.conftest import (
     feature_add,
     feature_divide,
@@ -340,26 +341,26 @@ class TestFeatureSet:
 
     def test_get_schema(self):
         expected_schema = [
-            {"column_name": "id", "type": "LongType", "primary_key": True},
-            {"column_name": "timestamp", "type": "TimestampType", "primary_key": False},
+            {"column_name": "id", "type": LongType(), "primary_key": True},
+            {"column_name": "timestamp", "type": TimestampType(), "primary_key": False},
             {
                 "column_name": "feature1__avg_over_2_minutes_fixed_windows",
-                "type": "FloatType",
+                "type": FloatType(),
                 "primary_key": False,
             },
             {
                 "column_name": "feature1__avg_over_15_minutes_fixed_windows",
-                "type": "FloatType",
+                "type": FloatType(),
                 "primary_key": False,
             },
             {
                 "column_name": "feature1__stddev_pop_over_2_minutes_fixed_windows",
-                "type": "FloatType",
+                "type": FloatType(),
                 "primary_key": False,
             },
             {
                 "column_name": "feature1__stddev_pop_over_15_minutes_fixed_windows",
-                "type": "FloatType",
+                "type": FloatType(),
                 "primary_key": False,
             },
         ]

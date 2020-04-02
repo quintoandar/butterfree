@@ -248,7 +248,7 @@ class FeatureSet:
                 schema.append(
                     {
                         "column_name": c,
-                        "type": str(f.dtype.spark),
+                        "type": f.dtype.spark,
                         "primary_key": True if isinstance(f, KeyFeature) else False,
                     }
                 )
