@@ -170,13 +170,14 @@ class OnlineFeatureStoreWriter(Writer):
             List of dicts regarding cassandra feature set schema.
 
         """
-        return [
-            {
-                "column_name": feature.name,
-                "type": feature.dtype.cassandra,
-                "primary_key": True if isinstance(feature, KeyFeature) else False,
-            }
-            for feature in feature_set.features
-            + feature_set.keys
-            + [feature_set.timestamp]
-        ]
+        schema = []
+        for f in feature_set.keys + [feature_set.timestamp] + feature_set.features:
+            for c in feature_set._get_features_columns(f):
+                schema.append(
+                    {
+                        "column_name": c,
+                        "type": f.dtype.cassandra,
+                        "primary_key": True if isinstance(f, KeyFeature) else False,
+                    }
+                )
+        return schema
