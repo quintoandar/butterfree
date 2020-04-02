@@ -1,6 +1,7 @@
 from unittest.mock import Mock
 
 import pytest
+from pyspark.sql import functions as F
 from tests.unit.butterfree.core.transform.conftest import (
     feature_add,
     feature_divide,
@@ -9,10 +10,14 @@ from tests.unit.butterfree.core.transform.conftest import (
 )
 
 from butterfree.core.clients import SparkClient
+from butterfree.core.constants.columns import TIMESTAMP_COLUMN
 from butterfree.core.constants.data_type import DataType
 from butterfree.core.transform import FeatureSet
-from butterfree.core.transform.features import Feature
-from butterfree.core.transform.transformations import AggregatedTransform
+from butterfree.core.transform.features import Feature, KeyFeature, TimestampFeature
+from butterfree.core.transform.transformations import (
+    AggregatedTransform,
+    SparkFunctionTransform,
+)
 
 
 class TestFeatureSet:
@@ -332,3 +337,62 @@ class TestFeatureSet:
                 keys=[key_id],
                 timestamp=timestamp_c,
             ).construct(dataframe, spark_client)
+
+    def test_get_schema(self):
+        expected_schema = [
+            {"column_name": "id", "type": "LongType", "primary_key": True},
+            {"column_name": "timestamp", "type": "TimestampType", "primary_key": False},
+            {
+                "column_name": "feature1__avg_over_2_minutes_fixed_windows",
+                "type": "FloatType",
+                "primary_key": False,
+            },
+            {
+                "column_name": "feature1__avg_over_15_minutes_fixed_windows",
+                "type": "FloatType",
+                "primary_key": False,
+            },
+            {
+                "column_name": "feature1__stddev_pop_over_2_minutes_fixed_windows",
+                "type": "FloatType",
+                "primary_key": False,
+            },
+            {
+                "column_name": "feature1__stddev_pop_over_15_minutes_fixed_windows",
+                "type": "FloatType",
+                "primary_key": False,
+            },
+        ]
+
+        feature_set = FeatureSet(
+            name="feature_set",
+            entity="entity",
+            description="description",
+            features=[
+                Feature(
+                    name="feature1",
+                    description="test",
+                    dtype=DataType.FLOAT,
+                    transformation=SparkFunctionTransform(
+                        functions=[F.avg, F.stddev_pop]
+                    ).with_window(
+                        partition_by="id",
+                        order_by=TIMESTAMP_COLUMN,
+                        mode="fixed_windows",
+                        window_definition=["2 minutes", "15 minutes"],
+                    ),
+                ),
+            ],
+            keys=[
+                KeyFeature(
+                    name="id",
+                    description="The user's Main ID or device ID",
+                    dtype=DataType.BIGINT,
+                )
+            ],
+            timestamp=TimestampFeature(),
+        )
+
+        schema = feature_set.get_schema()
+
+        assert schema == expected_schema

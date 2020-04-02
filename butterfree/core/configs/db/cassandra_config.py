@@ -1,4 +1,5 @@
 """Holds configurations to read and write with Spark to Cassandra DB."""
+from typing import Dict, List
 
 from butterfree.core.configs import environment
 from butterfree.core.configs.db.abstract_config import AbstractWriteConfig
@@ -160,3 +161,43 @@ class CassandraConfig(AbstractWriteConfig):
             "spark.cassandra.auth.password": self.password,
             "spark.cassandra.connection.host": self.host,
         }
+
+    def translate(self, schema) -> List[Dict]:
+        """Get feature set schema to be translated.
+
+        The output will be a list of dictionaries regarding cassandra
+        database schema.
+
+        Args:
+            schema: feature set schema in spark.
+
+        Returns:
+            Cassandra schema.
+
+        """
+        cassandra_mapping = {
+            "TimestampType": "timestamp",
+            "BinaryType": "boolean",
+            "BooleanType": "boolean",
+            "DateType": "timestamp",
+            "DecimalType": "decimal",
+            "DoubleType": "double",
+            "FloatType": "float",
+            "IntegerType": "int",
+            "LongType": "bigint",
+            "StringType": "text",
+            "ArrayType(LongType,true)": "frozen<list<bigint>>",
+            "ArrayType(StringType,true)": "frozen<list<text>>",
+            "ArrayType(FloatType,true)": "frozen<list<float>>",
+        }
+        cassandra_schema = []
+        for features in schema:
+            cassandra_schema.append(
+                {
+                    "column_name": features["column_name"],
+                    "type": cassandra_mapping[features["type"]],
+                    "primary_key": features["primary_key"],
+                }
+            )
+
+        return cassandra_schema
