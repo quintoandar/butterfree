@@ -126,3 +126,11 @@ class TestOnlineFeatureStoreWriter:
         )
         writer.filter_latest.assert_not_called()
         spark_client.write_dataframe.assert_not_called()
+
+    def test_get_feature_set_schema(
+        self, cassandra_config, test_feature_set, expected_schema
+    ):
+        writer = OnlineFeatureStoreWriter(cassandra_config)
+        schema = writer.get_db_schema(test_feature_set)
+
+        assert schema == expected_schema

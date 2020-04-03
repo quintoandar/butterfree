@@ -157,3 +157,16 @@ class OnlineFeatureStoreWriter(Writer):
         # the data already written to the FS.
         # TODO how to run data validations when a database has concurrent writes.
         pass
+
+    def get_db_schema(self, feature_set: FeatureSet):
+        """Get desired database schema.
+
+        Args:
+            feature_set: object processed with feature set metadata.
+
+        Returns:
+            Desired database schema.
+
+        """
+        db_schema = self.db_config.translate(feature_set.get_schema())
+        return db_schema

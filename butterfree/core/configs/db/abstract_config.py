@@ -1,6 +1,7 @@
 """Abstract classes for database configurations with spark."""
 
 from abc import ABC, abstractmethod, abstractproperty
+from typing import Dict, List
 
 
 class AbstractWriteConfig(ABC):
@@ -38,5 +39,17 @@ class AbstractWriteConfig(ABC):
 
         Returns:
             Connection options configuration.
+
+        """
+
+    @abstractmethod
+    def translate(self, schema) -> List[Dict]:
+        """Translate feature set spark schema to the corresponding database.
+
+        Args:
+          schema: feature set schema
+
+        Returns:
+            Corresponding database schema.
 
         """
