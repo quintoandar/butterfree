@@ -1,6 +1,7 @@
 """Holds configurations to read and write with Spark to AWS S3."""
 
 import os
+from typing import Dict, List
 
 from butterfree.core.configs import environment
 from butterfree.core.configs.db.abstract_config import AbstractWriteConfig
@@ -70,3 +71,7 @@ class S3Config(AbstractWriteConfig):
             "format_": self.format_,
             "path": os.path.join(f"s3a://{self.bucket}/", key),
         }
+
+    def translate(self, schema) -> List[Dict]:
+        """Translate feature set spark schema to the corresponding database."""
+        pass
