@@ -120,6 +120,10 @@ class TestFeatureSetPipeline:
             test_pipeline.feature_set.timestamp_column
         )
 
+        target_df = fixed_windows_output_feature_set_dataframe.orderBy(
+            test_pipeline.feature_set.timestamp_column
+        )
+
         # assert
         assert_dataframe_equality(df, target_df)
 
