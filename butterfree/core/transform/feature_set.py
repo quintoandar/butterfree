@@ -1,7 +1,7 @@
 """FeatureSet entity."""
 import itertools
 from functools import reduce
-from typing import List
+from typing import Dict, List
 
 import pyspark.sql.functions as F
 from pyspark.sql import Window
@@ -231,6 +231,28 @@ class FeatureSet:
 
         """
         return self.keys_columns + [self.timestamp_column] + self.features_columns
+
+    def get_schema(self) -> List[Dict]:
+        """Get feature set schema.
+
+        Args:
+            feature_set: object processed with feature set metadata.
+
+        Returns:
+            List of dicts regarding cassandra feature set schema.
+
+        """
+        schema = []
+        for f in self.keys + [self.timestamp] + self.features:
+            for c in self._get_features_columns(f):
+                schema.append(
+                    {
+                        "column_name": c,
+                        "type": f.dtype.spark,
+                        "primary_key": True if isinstance(f, KeyFeature) else False,
+                    }
+                )
+        return schema
 
     @staticmethod
     def _has_aggregated_transform(features):
