@@ -1,13 +1,10 @@
 """AggregatedFeatureSet entity."""
-from datetime import datetime
 from functools import reduce
 from typing import List
 
 from pyspark.sql import DataFrame, functions
 
 from butterfree.core.clients import SparkClient
-from butterfree.core.constants.columns import TIMESTAMP_COLUMN
-from butterfree.core.constants.data_type import DataType
 from butterfree.core.transform import FeatureSet
 from butterfree.core.transform.features import Feature
 from butterfree.core.transform.transformations import AggregatedTransform
@@ -139,57 +136,6 @@ class AggregatedFeatureSet(FeatureSet):
         """
         return all([not feature.transformation.has_windows for feature in features])
 
-    @staticmethod
-    def _generate_date_sequence_df(client: SparkClient, date_range, step=None):
-        """Generates a date sequence dataframe from a given date range.
-
-        Create a Spark DataFrame with a single column named timestamp and a
-        range of dates within the desired interval (start and end dates included).
-        It's also possible to provide a step argument.
-
-        Attributes:
-            client:  spark client used to create the dataframe.
-            date_range: list of the desired date interval.
-            step: time step.
-        """
-        day_in_seconds = 60 * 60 * 24
-        start_date, end_date = date_range
-        step = step or day_in_seconds
-        date_df = client.conn.createDataFrame(
-            [(start_date, end_date)], ("start_date", "end_date")
-        ).select(
-            [
-                functions.col(c)
-                .cast(DataType.TIMESTAMP.spark)
-                .cast(DataType.BIGINT.spark)
-                for c in ("start_date", "end_date")
-            ]
-        )
-        start_date, end_date = date_df.first()
-        return client.conn.range(start_date, end_date + day_in_seconds, step).select(
-            functions.col("id").cast(DataType.TIMESTAMP.spark).alias(TIMESTAMP_COLUMN)
-        )
-
-    def _create_date_range_dataframe(self, client: SparkClient, dataframe, end_date):
-        """Returns a date dataframe within two references.
-
-        Attributes:
-            client: client responsible for connecting to Spark session.
-            dataframe:  source dataframe.
-            end_date: user defined end date or the current date.
-        """
-        start_date = dataframe.select(functions.min(TIMESTAMP_COLUMN)).collect()[0][0]
-        end_date = end_date or datetime.now()
-        date_range = [
-            start_date
-            if isinstance(start_date, str)
-            else start_date.strftime("%Y-%m-%d"),
-            end_date if isinstance(end_date, str) else end_date.strftime("%Y-%m-%d"),
-        ]
-        date_df = self._generate_date_sequence_df(client, date_range)
-
-        return date_df
-
     def _dataframe_join(self, left, right, on, how):
         return left.join(right, on=on, how=how)
 
@@ -249,7 +195,6 @@ class AggregatedFeatureSet(FeatureSet):
             df_list.append(feature_df)
 
         if self._has_aggregated_transform_with_window_only(self.features):
-            date_df = self._create_date_range_dataframe(client, output_df, end_date)
 
             output_df = reduce(
                 lambda left, right: self._dataframe_join(
@@ -274,9 +219,8 @@ class AggregatedFeatureSet(FeatureSet):
                 output_df,
             )
 
-            output_df = self._dataframe_join(
-                output_df, date_df, on=[self.timestamp_column], how="inner"
-            )
+            if end_date:
+                output_df = output_df.filter(f"{self.timestamp_column} <= '{end_date}'")
 
         elif self._has_aggregated_transform_without_window_only(self.features):
             agg_df = output_df.groupBy(self.keys_columns).agg(
