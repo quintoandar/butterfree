@@ -98,3 +98,37 @@ class TestAggregatedTransform:
         output_df = test_feature.transform(feature_set_dataframe).orderBy("timestamp")
 
         assert_dataframe_equality(output_df, target_df_rolling_agg)
+
+    def test_feature_transform_with_pivot(
+        self, feature_set_df_pivot, target_df_pivot_agg
+    ):
+        test_feature = Feature(
+            name="feature",
+            description="unit test",
+            dtype=DataType.DOUBLE,
+            transformation=AggregatedTransform(
+                functions=["avg", "stddev_pop"], group_by="id", column="feature1",
+            ).with_pivot("pivot_col"),
+        )
+
+        output_df = test_feature.transform(feature_set_df_pivot)
+
+        assert_dataframe_equality(output_df, target_df_pivot_agg)
+
+    def test_feature_transform_with_pivot_and_window(
+        self, feature_set_df_pivot, target_df_pivot_agg_window
+    ):
+        test_feature = Feature(
+            name="feature",
+            description="unit test",
+            dtype=DataType.DOUBLE,
+            transformation=AggregatedTransform(
+                functions=["avg", "stddev_pop"], group_by="id", column="feature1",
+            )
+            .with_pivot("pivot_col")
+            .with_window(window_definition=["2 days"]),
+        )
+
+        output_df = test_feature.transform(feature_set_df_pivot)
+
+        assert_dataframe_equality(output_df, target_df_pivot_agg_window)
