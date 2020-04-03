@@ -167,11 +167,11 @@ class AggregatedTransform(TransformComponent):
         self._pivot_column = pivot_column
         return self
 
-    def _get_output_name(self, function, window=None, pivot_column=None):
+    def _get_output_name(self, function, window=None, pivot_value=None):
         base_name = "__".join([self._parent.name, function])
 
-        if pivot_column:
-            base_name = "_".join([pivot_column, base_name])
+        if pivot_value:
+            base_name = "_".join([pivot_value, base_name])
 
         if self._windows:
             return "_".join([base_name, window.get_name()])
