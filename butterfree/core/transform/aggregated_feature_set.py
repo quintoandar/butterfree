@@ -170,56 +170,13 @@ class AggregatedFeatureSet(FeatureSet):
             functions.col("id").cast(DataType.TIMESTAMP.spark).alias(TIMESTAMP_COLUMN)
         )
 
-    def _get_unique_keys(self, output_df):
-        """Get key columns unique values.
-
-        Create a Spark DataFrame with unique key columns values.
-
-        Attributes:
-            output_df:  dataframe to get unique key values.
-        """
-        return output_df.dropDuplicates(subset=self.keys_columns).select(
-            self.keys_columns
-        )
-
-    @staticmethod
-    def _set_cross_join_confs(client, state):
-        """Defines spark configuration."""
-        client.conn.conf.set("spark.sql.crossJoin.enabled", state)
-        client.conn.conf.set("spark.sql.autoBroadcastJoinThreshold", int(state))
-
-    def _cross_join_df(self, client: SparkClient, first_df, second_df):
-        """Cross join between desired dataframes.
-
-        Returns a cross join between the date daframe and transformed
-        dataframe. In order to make this operation faster, the smaller
-        dataframe is cached and autoBroadcastJoinThreshold conf is
-        setted to False.
-
-        Attributes:
-            client:  spark client used to create the dataframe.
-            first_df: a generic dataframe.
-            second_df: another generic dataframe.
-        """
-        self._set_cross_join_confs(client, True)
-        first_df.cache().take(
-            1
-        ) if second_df.count() >= first_df.count() else second_df.cache().take(1)
-        cross_join_df = first_df.join(second_df)
-        cross_join_df.cache().take(1)
-        self._set_cross_join_confs(client, False)
-        return cross_join_df
-
     def _create_date_range_dataframe(self, client: SparkClient, dataframe, end_date):
-        """Performs a join between dataframes.
-
-        Performs a join between the transformed dataframe and the date
-        dataframe.
+        """Returns a date dataframe within two references.
 
         Attributes:
-            dataframe:  source dataframe.
-            output_df: transformed dataframe.
             client: client responsible for connecting to Spark session.
+            dataframe:  source dataframe.
+            end_date: user defined end date or the current date.
         """
         start_date = dataframe.select(functions.min(TIMESTAMP_COLUMN)).collect()[0][0]
         end_date = end_date or datetime.now()
@@ -230,13 +187,34 @@ class AggregatedFeatureSet(FeatureSet):
             end_date if isinstance(end_date, str) else end_date.strftime("%Y-%m-%d"),
         ]
         date_df = self._generate_date_sequence_df(client, date_range)
-        unique_df = self._get_unique_keys(dataframe)
-        cross_join_df = self._cross_join_df(client, date_df, unique_df)
 
-        return cross_join_df
+        return date_df
 
     def _dataframe_join(self, left, right, on, how):
         return left.join(right, on=on, how=how)
+
+    def _create_agg_df_list(self, dataframe):
+        """Returns two aggregated dataframes.
+
+        The first dataframe consists of a date prior to the minimum
+        source dataframe date. The other one is the date next to the
+        maximun source dataframe date.
+
+        Attributes:
+            dataframe:  dataframe to be aggregated.
+        """
+        agg_list = []
+        for spec in [
+            (functions.min, functions.date_sub),
+            (functions.max, functions.date_add),
+        ]:
+            agg_df = (
+                dataframe.groupBy(self.keys_columns)
+                .agg(spec[0](self.timestamp_column).alias(self.timestamp_column))
+                .withColumn(self.timestamp_column, spec[1](self.timestamp_column, 1))
+            )
+            agg_list.append(agg_df)
+        return agg_list
 
     def construct(
         self, dataframe: DataFrame, client: SparkClient, end_date: str = None
@@ -271,16 +249,33 @@ class AggregatedFeatureSet(FeatureSet):
             df_list.append(feature_df)
 
         if self._has_aggregated_transform_with_window_only(self.features):
-            range_df = self._create_date_range_dataframe(client, output_df, end_date)
+            date_df = self._create_date_range_dataframe(client, output_df, end_date)
+
             output_df = reduce(
                 lambda left, right: self._dataframe_join(
                     left,
                     right,
                     on=self.keys_columns + [self.timestamp_column],
-                    how="left",
+                    how="full_outer",
                 ),
                 df_list,
-                range_df,
+            )
+
+            agg_df_list = self._create_agg_df_list(output_df)
+
+            output_df = reduce(
+                lambda left, right: self._dataframe_join(
+                    left,
+                    right,
+                    on=self.keys_columns + [self.timestamp_column],
+                    how="full_outer",
+                ),
+                agg_df_list,
+                output_df,
+            )
+
+            output_df = self._dataframe_join(
+                output_df, date_df, on=[self.timestamp_column], how="inner"
             )
 
         elif self._has_aggregated_transform_without_window_only(self.features):
