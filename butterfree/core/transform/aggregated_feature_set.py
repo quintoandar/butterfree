@@ -139,29 +139,6 @@ class AggregatedFeatureSet(FeatureSet):
     def _dataframe_join(self, left, right, on, how):
         return left.join(right, on=on, how=how)
 
-    def _create_agg_df_list(self, dataframe):
-        """Returns two aggregated dataframes.
-
-        The first dataframe consists of a date prior to the minimum
-        source dataframe date. The other one is the date next to the
-        maximun source dataframe date.
-
-        Attributes:
-            dataframe:  dataframe to be aggregated.
-        """
-        agg_list = []
-        for spec in [
-            (functions.min, functions.date_sub),
-            (functions.max, functions.date_add),
-        ]:
-            agg_df = (
-                dataframe.groupBy(self.keys_columns)
-                .agg(spec[0](self.timestamp_column).alias(self.timestamp_column))
-                .withColumn(self.timestamp_column, spec[1](self.timestamp_column, 1))
-            )
-            agg_list.append(agg_df)
-        return agg_list
-
     def construct(
         self, dataframe: DataFrame, client: SparkClient, end_date: str = None
     ) -> DataFrame:
@@ -204,19 +181,6 @@ class AggregatedFeatureSet(FeatureSet):
                     how="full_outer",
                 ),
                 df_list,
-            )
-
-            agg_df_list = self._create_agg_df_list(output_df)
-
-            output_df = reduce(
-                lambda left, right: self._dataframe_join(
-                    left,
-                    right,
-                    on=self.keys_columns + [self.timestamp_column],
-                    how="full_outer",
-                ),
-                agg_df_list,
-                output_df,
             )
 
             if end_date:

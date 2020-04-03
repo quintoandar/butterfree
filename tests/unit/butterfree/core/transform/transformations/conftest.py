@@ -360,8 +360,18 @@ def target_df_pivot_agg_window(spark_context, spark_session):
             "N_feature__avg_over_2_days_rolling_windows": 250,
             "N_feature__stddev_pop_over_2_days_rolling_windows": 50,
         },
+        {
+            "id": 1,
+            "timestamp": "2016-04-14 00:00:00",
+            "S_feature__avg_over_2_days_rolling_windows": None,
+            "S_feature__stddev_pop_over_2_days_rolling_windows": None,
+            "N_feature__avg_over_2_days_rolling_windows": None,
+            "N_feature__stddev_pop_over_2_days_rolling_windows": None,
+        },
     ]
-    df = spark_session.read.json(spark_context.parallelize(data, 1))
+    df = spark_session.read.json(
+        spark_context.parallelize(data).map(lambda x: json.dumps(x))
+    )
     df = df.withColumn(TIMESTAMP_COLUMN, df.timestamp.cast(DataType.TIMESTAMP.spark))
 
     return df
@@ -439,6 +449,16 @@ def target_df_rolling_agg(spark_context, spark_session):
             "feature1__stddev_pop_over_1_week_rolling_windows": 111.80339887498948,
             "feature1__count_over_1_day_rolling_windows": None,
             "feature1__count_over_1_week_rolling_windows": 4,
+        },
+        {
+            "id": 1,
+            "timestamp": "2016-04-19",
+            "feature1__avg_over_1_day_rolling_windows": None,
+            "feature1__avg_over_1_week_rolling_windows": None,
+            "feature1__stddev_pop_over_1_day_rolling_windows": None,
+            "feature1__stddev_pop_over_1_week_rolling_windows": None,
+            "feature1__count_over_1_day_rolling_windows": None,
+            "feature1__count_over_1_week_rolling_windows": None,
         },
     ]
     df = spark_session.read.json(
