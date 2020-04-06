@@ -5,6 +5,13 @@ Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each 
 
 ## Unreleased
 
+## [0.7.0](https://github.com/quintoandar/butterfree/releases/tag/0.7.0)
+### Changed
+* [MLOP-228] Remove cross join from AggregatedFeatureSet ([#123](https://github.com/quintoandar/butterfree/pull/123))
+
+### Fixed
+* [MLOP-227] FeatureSetPipeline Construct Method Fix ([#122](https://github.com/quintoandar/butterfree/pull/122))
+
 ## [0.6.0](https://github.com/quintoandar/butterfree/releases/tag/0.6.0)
 ### Added
 * [MLOP-209] with_stack on H3HashTransform ([#114](https://github.com/quintoandar/butterfree/pull/114))
