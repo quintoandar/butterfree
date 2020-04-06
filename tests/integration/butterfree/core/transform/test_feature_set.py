@@ -55,7 +55,13 @@ class TestFeatureSet:
                     ),
                 ),
             ],
-            keys=[KeyFeature(name="id", description="The user's Main ID or device ID")],
+            keys=[
+                KeyFeature(
+                    name="id",
+                    description="The user's Main ID or device ID",
+                    dtype=DataType.INTEGER,
+                )
+            ],
             timestamp=TimestampFeature(),
         )
 

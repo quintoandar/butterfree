@@ -73,6 +73,7 @@ class TestH3Transform:
         test_feature = KeyFeature(
             name="id",
             description="unit test",
+            dtype=DataType.DOUBLE,
             transformation=H3HashTransform(
                 h3_resolutions=[6, 7, 8, 9, 10, 11, 12],
                 lat_column="lat",

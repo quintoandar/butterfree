@@ -47,7 +47,9 @@ def input_dataframe(spark_context, spark_session):
 
 @fixture
 def feature_set():
-    key_features = [KeyFeature(name="id", description="Description")]
+    key_features = [
+        KeyFeature(name="id", description="Description", dtype=DataType.INTEGER)
+    ]
     ts_feature = TimestampFeature(from_column="timestamp")
     features = [
         Feature(name="feature", description="Description", dtype=DataType.FLOAT),
