@@ -104,7 +104,11 @@ class TestFeatureSetPipeline:
                     ),
                 ],
                 keys=[
-                    KeyFeature(name="id", description="The user's Main ID or device ID")
+                    KeyFeature(
+                        name="id",
+                        description="The user's Main ID or device ID",
+                        dtype=DataType.INTEGER,
+                    )
                 ],
                 timestamp=TimestampFeature(),
             ),

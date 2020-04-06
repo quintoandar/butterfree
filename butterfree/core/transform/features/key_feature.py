@@ -30,7 +30,7 @@ class KeyFeature(Feature):
         self,
         name: str,
         description: str,
-        dtype: DataType = None,
+        dtype: DataType,
         from_column: str = None,
         transformation: TransformComponent = None,
     ) -> None:

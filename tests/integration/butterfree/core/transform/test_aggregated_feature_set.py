@@ -49,7 +49,13 @@ class TestAggregatedFeatureSet:
                     ),
                 ),
             ],
-            keys=[KeyFeature(name="id", description="The user's Main ID or device ID")],
+            keys=[
+                KeyFeature(
+                    name="id",
+                    description="The user's Main ID or device ID",
+                    dtype=DataType.INTEGER,
+                )
+            ],
             timestamp=TimestampFeature(),
         )
 
@@ -98,7 +104,13 @@ class TestAggregatedFeatureSet:
                     ).with_window(window_definition=["1 week"],),
                 ),
             ],
-            keys=[KeyFeature(name="id", description="The user's Main ID or device ID")],
+            keys=[
+                KeyFeature(
+                    name="id",
+                    description="The user's Main ID or device ID",
+                    dtype=DataType.INTEGER,
+                )
+            ],
             timestamp=TimestampFeature(),
         )
 
@@ -139,7 +151,13 @@ class TestAggregatedFeatureSet:
                     ).with_window(window_definition=["1 day", "1 week"],),
                 ),
             ],
-            keys=[KeyFeature(name="id", description="The user's Main ID or device ID")],
+            keys=[
+                KeyFeature(
+                    name="id",
+                    description="The user's Main ID or device ID",
+                    dtype=DataType.INTEGER,
+                )
+            ],
             timestamp=TimestampFeature(),
         )
 
@@ -166,6 +184,7 @@ class TestAggregatedFeatureSet:
                 KeyFeature(
                     name="h3_id",
                     description="The h3 hash ID",
+                    dtype=DataType.DOUBLE,
                     transformation=H3HashTransform(
                         h3_resolutions=[6, 7, 8, 9, 10, 11, 12],
                         lat_column="lat",

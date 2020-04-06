@@ -53,7 +53,9 @@ class TestFeatureSetPipeline:
                 description="description",
                 keys=[
                     KeyFeature(
-                        name="user_id", description="The user's Main ID or device ID",
+                        name="user_id",
+                        description="The user's Main ID or device ID",
+                        dtype=DataType.INTEGER,
                     )
                 ],
                 timestamp=TimestampFeature(from_column="ts"),
@@ -114,7 +116,9 @@ class TestFeatureSetPipeline:
                 description="description",
                 keys=[
                     KeyFeature(
-                        name="user_id", description="The user's Main ID or device ID",
+                        name="user_id",
+                        description="The user's Main ID or device ID",
+                        dtype=DataType.INTEGER,
                     )
                 ],
                 timestamp=TimestampFeature(from_column="ts"),
@@ -165,7 +169,9 @@ class TestFeatureSetPipeline:
                 description="description",
                 keys=[
                     KeyFeature(
-                        name="user_id", description="The user's Main ID or device ID",
+                        name="user_id",
+                        description="The user's Main ID or device ID",
+                        dtype=DataType.INTEGER,
                     )
                 ],
                 timestamp=TimestampFeature(from_column="ts"),
@@ -221,6 +227,7 @@ class TestFeatureSetPipeline:
                         KeyFeature(
                             name="user_id",
                             description="The user's Main ID or device ID",
+                            dtype=DataType.INTEGER,
                         )
                     ],
                     timestamp=TimestampFeature(from_column="ts"),
@@ -266,6 +273,7 @@ class TestFeatureSetPipeline:
                         KeyFeature(
                             name="user_id",
                             description="The user's Main ID or device ID",
+                            dtype=DataType.INTEGER,
                         )
                     ],
                     timestamp=TimestampFeature(from_column="ts"),
@@ -339,7 +347,9 @@ class TestFeatureSetPipeline:
                 description="description",
                 keys=[
                     KeyFeature(
-                        name="user_id", description="The user's Main ID or device ID",
+                        name="user_id",
+                        description="The user's Main ID or device ID",
+                        dtype=DataType.INTEGER,
                     )
                 ],
                 timestamp=TimestampFeature(from_column="ts"),
