@@ -58,7 +58,7 @@ class TestKafkaReader:
         ],
     )
     def test_consume(
-        self, topic, topic_options, stream, spark_client, spark_context, spark_session,
+        self, topic, topic_options, stream, spark_client, spark_context, spark_session
     ):
         """Test for consume method in KafkaReader class.
 
@@ -93,10 +93,7 @@ class TestKafkaReader:
         output_df = kafka_reader.consume(spark_client)
         connection_string = specification["KAFKA_CONSUMER_CONNECTION_STRING"]
         options = dict(
-            {
-                "kafka.bootstrap.servers": connection_string,
-                "subscribe": topic,
-            },
+            {"kafka.bootstrap.servers": connection_string, "subscribe": topic},
             **topic_options if topic_options else {},
         )
 
