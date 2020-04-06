@@ -91,9 +91,10 @@ class TestKafkaReader:
 
         # act
         output_df = kafka_reader.consume(spark_client)
+        connection_string = specification["KAFKA_CONSUMER_CONNECTION_STRING"]
         options = dict(
             {
-                "kafka.bootstrap.servers": specification["KAFKA_CONSUMER_CONNECTION_STRING"],
+                "kafka.bootstrap.servers": connection_string,
                 "subscribe": topic,
             },
             **topic_options if topic_options else {},
