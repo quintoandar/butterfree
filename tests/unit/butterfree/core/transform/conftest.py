@@ -189,7 +189,7 @@ def feature3(spark_context, spark_session):
 
 @fixture
 def key_id():
-    return KeyFeature(name="id", description="description")
+    return KeyFeature(name="id", description="description", dtype=DataType.INTEGER)
 
 
 @fixture
