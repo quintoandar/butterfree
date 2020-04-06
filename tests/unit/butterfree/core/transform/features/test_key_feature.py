@@ -1,12 +1,18 @@
 from unittest.mock import Mock
 
+from butterfree.core.constants.data_type import DataType
 from butterfree.core.transform.features import KeyFeature
 
 
 class TestKeyFeature:
     def test_args_without_transformation(self):
 
-        test_key = KeyFeature(name="id", from_column="origin", description="unit test",)
+        test_key = KeyFeature(
+            name="id",
+            from_column="origin",
+            description="unit test",
+            dtype=DataType.INTEGER,
+        )
 
         assert test_key.name == "id"
         assert test_key.from_column == "origin"
@@ -18,6 +24,7 @@ class TestKeyFeature:
             name="id",
             from_column="origin",
             description="unit test",
+            dtype=DataType.INTEGER,
             transformation=Mock(),
         )
         assert test_key.name == "id"
