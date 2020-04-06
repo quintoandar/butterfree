@@ -32,6 +32,7 @@ class TestSQLExpressionTransform:
         feature_using_names = KeyFeature(
             name="id",
             description="id_a and id_b stacked in a single column.",
+            dtype=DataType.INTEGER,
             transformation=StackTransform("id_*"),
         )
 
