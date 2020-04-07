@@ -108,7 +108,7 @@ class TestAggregatedTransform:
             dtype=DataType.DOUBLE,
             transformation=AggregatedTransform(
                 functions=["avg", "stddev_pop"], group_by="id", column="feature1",
-            ).with_pivot("pivot_col"),
+            ).with_pivot("pivot_col", ["S", "N"]),
         )
 
         output_df = test_feature.transform(feature_set_df_pivot)
@@ -125,7 +125,7 @@ class TestAggregatedTransform:
             transformation=AggregatedTransform(
                 functions=["avg", "stddev_pop"], group_by="id", column="feature1",
             )
-            .with_pivot("pivot_col")
+            .with_pivot("pivot_col", ["S", "N"])
             .with_window(window_definition=["2 days"]),
         )
 
