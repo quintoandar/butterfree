@@ -62,10 +62,8 @@ class TestAggregatedFeatureSet:
         # act
         output_df = feature_set.construct(feature_set_dataframe, client=spark_client)
 
-        target_df = target_df_without_window
-
         # assert
-        assert_dataframe_equality(output_df, target_df)
+        assert_dataframe_equality(output_df, target_df_without_window)
 
     def test_construct_rolling_windows_with_end_date(
         self,
@@ -208,3 +206,38 @@ class TestAggregatedFeatureSet:
         output_df = feature_set.construct(h3_input_df, client=spark_client)
 
         assert_dataframe_equality(output_df, h3_target_df)
+
+    def test_construct_with_pivot(
+        self, feature_set_df_pivot, target_df_pivot_agg,
+    ):
+        # given
+
+        spark_client = SparkClient()
+
+        # arrange
+
+        feature_set = AggregatedFeatureSet(
+            name="feature_set",
+            entity="entity",
+            description="description",
+            features=[
+                Feature(
+                    name="feature",
+                    description="unit test",
+                    dtype=DataType.DOUBLE,
+                    transformation=AggregatedTransform(
+                        functions=["avg", "stddev_pop"],
+                        group_by="id",
+                        column="feature1",
+                    ).with_pivot("pivot_col", ["S", "N"]),
+                )
+            ],
+            keys=[KeyFeature(name="id", description="The user's Main ID or device ID")],
+            timestamp=TimestampFeature(),
+        )
+
+        # act
+        output_df = feature_set.construct(feature_set_df_pivot, client=spark_client)
+
+        # assert
+        assert_dataframe_equality(output_df, target_df_pivot_agg)
