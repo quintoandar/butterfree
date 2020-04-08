@@ -21,7 +21,7 @@ class KafkaReader(Reader):
         connection_string: string with hosts and ports to connect.
             The string need to be in the format: host1:port,host2:port,...,hostN:portN
             The argument is not necessary if is passed as a environment variable
-            named KAFKA_CONNECTION_STRING.
+            named KAFKA_CONSUMER_CONNECTION_STRING.
         topic_options: additional options for consuming from topic. See docs:
             https://spark.apache.org/docs/latest/structured-streaming-kafka-integration.html.
         stream: flag to indicate the reading mode: stream or batch
@@ -119,7 +119,7 @@ class KafkaReader(Reader):
         self.topic = topic
         self.value_schema = value_schema
         self.connection_string = connection_string or environment.get_variable(
-            "KAFKA_CONNECTION_STRING"
+            "KAFKA_CONSUMER_CONNECTION_STRING"
         )
         self.options = dict(
             {
