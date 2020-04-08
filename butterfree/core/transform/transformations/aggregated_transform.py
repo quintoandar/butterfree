@@ -281,23 +281,6 @@ class AggregatedTransform(TransformComponent):
 
         return dataframe.select(*columns_select)
 
-    def _create_agg_df(self, dataframe, agg_function, slide_function):
-        """Returns a aggregated dataframe.
-
-        Returns a dataframe with the next date regarding the latest
-        source dataframe date.
-
-        Attributes:
-            dataframe:  dataframe to be aggregated.
-            agg_function: aggregation function.
-            slide_function: function that sums days to the lastest date.
-        """
-        return (
-            dataframe.groupBy(self.group_by)
-            .agg(agg_function(TIMESTAMP_COLUMN).alias(TIMESTAMP_COLUMN))
-            .withColumn(TIMESTAMP_COLUMN, slide_function(TIMESTAMP_COLUMN, 1))
-        )
-
     def transform(self, dataframe: DataFrame) -> DataFrame:
         """Performs a transformation to the feature pipeline.
 
@@ -318,10 +301,5 @@ class AggregatedTransform(TransformComponent):
 
         if self._windows:
             agg_df = itertools.chain.from_iterable(agg_df)
-            dataframe = reduce(self._dataframe_list_join, agg_df)
-            agg_df_latest = self._create_agg_df(
-                dataframe, functions.max, functions.date_add
-            )
-            return self._dataframe_list_join(dataframe, agg_df_latest,)
 
         return reduce(self._dataframe_list_join, agg_df)

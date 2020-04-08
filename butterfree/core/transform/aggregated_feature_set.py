@@ -1,4 +1,5 @@
 """AggregatedFeatureSet entity."""
+from datetime import timedelta
 from functools import reduce
 from typing import List
 
@@ -8,6 +9,7 @@ from butterfree.core.clients import SparkClient
 from butterfree.core.transform import FeatureSet
 from butterfree.core.transform.features import Feature
 from butterfree.core.transform.transformations import AggregatedTransform
+from butterfree.core.transform.utils import date_range
 
 
 class AggregatedFeatureSet(FeatureSet):
@@ -136,7 +138,20 @@ class AggregatedFeatureSet(FeatureSet):
         """
         return all([not feature.transformation.has_windows for feature in features])
 
-    def _dataframe_join(self, left, right, on, how):
+    def _get_base_dataframe(self, client, dataframe, end_date):
+        start_date = dataframe.agg(functions.min(self.timestamp_column)).take(1)[0][0]
+        end_date = end_date or dataframe.agg(functions.max(self.timestamp_column)).take(
+            1
+        )[0][0] + timedelta(days=1)
+        date_df = date_range.get_date_range(client, start_date, end_date)
+        unique_keys = dataframe.dropDuplicates(subset=self.keys_columns).select(
+            *self.keys_columns
+        )
+
+        return unique_keys.crossJoin(date_df)
+
+    @staticmethod
+    def _dataframe_join(left, right, on, how):
         return left.join(right, on=on, how=how)
 
     def construct(
@@ -157,6 +172,13 @@ class AggregatedFeatureSet(FeatureSet):
             Spark dataframe with all the feature columns.
 
         """
+        if end_date is None and self._has_aggregated_transform_with_window_only(
+            self.features
+        ):
+            raise ValueError(
+                "When using aggregate with windows, one must give end_date."
+            )
+
         df_list = []
         if not isinstance(dataframe, DataFrame):
             raise ValueError("source_df must be a dataframe")
@@ -172,15 +194,18 @@ class AggregatedFeatureSet(FeatureSet):
             df_list.append(feature_df)
 
         if self._has_aggregated_transform_with_window_only(self.features):
-
+            base_df = self._get_base_dataframe(
+                client=client, dataframe=output_df, end_date=end_date
+            )
             output_df = reduce(
                 lambda left, right: self._dataframe_join(
                     left,
                     right,
                     on=self.keys_columns + [self.timestamp_column],
-                    how="full_outer",
+                    how="left",
                 ),
                 df_list,
+                base_df,
             )
 
             if end_date:
