@@ -3,8 +3,6 @@ from unittest.mock import Mock
 import pytest
 from pyspark.sql import functions as F
 from pyspark.sql.types import FloatType, LongType, TimestampType
-
-from butterfree.testing.dataframe import assert_dataframe_equality
 from tests.unit.butterfree.core.transform.conftest import (
     feature_add,
     feature_divide,
@@ -21,6 +19,7 @@ from butterfree.core.transform.transformations import (
     AggregatedTransform,
     SparkFunctionTransform,
 )
+from butterfree.testing.dataframe import assert_dataframe_equality
 
 
 class TestFeatureSet:

@@ -99,7 +99,7 @@ def make_rolling_windows_agg_dataframe(spark_context, spark_session):
             "id": 1,
             "timestamp": "2016-04-12 00:00:00",
             "feature1__avg_over_1_week_rolling_windows": 300.0,
-            "feature1__mode_over_1_week_rolling_windows": '300',
+            "feature1__mode_over_1_week_rolling_windows": "300",
             "feature2__avg_over_1_week_rolling_windows": 350.0,
         },
         {
@@ -113,7 +113,7 @@ def make_rolling_windows_agg_dataframe(spark_context, spark_session):
             "id": 1,
             "timestamp": "2016-04-23 00:00:00",
             "feature1__avg_over_1_week_rolling_windows": 1000.0,
-            "feature1__mode_over_1_week_rolling_windows": '1000',
+            "feature1__mode_over_1_week_rolling_windows": "1000",
             "feature2__avg_over_1_week_rolling_windows": 1100.0,
         },
         {
