@@ -105,6 +105,41 @@ def h3_target_df(spark_context, spark_session):
     data = [
         {
             "h3_id": "8ba8100ea0d5fff",
+            "timestamp": "2016-04-11 00:00:00",
+            "house_id__count_over_1_day_rolling_windows": None,
+        },
+        {
+            "h3_id": "88a8100ea1fffff",
+            "timestamp": "2016-04-11 00:00:00",
+            "house_id__count_over_1_day_rolling_windows": None,
+        },
+        {
+            "h3_id": "8ca8100ea0d57ff",
+            "timestamp": "2016-04-11 00:00:00",
+            "house_id__count_over_1_day_rolling_windows": None,
+        },
+        {
+            "h3_id": "89a8100ea0fffff",
+            "timestamp": "2016-04-11 00:00:00",
+            "house_id__count_over_1_day_rolling_windows": None,
+        },
+        {
+            "h3_id": "86a8100efffffff",
+            "timestamp": "2016-04-11 00:00:00",
+            "house_id__count_over_1_day_rolling_windows": None,
+        },
+        {
+            "h3_id": "87a8100eaffffff",
+            "timestamp": "2016-04-11 00:00:00",
+            "house_id__count_over_1_day_rolling_windows": None,
+        },
+        {
+            "h3_id": "8aa8100ea0d7fff",
+            "timestamp": "2016-04-11 00:00:00",
+            "house_id__count_over_1_day_rolling_windows": None,
+        },
+        {
+            "h3_id": "8ba8100ea0d5fff",
             "timestamp": "2016-04-12 00:00:00",
             "house_id__count_over_1_day_rolling_windows": 2,
         },
@@ -287,6 +322,14 @@ def rolling_windows_output_feature_set_dataframe_base_date(
     spark_context, spark_session
 ):
     data = [
+        {
+            "id": 1,
+            "origin_ts": "2016-04-11 00:00:00",
+            "feature1__avg_over_1_day_rolling_windows": None,
+            "feature2__avg_over_1_week_rolling_windows": None,
+            "feature1__stddev_pop_over_1_day_rolling_windows": None,
+            "feature2__stddev_pop_over_1_week_rolling_windows": None,
+        },
         {
             "id": 1,
             "origin_ts": "2016-04-12 00:00:00",

@@ -1,3 +1,4 @@
+import pytest
 from pyspark.sql import functions as F
 
 from butterfree.core.clients import SparkClient
@@ -159,17 +160,9 @@ class TestAggregatedFeatureSet:
             timestamp=TimestampFeature(),
         )
 
-        # act
-        output_df = feature_set.construct(
-            feature_set_dataframe, client=spark_client
-        ).orderBy("timestamp")
-
-        target_df = rolling_windows_output_feature_set_dataframe.orderBy(
-            feature_set.timestamp_column
-        ).select(feature_set.columns)
-
-        # assert
-        assert_dataframe_equality(output_df, target_df)
+        # act & assert
+        with pytest.raises(ValueError):
+            _ = feature_set.construct(feature_set_dataframe, client=spark_client)
 
     def test_h3_feature_set(self, h3_input_df, h3_target_df):
         spark_client = SparkClient()
@@ -203,7 +196,9 @@ class TestAggregatedFeatureSet:
             ],
         )
 
-        output_df = feature_set.construct(h3_input_df, client=spark_client)
+        output_df = feature_set.construct(
+            h3_input_df, client=spark_client, end_date="2016-04-14"
+        )
 
         assert_dataframe_equality(output_df, h3_target_df)
 
