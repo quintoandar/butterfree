@@ -10,9 +10,10 @@ from butterfree.core.transform.transformations import (
     AggregatedTransform,
     SparkFunctionTransform,
 )
+from butterfree.testing.dataframe import assert_dataframe_equality
 
 
-class TestFeatureSet:
+class TestAggregatedFeatureSet:
     def test_feature_set_with_invalid_feature(self, key_id, timestamp_c, dataframe):
         spark_client = SparkClient()
 
@@ -70,6 +71,47 @@ class TestFeatureSet:
                 keys=[key_id],
                 timestamp=timestamp_c,
             ).construct(dataframe, spark_client)
+
+    def test_agg_feature_set_with_window(
+        self, key_id, timestamp_c, dataframe, rolling_windows_agg_dataframe
+    ):
+        spark_client = SparkClient()
+
+        fs = AggregatedFeatureSet(
+            name="name",
+            entity="entity",
+            description="description",
+            features=[
+                Feature(
+                    name="feature1",
+                    description="unit test",
+                    dtype=DataType.FLOAT,
+                    transformation=AggregatedTransform(
+                        functions=["avg", "mode"], group_by="id", column="feature1",
+                    ).with_window(window_definition=["1 week"]),
+                ),
+                Feature(
+                    name="feature2",
+                    dtype=DataType.FLOAT,
+                    description="unit test",
+                    transformation=AggregatedTransform(
+                        functions=["avg"], group_by="id", column="feature2",
+                    ).with_window(window_definition=["1 week"]),
+                ),
+            ],
+            keys=[key_id],
+            timestamp=timestamp_c,
+        )
+
+        # raises without end date
+        with pytest.raises(ValueError):
+            _ = fs.construct(dataframe, spark_client)
+
+        # filters with date smaller then mocked max
+        output_df = fs.construct(dataframe, spark_client, end_date="2016-04-17")
+        assert output_df.count() < rolling_windows_agg_dataframe.count()
+        output_df = fs.construct(dataframe, spark_client, end_date="2016-05-01")
+        assert_dataframe_equality(output_df, rolling_windows_agg_dataframe)
 
     def test_get_schema(self):
         expected_schema = [
