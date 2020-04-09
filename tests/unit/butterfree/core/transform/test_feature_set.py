@@ -3,6 +3,8 @@ from unittest.mock import Mock
 import pytest
 from pyspark.sql import functions as F
 from pyspark.sql.types import FloatType, LongType, TimestampType
+
+from butterfree.testing.dataframe import assert_dataframe_equality
 from tests.unit.butterfree.core.transform.conftest import (
     feature_add,
     feature_divide,
@@ -211,7 +213,7 @@ class TestFeatureSet:
             + feature_add.get_output_columns()
             + feature_divide.get_output_columns()
         )
-        assert result_df.collect() == feature_set_dataframe.collect()
+        assert_dataframe_equality(result_df, feature_set_dataframe)
         assert result_df.is_cached
 
     def test_construct_invalid_df(
@@ -258,7 +260,7 @@ class TestFeatureSet:
         result_df = feature_set.construct(dataframe, spark_client)
 
         # assert
-        assert result_df.collect() == feature_set_dataframe.collect()
+        assert_dataframe_equality(result_df, feature_set_dataframe)
 
     def test__get_features_columns(self):
         # arrange

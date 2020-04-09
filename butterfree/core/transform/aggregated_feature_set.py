@@ -166,7 +166,7 @@ class AggregatedFeatureSet(FeatureSet):
         Args:
             dataframe: input dataframe to be transformed by the features.
             client: client responsible for connecting to Spark session.
-            end_date: user defined base date.
+            end_date: user defined max date for having aggregated data (exclusive).
 
         Returns:
             Spark dataframe with all the feature columns.
@@ -207,9 +207,6 @@ class AggregatedFeatureSet(FeatureSet):
                 df_list,
                 base_df,
             )
-
-            if end_date:
-                output_df = output_df.filter(f"{self.timestamp_column} <= '{end_date}'")
 
         elif self._has_aggregated_transform_without_window_only(self.features):
             agg_df = output_df.groupBy(self.keys_columns).agg(

@@ -27,15 +27,22 @@ def make_dataframe(spark_context, spark_session):
         {
             "id": 1,
             "ts": "2016-04-11 11:46:24",
-            "feature1": 400,
+            "feature1": 300,
             "feature2": 400,
             "nonfeature": 0,
         },
         {
             "id": 1,
             "ts": "2016-04-11 12:03:21",
-            "feature1": 500,
+            "feature1": 400,
             "feature2": 500,
+            "nonfeature": 0,
+        },
+        {
+            "id": 1,
+            "ts": "2016-04-22 12:03:21",
+            "feature1": 1000,
+            "feature2": 1100,
             "nonfeature": 0,
         },
     ]
@@ -85,16 +92,36 @@ def make_rolling_windows_agg_dataframe(spark_context, spark_session):
             "id": 1,
             "timestamp": "2016-04-11 00:00:00",
             "feature1__avg_over_1_week_rolling_windows": None,
+            "feature1__mode_over_1_week_rolling_windows": None,
+            "feature2__avg_over_1_week_rolling_windows": None,
         },
         {
             "id": 1,
             "timestamp": "2016-04-12 00:00:00",
-            "feature1__avg_over_1_week_rolling_windows": 350.0,
+            "feature1__avg_over_1_week_rolling_windows": 300.0,
+            "feature1__mode_over_1_week_rolling_windows": '300',
+            "feature2__avg_over_1_week_rolling_windows": 350.0,
         },
         {
             "id": 1,
             "timestamp": "2016-04-19 00:00:00",
             "feature1__avg_over_1_week_rolling_windows": None,
+            "feature1__mode_over_1_week_rolling_windows": None,
+            "feature2__avg_over_1_week_rolling_windows": None,
+        },
+        {
+            "id": 1,
+            "timestamp": "2016-04-23 00:00:00",
+            "feature1__avg_over_1_week_rolling_windows": 1000.0,
+            "feature1__mode_over_1_week_rolling_windows": '1000',
+            "feature2__avg_over_1_week_rolling_windows": 1100.0,
+        },
+        {
+            "id": 1,
+            "timestamp": "2016-04-30 00:00:00",
+            "feature1__avg_over_1_week_rolling_windows": None,
+            "feature1__mode_over_1_week_rolling_windows": None,
+            "feature2__avg_over_1_week_rolling_windows": None,
         },
     ]
     df = spark_session.read.json(
