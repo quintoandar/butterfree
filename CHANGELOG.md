@@ -15,6 +15,7 @@ Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each 
 
 ### Fixed
 * [MLOP-231] Method output_columns supports Pivot Aggregated ([#128](https://github.com/quintoandar/butterfree/pull/128))
+* Fix dtype on Keyfeature. ([#129](https://github.com/quintoandar/butterfree/pull/129))
 
 ## [0.7.0](https://github.com/quintoandar/butterfree/releases/tag/0.7.0)
 ### Added
