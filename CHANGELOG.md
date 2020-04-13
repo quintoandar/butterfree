@@ -5,6 +5,17 @@ Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each 
 
 ## Unreleased
 
+## [0.8.0](https://github.com/quintoandar/butterfree/releases/tag/0.8.0)
+### Added
+* [MLOP-225] KeyFeature need dtype to be a required arg ([#126](https://github.com/quintoandar/butterfree/pull/126))
+
+### Changed
+* [MLOP-229] Revert cross join changes ([#130](https://github.com/quintoandar/butterfree/pull/130))
+* Update kafak consumer config ([#127](https://github.com/quintoandar/butterfree/pull/127))
+
+### Fixed
+* [MLOP-231] Method output_columns supports Pivot Aggregated ([#128](https://github.com/quintoandar/butterfree/pull/128))
+
 ## [0.7.0](https://github.com/quintoandar/butterfree/releases/tag/0.7.0)
 ### Added
 * [MLOP-140] Make OFSW get feature set schema ([#112](https://github.com/quintoandar/butterfree/pull/112))
