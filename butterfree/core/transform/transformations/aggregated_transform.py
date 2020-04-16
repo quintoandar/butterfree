@@ -26,7 +26,7 @@ class AggregatedTransform(TransformComponent):
 
     This class helps defining on a feature, which aggregation function will be applied
     to build a new aggregated column. Allowed aggregations are registered under the
-     ALLOWED_AGGREGATIONS class attribute.
+     allowed_aggregations property.
 
     Attributes:
         functions: aggregation functions, such as avg, std, count.
@@ -60,7 +60,7 @@ class AggregatedTransform(TransformComponent):
         super(AggregatedTransform, self).__init__()
         self.functions = functions
 
-    ALLOWED_AGGREGATIONS = {
+    __ALLOWED_AGGREGATIONS = {
         "approx_count_distinct": functions.approx_count_distinct,
         "avg": functions.avg,
         "collect_list": functions.collect_list,
@@ -106,14 +106,16 @@ class AggregatedTransform(TransformComponent):
     def aggregations(self) -> List[Column]:
         """Aggregated spark columns."""
         return [
-            self.ALLOWED_AGGREGATIONS[f](self._parent.from_column or self._parent.name)
+            self.__ALLOWED_AGGREGATIONS[f](
+                self._parent.from_column or self._parent.name
+            )
             for f in self.functions
         ]
 
     @property
     def allowed_aggregations(self) -> List[str]:
         """Allowed aggregations to be used in the transformation."""
-        return list(self.ALLOWED_AGGREGATIONS.keys())
+        return list(self.__ALLOWED_AGGREGATIONS.keys())
 
     def _get_output_name(self, function):
         return "__".join([self._parent.name, function])
