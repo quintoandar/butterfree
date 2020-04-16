@@ -355,7 +355,11 @@ class FeatureSet:
         return df.select([column for column in self.columns])
 
     def construct(
-        self, dataframe: DataFrame, client: SparkClient, end_date: str = None
+        self,
+        dataframe: DataFrame,
+        client: SparkClient,
+        end_date: str = None,
+        num_processors: int = None,
     ) -> DataFrame:
         """Use all the features to build the feature set dataframe.
 
@@ -366,6 +370,7 @@ class FeatureSet:
             dataframe: input dataframe to be transformed by the features.
             client: client responsible for connecting to Spark session.
             end_date: user defined base date.
+            num_processors: cluster total number of processors for repartitioning.
 
         Returns:
             Spark dataframe with all the feature columns.

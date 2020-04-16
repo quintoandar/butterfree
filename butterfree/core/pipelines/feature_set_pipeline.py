@@ -199,7 +199,10 @@ class FeatureSetPipeline:
             )
 
         dataframe = self.feature_set.construct(
-            dataframe=dataframe, client=self.spark_client, end_date=end_date
+            dataframe=dataframe,
+            client=self.spark_client,
+            end_date=end_date,
+            num_processors=num_processors,
         )
 
         self.sink.flush(

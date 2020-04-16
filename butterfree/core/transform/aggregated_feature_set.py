@@ -228,7 +228,7 @@ class AggregatedFeatureSet(FeatureSet):
         dataframe: DataFrame,
         client: SparkClient,
         end_date: str = None,
-        num_processors=None,
+        num_processors: int = None,
     ) -> DataFrame:
         """Use all the features to build the feature set dataframe.
 
@@ -240,6 +240,7 @@ class AggregatedFeatureSet(FeatureSet):
             dataframe: input dataframe to be transformed by the features.
             client: client responsible for connecting to Spark session.
             end_date: user defined max date for having aggregated data (exclusive).
+            num_processors: cluster total number of processors for repartitioning.
 
         Returns:
             Spark dataframe with all the feature columns.
