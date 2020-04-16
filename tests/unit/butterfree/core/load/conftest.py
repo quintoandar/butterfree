@@ -144,17 +144,13 @@ def test_feature_set():
                 name="feature1",
                 description="test",
                 dtype=DataType.DOUBLE,
-                transformation=AggregatedTransform(
-                    functions=["avg", "stddev_pop"], group_by="id", column="feature1",
-                ).with_window(window_definition=["1 week"]),
+                transformation=AggregatedTransform(functions=["avg", "stddev_pop"]),
             ),
             Feature(
                 name="feature2",
                 description="test",
                 dtype=DataType.DOUBLE,
-                transformation=AggregatedTransform(
-                    functions=["count"], group_by="id", column="feature2",
-                ).with_window(window_definition=["2 days"]),
+                transformation=AggregatedTransform(functions=["count"]),
             ),
         ],
         keys=[
@@ -165,7 +161,7 @@ def test_feature_set():
             )
         ],
         timestamp=TimestampFeature(),
-    )
+    ).with_windows(definitions=["1 week", "2 days"])
 
 
 @fixture
@@ -183,7 +179,22 @@ def expected_schema():
             "primary_key": False,
         },
         {
+            "column_name": "feature1__avg_over_2_days_rolling_windows",
+            "type": DataType.DOUBLE.cassandra,
+            "primary_key": False,
+        },
+        {
             "column_name": "feature1__stddev_pop_over_1_week_rolling_windows",
+            "type": DataType.DOUBLE.cassandra,
+            "primary_key": False,
+        },
+        {
+            "column_name": "feature1__stddev_pop_over_2_days_rolling_windows",
+            "type": DataType.DOUBLE.cassandra,
+            "primary_key": False,
+        },
+        {
+            "column_name": "feature2__count_over_1_week_rolling_windows",
             "type": DataType.DOUBLE.cassandra,
             "primary_key": False,
         },

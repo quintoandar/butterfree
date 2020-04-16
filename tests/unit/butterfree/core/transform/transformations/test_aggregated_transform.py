@@ -12,23 +12,20 @@ class TestAggregatedTransform:
             name="feature1",
             description="unit test",
             dtype=DataType.BIGINT,
-            transformation=AggregatedTransform(
-                functions=["avg", "stddev_pop"], group_by=["id"], column="feature1",
-            ),
+            transformation=AggregatedTransform(functions=["avg", "stddev_pop"]),
         )
 
-        output_df = test_feature.transform(feature_set_dataframe)
-
-        assert_dataframe_equality(output_df, target_df_agg)
+        # aggregated feature transform won't run transformations
+        # and depends on the feature set
+        with pytest.raises(NotImplementedError):
+            _ = test_feature.transform(feature_set_dataframe)
 
     def test_output_columns(self):
         test_feature = Feature(
             name="feature1",
             description="unit test",
             dtype=DataType.BIGINT,
-            transformation=AggregatedTransform(
-                functions=["avg", "stddev_pop"], group_by="id", column="feature1",
-            ).with_window(window_definition=["7 days", "2 weeks"]),
+            transformation=AggregatedTransform(functions=["avg", "stddev_pop"]),
         )
 
         df_columns = test_feature.get_output_columns()
@@ -36,15 +33,7 @@ class TestAggregatedTransform:
         assert all(
             [
                 a == b
-                for a, b in zip(
-                    df_columns,
-                    [
-                        "feature1__avg_over_7_days_rolling_windows",
-                        "feature1__avg_over_2_weeks_rolling_windows",
-                        "feature1__stddev_pop_over_7_days_rolling_windows",
-                        "feature1__stddev_pop_over_2_weeks_rolling_windows",
-                    ],
-                )
+                for a, b in zip(df_columns, ["feature1__avg", "feature1__stddev_pop",],)
             ]
         )
 
@@ -54,9 +43,7 @@ class TestAggregatedTransform:
                 name="feature1",
                 description="unit test",
                 dtype=DataType.BIGINT,
-                transformation=AggregatedTransform(
-                    functions=["median"], group_by="id", column="feature1",
-                ).with_window(window_definition=["7 days", "2 weeks"]),
+                transformation=AggregatedTransform(functions=["median"]),
             )
 
     def test_blank_aggregation(self, feature_set_dataframe):
@@ -65,70 +52,5 @@ class TestAggregatedTransform:
                 name="feature1",
                 description="unit test",
                 dtype=DataType.BIGINT,
-                transformation=AggregatedTransform(
-                    functions=[], group_by="id", column="feature1",
-                ),
+                transformation=AggregatedTransform(functions=[]),
             )
-
-    def test_negative_window(self, feature_set_dataframe):
-        with pytest.raises(KeyError):
-            Feature(
-                name="feature1",
-                description="unit test",
-                dtype=DataType.BIGINT,
-                transformation=AggregatedTransform(
-                    functions=["avg", "stddev_pop"], group_by="id", column="feature1",
-                ).with_window(window_definition=["-2 weeks"]),
-            ).transform(feature_set_dataframe)
-
-    def test_feature_transform_output_rolling_windows(
-        self, feature_set_dataframe, target_df_rolling_agg
-    ):
-        test_feature = Feature(
-            name="feature1",
-            description="unit test",
-            dtype=DataType.DOUBLE,
-            transformation=AggregatedTransform(
-                functions=["avg", "stddev_pop", "count"],
-                group_by="id",
-                column="feature1",
-            ).with_window(window_definition=["1 day", "1 week"]),
-        )
-
-        output_df = test_feature.transform(feature_set_dataframe).orderBy("timestamp")
-
-        assert_dataframe_equality(output_df, target_df_rolling_agg)
-
-    def test_feature_transform_with_pivot(
-        self, feature_set_df_pivot, target_df_pivot_agg
-    ):
-        test_feature = Feature(
-            name="feature",
-            description="unit test",
-            dtype=DataType.DOUBLE,
-            transformation=AggregatedTransform(
-                functions=["avg", "stddev_pop"], group_by="id", column="feature1",
-            ).with_pivot("pivot_col", ["S", "N"]),
-        )
-
-        output_df = test_feature.transform(feature_set_df_pivot)
-
-        assert_dataframe_equality(output_df, target_df_pivot_agg)
-
-    def test_feature_transform_with_pivot_and_window(
-        self, feature_set_df_pivot, target_df_pivot_agg_window
-    ):
-        test_feature = Feature(
-            name="feature",
-            description="unit test",
-            dtype=DataType.DOUBLE,
-            transformation=AggregatedTransform(
-                functions=["avg", "stddev_pop"], group_by="id", column="feature1",
-            )
-            .with_pivot("pivot_col", ["S", "N"])
-            .with_window(window_definition=["2 days"]),
-        )
-
-        output_df = test_feature.transform(feature_set_df_pivot)
-
-        assert_dataframe_equality(output_df, target_df_pivot_agg_window)

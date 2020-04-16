@@ -37,17 +37,13 @@ class TestAggregatedFeatureSet:
                     name="feature1",
                     description="test",
                     dtype=DataType.DOUBLE,
-                    transformation=AggregatedTransform(
-                        functions=["avg"], group_by="id", column="feature1",
-                    ),
+                    transformation=AggregatedTransform(functions=["avg"]),
                 ),
                 Feature(
                     name="feature2",
                     description="test",
                     dtype=DataType.BIGINT,
-                    transformation=AggregatedTransform(
-                        functions=["count"], group_by="id", column="feature2",
-                    ),
+                    transformation=AggregatedTransform(functions=["count"]),
                 ),
             ],
             keys=[
@@ -57,7 +53,7 @@ class TestAggregatedFeatureSet:
                     dtype=DataType.INTEGER,
                 )
             ],
-            timestamp=TimestampFeature(),
+            timestamp=TimestampFeature(from_column="fixed_ts"),
         )
 
         # act
@@ -88,9 +84,7 @@ class TestAggregatedFeatureSet:
                     dtype=DataType.FLOAT,
                     transformation=AggregatedTransform(
                         functions=["avg", "stddev_pop"],
-                        group_by="id",
-                        column="feature1",
-                    ).with_window(window_definition=["1 day"],),
+                    ),
                 ),
                 Feature(
                     name="feature2",
@@ -98,9 +92,7 @@ class TestAggregatedFeatureSet:
                     dtype=DataType.FLOAT,
                     transformation=AggregatedTransform(
                         functions=["avg", "stddev_pop"],
-                        group_by="id",
-                        column="feature2",
-                    ).with_window(window_definition=["1 week"],),
+                    ),
                 ),
             ],
             keys=[
@@ -111,7 +103,7 @@ class TestAggregatedFeatureSet:
                 )
             ],
             timestamp=TimestampFeature(),
-        )
+        ).with_windows(definitions=["1 day", "1 week"])
 
         # act
         output_df = feature_set.construct(
@@ -145,9 +137,7 @@ class TestAggregatedFeatureSet:
                     dtype=DataType.FLOAT,
                     transformation=AggregatedTransform(
                         functions=["avg", "stddev_pop"],
-                        group_by="id",
-                        column="feature1",
-                    ).with_window(window_definition=["1 day", "1 week"],),
+                    ),
                 ),
             ],
             keys=[
@@ -158,7 +148,7 @@ class TestAggregatedFeatureSet:
                 )
             ],
             timestamp=TimestampFeature(),
-        )
+        ).with_windows(definitions=["1 day", "1 week"],)
 
         # act & assert
         with pytest.raises(ValueError):
@@ -189,12 +179,10 @@ class TestAggregatedFeatureSet:
                     name="house_id",
                     description="Count of house ids over a day.",
                     dtype=DataType.BIGINT,
-                    transformation=AggregatedTransform(
-                        functions=["count"], group_by="h3_id", column="house_id",
-                    ).with_window(window_definition=["1 day"]),
+                    transformation=AggregatedTransform(functions=["count"]),
                 ),
             ],
-        )
+        ).with_windows(definitions=["1 day"])
 
         output_df = feature_set.construct(
             h3_input_df, client=spark_client, end_date="2016-04-14"
@@ -222,9 +210,8 @@ class TestAggregatedFeatureSet:
                     dtype=DataType.DOUBLE,
                     transformation=AggregatedTransform(
                         functions=["avg", "stddev_pop"],
-                        group_by="id",
-                        column="feature1",
-                    ).with_pivot("pivot_col", ["S", "N"]),
+                    ),
+                    from_column="feature1",
                 )
             ],
             keys=[
@@ -234,8 +221,8 @@ class TestAggregatedFeatureSet:
                     dtype=DataType.INTEGER,
                 )
             ],
-            timestamp=TimestampFeature(),
-        )
+            timestamp=TimestampFeature(from_column="fixed_ts"),
+        ).with_pivot("pivot_col", ["S", "N"])
 
         # act
         output_df = feature_set.construct(feature_set_df_pivot, client=spark_client)

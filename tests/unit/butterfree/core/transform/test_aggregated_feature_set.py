@@ -40,38 +40,6 @@ class TestAggregatedFeatureSet:
                 timestamp=timestamp_c,
             ).construct(dataframe, spark_client)
 
-    def test_feature_set_with_window_and_no_window(
-        self, key_id, timestamp_c, dataframe
-    ):
-        spark_client = SparkClient()
-
-        with pytest.raises(ValueError):
-            AggregatedFeatureSet(
-                name="name",
-                entity="entity",
-                description="description",
-                features=[
-                    Feature(
-                        name="feature1",
-                        description="unit test",
-                        dtype=DataType.FLOAT,
-                        transformation=AggregatedTransform(
-                            functions=["avg"], group_by="id", column="feature1",
-                        ).with_window(window_definition=["1 day", "1 week"]),
-                    ),
-                    Feature(
-                        name="feature1",
-                        dtype=DataType.FLOAT,
-                        description="unit test",
-                        transformation=AggregatedTransform(
-                            functions=["count"], group_by="id", column="feature1",
-                        ),
-                    ),
-                ],
-                keys=[key_id],
-                timestamp=timestamp_c,
-            ).construct(dataframe, spark_client)
-
     def test_agg_feature_set_with_window(
         self, key_id, timestamp_c, dataframe, rolling_windows_agg_dataframe
     ):
@@ -86,22 +54,18 @@ class TestAggregatedFeatureSet:
                     name="feature1",
                     description="unit test",
                     dtype=DataType.FLOAT,
-                    transformation=AggregatedTransform(
-                        functions=["avg", "mode"], group_by="id", column="feature1",
-                    ).with_window(window_definition=["1 week"]),
+                    transformation=AggregatedTransform(functions=["avg"]),
                 ),
                 Feature(
                     name="feature2",
                     dtype=DataType.FLOAT,
                     description="unit test",
-                    transformation=AggregatedTransform(
-                        functions=["avg"], group_by="id", column="feature2",
-                    ).with_window(window_definition=["1 week"]),
+                    transformation=AggregatedTransform(functions=["avg"]),
                 ),
             ],
             keys=[key_id],
             timestamp=timestamp_c,
-        )
+        ).with_windows(definitions=["1 week"])
 
         # raises without end date
         with pytest.raises(ValueError):
@@ -123,8 +87,23 @@ class TestAggregatedFeatureSet:
                 "primary_key": False,
             },
             {
+                "column_name": "feature1__avg_over_2_days_rolling_windows",
+                "type": DoubleType(),
+                "primary_key": False,
+            },
+            {
                 "column_name": "feature1__stddev_pop_over_1_week_rolling_windows",
                 "type": DoubleType(),
+                "primary_key": False,
+            },
+            {
+                "column_name": "feature1__stddev_pop_over_2_days_rolling_windows",
+                "type": DoubleType(),
+                "primary_key": False,
+            },
+            {
+                "column_name": "feature2__count_over_1_week_rolling_windows",
+                "type": ArrayType(StringType(), True),
                 "primary_key": False,
             },
             {
@@ -145,17 +124,13 @@ class TestAggregatedFeatureSet:
                     dtype=DataType.DOUBLE,
                     transformation=AggregatedTransform(
                         functions=["avg", "stddev_pop"],
-                        group_by="id",
-                        column="feature1",
-                    ).with_window(window_definition=["1 week"]),
+                    ),
                 ),
                 Feature(
                     name="feature2",
                     description="test",
                     dtype=DataType.ARRAY_STRING,
-                    transformation=AggregatedTransform(
-                        functions=["count"], group_by="id", column="feature2",
-                    ).with_window(window_definition=["2 days"]),
+                    transformation=AggregatedTransform(functions=["count"]),
                 ),
             ],
             keys=[
@@ -166,7 +141,7 @@ class TestAggregatedFeatureSet:
                 )
             ],
             timestamp=TimestampFeature(),
-        )
+        ).with_windows(definitions=["1 week", "2 days"])
 
         schema = feature_set.get_schema()
 
