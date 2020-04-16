@@ -15,6 +15,174 @@ from butterfree.core.transform.utils import Window, date_range
 
 
 class AggregatedFeatureSet(FeatureSet):
+    """Holds metadata about the aggregated feature set.
+
+    This class overrides some methods of the parent FeatureSet class and has specific
+    methods for aggregations.
+
+    The AggregatedTransform can only be used on AggregatedFeatureSets. The construct
+    method will be responsible by collecting every feature's transformation definitions
+    so it can run a groupby over the input dataframe, taking into account whether the
+    user want's to run an rolling window aggregation, pivoting or just apply aggregation
+    functions.
+
+    Example:
+        This an example regarding the aggregated feature set definition. All features
+        and its transformations are defined.
+    >>> from butterfree.core.transform.aggregated_feature_set import (
+    ...       AggregatedFeatureSet
+    ... )
+    >>> from butterfree.core.transform.features import (
+    ...     Feature,
+    ...     KeyFeature,
+    ...     TimestampFeature,
+    ...)
+    >>> from butterfree.core.transform.transformations import (
+    ...     AggregatedTransform,
+    ... )
+    >>> from butterfree.core.constants.data_type import DataType
+    >>> from butterfree.core.clients import SparkClient
+    >>> client = SparkClient()
+    >>> client.conn.conf.set("spark.sql.session.timeZone", "UTC")
+    >>> dataframe = client.conn.createDataFrame(
+    ...     [
+    ...         (1, "2020-01-01 13:01:00+000", 1000, "publicado"),
+    ...         (2, "2020-01-01 14:01:00+000", 2000, "publicado"),
+    ...         (1, "2020-01-02 13:01:00+000", 2000, "alugado"),
+    ...         (1, "2020-01-03 13:01:00+000", 1000, "despublicado"),
+    ...         (2, "2020-01-09 14:01:00+000", 1000, "despublicado"),
+    ...     ],
+    ...     ("id", "ts", "rent", "status"),
+    ... )
+    >>> dataframe = dataframe.withColumn("ts", dataframe["ts"].cast("timestamp"))
+    >>> feature_set = AggregatedFeatureSet(
+    ...    name="aggregated_feature_set",
+    ...    entity="entity",
+    ...    description="description",
+    ...    features=[
+    ...        Feature(
+    ...            name="feature1",
+    ...            description="test",
+    ...            transformation=AggregatedTransform(
+    ...                 functions=["avg", "stddev_pop"],
+    ...             ),
+    ...             dtype=DataType.DOUBLE,
+    ...             from_column="rent",
+    ...        ),
+    ...    ],
+    ...    keys=[KeyFeature(name="id", description="lul")],
+    ...    timestamp=TimestampFeature(from_column="ts"),
+    ...)
+    >>> result = feature_set.construct(
+    ...     dataframe=dataframe,
+    ...     client=client,
+    ...     end_date="2020-01-15"
+    ... )
+    >>> result.show()
+    +---+-------------------+-------------+----------------+
+    | id|          timestamp|feature1__avg|feature1__stddev|
+    +---+-------------------+-------------+----------------+
+    |  1|2020-01-01 13:01:00|       1000.0|            null|
+    |  1|2020-01-03 13:01:00|       1000.0|            null|
+    |  1|2020-01-02 13:01:00|       2000.0|            null|
+    |  2|2020-01-09 14:01:00|       1000.0|            null|
+    |  2|2020-01-01 14:01:00|       2000.0|            null|
+    +---+-------------------+-------------+----------------+
+
+    Since you didn't define a window, the AggregateFeatureSet will always group by
+    keys and timestamp feature columns. So in this example, there will be no changes to
+    the dataframe, since it doesn't duplicate on id and timestamp :)
+
+    Let's run one example with windows:
+
+    >>> feature_set.with_windows(definitions=["3 days"])
+    >>> result = feature_set.construct(
+    ...     dataframe=dataframe,
+    ...     client=client,
+    ...     end_date="2020-01-15"
+    ... )
+    >>> result.orderBy("timestamp", "id").show()
+    +---+-------------------+-----------------------------------------+
+    | id|          timestamp|feature1__avg_over_3_days_rolling_windows|
+    +---+-------------------+-----------------------------------------+
+    |  1|2020-01-01 00:00:00|                                     null|
+    |  2|2020-01-01 00:00:00|                                     null|
+    |  1|2020-01-02 00:00:00|                                   1000.0|
+    |  2|2020-01-02 00:00:00|                                   2000.0|
+    |  1|2020-01-03 00:00:00|                                   1500.0|
+    |  1|2020-01-04 00:00:00|                       1333.3333333333333|
+    |  1|2020-01-05 00:00:00|                                   1500.0|
+    |  2|2020-01-05 00:00:00|                                     null|
+    |  1|2020-01-06 00:00:00|                                   1000.0|
+    |  1|2020-01-07 00:00:00|                                     null|
+    |  2|2020-01-10 00:00:00|                                   1000.0|
+    |  2|2020-01-13 00:00:00|                                     null|
+    +---+-------------------+-----------------------------------------+
+
+    +---+-------------------+--------------------------------------------+
+    | id|          timestamp|feature1__stddev_over_3_days_rolling_windows|
+    +---+-------------------+--------------------------------------------+
+    |  1|2020-01-01 00:00:00|                                        null|
+    |  2|2020-01-01 00:00:00|                                        null|
+    |  1|2020-01-02 00:00:00|                                        null|
+    |  2|2020-01-02 00:00:00|                                        null|
+    |  1|2020-01-03 00:00:00|                           707.1067811865476|
+    |  1|2020-01-04 00:00:00|                           577.3502691896258|
+    |  1|2020-01-05 00:00:00|                           707.1067811865476|
+    |  2|2020-01-05 00:00:00|                                        null|
+    |  1|2020-01-06 00:00:00|                                        null|
+    |  1|2020-01-07 00:00:00|                                        null|
+    |  2|2020-01-10 00:00:00|                                        null|
+    |  2|2020-01-13 00:00:00|                                        null|
+    +---+-------------------+--------------------------------------------+
+
+    (Had to break down the table result.)
+
+    And with pivot:
+
+    >>> feature_set.with_pivot(column="status", values=["publicado", "despublicado"])
+    +---+-------------------+-----------------------+--------------------------+
+    | id|          timestamp|publicado_feature1__avg|publicado_feature1__stddev|
+    +---+-------------------+-----------------------+--------------------------+
+    |  1|2020-01-01 13:01:00|                 1000.0|                      null|
+    |  2|2020-01-01 14:01:00|                 2000.0|                      null|
+    |  1|2020-01-02 13:01:00|                   null|                      null|
+    |  1|2020-01-03 13:01:00|                   null|                      null|
+    |  2|2020-01-09 14:01:00|                   null|                      null|
+    +---+-------------------+-----------------------+--------------------------+
+
+    +---+-------------------+--------------------------+-----------------------------+
+    | id|          timestamp|despublicado_feature1__avg|despublicado_feature1__stddev|
+    +---+-------------------+--------------------------+-----------------------------+
+    |  1|2020-01-01 13:01:00|                      null|                         null|
+    |  2|2020-01-01 14:01:00|                      null|                         null|
+    |  1|2020-01-02 13:01:00|                      null|                         null|
+    |  1|2020-01-03 13:01:00|                    1000.0|                         null|
+    |  2|2020-01-09 14:01:00|                    1000.0|                         null|
+    +---+-------------------+--------------------------+-----------------------------+
+
+    As you can see, we need to pass the values you want to pivot. It optimizes this
+    processing in spark and allows ignoring values when pivoting. If you wanted to get
+    the pivot aggregation for "alugado" too, just use:
+
+    >>> feature_set.with_pivot(
+    ...     column="status", values=["publicado", "despublicado", "alugado"]
+    ... )
+
+    You can also run it with pivot AND windows:
+
+    >>> feature_set.with_pivot(
+    ...     column="status",
+    ...     values=["publicado", "despublicado", "alugado"]
+    ... ).with_windows(definitions=["1 day", "2 weeks"])
+
+    The construct method will execute the feature set, computing all the
+    defined aggregated transformations at once.
+
+    Remember: when using an AggregatedFeatureSet without window, the group will use the
+    timestamp column.
+    """
+
     def __init__(
         self,
         name: str,
@@ -112,6 +280,20 @@ class AggregatedFeatureSet(FeatureSet):
         return self
 
     def with_pivot(self, column: str, values: List[str]):
+        """Add a pivot configuration for your aggregated feature set.
+
+        This means we will group the input data, pivot over the column parameter and
+        run each aggregation function over the columns within each value group in
+        the values parameter. In spark it will be something like:
+        dataframe.groupBy(*group).pivot(column, values).agg(*aggregations)
+
+        Args:
+            column: the column, containing categorical values, to pivot on.
+            values: the distinct values you want to be pivoted.
+
+        Returns:
+            An AggregatedFeatureSet configured with pivot.
+        """
         self._pivot_column = column
         self._pivot_values = values
         return self
@@ -187,11 +369,8 @@ class AggregatedFeatureSet(FeatureSet):
     def get_schema(self) -> List[Dict]:
         """Get feature set schema.
 
-        Args:
-            feature_set: object processed with feature set metadata.
-
         Returns:
-            List of dicts regarding cassandra feature set schema.
+            List of dicts with the feature set schema.
 
         """
         schema = []

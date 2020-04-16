@@ -1,31 +1,37 @@
 """Aggregated Transform entity."""
-import itertools
-from functools import reduce
 from typing import List
 
 from parameters_validation import non_blank
-from pyspark.sql import DataFrame, functions
+from pyspark.sql import Column, DataFrame, functions
 
-from butterfree.core.constants.columns import TIMESTAMP_COLUMN
 from butterfree.core.transform.transformations.transform_component import (
     TransformComponent,
 )
 from butterfree.core.transform.transformations.user_defined_functions import mode
-from butterfree.core.transform.utils import Window
 
 
 class AggregatedTransform(TransformComponent):
     """Specifies an aggregation.
 
+    This transformation needs to be used within an AggregatedFeatureSet. Unlike the
+    other transformations, this class won't have a transform method implemented.
+
+    The idea behing aggregating is that, in spark, we should execute all aggregation
+    functions after a single groupby. So an AggregateFeatureSet will have many Features
+    with AggregatedTransform. If each one of them needs to apply a groupby.agg(), then
+    we must join all the results in the end, making this computation extremely slow.
+
+    Now, the AggregateFeatureSet will collect all Features' AggregatedTransform
+    definitions and run, at once, a groupby.agg(*aggregations).
+
+    This class helps defining on a feature, which aggregation function will be applied
+    to build a new aggregated column. Allowed aggregations are registered under the
+     ALLOWED_AGGREGATIONS class attribute.
+
     Attributes:
-        group_by: list of columns to group by.
         functions: aggregation functions, such as avg, std, count.
-        column: column to be used in aggregation function.
 
     Example:
-        It's necessary to declare the desired aggregation method, (average,
-        standard deviation and count are currently supported, as it can be
-        seen in __ALLOWED_AGGREGATIONS), the group by column and aggregation column.
         >>> from butterfree.core.transform.transformations import AggregatedTransform
         >>> from butterfree.core.transform.features import Feature
         >>> from pyspark import SparkContext
@@ -37,53 +43,24 @@ class AggregatedTransform(TransformComponent):
         ...                             (1, "2016-04-11 11:44:12", 300),
         ...                             (1, "2016-04-11 11:46:24", 400),
         ...                             (1, "2016-04-11 12:03:21", 500)]
-        ...                           ).toDF("id", "timestamp", "feature")
+        ...                           ).toDF("id", "timestamp", "somenumber")
         >>> df = df.withColumn("timestamp", df.timestamp.cast(TimestampType()))
         >>> feature = Feature(
         ...    name="feature",
         ...    description="aggregated transform",
         ...    transformation=AggregatedTransform(
         ...        functions=["avg"],
-        ...        group_by="id",
-        ...        column="feature",
-        ...    )
+        ...    ),
+        ...    from_column="somenumber",
         ...)
-        >>> feature.transform(df).show()
-        +---+-----------+
-        | id|feature_avg|
-        +---+-----------+
-        |  1|      350.0|
-        +---+-----------+
-
-        We can use this transformation with windows.
-        >>> feature_rolling_windows = Feature(
-        ...    name="feature",
-        ...    description="aggregated transform with rolling windows usage example",
-        ...    transformation=AggregatedTransform(
-        ...        functions=["avg"],
-        ...        group_by="id",
-        ...        column="feature",
-        ...    ).with_window(
-        ...        window_definition=["1 day"],
-        ...   )
-        ...)
-        >>> feature_rolling_windows.transform(df).orderBy("timestamp").show()
-        +---+-------------------+---------------------------------------+
-        | id|          timestamp|feature_avg_over_1_day_rolling_windows|
-        +---+-------------------+---------------------------------------+
-        |  1|2016-04-11 21:00:00|                                  350.0|
-        +---+-------------------+---------------------------------------+
-
-        It's important to notice that transformation affects the
-        dataframe granularity and, as it's possible to see, returns only
-        columns related to its transformation.
+        >>> feature.get_output_columns()
     """
 
     def __init__(self, functions: non_blank(List[str])):
         super(AggregatedTransform, self).__init__()
         self.functions = functions
 
-    __ALLOWED_AGGREGATIONS = {
+    ALLOWED_AGGREGATIONS = {
         "approx_count_distinct": functions.approx_count_distinct,
         "avg": functions.avg,
         "collect_list": functions.collect_list,
@@ -126,24 +103,24 @@ class AggregatedTransform(TransformComponent):
         self._functions = aggregations
 
     @property
-    def aggregations(self):
+    def aggregations(self) -> List[Column]:
+        """Aggregated spark columns."""
         return [
-            self.__ALLOWED_AGGREGATIONS[f](
-                self._parent.from_column or self._parent.name
-            )
+            self.ALLOWED_AGGREGATIONS[f](self._parent.from_column or self._parent.name)
             for f in self.functions
         ]
 
     @property
     def allowed_aggregations(self) -> List[str]:
         """Allowed aggregations to be used in the transformation."""
-        return list(self.__ALLOWED_AGGREGATIONS.keys())
+        return list(self.ALLOWED_AGGREGATIONS.keys())
 
     def _get_output_name(self, function):
         return "__".join([self._parent.name, function])
 
     @property
     def output_columns(self) -> List[str]:
+        """Columns names generated by the transformation."""
         return [self._get_output_name(f) for f in self.functions]
 
     def transform(self, dataframe: DataFrame) -> DataFrame:
