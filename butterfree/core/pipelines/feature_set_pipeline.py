@@ -175,6 +175,7 @@ class FeatureSetPipeline:
         self,
         end_date: str = None,
         partition_by: List[str] = None,
+        order_by: List[str] = None,
         num_processors: int = None,
     ):
         """Runs the defined feature set pipeline.
@@ -192,7 +193,10 @@ class FeatureSetPipeline:
         dataframe = self.source.construct(client=self.spark_client)
 
         if partition_by:
-            dataframe = repartition_sort_df(dataframe, partition_by, num_processors)
+            order_by = order_by or partition_by
+            dataframe = repartition_sort_df(
+                dataframe, partition_by, order_by, num_processors
+            )
 
         dataframe = self.feature_set.construct(
             dataframe=dataframe, client=self.spark_client, end_date=end_date
