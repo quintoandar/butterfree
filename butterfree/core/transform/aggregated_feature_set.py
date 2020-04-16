@@ -1,65 +1,35 @@
 """AggregatedFeatureSet entity."""
+import itertools
 from datetime import timedelta
 from functools import reduce
-from typing import List
+from typing import Dict, List
 
 from pyspark.sql import DataFrame, functions
 
 from butterfree.core.clients import SparkClient
+from butterfree.core.dataframe_service import repartition_sort_df
 from butterfree.core.transform import FeatureSet
-from butterfree.core.transform.features import Feature
+from butterfree.core.transform.features import Feature, KeyFeature, TimestampFeature
 from butterfree.core.transform.transformations import AggregatedTransform
-from butterfree.core.transform.utils import date_range
+from butterfree.core.transform.utils import Window, date_range
 
 
 class AggregatedFeatureSet(FeatureSet):
-    """Holds metadata about the aggregated feature set.
-
-    This class overrides some methods of the ancestor FeatureSet class
-    and has specific methods for aggregations.
-
-    The AggregatedTransform can only be used on AggregatedFeatureSets.
-
-    Example:
-        This an example regarding the aggregated feature set definition. All features
-        and its transformations are defined.
-    >>> from butterfree.core.transform.aggregated_feature_set import (
-    ...       AggregatedFeatureSet
-    ... )
-    >>> from butterfree.core.transform.features import (
-    ...     Feature,
-    ...     KeyFeature,
-    ...     TimestampFeature,
-    ...)
-    >>> from butterfree.core.transform.transformations import (
-    ...     AggregatedTransform,
-    ... )
-    >>> feature_set = AggregatedFeatureSet(
-    ...    name="aggregated feature_set",
-    ...    entity="entity",
-    ...    description="description",
-    ...    features=[
-    ...        Feature(
-    ...            name="feature1",
-    ...            description="test",
-    ...            transformation=AggregatedTransform(
-    ...                 functions=["avg", "stddev_pop"],
-    ...                 group_by="id",
-    ...                 column="feature1",
-    ...             ).with_window(window_definition=["1 day"],),
-    ...        ),
-    ...    ],
-    ...    keys=[KeyFeature(name="id", description="The user's Main ID or device ID")],
-    ...    timestamp=TimestampFeature(),
-    ...)
-    >>> feature_set.construct(dataframe=dataframe)
-
-    The construct method will execute the feature set, computing all the
-    defined aggregated transformations.
-
-    When you use an AggregatedFeatureSet without window, we defined that
-    the TimestampFeature is the lastest time value in the column.
-    """
+    def __init__(
+        self,
+        name: str,
+        entity: str,
+        description: str,
+        keys: List[KeyFeature],
+        timestamp: TimestampFeature,
+        features: List[Feature],
+    ):
+        self._windows = []
+        self._pivot_column = None
+        self._pivot_values = []
+        super(AggregatedFeatureSet, self).__init__(
+            name, entity, description, keys, timestamp, features,
+        )
 
     @property
     def features(self) -> List[Feature]:
@@ -83,15 +53,6 @@ class AggregatedFeatureSet(FeatureSet):
                 "You need to use Feature Set."
             )
 
-        if not self._has_aggregated_transform_with_window_only(
-            value
-        ) and not self._has_aggregated_transform_without_window_only(value):
-            raise ValueError(
-                "You can only define aggregate transformations with "
-                "or without windows, so you cannot "
-                "define with both types."
-            )
-
         self.__features = value
 
     @staticmethod
@@ -113,30 +74,47 @@ class AggregatedFeatureSet(FeatureSet):
         )
 
     @staticmethod
-    def _has_aggregated_transform_with_window_only(features):
-        """Aggregated Transform window check.
+    def _build_feature_column_name(feature_column, pivot_value=None, window=None):
+        base_name = feature_column
+        if pivot_value is not None:
+            base_name = f"{pivot_value}_{base_name}"
+        if window is not None:
+            base_name = f"{base_name}_{window.get_name()}"
 
-        Checks if there's a window within the scope of the
-        all AggregatedTransform.
+        return base_name
 
-        Returns:
-            True if there's a window in all features.
+    @property
+    def features_columns(self) -> List[str]:
+        """Name of the columns of all features in feature set."""
+        base_columns = list(
+            itertools.chain(*[f.get_output_columns() for f in self.features])
+        )
 
-        """
-        return all([feature.transformation.has_windows for feature in features])
+        pivot_values = self._pivot_values or [None]
+        windows = self._windows or [None]
+        feature_columns = [
+            self._build_feature_column_name(fc, pivot_value=pv, window=w)
+            for pv, fc, w in itertools.product(pivot_values, base_columns, windows)
+        ]
+        return feature_columns
 
-    @staticmethod
-    def _has_aggregated_transform_without_window_only(features):
-        """Aggregated Transform without window check.
+    def with_windows(self, definitions: List[str]):
+        """Create a list with windows defined."""
+        self._windows = [
+            Window(
+                partition_by=None,
+                order_by=None,
+                mode="rolling_windows",
+                window_definition=definition,
+            )
+            for definition in definitions
+        ]
+        return self
 
-        Checks if there isn't a window within the scope of the
-        all AggregatedTransform.
-
-        Returns:
-            True if there isn't a window in all features.
-
-        """
-        return all([not feature.transformation.has_windows for feature in features])
+    def with_pivot(self, column: str, values: List[str]):
+        self._pivot_column = column
+        self._pivot_values = values
+        return self
 
     def _get_base_dataframe(self, client, dataframe, end_date):
         start_date = dataframe.agg(functions.min(self.timestamp_column)).take(1)[0][0]
@@ -154,8 +132,103 @@ class AggregatedFeatureSet(FeatureSet):
     def _dataframe_join(left, right, on, how):
         return left.join(right, on=on, how=how)
 
+    def _aggregate(self, dataframe, features, window=None):
+        aggregations = list(
+            itertools.chain.from_iterable(
+                [f.transformation.aggregations for f in features]
+            )
+        )
+        grouped_data = (
+            dataframe.groupby(*self.keys_columns, window.get())
+            if window is not None
+            else dataframe.groupby(*self.keys_columns, self.timestamp_column)
+        )
+
+        if self._pivot_column:
+            grouped_data = grouped_data.pivot(self._pivot_column, self._pivot_values)
+
+        aggregated = grouped_data.agg(*aggregations)
+        return self._with_renamed_columns(aggregated, features, window)
+
+    def _with_renamed_columns(self, aggregated, features, window):
+        old_columns = [
+            c
+            for c in aggregated.columns
+            if c not in self.keys_columns + [self.timestamp_column, "window"]
+        ]
+
+        # the loop order here is really important
+        # spark will always create the aggregated dataframe following the order:
+        # pivot_value then aggregation function
+        # so when we have 2 pivot values and 2 agg functions
+        # the result columns will be something like: pivot_value1_function1,
+        # pivot_value1_function_2, pivot_value2_function1 and pivot_value2_function2
+        base_columns = list(
+            itertools.chain(*[f.get_output_columns() for f in features])
+        )
+        pivot_values = self._pivot_values or [None]
+        new_columns = [
+            self._build_feature_column_name(fc, pivot_value=pv, window=window)
+            for pv, fc in itertools.product(pivot_values, base_columns)
+        ]
+
+        select = [
+            f"`{old_name}` as {new_name}"
+            for old_name, new_name in zip(old_columns, new_columns)
+        ]
+        if self._windows:
+            select.append(f"window.end as {self.timestamp_column}")
+        else:
+            select.append(f"{self.timestamp_column}")
+
+        select += [kc for kc in self.keys_columns]
+        return aggregated.selectExpr(*select)
+
+    def get_schema(self) -> List[Dict]:
+        """Get feature set schema.
+
+        Args:
+            feature_set: object processed with feature set metadata.
+
+        Returns:
+            List of dicts regarding cassandra feature set schema.
+
+        """
+        schema = []
+        for f in self.keys + [self.timestamp]:
+            for c in self._get_features_columns(f):
+                schema.append(
+                    {
+                        "column_name": c,
+                        "type": f.dtype.spark,
+                        "primary_key": True if isinstance(f, KeyFeature) else False,
+                    }
+                )
+        pivot_values = self._pivot_values or [None]
+        windows = self._windows or [None]
+        for f in self.features:
+            combination = itertools.product(
+                pivot_values, self._get_features_columns(f), windows
+            )
+            for pv, fc, w in combination:
+                name = self._build_feature_column_name(fc, pivot_value=pv, window=w)
+
+                schema.append(
+                    {
+                        "column_name": name,
+                        "type": f.dtype.spark,
+                        "primary_key": True if isinstance(f, KeyFeature) else False,
+                    }
+                )
+
+        return schema
+
     def construct(
-        self, dataframe: DataFrame, client: SparkClient, end_date: str = None
+        self,
+        dataframe: DataFrame,
+        client: SparkClient,
+        end_date: str = None,
+        num_processors=None,
     ) -> DataFrame:
         """Use all the features to build the feature set dataframe.
 
@@ -172,14 +245,11 @@ class AggregatedFeatureSet(FeatureSet):
             Spark dataframe with all the feature columns.
 
         """
-        if end_date is None and self._has_aggregated_transform_with_window_only(
-            self.features
-        ):
+        if end_date is None and self._windows:
             raise ValueError(
                 "When using aggregate with windows, one must give end_date."
             )
 
-        df_list = []
         if not isinstance(dataframe, DataFrame):
             raise ValueError("source_df must be a dataframe")
 
@@ -189,14 +259,37 @@ class AggregatedFeatureSet(FeatureSet):
             dataframe,
         )
 
-        for feature in self.features:
-            feature_df = feature.transform(output_df)
-            df_list.append(feature_df)
+        # repartition to have all ids at the same partition
+        # by doing that, we won't have to shuffle data on grouping by id
+        output_df = repartition_sort_df(
+            output_df,
+            partition_by=self.keys_columns,
+            order_by=[self.timestamp_column],
+            num_processors=num_processors,
+        )
 
-        if self._has_aggregated_transform_with_window_only(self.features):
+        if self._windows:
+            # prepare our left table, a cartesian product between distinct keys
+            # and dates in range for this feature set
+            # make the left table co-partitioned with the aggregations' result
+            # improving our upcoming joins
             base_df = self._get_base_dataframe(
                 client=client, dataframe=output_df, end_date=end_date
             )
+            base_df = repartition_sort_df(
+                base_df,
+                partition_by=self.keys_columns,
+                order_by=[self.timestamp_column],
+                num_processors=num_processors,
+            )
+
+            # run aggregations for each window
+            agg_list = [
+                self._aggregate(dataframe=output_df, features=self.features, window=w)
+                for w in self._windows
+            ]
+
+            # left join each aggregation result to our base dataframe
             output_df = reduce(
                 lambda left, right: self._dataframe_join(
                     left,
@@ -204,31 +297,87 @@ class AggregatedFeatureSet(FeatureSet):
                     on=self.keys_columns + [self.timestamp_column],
                     how="left",
                 ),
-                df_list,
+                agg_list,
                 base_df,
             )
+        else:
+            output_df = self._aggregate(output_df, features=self.features)
 
-        elif self._has_aggregated_transform_without_window_only(self.features):
-            agg_df = output_df.groupBy(self.keys_columns).agg(
-                functions.max(functions.col(self.timestamp_column)).alias(
-                    self.timestamp_column
-                )
+        output_df = (
+            repartition_sort_df(
+                output_df,
+                partition_by=self.keys_columns,
+                order_by=[self.timestamp_column],
+                num_processors=num_processors,
             )
-            output_df = reduce(
-                lambda left, right: self._dataframe_join(
-                    left,
-                    right,
-                    on=self.features[0].transformation.group_by,
-                    how="full_outer",
-                ),
-                df_list,
-                agg_df,
-            )
-
-        output_df = output_df.select(*self.columns)
+            .select(*self.columns)
+            .replace(float("nan"), None)
+        )
 
         if not output_df.isStreaming:
             output_df = self._filter_duplicated_rows(output_df)
             output_df.cache().count()
 
         return output_df
+
+
+if __name__ == "__main__":
+    from butterfree.core.clients import SparkClient
+    from butterfree.core.constants.data_type import DataType
+
+    client = SparkClient()
+
+    client.conn.conf.set("spark.sql.session.timeZone", "UTC")
+    df = client.conn.createDataFrame(
+        [
+            (1, "2020-01-01 13:01:00+000", 1000, "publicado"),
+            (2, "2020-01-01 14:01:00+000", 2000, "publicado"),
+            (1, "2020-01-02 13:01:00+000", 2000, "alugado"),
+            (1, "2020-01-03 13:01:00+000", 1000, "despublicado"),
+            (2, "2020-01-09 14:01:00+000", 1000, "despublicado"),
+        ],
+        ("id", "ts", "rent", "status"),
+    )
+    df = df.withColumn("ts", df["ts"].cast("timestamp"))
+
+    fs = (
+        AggregatedFeatureSet(
+            name="user_aggregations_listing_page_viewed",
+            entity="user",
+            description=(
+                """Holds all house visit_intent_clicked events within amplitude's scope."""
+            ),
+            keys=[
+                KeyFeature(name="id", description="The user ID", dtype=DataType.STRING)
+            ],
+            timestamp=TimestampFeature(from_column="ts"),
+            features=[
+                Feature(
+                    name="rent",
+                    description="Count of house ids over 30 days, considering the "
+                    "listing_page_viewed event.",
+                    dtype=DataType.DOUBLE,
+                    transformation=AggregatedTransform(functions=["avg", "stddev"]),
+                ),
+            ],
+        )
+        .with_windows(definitions=["3 days", "7 days"])
+        .with_pivot("status", ["publicado", "alugado", "despublicado"])
+    )
+
+    print(fs.features_columns)
+    resultdf = fs.construct(df, client, end_date="2020-01-14")
+    print(resultdf.count())
+    print(resultdf.show())
+
+    expected = client.conn.createDataFrame(
+        [
+            (1, "2020-01-01 13:01:00+000", 1000, "publicado"),
+            (2, "2020-01-01 14:01:00+000", 2000, "publicado"),
+            (1, "2020-01-02 13:01:00+000", 2000, "alugado"),
+            (1, "2020-01-03 13:01:00+000", 1000, "despublicado"),
+            (2, "2020-01-09 14:01:00+000", 1000, "despublicado"),
+        ],
+        ("id", "ts", "rent", "status"),
+    )
+    df = df.withColumn("ts", df["ts"].cast("timestamp"))
