@@ -396,7 +396,7 @@ class AggregatedFeatureSet(FeatureSet):
                     {
                         "column_name": name,
                         "type": f.dtype.spark,
-                        "primary_key": True if isinstance(f, KeyFeature) else False,
+                        "primary_key": False,
                     }
                 )
 

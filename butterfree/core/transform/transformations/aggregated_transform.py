@@ -34,26 +34,20 @@ class AggregatedTransform(TransformComponent):
     Example:
         >>> from butterfree.core.transform.transformations import AggregatedTransform
         >>> from butterfree.core.transform.features import Feature
-        >>> from pyspark import SparkContext
-        >>> from pyspark.sql import session
-        >>> from pyspark.sql.types import TimestampType
-        >>> sc = SparkContext.getOrCreate()
-        >>> spark = session.SparkSession(sc)
-        >>> df = spark.createDataFrame([(1, "2016-04-11 11:31:11", 200),
-        ...                             (1, "2016-04-11 11:44:12", 300),
-        ...                             (1, "2016-04-11 11:46:24", 400),
-        ...                             (1, "2016-04-11 12:03:21", 500)]
-        ...                           ).toDF("id", "timestamp", "somenumber")
-        >>> df = df.withColumn("timestamp", df.timestamp.cast(TimestampType()))
+        >>> from butterfree.core.constants.data_type import DataType
         >>> feature = Feature(
-        ...    name="feature",
-        ...    description="aggregated transform",
-        ...    transformation=AggregatedTransform(
-        ...        functions=["avg"],
-        ...    ),
-        ...    from_column="somenumber",
+        ...     name="feature",
+        ...     description="aggregated transform",
+        ...     transformation=AggregatedTransform(
+        ...         functions=["avg", "stddev_pop"],
+        ...     ),
+        ...     dtype=DataType.DOUBLE,
+        ...     from_column="somenumber",
         ...)
         >>> feature.get_output_columns()
+        ['feature__avg', 'feature__stddev_pop']
+        >>> feature.transform(anydf)
+        NotImplementedError: ...
     """
 
     def __init__(self, functions: non_blank(List[str])):
@@ -126,13 +120,16 @@ class AggregatedTransform(TransformComponent):
         return [self._get_output_name(f) for f in self.functions]
 
     def transform(self, dataframe: DataFrame) -> DataFrame:
-        """Performs a transformation to the feature pipeline.
+        """(NotImplemented) Performs a transformation to the feature pipeline.
+
+        For the AggregatedTransform, the transformation won't be applied without
+        using an AggregatedFeatureSet.
 
         Args:
             dataframe: input dataframe.
 
-        Returns:
-            Transformed dataframe.
+        Raises:
+            NotImplementedError.
         """
         raise NotImplementedError(
             "AggregatedTransform won't be used outside an AggregatedFeatureSet, "
