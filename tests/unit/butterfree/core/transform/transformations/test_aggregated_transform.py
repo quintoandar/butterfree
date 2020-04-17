@@ -132,3 +132,21 @@ class TestAggregatedTransform:
         output_df = test_feature.transform(feature_set_df_pivot)
 
         assert_dataframe_equality(output_df, target_df_pivot_agg_window)
+
+    def test_feature_transform_with_distinct(
+        self, feature_set_df_distinct, target_df_distinct
+    ):
+        test_feature = Feature(
+            name="feature",
+            description="unit test",
+            dtype=DataType.DOUBLE,
+            transformation=AggregatedTransform(
+                functions=["sum"], group_by="h3", column="feature",
+            )
+            .with_window(window_definition=["3 days"])
+            .with_distinct(distinct_column="id"),
+        )
+
+        output_df = test_feature.transform(feature_set_df_distinct)
+
+        assert_dataframe_equality(output_df, target_df_distinct)

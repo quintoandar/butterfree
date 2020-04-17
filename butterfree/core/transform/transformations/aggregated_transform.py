@@ -5,6 +5,7 @@ from typing import List
 
 from parameters_validation import non_blank
 from pyspark.sql import DataFrame, functions
+from pyspark.sql.functions import col
 
 from butterfree.core.constants.columns import TIMESTAMP_COLUMN
 from butterfree.core.transform.transformations.transform_component import (
@@ -80,7 +81,7 @@ class AggregatedTransform(TransformComponent):
     """
 
     def __init__(
-        self, group_by, functions: non_blank(List[str]), column: non_blank(str)
+        self, group_by, functions: non_blank(List[str]), column: non_blank(str),
     ):
         super(AggregatedTransform, self).__init__()
         self.group_by = group_by
@@ -89,6 +90,7 @@ class AggregatedTransform(TransformComponent):
         self._windows = []
         self._pivot_column = None
         self._pivot_values = []
+        self._distinct_column = None
 
     __ALLOWED_AGGREGATIONS = {
         "approx_count_distinct": functions.approx_count_distinct,
@@ -169,6 +171,11 @@ class AggregatedTransform(TransformComponent):
         self._pivot_values = pivot_values
         return self
 
+    def with_distinct(self, distinct_column):
+        """Create a list with windows defined."""
+        self._distinct_column = distinct_column
+        return self
+
     def _get_output_name(self, function, window=None, pivot_value=None):
         base_name = "__".join([self._parent.name, function])
 
@@ -237,10 +244,36 @@ class AggregatedTransform(TransformComponent):
                 for w in window
             ]
 
+        if self._distinct_column:
+            data_on = dataframe.groupBy(
+                groupby,
+                self._distinct_column,
+                window.get() if window else TIMESTAMP_COLUMN,
+            ).agg(
+                self.__ALLOWED_AGGREGATIONS["max"](TIMESTAMP_COLUMN).alias(
+                    TIMESTAMP_COLUMN
+                )
+            )
+            dataframe = (
+                data_on.alias("a")
+                .join(
+                    dataframe.alias("b"),
+                    (
+                        col(f"a.{self._distinct_column}")
+                        == col(f"b.{self._distinct_column}")
+                    )
+                    & (col(f"a.{TIMESTAMP_COLUMN}") == col(f"b.{TIMESTAMP_COLUMN}")),
+                    "left",
+                )
+                .select("a.*", self.column)
+            )
+
         data = (
             dataframe.groupBy(groupby)
             if not window
-            else dataframe.groupBy(groupby, window.get())
+            else dataframe.groupBy(
+                groupby, "window" if self._distinct_column else window.get()
+            )
         )
 
         if pivot_on:

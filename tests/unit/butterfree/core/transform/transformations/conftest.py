@@ -21,6 +21,50 @@ def feature_set_dataframe(spark_context, spark_session):
 
 
 @fixture
+def feature_set_df_distinct(spark_context, spark_session):
+    data = [
+        {"id": 1, "timestamp": "2020-01-01", "feature": 1, "h3": "86a8100efffffff"},
+        {"id": 2, "timestamp": "2020-01-01", "feature": 2, "h3": "86a8100efffffff"},
+        {"id": 3, "timestamp": "2020-01-02", "feature": 1, "h3": "86a8100efffffff"},
+        {"id": 2, "timestamp": "2020-01-02", "feature": 1, "h3": "86a8100efffffff"},
+    ]
+    df = spark_session.read.json(spark_context.parallelize(data, 1))
+    df = df.withColumn(TIMESTAMP_COLUMN, df.timestamp.cast(DataType.TIMESTAMP.spark))
+
+    return df
+
+
+@fixture
+def target_df_distinct(spark_context, spark_session):
+    data = [
+        {
+            "h3": "86a8100efffffff",
+            "timestamp": "2020-01-02 00:00:00",
+            "feature__sum_over_3_days_rolling_windows": 3,
+        },
+        {
+            "h3": "86a8100efffffff",
+            "timestamp": "2020-01-03 00:00:00",
+            "feature__sum_over_3_days_rolling_windows": 3,
+        },
+        {
+            "h3": "86a8100efffffff",
+            "timestamp": "2020-01-04 00:00:00",
+            "feature__sum_over_3_days_rolling_windows": 3,
+        },
+        {
+            "h3": "86a8100efffffff",
+            "timestamp": "2020-01-05 00:00:00",
+            "feature__sum_over_3_days_rolling_windows": 2,
+        },
+    ]
+    df = spark_session.read.json(spark_context.parallelize(data, 1))
+    df = df.withColumn(TIMESTAMP_COLUMN, df.timestamp.cast(DataType.TIMESTAMP.spark))
+
+    return df
+
+
+@fixture
 def feature_set_df_pivot(spark_context, spark_session):
     data = [
         {
