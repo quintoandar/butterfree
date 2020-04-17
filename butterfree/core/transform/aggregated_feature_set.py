@@ -393,11 +393,7 @@ class AggregatedFeatureSet(FeatureSet):
                 name = self._build_feature_column_name(fc, pivot_value=pv, window=w)
 
                 schema.append(
-                    {
-                        "column_name": name,
-                        "type": f.dtype.spark,
-                        "primary_key": False,
-                    }
+                    {"column_name": name, "type": f.dtype.spark, "primary_key": False}
                 )
 
         return schema
