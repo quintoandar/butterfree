@@ -166,13 +166,13 @@ class AggregatedTransform(TransformComponent):
         return self
 
     def with_pivot(self, pivot_column, pivot_values):
-        """Create a list with windows defined."""
+        """This method receives columns to perform the pivot on GroupedData."""
         self._pivot_column = pivot_column
         self._pivot_values = pivot_values
         return self
 
     def with_distinct(self, distinct_column):
-        """Create a list with windows defined."""
+        """This method receives the column where it will perform the distinction."""
         self._distinct_column = distinct_column
         return self
 
