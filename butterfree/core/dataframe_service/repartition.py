@@ -3,12 +3,15 @@ from typing import List
 
 from pyspark.sql.dataframe import DataFrame
 
-from butterfree.core.constants.spark_constants import DEFAULT_NUM_PARTITIONS
+from butterfree.core.constants.spark_constants import (
+    DEFAULT_NUM_PARTITIONS,
+    PARTITION_PROCESSOR_RATIO,
+)
 
 
 def _num_partitions_definition(num_processors, num_partitions):
     num_partitions = (
-        num_processors * 40
+        num_processors * PARTITION_PROCESSOR_RATIO
         if num_processors
         else num_partitions or DEFAULT_NUM_PARTITIONS
     )
@@ -37,6 +40,7 @@ def repartition_df(
 def repartition_sort_df(
     dataframe: DataFrame,
     partition_by: List[str],
+    order_by: List[str],
     num_processors: int = None,
     num_partitions: int = None,
 ):
@@ -54,4 +58,4 @@ def repartition_sort_df(
     """
     num_partitions = _num_partitions_definition(num_processors, num_partitions)
     dataframe = repartition_df(dataframe, partition_by, num_partitions)
-    return dataframe.sortWithinPartitions(*partition_by)
+    return dataframe.sortWithinPartitions(*order_by)
