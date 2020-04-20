@@ -5,6 +5,10 @@ Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each 
 
 ## Unreleased
 
+## [0.8.0](https://github.com/quintoandar/butterfree/releases/tag/0.8.0)
+### Changed
+* [PROPOSAL] Optimizing rolling window aggregations ([#134](https://github.com/quintoandar/butterfree/pull/134))
+
 ## [0.7.1](https://github.com/quintoandar/butterfree/releases/tag/0.7.1)
 ### Added
 * [MLOP-225] KeyFeature need dtype to be a required arg ([#126](https://github.com/quintoandar/butterfree/pull/126))
