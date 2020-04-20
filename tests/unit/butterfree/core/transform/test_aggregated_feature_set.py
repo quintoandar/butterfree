@@ -186,7 +186,9 @@ class TestAggregatedFeatureSet:
     ):
         spark_client = SparkClient()
 
-        with pytest.raises(ValueError, match="The distinct keep param can only be 'last' or 'first'."):
+        with pytest.raises(
+            ValueError, match="The distinct keep param can only be 'last' or 'first'."
+        ):
             AggregatedFeatureSet(
                 name="name",
                 entity="entity",
@@ -212,7 +214,9 @@ class TestAggregatedFeatureSet:
     ):
         spark_client = SparkClient()
 
-        with pytest.raises(ValueError, match="The distinct subset param can't be empty."):
+        with pytest.raises(
+            ValueError, match="The distinct subset param can't be empty."
+        ):
             AggregatedFeatureSet(
                 name="name",
                 entity="entity",
@@ -227,8 +231,6 @@ class TestAggregatedFeatureSet:
                 ],
                 keys=[KeyFeature(name="h3", description="test", dtype=DataType.STRING)],
                 timestamp=timestamp_c,
-            ).with_windows(["3 days"]).with_distinct(
-                subset=[], keep="first"
-            ).construct(
+            ).with_windows(["3 days"]).with_distinct(subset=[], keep="first").construct(
                 feature_set_with_distinct_dataframe, spark_client, end_date="2020-01-10"
             )
