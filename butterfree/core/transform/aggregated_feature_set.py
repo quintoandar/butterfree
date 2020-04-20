@@ -281,8 +281,11 @@ class AggregatedFeatureSet(FeatureSet):
         Returns:
             An AggregatedFeatureSet configured with distinct.
         """
-        if keep != "last" and keep != "first":
-            raise ValueError("The distinct_keep param can only be 'last' or 'first'.")
+        if keep not in ["last", "first"]:
+            raise ValueError("The distinct keep param can only be 'last' or 'first'.")
+
+        if not subset:
+            raise ValueError("The distinct subset param can't be empty.")
 
         self._distinct_subset = subset
         self._distinct_keep = keep
