@@ -360,9 +360,7 @@ class TestFeatureSetPipeline:
                         dtype=DataType.FLOAT,
                         transformation=AggregatedTransform(
                             functions=["avg", "stddev_pop"],
-                            group_by="user_id",
-                            column="rent",
-                        ).with_window(window_definition=["7 days", "2 weeks"]),
+                        ),
                     ),
                 ],
             ),
