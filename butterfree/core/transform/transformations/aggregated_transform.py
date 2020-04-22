@@ -3,6 +3,7 @@ from typing import List
 
 from parameters_validation import non_blank
 from pyspark.sql import Column, DataFrame, functions
+from pyspark.sql.functions import col, expr, when
 
 from butterfree.core.transform.transformations.transform_component import (
     TransformComponent,
@@ -30,6 +31,10 @@ class AggregatedTransform(TransformComponent):
 
     Attributes:
         functions: aggregation functions, such as avg, std, count.
+        filter_expression: sql boolean expression to be used inside agg function.
+            The filter expression can be used to aggregate some column only with
+            records that obey certain condition. Has the same behaviour of the
+            following SQL expression: `agg(case when filter_expression then col end)`
 
     Example:
         >>> from butterfree.core.transform.transformations import AggregatedTransform
@@ -50,9 +55,10 @@ class AggregatedTransform(TransformComponent):
         NotImplementedError: ...
     """
 
-    def __init__(self, functions: non_blank(List[str])):
+    def __init__(self, functions: non_blank(List[str]), filter_expression: str = None):
         super(AggregatedTransform, self).__init__()
         self.functions = functions
+        self.filter_expression = filter_expression
 
     __ALLOWED_AGGREGATIONS = {
         "approx_count_distinct": functions.approx_count_distinct,
@@ -99,12 +105,16 @@ class AggregatedTransform(TransformComponent):
     @property
     def aggregations(self) -> List[Column]:
         """Aggregated spark columns."""
-        return [
-            self.__ALLOWED_AGGREGATIONS[f](
-                self._parent.from_column or self._parent.name
-            )
-            for f in self.functions
-        ]
+        column_name = self._parent.from_column or self._parent.name
+
+        # if transform has a filter expression apply inside agg function
+        # if not, use just the target column name inside agg function
+        expression = (
+            when(expr(self.filter_expression), col(column_name))
+            if self.filter_expression
+            else column_name
+        )
+        return [self.__ALLOWED_AGGREGATIONS[f](expression) for f in self.functions]
 
     @property
     def allowed_aggregations(self) -> List[str]:

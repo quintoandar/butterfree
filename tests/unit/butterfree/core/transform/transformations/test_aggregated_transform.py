@@ -1,4 +1,5 @@
 import pytest
+from pyspark.sql import functions
 
 from butterfree.core.constants.data_type import DataType
 from butterfree.core.transform.features import Feature
@@ -53,3 +54,28 @@ class TestAggregatedTransform:
                 dtype=DataType.BIGINT,
                 transformation=AggregatedTransform(functions=[]),
             )
+
+    def test_aggregations_with_filter_expression(self, spark_context):
+        # arrange
+        test_feature = Feature(
+            name="feature_with_filter",
+            description="unit test",
+            dtype=DataType.BIGINT,
+            transformation=AggregatedTransform(
+                functions=["avg", "min", "max"], filter_expression="type = 'a'"
+            ),
+            from_column="feature",
+        )
+        target_aggregations = [
+            agg(functions.when(functions.expr("type = 'a'"), functions.col("feature")))
+            for agg in [functions.avg, functions.min, functions.max]
+        ]
+
+        # act
+        output_aggregations = test_feature.transformation.aggregations
+
+        # assert
+
+        # cast to string to compare the columns definitions because direct column
+        # comparison was not working
+        assert str(target_aggregations) == str(output_aggregations)

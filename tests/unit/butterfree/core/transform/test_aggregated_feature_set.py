@@ -10,7 +10,10 @@ from butterfree.core.transform.transformations import (
     AggregatedTransform,
     SparkFunctionTransform,
 )
-from butterfree.testing.dataframe import assert_dataframe_equality
+from butterfree.testing.dataframe import (
+    assert_dataframe_equality,
+    create_df_from_collection,
+)
 
 
 class TestAggregatedFeatureSet:
@@ -234,3 +237,81 @@ class TestAggregatedFeatureSet:
             ).with_windows(["3 days"]).with_distinct(subset=[], keep="first").construct(
                 feature_set_with_distinct_dataframe, spark_client, end_date="2020-01-10"
             )
+
+    def test_feature_transform_with_filter_expression(
+        self, spark_context, spark_session
+    ):
+        # arrange
+        input_data = [
+            {
+                "id": 1,
+                "timestamp": "2020-04-22T00:00:00+00:00",
+                "feature": 10,
+                "type": "a",
+            },
+            {
+                "id": 1,
+                "timestamp": "2020-04-22T00:00:00+00:00",
+                "feature": 20,
+                "type": "a",
+            },
+            {
+                "id": 1,
+                "timestamp": "2020-04-22T00:00:00+00:00",
+                "feature": 30,
+                "type": "b",
+            },
+            {
+                "id": 2,
+                "timestamp": "2020-04-22T00:00:00+00:00",
+                "feature": 10,
+                "type": "a",
+            },
+        ]
+        target_data = [
+            {
+                "id": 1,
+                "timestamp": "2020-04-22T00:00:00+00:00",
+                "feature_only_type_a__avg": 15.0,
+                "feature_only_type_a__min": 10,
+                "feature_only_type_a__max": 20,
+            },
+            {
+                "id": 2,
+                "timestamp": "2020-04-22T00:00:00+00:00",
+                "feature_only_type_a__avg": 10.0,
+                "feature_only_type_a__min": 10,
+                "feature_only_type_a__max": 10,
+            },
+        ]
+        input_df = create_df_from_collection(
+            input_data, spark_context, spark_session
+        ).withColumn("timestamp", functions.to_timestamp(functions.col("timestamp")))
+        target_df = create_df_from_collection(
+            target_data, spark_context, spark_session
+        ).withColumn("timestamp", functions.to_timestamp(functions.col("timestamp")))
+
+        fs = AggregatedFeatureSet(
+            name="name",
+            entity="entity",
+            description="description",
+            keys=[KeyFeature(name="id", description="test", dtype=DataType.INTEGER)],
+            timestamp=TimestampFeature(),
+            features=[
+                Feature(
+                    name="feature_only_type_a",
+                    description="aggregations only when type = a",
+                    dtype=DataType.BIGINT,
+                    transformation=AggregatedTransform(
+                        functions=["avg", "min", "max"], filter_expression="type = 'a'"
+                    ),
+                    from_column="feature",
+                ),
+            ],
+        )
+
+        # act
+        output_df = fs.construct(input_df, SparkClient())
+
+        # assert
+        assert_dataframe_equality(target_df, output_df)
