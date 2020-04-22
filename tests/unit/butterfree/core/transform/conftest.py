@@ -138,6 +138,76 @@ def make_fs(spark_context, spark_session):
     return df
 
 
+def make_fs_dataframe_with_distinct(spark_context, spark_session):
+    data = [
+        {
+            "id": 1,
+            "timestamp": "2020-01-01 00:00:00",
+            "feature": 1,
+            "h3": "86a8100efffffff",
+        },
+        {
+            "id": 2,
+            "timestamp": "2020-01-01 00:00:00",
+            "feature": 2,
+            "h3": "86a8100efffffff",
+        },
+        {
+            "id": 3,
+            "timestamp": "2020-01-02 00:00:00",
+            "feature": 1,
+            "h3": "86a8100efffffff",
+        },
+        {
+            "id": 3,
+            "timestamp": "2020-01-02 00:00:00",
+            "feature": 1,
+            "h3": "86a8100efffffff",
+        },
+        {
+            "id": 2,
+            "timestamp": "2020-01-02 00:00:00",
+            "feature": 1,
+            "h3": "86a8100efffffff",
+        },
+    ]
+    df = spark_session.read.json(spark_context.parallelize(data, 1))
+    df = df.withColumn("timestamp", df.timestamp.cast(DataType.TIMESTAMP.spark))
+
+    return df
+
+
+def make_target_df_distinct(spark_context, spark_session):
+    data = [
+        {
+            "h3": "86a8100efffffff",
+            "timestamp": "2020-01-01 00:00:00",
+            "feature__sum_over_3_days_rolling_windows": None,
+        },
+        {
+            "h3": "86a8100efffffff",
+            "timestamp": "2020-01-02 00:00:00",
+            "feature__sum_over_3_days_rolling_windows": 3,
+        },
+        {
+            "h3": "86a8100efffffff",
+            "timestamp": "2020-01-05 00:00:00",
+            "feature__sum_over_3_days_rolling_windows": 2,
+        },
+        {
+            "h3": "86a8100efffffff",
+            "timestamp": "2020-01-06 00:00:00",
+            "feature__sum_over_3_days_rolling_windows": None,
+        },
+    ]
+    df = spark_session.read.json(
+        spark_context.parallelize(data).map(lambda x: json.dumps(x))
+    )
+    df = df.withColumn("timestamp", df.timestamp.cast(DataType.TIMESTAMP.spark))
+
+    return df
+
+
 @fixture
 def dataframe(spark_context, spark_session):
     return make_dataframe(spark_context, spark_session)
@@ -161,6 +231,16 @@ def output_filtering_dataframe(spark_context, spark_session):
 @fixture
 def rolling_windows_agg_dataframe(spark_context, spark_session):
     return make_rolling_windows_agg_dataframe(spark_context, spark_session)
+
+
+@fixture
+def feature_set_with_distinct_dataframe(spark_context, spark_session):
+    return make_fs_dataframe_with_distinct(spark_context, spark_session)
+
+
+@fixture
+def target_with_distinct_dataframe(spark_context, spark_session):
+    return make_target_df_distinct(spark_context, spark_session)
 
 
 @fixture
