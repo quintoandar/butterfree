@@ -4,6 +4,7 @@ from datetime import timedelta
 from functools import reduce
 from typing import Dict, List
 
+from pyspark import sql
 from pyspark.sql import DataFrame, functions
 
 from butterfree.core.clients import SparkClient
@@ -195,6 +196,8 @@ class AggregatedFeatureSet(FeatureSet):
         self._windows = []
         self._pivot_column = None
         self._pivot_values = []
+        self._distinct_subset = []
+        self._distinct_keep = None
         super(AggregatedFeatureSet, self).__init__(
             name, entity, description, keys, timestamp, features,
         )
@@ -266,6 +269,29 @@ class AggregatedFeatureSet(FeatureSet):
         ]
         return feature_columns
 
+    def with_distinct(self, subset: List, keep: str = "last"):
+        """Add a distinct configuration for your aggregated feature set.
+
+        Args:
+            subset: the columns where it will identify duplicates.
+            keep: determines which duplicates to keep. Default 'last'.
+                - first : Ascending sorting by timestamp.
+                - last : Descending sorting by timestamp.
+
+        Returns:
+            An AggregatedFeatureSet configured with distinct.
+        """
+        if keep not in ["last", "first"]:
+            raise ValueError("The distinct keep param can only be 'last' or 'first'.")
+
+        if not subset:
+            raise ValueError("The distinct subset param can't be empty.")
+
+        self._distinct_subset = subset
+        self._distinct_keep = keep
+
+        return self
+
     def with_windows(self, definitions: List[str]):
         """Create a list with windows defined."""
         self._windows = [
@@ -320,11 +346,32 @@ class AggregatedFeatureSet(FeatureSet):
                 [f.transformation.aggregations for f in features]
             )
         )
-        grouped_data = (
-            dataframe.groupby(*self.keys_columns, window.get())
-            if window is not None
-            else dataframe.groupby(*self.keys_columns, self.timestamp_column)
-        )
+
+        groupby = self.keys_columns.copy()
+        if window is not None:
+            dataframe = dataframe.withColumn("window", window.get())
+            groupby.append("window")
+        else:
+            groupby.append(self.timestamp_column)
+
+        if self._distinct_subset:
+            orderby = (
+                functions.col(self.timestamp_column).desc()
+                if self._distinct_keep == "last"
+                else functions.col(self.timestamp_column).asc()
+            )
+
+            partition_window = (
+                sql.Window()
+                .partitionBy(*groupby, *self._distinct_subset)
+                .orderBy(orderby)
+            )
+
+            dataframe = dataframe.withColumn(
+                "keep_rn", functions.row_number().over(partition_window)
+            ).filter("keep_rn = 1")
+
+        grouped_data = dataframe.groupby(*groupby)
 
         if self._pivot_column:
             grouped_data = grouped_data.pivot(self._pivot_column, self._pivot_values)
