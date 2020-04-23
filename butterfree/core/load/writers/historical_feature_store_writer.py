@@ -24,6 +24,12 @@ class HistoricalFeatureStoreWriter(Writer):
         database: database to use in Spark metastore.
             By default FEATURE_STORE_HISTORICAL_DATABASE environment variable.
         num_partitions: value to use in repartition df before save.
+        validation_threshold: lower and upper tolerance to using in count validation.
+            The default value is defined in DEFAULT_VALIDATION_THRESHOLD property.
+            For example: with a validation_threshold = 0.01 and a given calculated
+            count on the dataframe equal to 100000 records, if the feature store
+            return a count equal to 995000 an error will not be thrown  .
+            Use validation_threshold = 0 to not use tolerance in the validation.
 
     Example:
         Simple example regarding HistoricalFeatureStoreWriter class instantiation.
@@ -74,12 +80,21 @@ class HistoricalFeatureStoreWriter(Writer):
         columns.PARTITION_DAY,
     ]
 
-    def __init__(self, db_config=None, database=None, num_partitions=None):
+    DEFAULT_VALIDATION_THRESHOLD = 0.01
+
+    def __init__(
+        self,
+        db_config=None,
+        database=None,
+        num_partitions=None,
+        validation_threshold: float = DEFAULT_VALIDATION_THRESHOLD,
+    ):
         self.db_config = db_config or S3Config()
         self.database = database or environment.get_variable(
             "FEATURE_STORE_HISTORICAL_DATABASE"
         )
         self.num_partitions = num_partitions or DEFAULT_NUM_PARTITIONS
+        self.validation_threshold = validation_threshold
 
     def write(
         self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient
@@ -103,6 +118,17 @@ class HistoricalFeatureStoreWriter(Writer):
             **self.db_config.get_options(s3_key),
         )
 
+    def _assert_validation_count(self, table_name, written_count, dataframe_count):
+        lower_bound = (1 - self.validation_threshold) * written_count
+        upper_bound = (1 + self.validation_threshold) * written_count
+        validation = lower_bound <= dataframe_count <= upper_bound
+        assert validation, (
+            "Data written to the Historical Feature Store and read back "
+            f"from {table_name} has a different count than the feature set dataframe. "
+            f"\nNumber of rows in {table_name}: {written_count}."
+            f"\nNumber of rows in the dataframe: {dataframe_count}."
+        )
+
     def validate(
         self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient
     ):
@@ -124,13 +150,7 @@ class HistoricalFeatureStoreWriter(Writer):
 
         written_count = spark_client.sql(query=query_count).collect().pop()["row"]
         dataframe_count = dataframe.count()
-
-        assert written_count == dataframe_count, (
-            "Data written to the Historical Feature Store and read back "
-            f"from {table_name} has a different count than the feature set dataframe. "
-            f"\nNumber of rows in {table_name}: {written_count}."
-            f"\nNumber of rows in the dataframe: {dataframe_count}."
-        )
+        self._assert_validation_count(table_name, written_count, dataframe_count)
 
     def _create_partitions(self, dataframe):
         # create year partition column
