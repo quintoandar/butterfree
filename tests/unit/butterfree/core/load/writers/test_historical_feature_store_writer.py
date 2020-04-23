@@ -144,7 +144,7 @@ class TestHistoricalFeatureStoreWriter:
 
     @pytest.mark.parametrize(
         "written_count, dataframe_count, threshold",
-        [(100, 101, None), (100, 99, None), (100, 108, 0.10), (100, 92, 0.10),],
+        [(100, 101, None), (100, 99, None), (100, 108, 0.10), (100, 92, 0.10)],
     )
     def test__assert_validation_count(self, written_count, dataframe_count, threshold):
         # arrange
@@ -159,7 +159,7 @@ class TestHistoricalFeatureStoreWriter:
 
     @pytest.mark.parametrize(
         "written_count, dataframe_count, threshold",
-        [(100, 102, None), (100, 98, None), (100, 111, 0.10), (100, 88, 0.10),],
+        [(100, 102, None), (100, 98, None), (100, 111, 0.10), (100, 88, 0.10)],
     )
     def test__assert_validation_count_error(
         self, written_count, dataframe_count, threshold
