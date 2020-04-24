@@ -6,6 +6,7 @@ Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each 
 ## Unreleased
 ### Added
 * [MLOP-191] AggregatedTransform with filter option to use subset during aggregation ([#139](https://github.com/quintoandar/butterfree/pull/139))
+* [MLOP-190] AggregateTransform with distinct_on option to de-duplicate auditable/historical tables ([#138](https://github.com/quintoandar/butterfree/pull/138))
 
 ### Changed
 * [MLOP-248] HistoricaFeatureStoreWriter validation count threshold ([#140](https://github.com/quintoandar/butterfree/pull/140))
