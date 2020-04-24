@@ -141,3 +141,36 @@ class TestHistoricalFeatureStoreWriter:
         assert input_df.select(spark_partition_id()).distinct().count() == 1
         # Desired number of partitions
         assert result_df.select(spark_partition_id()).distinct().count() == 200
+
+    @pytest.mark.parametrize(
+        "written_count, dataframe_count, threshold",
+        [(100, 101, None), (100, 99, None), (100, 108, 0.10), (100, 92, 0.10)],
+    )
+    def test__assert_validation_count(self, written_count, dataframe_count, threshold):
+        # arrange
+        writer = (
+            HistoricalFeatureStoreWriter(validation_threshold=threshold)
+            if threshold
+            else HistoricalFeatureStoreWriter()
+        )
+
+        # act and assert
+        writer._assert_validation_count("table", written_count, dataframe_count)
+
+    @pytest.mark.parametrize(
+        "written_count, dataframe_count, threshold",
+        [(100, 102, None), (100, 98, None), (100, 111, 0.10), (100, 88, 0.10)],
+    )
+    def test__assert_validation_count_error(
+        self, written_count, dataframe_count, threshold
+    ):
+        # arrange
+        writer = (
+            HistoricalFeatureStoreWriter(validation_threshold=threshold)
+            if threshold
+            else HistoricalFeatureStoreWriter()
+        )
+
+        # act and assert
+        with pytest.raises(AssertionError):
+            writer._assert_validation_count("table", written_count, dataframe_count)

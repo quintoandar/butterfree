@@ -7,6 +7,9 @@ Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each 
 ### Added
 * [MLOP-191] AggregatedTransform with filter option to use subset during aggregation ([#139](https://github.com/quintoandar/butterfree/pull/139))
 
+### Changed
+* [MLOP-248] HistoricaFeatureStoreWriter validation count threshold ([#140](https://github.com/quintoandar/butterfree/pull/140))
+
 ## [0.8.0](https://github.com/quintoandar/butterfree/releases/tag/0.8.0)
 ### Changed
 * [PROPOSAL] Optimizing rolling window aggregations ([#134](https://github.com/quintoandar/butterfree/pull/134))
