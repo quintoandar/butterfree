@@ -181,7 +181,7 @@ def make_target_df_distinct(spark_context, spark_session):
     data = [
         {
             "h3": "86a8100efffffff",
-            "timestamp": "2019-12-31 00:00:00",
+            "timestamp": "2020-01-01 00:00:00",
             "feature__sum_over_3_days_rolling_windows": None,
         },
         {
