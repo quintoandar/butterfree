@@ -5,7 +5,11 @@ renaming and cast types using parent's (a Feature) information.
 """
 
 from butterfree.core.transform.transformations.user_defined_functions.mode import mode
+from butterfree.core.transform.transformations.user_defined_functions.most_frequent import (
+    most_frequent_elements_list,
+)
 
 __all__ = [
     "mode",
+    "most_frequent_elements_list",
 ]
