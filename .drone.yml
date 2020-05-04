@@ -68,7 +68,7 @@ pipeline:
       branch: master
       event: push
 
-  prepare-release-dev:
+  prepare-package-dev:
     image: alpine:3.10
     commands:
       - find . -wholename "./dist/quintoandar_butterfree-*-py3-none-any.whl" -exec mv '{}' ./dist/quintoandar_butterfree-dev-py3-none-any.whl \;
@@ -84,7 +84,7 @@ pipeline:
       event: tag
       branch: master
 
-  export-releases-to-s3-forno:
+  export-package-to-s3-forno:
     image: plugins/s3
     pull: true
     bucket: artifacts.s3.forno.data.quintoandar.com.br
@@ -97,7 +97,7 @@ pipeline:
       event: push
       branch: forno
 
-  export-releases-to-s3-dev:
+  export-package-to-s3-dev:
     image: plugins/s3
     pull: true
     bucket: artifacts.s3.data.quintoandar.com.br
@@ -109,6 +109,19 @@ pipeline:
     when:
       event: push
       branch: staging
+
+  export-releases-to-s3-forno:
+    image: plugins/s3
+    pull: true
+    bucket: artifacts.s3.forno.data.quintoandar.com.br
+    source: dist/*.whl
+    target: butterfree/
+    strip_prefix: dist/
+    acl: bucket-owner-full-control
+    cache_control: no-cache
+    when:
+      event: tag
+      branch: master
 
   export-releases-to-s3-prod:
     image: plugins/s3
