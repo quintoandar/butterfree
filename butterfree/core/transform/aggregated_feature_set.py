@@ -8,7 +8,7 @@ from pyspark import sql
 from pyspark.sql import DataFrame, functions
 
 from butterfree.core.clients import SparkClient
-from butterfree.core.dataframe_service import repartition_sort_df
+from butterfree.core.dataframe_service import repartition_df
 from butterfree.core.transform import FeatureSet
 from butterfree.core.transform.features import Feature, KeyFeature, TimestampFeature
 from butterfree.core.transform.transformations import AggregatedTransform
@@ -337,10 +337,13 @@ class AggregatedFeatureSet(FeatureSet):
         return unique_keys.crossJoin(date_df)
 
     @staticmethod
-    def _dataframe_join(left, right, on, how):
+    def _dataframe_join(left, right, on, how, num_processors=None):
+        # make both tables co-partitioned to improve join performance
+        left = repartition_df(left, partition_by=on, num_processors=num_processors)
+        right = repartition_df(right, partition_by=on, num_processors=num_processors)
         return left.join(right, on=on, how=how)
 
-    def _aggregate(self, dataframe, features, window=None):
+    def _aggregate(self, dataframe, features, window=None, num_processors=None):
         aggregations = list(
             itertools.chain.from_iterable(
                 [f.transformation.aggregations for f in features]
@@ -371,6 +374,11 @@ class AggregatedFeatureSet(FeatureSet):
                 "keep_rn", functions.row_number().over(partition_window)
             ).filter("keep_rn = 1")
 
+        # repartition to have all rows for each group at the same partition
+        # by doing that, we won't have to shuffle data on grouping by id
+        dataframe = repartition_df(
+            dataframe, partition_by=groupby, num_processors=num_processors,
+        )
         grouped_data = dataframe.groupby(*groupby)
 
         if self._pivot_column:
@@ -482,33 +490,21 @@ class AggregatedFeatureSet(FeatureSet):
             dataframe,
         )
 
-        # repartition to have all ids at the same partition
-        # by doing that, we won't have to shuffle data on grouping by id
-        output_df = repartition_sort_df(
-            output_df,
-            partition_by=self.keys_columns,
-            order_by=[self.timestamp_column],
-            num_processors=num_processors,
-        )
-
         if self._windows:
             # prepare our left table, a cartesian product between distinct keys
             # and dates in range for this feature set
-            # make the left table co-partitioned with the aggregations' result
-            # improving our upcoming joins
             base_df = self._get_base_dataframe(
                 client=client, dataframe=output_df, end_date=end_date
-            )
-            base_df = repartition_sort_df(
-                base_df,
-                partition_by=self.keys_columns,
-                order_by=[self.timestamp_column],
-                num_processors=num_processors,
             )
 
             # run aggregations for each window
             agg_list = [
-                self._aggregate(dataframe=output_df, features=self.features, window=w)
+                self._aggregate(
+                    dataframe=output_df,
+                    features=self.features,
+                    window=w,
+                    num_processors=num_processors,
+                )
                 for w in self._windows
             ]
 
@@ -519,6 +515,7 @@ class AggregatedFeatureSet(FeatureSet):
                     right,
                     on=self.keys_columns + [self.timestamp_column],
                     how="left",
+                    num_processors=num_processors,
                 ),
                 agg_list,
                 base_df,
@@ -526,17 +523,7 @@ class AggregatedFeatureSet(FeatureSet):
         else:
             output_df = self._aggregate(output_df, features=self.features)
 
-        output_df = (
-            repartition_sort_df(
-                output_df,
-                partition_by=self.keys_columns,
-                order_by=[self.timestamp_column],
-                num_processors=num_processors,
-            )
-            .select(*self.columns)
-            .replace(float("nan"), None)
-        )
-
+        output_df = output_df.select(*self.columns).replace(float("nan"), None)
         if not output_df.isStreaming:
             output_df = self._filter_duplicated_rows(output_df)
             output_df.cache().count()
