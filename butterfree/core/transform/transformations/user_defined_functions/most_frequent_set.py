@@ -5,15 +5,15 @@ from pyspark.sql.types import ArrayType, StringType
 
 @pandas_udf(ArrayType(StringType()), PandasUDFType.GROUPED_AGG)
 def most_frequent_set(column):
-    """Computes the most frequent aggregation.
+    """Computes the most frequent set aggregation.
 
     Attributes:
-        column: desired data to be aggregated with most frequent aggregation.
+        column: desired data to be aggregated with most frequent set aggregation.
 
     Example:
         It's necessary to declare the desired aggregation method, (average,
         standard deviation and count are currently supported, as it can be
-        seen in __ALLOWED_AGGREGATIONS) and define the most frequent aggregation.
+        seen in __ALLOWED_AGGREGATIONS) and define the most frequent set aggregation.
         >>> from pyspark import SparkContext
         >>> from pyspark.sql import session, Window
         >>> from pyspark.sql.functions import PandasUDFType, pandas_udf
@@ -27,12 +27,12 @@ def most_frequent_set(column):
         ... def most_frequent_set(column):
         ...    return column.astype(str).value_counts().index.tolist()
         >>> df.groupby("id").agg(most_frequent_set("column")).show()
-        +---+-----------------------------------+
-        | id|most_frequent_elements_list(column)|
-        +---+-----------------------------------+
-        |  1|                                [1]|
-        |  2|                             [2, 1]|
-        +---+-----------------------------------+
+        +---+-------------------------+
+        | id|most_frequent_set(column)|
+        +---+-------------------------+
+        |  1|                      [1]|
+        |  2|                   [2, 1]|
+        +---+-------------------------+
         >>> w = Window \
         ...     .partitionBy('id') \
         ...     .rowsBetween(Window.unboundedPreceding, Window.unboundedFollowing)
