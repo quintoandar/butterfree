@@ -142,31 +142,31 @@ def make_fs_dataframe_with_distinct(spark_context, spark_session):
     data = [
         {
             "id": 1,
-            "timestamp": "2020-01-01 00:00:00",
+            "timestamp": "2020-01-01 11:31:11",
             "feature": 1,
             "h3": "86a8100efffffff",
         },
         {
             "id": 2,
-            "timestamp": "2020-01-01 00:00:00",
+            "timestamp": "2020-01-01 11:31:11",
             "feature": 2,
             "h3": "86a8100efffffff",
         },
         {
             "id": 3,
-            "timestamp": "2020-01-02 00:00:00",
+            "timestamp": "2020-01-02 11:31:11",
             "feature": 1,
             "h3": "86a8100efffffff",
         },
         {
             "id": 3,
-            "timestamp": "2020-01-02 00:00:00",
+            "timestamp": "2020-01-02 11:31:11",
             "feature": 1,
             "h3": "86a8100efffffff",
         },
         {
             "id": 2,
-            "timestamp": "2020-01-02 00:00:00",
+            "timestamp": "2020-01-02 11:31:11",
             "feature": 1,
             "h3": "86a8100efffffff",
         },
@@ -181,7 +181,7 @@ def make_target_df_distinct(spark_context, spark_session):
     data = [
         {
             "h3": "86a8100efffffff",
-            "timestamp": "2019-12-31 00:00:00",
+            "timestamp": "2020-01-01 00:00:00",
             "feature__sum_over_3_days_rolling_windows": None,
         },
         {
@@ -193,6 +193,11 @@ def make_target_df_distinct(spark_context, spark_session):
             "h3": "86a8100efffffff",
             "timestamp": "2020-01-05 00:00:00",
             "feature__sum_over_3_days_rolling_windows": 2,
+        },
+        {
+            "h3": "86a8100efffffff",
+            "timestamp": "2020-01-06 00:00:00",
+            "feature__sum_over_3_days_rolling_windows": None,
         },
     ]
     df = spark_session.read.json(
