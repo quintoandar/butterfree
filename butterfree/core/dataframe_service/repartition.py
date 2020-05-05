@@ -22,8 +22,8 @@ def _num_partitions_definition(num_processors, num_partitions):
 def repartition_df(
     dataframe: DataFrame,
     partition_by: List[str],
-    num_processors: int = None,
     num_partitions: int = None,
+    num_processors: int = None,
 ):
     """Partition the DataFrame.
 
