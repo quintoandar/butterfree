@@ -1,10 +1,10 @@
-"""Method to compute most frequent aggregation."""
+"""Method to compute most frequent set aggregation."""
 from pyspark.sql.functions import PandasUDFType, pandas_udf
-from pyspark.sql.types import ArrayType, LongType
+from pyspark.sql.types import ArrayType, StringType
 
 
-@pandas_udf(ArrayType(LongType()), PandasUDFType.GROUPED_AGG)
-def most_frequent_elements_list(column):
+@pandas_udf(ArrayType(StringType()), PandasUDFType.GROUPED_AGG)
+def most_frequent_set(column):
     """Computes the most frequent aggregation.
 
     Attributes:
@@ -17,16 +17,16 @@ def most_frequent_elements_list(column):
         >>> from pyspark import SparkContext
         >>> from pyspark.sql import session, Window
         >>> from pyspark.sql.functions import PandasUDFType, pandas_udf
-        >>> from pyspark.sql.types import ArrayType, LongType
+        >>> from pyspark.sql.types import ArrayType, StringType
         >>> sc = SparkContext.getOrCreate()
         >>> spark = session.SparkSession(sc)
         >>> df = spark.createDataFrame(
         >>>      [(1, 1), (1, 1), (2, 2), (2, 1), (2, 2)],
         >>>      ("id", "column"))
-        >>> @pandas_udf(ArrayType(LongType()), PandasUDFType.GROUPED_AGG)
-        ... def most_frequent_elements_list(column):
-        ...    return column.value_counts().index.tolist()
-        >>> df.groupby("id").agg(most_frequent_elements_list("column")).show()
+        >>> @pandas_udf(ArrayType(StringType()), PandasUDFType.GROUPED_AGG)
+        ... def most_frequent_set(column):
+        ...    return column.astype(str).value_counts().index.tolist()
+        >>> df.groupby("id").agg(most_frequent_set("column")).show()
         +---+-----------------------------------+
         | id|most_frequent_elements_list(column)|
         +---+-----------------------------------+
@@ -37,7 +37,7 @@ def most_frequent_elements_list(column):
         ...     .partitionBy('id') \
         ...     .rowsBetween(Window.unboundedPreceding, Window.unboundedFollowing)
         >>> df.withColumn(
-        ...     'most_viewed', most_frequent_elements_list("column").over(w)
+        ...     'most_viewed', most_frequent_set("column").over(w)
         ... ).show()
         +---+------+-----------+
         | id|column|most_viewed|
@@ -54,4 +54,4 @@ def most_frequent_elements_list(column):
         For that reason, mode is meant to be used just in rolling_windows mode,
         initially. We intend to make it available to others modes soon.
     """
-    return column.value_counts().index.tolist()
+    return column.astype(str).value_counts().index.tolist()
