@@ -180,7 +180,7 @@ class TestAggregatedFeatureSet:
 
         # assert
         output_df = fs.construct(
-            feature_set_with_distinct_dataframe, spark_client, end_date="2020-01-10"
+            feature_set_with_distinct_dataframe, spark_client, end_date="2020-01-05"
         )
         assert_dataframe_equality(output_df, target_with_distinct_dataframe)
 
