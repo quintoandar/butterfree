@@ -20,20 +20,24 @@ def _num_partitions_definition(num_processors, num_partitions):
 
 
 def repartition_df(
-    dataframe: DataFrame, partition_by: List[str], num_partitions: int = None
+    dataframe: DataFrame,
+    partition_by: List[str],
+    num_partitions: int = None,
+    num_processors: int = None,
 ):
     """Partition the DataFrame.
 
     Args:
         dataframe: Spark DataFrame.
-        num_partitions: number of partitions.
         partition_by: list of partitions.
+        num_processors: number of processors.
+        num_partitions: number of partitions.
 
     Returns:
         Partitioned dataframe.
 
     """
-    num_partitions = num_partitions or DEFAULT_NUM_PARTITIONS
+    num_partitions = _num_partitions_definition(num_processors, num_partitions)
     return dataframe.repartition(num_partitions, *partition_by)
 
 
@@ -48,9 +52,10 @@ def repartition_sort_df(
 
     Args:
         dataframe: Spark DataFrame.
-        num_partitions: number of partitions.
-        partition_by: list of partitions.
+        partition_by: list of columns to partition by.
+        order_by: list of columns to order by.
         num_processors: number of processors.
+        num_partitions: number of partitions.
 
     Returns:
         Partitioned and sorted dataframe.
