@@ -9,6 +9,7 @@ from butterfree.core.transform.transformations.transform_component import (
     TransformComponent,
 )
 from butterfree.core.transform.transformations.user_defined_functions import mode
+from butterfree.core.transform.transformations.user_defined_functions import most_frequent_set
 
 
 class AggregatedTransform(TransformComponent):
@@ -72,6 +73,7 @@ class AggregatedTransform(TransformComponent):
         "max": functions.max,
         "min": functions.min,
         "mode": mode,
+        "most_frequent_set": most_frequent_set,
         "skewness": functions.skewness,
         "stddev": functions.stddev,
         "stddev_pop": functions.stddev_pop,
