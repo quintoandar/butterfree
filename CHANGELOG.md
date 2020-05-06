@@ -5,13 +5,17 @@ Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each 
 
 ## Unreleased
 
+## [0.9.2](https://github.com/quintoandar/butterfree/releases/tag/0.9.2)
+### Added
+* Add most_frequent_set to allowed agg ([#150](https://github.com/quintoandar/butterfree/pull/150))
+
 ## [0.9.1](https://github.com/quintoandar/butterfree/releases/tag/0.9.1)
 ### Added
 * [MLOP-280] Create new most frequent set aggregation ([#145](https://github.com/quintoandar/butterfree/pull/145))
 
 ### Changed
-* Optimize Aggregated Feature Sets with Repartition (#147(https://github.com/quintoandar/butterfree/pull/147))
-* [MLOP-281] Fix target dataframe in test_aggregated_feature_set (#146(https://github.com/quintoandar/butterfree/pull/146))
+* Optimize Aggregated Feature Sets with Repartition ([#147](https://github.com/quintoandar/butterfree/pull/147))
+* [MLOP-281] Fix target dataframe in test_aggregated_feature_set ([#146](https://github.com/quintoandar/butterfree/pull/146))
 
 ## [0.9.0](https://github.com/quintoandar/butterfree/releases/tag/0.9.0)
 ### Added
