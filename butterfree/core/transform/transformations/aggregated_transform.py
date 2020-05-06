@@ -8,8 +8,10 @@ from pyspark.sql.functions import col, expr, when
 from butterfree.core.transform.transformations.transform_component import (
     TransformComponent,
 )
-from butterfree.core.transform.transformations.user_defined_functions import mode
-from butterfree.core.transform.transformations.user_defined_functions import most_frequent_set
+from butterfree.core.transform.transformations.user_defined_functions import (
+    mode,
+    most_frequent_set,
+)
 
 
 class AggregatedTransform(TransformComponent):
