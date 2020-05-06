@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each release or unreleased log for a better organization.
 
 ## Unreleased
+
+## [0.9.1](https://github.com/quintoandar/butterfree/releases/tag/0.9.1)
+### Added
+* [MLOP-280] Create new most frequent set aggregation ([#145](https://github.com/quintoandar/butterfree/pull/145))
+
+### Changed
+* Optimize Aggregated Feature Sets with Repartition (#147(https://github.com/quintoandar/butterfree/pull/147))
+* [MLOP-281] Fix target dataframe in test_aggregated_feature_set (#146(https://github.com/quintoandar/butterfree/pull/146))
+
+## [0.9.0](https://github.com/quintoandar/butterfree/releases/tag/0.9.0)
 ### Added
 * [MLOP-191] AggregatedTransform with filter option to use subset during aggregation ([#139](https://github.com/quintoandar/butterfree/pull/139))
 * [MLOP-190] AggregateTransform with distinct_on option to de-duplicate auditable/historical tables ([#138](https://github.com/quintoandar/butterfree/pull/138))
