@@ -27,7 +27,7 @@ Please delete options that are not relevant.
 _Have you achieved all the acceptance criteria? How?_
 _Is there any alternative flow in the testing process that you want to describe?_
 
-# Checklist
+## Checklist
 - [ ] My code follows the style guidelines of this project (docstrings, type hinting and linter compliance);
 - [ ] I have performed a self-review of my own code;
 - [ ] I have made corresponding changes to the documentation;
