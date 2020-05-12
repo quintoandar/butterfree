@@ -1,15 +1,21 @@
-<!-- The main idea here is to normalize all pull requests. Please replace the content of each section with valuable information of the pull request that's being open. -->
-
-# Description :open_book:
-Replace me for a cool overview of why this PR is being created. You can
+## Why? :open_book:
+_Replace me for a cool overview of why this PR is being created. You can
 refer to the Jira task or Github issue here too. Never forget to put the
-tag of a related Jira task in the title.
+tag of a related Jira task in the title._
 
-Please include a summary of the change and which issue is fixed. 
-Please also include relevant motivation and context. List any dependencies 
-that are required for this change.
+## What? :wrench:
+_Replace me for a detailed explanation of what is being modified._
+_Want to add some awesome bullet points?_
+- _First changes;_
+- _Second changes;_
+- _..._
 
-## Type of change :wrench:
+_How about some cool checkboxes?_
+- [X] _First changes;_
+- [X] _Second changes;_
+- [ ] _..._
+
+## Type of change
 Please delete options that are not relevant.
 
 - [ ] Bug fix (non-breaking change which fixes an issue)
@@ -18,17 +24,8 @@ Please delete options that are not relevant.
 - [ ] This change requires a documentation update
 
 ## How everything was tested? :straight_ruler:
-Have you achieved all the acceptance criteria? How?
-
-Is there any alternative flow in the testing process that you want to describe?
-
-Please describe the tests that you ran to verify your changes. 
-Provide instructions so we can reproduce. 
-Please also list any relevant details for your test configuration.
-
-1. Test A
-2. Test B
-3. Test C
+_Have you achieved all the acceptance criteria? How?_
+_Is there any alternative flow in the testing process that you want to describe?_
 
 # Checklist
 - [ ] My code follows the style guidelines of this project (docstrings, type hinting and linter compliance);
@@ -39,4 +36,4 @@ Please also list any relevant details for your test configuration.
 - [ ] Add labels to distinguish the type of pull request. Available labels are `bug`, `enhancement`, `feature`, and `review`.
 
 ## Attention Points :warning:
-Replace me for what the reviewer will need to pay attention to in the PR or just to cover any concerns after the merge.
+_Replace me for what the reviewer will need to pay attention to in the PR or just to cover any concerns after the merge._
