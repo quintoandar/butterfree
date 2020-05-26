@@ -344,11 +344,7 @@ class AggregatedFeatureSet(FeatureSet):
         return left.join(right, on=on, how=how)
 
     def _aggregate(self, dataframe, features, window=None, num_processors=None):
-        aggregations = list(
-            itertools.chain.from_iterable(
-                [f.transformation.aggregations for f in features]
-            )
-        )
+        aggregations = [c.function for f in features for c in f.transformation.aggregations]
 
         groupby = self.keys_columns.copy()
         if window is not None:
@@ -409,9 +405,13 @@ class AggregatedFeatureSet(FeatureSet):
             for pv, fc in itertools.product(pivot_values, base_columns)
         ]
 
+        type = [c.data_type for f in features for c in f.transformation.aggregations]
+        if pivot_values != [None]:
+            type =
+
         select = [
-            f"`{old_name}` as {new_name}"
-            for old_name, new_name in zip(old_columns, new_columns)
+            f"cast(`{old_name}` as {dt.typeName()}) as {new_name}"
+            for old_name, new_name, dt in zip(old_columns, new_columns, type)
         ]
         if self._windows:
             select.append(f"window.end as {self.timestamp_column}")
