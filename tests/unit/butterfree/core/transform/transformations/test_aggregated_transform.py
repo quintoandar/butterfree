@@ -86,7 +86,7 @@ class TestAggregatedTransform:
 
         # act
         output_aggregations = [
-            agg.function for agg in test_feature.transformation.aggregations
+            agg.function_agg for agg in test_feature.transformation.aggregations
         ]
 
         # assert

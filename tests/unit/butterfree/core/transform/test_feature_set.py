@@ -18,6 +18,7 @@ from butterfree.core.transform.features import Feature, KeyFeature, TimestampFea
 from butterfree.core.transform.transformations import (
     AggregatedTransform,
     SparkFunctionTransform,
+    SQLExpressionTransform,
 )
 from butterfree.core.transform.utils.aggreagted_function import Function
 from butterfree.testing.dataframe import assert_dataframe_equality
@@ -400,3 +401,23 @@ class TestFeatureSet:
         schema = feature_set.get_schema()
 
         assert schema == expected_schema
+
+    def test_feature_without_datatype(self, key_id, timestamp_c, dataframe):
+        spark_client = SparkClient()
+        with pytest.raises(ValueError):
+            FeatureSet(
+                name="name",
+                entity="entity",
+                description="description",
+                features=[
+                    Feature(
+                        name="feature1",
+                        description="test",
+                        transformation=SQLExpressionTransform(
+                            expression="feature1 + a"
+                        ),
+                    ),
+                ],
+                keys=[key_id],
+                timestamp=timestamp_c,
+            ).construct(dataframe, spark_client)

@@ -44,6 +44,7 @@ class FeatureSet:
     ...     SparkFunctionTransform,
     ...     CustomTransform,
     ... )
+    >>> from butterfree.core.transform.utils.aggreagted_function import Function
     >>> import pyspark.sql.functions as F
 
     >>> def divide(df, fs, column1, column2):
@@ -60,7 +61,9 @@ class FeatureSet:
     ...            name="feature1",
     ...            description="test",
     ...            transformation=SparkFunctionTransform(
-    ...                 functions=[F.avg, F.stddev_pop]
+    ...                 functions=[
+    ...                            Function(F.avg, DataType.DOUBLE),
+    ...                            Function(F.stddev_pop, DataType.DOUBLE)]
     ...             ).with_window(
     ...                 partition_by="id",
     ...                 order_by=TIMESTAMP_COLUMN,

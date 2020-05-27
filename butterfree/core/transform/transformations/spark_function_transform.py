@@ -112,10 +112,10 @@ class SparkFunctionTransform(TransformComponent):
             if self._windows:
                 for window in self._windows:
                     output_columns.append(
-                        self._get_output_name(function.function, window)
+                        self._get_output_name(function.function_agg, window)
                     )
             else:
-                output_columns.append(self._get_output_name(function.function))
+                output_columns.append(self._get_output_name(function.function_agg))
 
         return output_columns
 
@@ -132,15 +132,17 @@ class SparkFunctionTransform(TransformComponent):
             if self._windows:
                 for window in self._windows:
                     dataframe = dataframe.withColumn(
-                        self._get_output_name(function.function, window),
-                        function.function(self._parent.from_column or self._parent.name)
+                        self._get_output_name(function.function_agg, window),
+                        function.function_agg(
+                            self._parent.from_column or self._parent.name
+                        )
                         .over(window.get())
                         .cast(function.data_type.spark),
                     )
             else:
                 dataframe = dataframe.withColumn(
-                    self._get_output_name(function.function),
-                    function.function(
+                    self._get_output_name(function.function_agg),
+                    function.function_agg(
                         self._parent.from_column or self._parent.name
                     ).cast(function.data_type.spark),
                 )
