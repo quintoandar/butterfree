@@ -30,7 +30,7 @@ class HistoricalFeatureStoreWriter(Writer):
             count on the dataframe equal to 100000 records, if the feature store
             return a count equal to 995000 an error will not be thrown  .
             Use validation_threshold = 0 to not use tolerance in the validation.
-        debug_mode:
+        debug_mode: "dry run" mode, write the result to a temporary view.
 
     Example:
         Simple example regarding HistoricalFeatureStoreWriter class instantiation.
@@ -108,6 +108,10 @@ class HistoricalFeatureStoreWriter(Writer):
             feature_set: object processed with feature_set informations.
             dataframe: spark dataframe containing data from a feature set.
             spark_client: client for spark connections with external services.
+
+        If the debug_mode is set to True, a temporary table with a name in the format:
+        historical_feature_store__{feature_set.name} will be created instead of writing
+        to the real historical feature store.
 
         """
         dataframe = self._create_partitions(dataframe)

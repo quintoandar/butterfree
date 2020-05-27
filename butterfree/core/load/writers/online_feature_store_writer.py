@@ -20,7 +20,7 @@ class OnlineFeatureStoreWriter(Writer):
     Attributes:
         db_config: Spark configuration for connect databases.
             For more information check the module 'butterfree.core.db.configs'.
-        debug_mode:
+        debug_mode: "dry run" mode, write the result to a temporary view.
 
     Example:
         Simple example regarding OnlineFeatureStoreWriter class instantiation.
@@ -103,6 +103,10 @@ class OnlineFeatureStoreWriter(Writer):
 
         Returns:
             Streaming handler if writing streaming df, None otherwise.
+
+        If the debug_mode is set to True, a temporary table with a name in the format:
+        online_feature_store__{feature_set.name} will be created instead of writing to
+        the real online feature store.
 
         """
         if dataframe.isStreaming:
