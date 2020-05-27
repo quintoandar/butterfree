@@ -23,5 +23,5 @@ class TestTableReader:
         output_df = table_reader.consume(spark_client)
 
         # assert
-        spark_client.read_table.assert_called_once_with(database, table)
+        spark_client.read_table.assert_called_once_with(table, database)
         assert target_df.collect() == output_df.collect()

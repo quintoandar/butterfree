@@ -41,35 +41,27 @@ class TestHistoricalFeatureStoreWriter:
         )
         assert feature_set.name == spark_client.write_table.call_args[1]["table_name"]
 
-    def test_validate(
-        self, feature_set_dataframe, count_feature_set_dataframe, mocker, feature_set
-    ):
+    def test_validate(self, feature_set_dataframe, mocker, feature_set):
         # given
         spark_client = mocker.stub("spark_client")
-        spark_client.sql = mocker.stub("sql")
-        spark_client.sql.return_value = count_feature_set_dataframe
+        spark_client.read_table = mocker.stub("read_table")
+        spark_client.read_table.return_value = feature_set_dataframe
 
         writer = HistoricalFeatureStoreWriter()
-        query_format_string = "SELECT COUNT(1) as row FROM {}.{}"
-        query_count = query_format_string.format(writer.database, feature_set.name)
 
         # when
-        result = writer.validate(feature_set, feature_set_dataframe, spark_client)
+        writer.validate(feature_set, feature_set_dataframe, spark_client)
 
         # then
-        spark_client.sql.assert_called_once()
-        assert query_count == spark_client.sql.call_args[1]["query"]
-        assert result is None
+        spark_client.read_table.assert_called_once()
 
-    def test_validate_false(
-        self, feature_set_dataframe, count_feature_set_dataframe, mocker, feature_set
-    ):
+    def test_validate_false(self, feature_set_dataframe, mocker, feature_set):
         # given
         spark_client = mocker.stub("spark_client")
-        spark_client.sql = mocker.stub("sql")
-        spark_client.sql.return_value = count_feature_set_dataframe.withColumn(
-            "row", count_feature_set_dataframe.row + 1
-        )  # add 1 to the right dataframe count, now the counts should'n be the same
+        spark_client.read_table = mocker.stub("read_table")
+
+        # limiting df to 1 row, now the counts should'n be the same
+        spark_client.read_table.return_value = feature_set_dataframe.limit(1)
 
         writer = HistoricalFeatureStoreWriter()
 

@@ -20,6 +20,7 @@ class OnlineFeatureStoreWriter(Writer):
     Attributes:
         db_config: Spark configuration for connect databases.
             For more information check the module 'butterfree.core.db.configs'.
+        debug_mode:
 
     Example:
         Simple example regarding OnlineFeatureStoreWriter class instantiation.
@@ -58,10 +59,9 @@ class OnlineFeatureStoreWriter(Writer):
         according to OnlineFeatureStoreWriter class arguments.
     """
 
-    def __init__(
-        self, db_config=None,
-    ):
+    def __init__(self, db_config=None, debug_mode: bool = False):
         self.db_config = db_config or CassandraConfig()
+        self.debug_mode = debug_mode
 
     @staticmethod
     def filter_latest(dataframe: DataFrame, id_columns: List[Any]):
@@ -92,7 +92,7 @@ class OnlineFeatureStoreWriter(Writer):
         )
 
     def write(
-        self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient
+        self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient,
     ) -> Optional[StreamingQuery]:
         """Loads the latest data from a feature set into the Feature Store.
 
@@ -106,6 +106,11 @@ class OnlineFeatureStoreWriter(Writer):
 
         """
         if dataframe.isStreaming:
+            if self.debug_mode:
+                raise NotImplementedError(
+                    "Writing stream df in debug_mod is not implemented yet."
+                )
+
             checkpoint_path = (
                 os.path.join(
                     self.db_config.stream_checkpoint_path,
@@ -130,6 +135,12 @@ class OnlineFeatureStoreWriter(Writer):
         dataframe = self.filter_latest(
             dataframe=dataframe, id_columns=feature_set.keys_columns
         )
+
+        if self.debug_mode:
+            spark_client.create_temporary_view(
+                name=f"online_feature_store__{feature_set.name}", dataframe=dataframe
+            )
+            return
 
         for table in [feature_set.name, feature_set.entity]:
             spark_client.write_dataframe(

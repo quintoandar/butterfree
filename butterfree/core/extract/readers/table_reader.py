@@ -63,4 +63,4 @@ class TableReader(Reader):
             Dataframe with all the data from the table.
 
         """
-        return client.read_table(self.database, self.table)
+        return client.read_table(self.table, self.database)

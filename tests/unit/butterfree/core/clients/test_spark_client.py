@@ -65,23 +65,27 @@ class TestSparkClient:
         # assert
         assert result_df.collect() == target_df.collect()
 
-    def test_read_table(self, target_df, mocked_spark_read):
+    @pytest.mark.parametrize(
+        "database, table, target_table_name",
+        [(None, "table", "table"), ("database", "table", "database.table")],
+    )
+    def test_read_table(
+        self, target_df, mocked_spark_read, database, table, target_table_name
+    ):
         # arrange
-        database = "default"
-        table = "test_table"
         spark_client = SparkClient()
         mocked_spark_read.table.return_value = target_df
         spark_client._session = mocked_spark_read
 
         # act
-        result_df = spark_client.read_table(database, table)
+        result_df = spark_client.read_table(table, database)
 
         # assert
-        mocked_spark_read.table.assert_called_once_with("{}.{}".format(database, table))
+        mocked_spark_read.table.assert_called_once_with(target_table_name)
         assert target_df == result_df
 
     @pytest.mark.parametrize(
-        "database, table", [(None, "table"), ("database", None), ("database", 123)],
+        "database, table", [("database", None), ("database", 123)],
     )
     def test_read_table_invalid_params(self, database, table):
         # arrange
@@ -89,7 +93,7 @@ class TestSparkClient:
 
         # act and assert
         with pytest.raises(ValueError):
-            spark_client.read_table(database, table)
+            spark_client.read_table(table, database)
 
     @pytest.mark.parametrize(
         "format, mode", [("parquet", "append"), ("csv", "overwrite")],

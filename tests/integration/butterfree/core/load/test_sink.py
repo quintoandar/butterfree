@@ -48,7 +48,7 @@ def test_sink(input_dataframe, feature_set):
 
     # get historical results
     historical_result_df = client.read_table(
-        historical_writer.database, feature_set.name
+        feature_set.name, historical_writer.database
     )
 
     # get online results

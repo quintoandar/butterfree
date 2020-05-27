@@ -18,7 +18,7 @@ class Writer(ABC):
 
     @abstractmethod
     def write(
-        self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient
+        self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient,
     ):
         """Loads the data from a feature set into the Feature Store.
 
