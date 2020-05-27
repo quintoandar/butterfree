@@ -10,6 +10,7 @@ from butterfree.core.transform.transformations import (
     AggregatedTransform,
     SparkFunctionTransform,
 )
+from butterfree.core.transform.utils.aggreagted_function import Function
 from butterfree.testing.dataframe import (
     assert_dataframe_equality,
     create_df_from_collection,
@@ -29,9 +30,8 @@ class TestAggregatedFeatureSet:
                     Feature(
                         name="feature1",
                         description="test",
-                        dtype=DataType.FLOAT,
                         transformation=SparkFunctionTransform(
-                            functions=[functions.avg],
+                            functions=[Function(functions.avg, DataType.FLOAT)],
                         ).with_window(
                             partition_by="id",
                             mode="row_windows",
@@ -56,14 +56,16 @@ class TestAggregatedFeatureSet:
                 Feature(
                     name="feature1",
                     description="unit test",
-                    dtype=DataType.FLOAT,
-                    transformation=AggregatedTransform(functions=["avg"]),
+                    transformation=AggregatedTransform(
+                        functions=[Function("avg", DataType.FLOAT)]
+                    ),
                 ),
                 Feature(
                     name="feature2",
-                    dtype=DataType.FLOAT,
                     description="unit test",
-                    transformation=AggregatedTransform(functions=["avg"]),
+                    transformation=AggregatedTransform(
+                        functions=[Function("avg", DataType.FLOAT)]
+                    ),
                 ),
             ],
             keys=[key_id],
@@ -124,16 +126,19 @@ class TestAggregatedFeatureSet:
                 Feature(
                     name="feature1",
                     description="test",
-                    dtype=DataType.DOUBLE,
                     transformation=AggregatedTransform(
-                        functions=["avg", "stddev_pop"],
+                        functions=[
+                            Function("avg", DataType.DOUBLE),
+                            Function("stddev_pop", DataType.DOUBLE),
+                        ],
                     ),
                 ),
                 Feature(
                     name="feature2",
                     description="test",
-                    dtype=DataType.ARRAY_STRING,
-                    transformation=AggregatedTransform(functions=["count"]),
+                    transformation=AggregatedTransform(
+                        functions=[Function("count", DataType.ARRAY_STRING)]
+                    ),
                 ),
             ],
             keys=[
@@ -167,8 +172,9 @@ class TestAggregatedFeatureSet:
                     Feature(
                         name="feature",
                         description="test",
-                        dtype=DataType.INTEGER,
-                        transformation=AggregatedTransform(functions=["sum"]),
+                        transformation=AggregatedTransform(
+                            functions=[Function("sum", DataType.INTEGER)]
+                        ),
                     ),
                 ],
                 keys=[KeyFeature(name="h3", description="test", dtype=DataType.STRING)],
@@ -200,8 +206,9 @@ class TestAggregatedFeatureSet:
                     Feature(
                         name="feature",
                         description="test",
-                        dtype=DataType.INTEGER,
-                        transformation=AggregatedTransform(functions=["sum"]),
+                        transformation=AggregatedTransform(
+                            functions=[Function("sum", DataType.INTEGER)]
+                        ),
                     ),
                 ],
                 keys=[KeyFeature(name="h3", description="test", dtype=DataType.STRING)],
@@ -228,8 +235,9 @@ class TestAggregatedFeatureSet:
                     Feature(
                         name="feature",
                         description="test",
-                        dtype=DataType.INTEGER,
-                        transformation=AggregatedTransform(functions=["sum"]),
+                        transformation=AggregatedTransform(
+                            functions=[Function("sum", DataType.INTEGER)]
+                        ),
                     ),
                 ],
                 keys=[KeyFeature(name="h3", description="test", dtype=DataType.STRING)],
@@ -303,7 +311,12 @@ class TestAggregatedFeatureSet:
                     description="aggregations only when type = a",
                     dtype=DataType.BIGINT,
                     transformation=AggregatedTransform(
-                        functions=["avg", "min", "max"], filter_expression="type = 'a'"
+                        functions=[
+                            Function("avg", DataType.FLOAT),
+                            Function("min", DataType.FLOAT),
+                            Function("max", DataType.FLOAT),
+                        ],
+                        filter_expression="type = 'a'",
                     ),
                     from_column="feature",
                 ),

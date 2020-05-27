@@ -38,13 +38,17 @@ class TestAggregatedFeatureSet:
                     name="feature1",
                     description="test",
                     dtype=DataType.DOUBLE,
-                    transformation=AggregatedTransform(functions=[Function("avg", DataType.DOUBLE)]),
+                    transformation=AggregatedTransform(
+                        functions=[Function("avg", DataType.DOUBLE)]
+                    ),
                 ),
                 Feature(
                     name="feature2",
                     description="test",
                     dtype=DataType.FLOAT,
-                    transformation=AggregatedTransform(functions=[Function("count", DataType.BIGINT)]),
+                    transformation=AggregatedTransform(
+                        functions=[Function("count", DataType.BIGINT)]
+                    ),
                 ),
             ],
             keys=[
@@ -83,14 +87,20 @@ class TestAggregatedFeatureSet:
                     name="feature1",
                     description="test",
                     transformation=AggregatedTransform(
-                        functions=[Function("avg", DataType.DOUBLE), Function("stddev_pop", DataType.DOUBLE)],
+                        functions=[
+                            Function("avg", DataType.DOUBLE),
+                            Function("stddev_pop", DataType.DOUBLE),
+                        ],
                     ),
                 ),
                 Feature(
                     name="feature2",
                     description="test",
                     transformation=AggregatedTransform(
-                        functions=[Function("avg", DataType.DOUBLE), Function("stddev_pop", DataType.DOUBLE)],
+                        functions=[
+                            Function("avg", DataType.DOUBLE),
+                            Function("stddev_pop", DataType.DOUBLE),
+                        ],
                     ),
                 ),
             ],
@@ -134,7 +144,10 @@ class TestAggregatedFeatureSet:
                     name="feature1",
                     description="test",
                     transformation=AggregatedTransform(
-                        functions=[Function("avg", DataType.DOUBLE), Function("stddev_pop", DataType.DOUBLE)],
+                        functions=[
+                            Function("avg", DataType.DOUBLE),
+                            Function("stddev_pop", DataType.DOUBLE),
+                        ],
                     ),
                 ),
             ],
@@ -176,7 +189,9 @@ class TestAggregatedFeatureSet:
                 Feature(
                     name="house_id",
                     description="Count of house ids over a day.",
-                    transformation=AggregatedTransform(functions=[Function("count", DataType.BIGINT)]),
+                    transformation=AggregatedTransform(
+                        functions=[Function("count", DataType.BIGINT)]
+                    ),
                 ),
             ],
         ).with_windows(definitions=["1 day"])
@@ -205,7 +220,10 @@ class TestAggregatedFeatureSet:
                     name="feature",
                     description="unit test",
                     transformation=AggregatedTransform(
-                        functions=[Function("avg", DataType.DOUBLE), Function("stddev_pop", DataType.DOUBLE)],
+                        functions=[
+                            Function("avg", DataType.FLOAT),
+                            Function("stddev_pop", DataType.DOUBLE),
+                        ],
                     ),
                     from_column="feature1",
                 )

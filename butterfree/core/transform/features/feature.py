@@ -7,7 +7,11 @@ from pyspark.sql import DataFrame
 from pyspark.sql.functions import col
 
 from butterfree.core.constants.data_type import DataType
-from butterfree.core.transform.transformations import TransformComponent, AggregatedTransform, SparkFunctionTransform
+from butterfree.core.transform.transformations import (
+    AggregatedTransform,
+    SparkFunctionTransform,
+    TransformComponent,
+)
 
 
 class Feature:
@@ -70,12 +74,20 @@ class Feature:
 
     @dtype.setter
     def dtype(self, dtype: DataType) -> None:
-        if not (isinstance(self.transformation, AggregatedTransform) or isinstance(self.transformation, SparkFunctionTransform)) and dtype is None:
-            raise ValueError("dtype can't be None, except if the transformation is AggregatedTransform or SparkFunctionTransform")
+        if (
+            not (
+                isinstance(self.transformation, AggregatedTransform)
+                or isinstance(self.transformation, SparkFunctionTransform)
+            )
+            and dtype is None
+        ):
+            raise ValueError(
+                "dtype can't be None, except if the transformation is "
+                "AggregatedTransform or SparkFunctionTransform"
+            )
         if dtype is not None and not isinstance(dtype, DataType):
             raise ValueError("dtype must be a DataType.")
-        # if not isinstance(self.transformation, SparkFunctionTransform) and dtype is None:
-        #     raise ValueError("name must be a string with the feature set label.")
+
         self._dtype = dtype
 
     def get_output_columns(self) -> List[str]:

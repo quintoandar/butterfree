@@ -2,7 +2,7 @@
 from typing import List
 
 from parameters_validation import non_blank
-from pyspark.sql import Column, DataFrame, functions
+from pyspark.sql import DataFrame, functions
 from pyspark.sql.functions import col, expr, when
 
 from butterfree.core.transform.transformations.transform_component import (
@@ -34,7 +34,7 @@ class AggregatedTransform(TransformComponent):
      allowed_aggregations property.
 
     Attributes:
-        functions: aggregation functions, such as avg, std, count.
+        functions: namedtuple with aggregation function and data type.
         filter_expression: sql boolean expression to be used inside agg function.
             The filter expression can be used to aggregate some column only with
             records that obey certain condition. Has the same behaviour of the
@@ -59,7 +59,9 @@ class AggregatedTransform(TransformComponent):
         NotImplementedError: ...
     """
 
-    def __init__(self, functions: non_blank(List[Function]), filter_expression: str = None):
+    def __init__(
+        self, functions: non_blank(List[Function]), filter_expression: str = None
+    ):
         super(AggregatedTransform, self).__init__()
         self.functions = functions
         self.filter_expression = filter_expression
@@ -119,7 +121,13 @@ class AggregatedTransform(TransformComponent):
             if self.filter_expression
             else column_name
         )
-        return [Function(self.__ALLOWED_AGGREGATIONS[f"{f.function}"](expression), f.data_type.spark) for f in self.functions]
+        return [
+            Function(
+                self.__ALLOWED_AGGREGATIONS[f"{f.function}"](expression),
+                f.data_type.spark,
+            )
+            for f in self.functions
+        ]
 
     @property
     def allowed_aggregations(self) -> List[str]:

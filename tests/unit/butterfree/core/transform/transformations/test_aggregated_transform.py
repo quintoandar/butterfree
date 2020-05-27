@@ -4,6 +4,7 @@ from pyspark.sql import functions
 from butterfree.core.constants.data_type import DataType
 from butterfree.core.transform.features import Feature
 from butterfree.core.transform.transformations import AggregatedTransform
+from butterfree.core.transform.utils.aggreagted_function import Function
 
 
 class TestAggregatedTransform:
@@ -11,8 +12,12 @@ class TestAggregatedTransform:
         test_feature = Feature(
             name="feature1",
             description="unit test",
-            dtype=DataType.BIGINT,
-            transformation=AggregatedTransform(functions=["avg", "stddev_pop"]),
+            transformation=AggregatedTransform(
+                functions=[
+                    Function("avg", DataType.DOUBLE),
+                    Function("stddev_pop", DataType.DOUBLE),
+                ]
+            ),
         )
 
         # aggregated feature transform won't run transformations
@@ -24,8 +29,12 @@ class TestAggregatedTransform:
         test_feature = Feature(
             name="feature1",
             description="unit test",
-            dtype=DataType.BIGINT,
-            transformation=AggregatedTransform(functions=["avg", "stddev_pop"]),
+            transformation=AggregatedTransform(
+                functions=[
+                    Function("avg", DataType.DOUBLE),
+                    Function("stddev_pop", DataType.DOUBLE),
+                ]
+            ),
         )
 
         df_columns = test_feature.get_output_columns()
@@ -42,8 +51,9 @@ class TestAggregatedTransform:
             Feature(
                 name="feature1",
                 description="unit test",
-                dtype=DataType.BIGINT,
-                transformation=AggregatedTransform(functions=["median"]),
+                transformation=AggregatedTransform(
+                    functions=[Function("median", DataType.DOUBLE)]
+                ),
             )
 
     def test_blank_aggregation(self, feature_set_dataframe):
@@ -51,7 +61,6 @@ class TestAggregatedTransform:
             Feature(
                 name="feature1",
                 description="unit test",
-                dtype=DataType.BIGINT,
                 transformation=AggregatedTransform(functions=[]),
             )
 
@@ -60,9 +69,13 @@ class TestAggregatedTransform:
         test_feature = Feature(
             name="feature_with_filter",
             description="unit test",
-            dtype=DataType.BIGINT,
             transformation=AggregatedTransform(
-                functions=["avg", "min", "max"], filter_expression="type = 'a'"
+                functions=[
+                    Function("avg", DataType.DOUBLE),
+                    Function("min", DataType.DOUBLE),
+                    Function("max", DataType.DOUBLE),
+                ],
+                filter_expression="type = 'a'",
             ),
             from_column="feature",
         )
@@ -72,7 +85,9 @@ class TestAggregatedTransform:
         ]
 
         # act
-        output_aggregations = test_feature.transformation.aggregations
+        output_aggregations = [
+            agg.function for agg in test_feature.transformation.aggregations
+        ]
 
         # assert
 

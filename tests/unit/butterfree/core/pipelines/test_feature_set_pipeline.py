@@ -23,6 +23,7 @@ from butterfree.core.transform.transformations import (
     AggregatedTransform,
     SparkFunctionTransform,
 )
+from butterfree.core.transform.utils.aggreagted_function import Function
 
 
 class TestFeatureSetPipeline:
@@ -63,9 +64,11 @@ class TestFeatureSetPipeline:
                     Feature(
                         name="listing_page_viewed__rent_per_month",
                         description="Average of something.",
-                        dtype=DataType.FLOAT,
                         transformation=SparkFunctionTransform(
-                            functions=[functions.avg, functions.stddev_pop],
+                            functions=[
+                                Function(functions.avg, DataType.FLOAT),
+                                Function(functions.stddev_pop, DataType.FLOAT),
+                            ],
                         ).with_window(
                             partition_by="user_id",
                             order_by=TIMESTAMP_COLUMN,
@@ -126,9 +129,11 @@ class TestFeatureSetPipeline:
                     Feature(
                         name="listing_page_viewed__rent_per_month",
                         description="Average of something.",
-                        dtype=DataType.FLOAT,
                         transformation=SparkFunctionTransform(
-                            functions=[functions.avg, functions.stddev_pop],
+                            functions=[
+                                Function(functions.avg, DataType.FLOAT),
+                                Function(functions.stddev_pop, DataType.FLOAT),
+                            ],
                         ).with_window(
                             partition_by="user_id",
                             order_by=TIMESTAMP_COLUMN,
@@ -179,9 +184,11 @@ class TestFeatureSetPipeline:
                     Feature(
                         name="listing_page_viewed__rent_per_month",
                         description="Average of something.",
-                        dtype=DataType.FLOAT,
                         transformation=SparkFunctionTransform(
-                            functions=[functions.avg, functions.stddev_pop],
+                            functions=[
+                                Function(functions.avg, DataType.FLOAT),
+                                Function(functions.stddev_pop, DataType.FLOAT),
+                            ],
                         ).with_window(
                             partition_by="user_id",
                             order_by=TIMESTAMP_COLUMN,
@@ -235,9 +242,11 @@ class TestFeatureSetPipeline:
                         Feature(
                             name="listing_page_viewed__rent_per_month",
                             description="Average of something.",
-                            dtype=DataType.FLOAT,
                             transformation=SparkFunctionTransform(
-                                functions=[functions.avg, functions.stddev_pop],
+                                functions=[
+                                    Function(functions.avg, DataType.FLOAT),
+                                    Function(functions.stddev_pop, DataType.FLOAT),
+                                ],
                             ).with_window(
                                 partition_by="user_id",
                                 order_by=TIMESTAMP_COLUMN,
@@ -281,9 +290,11 @@ class TestFeatureSetPipeline:
                         Feature(
                             name="listing_page_viewed__rent_per_month",
                             description="Average of something.",
-                            dtype=DataType.FLOAT,
                             transformation=SparkFunctionTransform(
-                                functions=[functions.avg, functions.stddev_pop],
+                                functions=[
+                                    Function(functions.avg, DataType.FLOAT),
+                                    Function(functions.stddev_pop, DataType.FLOAT),
+                                ],
                             ).with_window(
                                 partition_by="user_id",
                                 order_by=TIMESTAMP_COLUMN,
@@ -357,9 +368,11 @@ class TestFeatureSetPipeline:
                     Feature(
                         name="listing_page_viewed__rent_per_month",
                         description="Average of something.",
-                        dtype=DataType.FLOAT,
                         transformation=AggregatedTransform(
-                            functions=["avg", "stddev_pop"],
+                            functions=[
+                                Function("avg", DataType.FLOAT),
+                                Function("stddev_pop", DataType.FLOAT),
+                            ],
                         ),
                     ),
                 ],

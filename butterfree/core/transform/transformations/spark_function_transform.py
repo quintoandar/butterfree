@@ -7,13 +7,14 @@ from butterfree.core.transform.transformations.transform_component import (
     TransformComponent,
 )
 from butterfree.core.transform.utils import Window
+from butterfree.core.transform.utils.aggreagted_function import Function
 
 
 class SparkFunctionTransform(TransformComponent):
     """Defines an Spark Function.
 
     Attributes:
-        function: spark functions to be used.
+        function: namedtuple with spark function and data type.
          For more information check functions:
          'https://spark.apache.org/docs/2.3.1/api/python/_modules/pyspark/sql/functions.html'.
 
@@ -75,7 +76,7 @@ class SparkFunctionTransform(TransformComponent):
 
     """
 
-    def __init__(self, functions: non_blank(List[str])):
+    def __init__(self, functions: non_blank(List[Function])):
         super().__init__()
         self.functions = functions
         self._windows = []
@@ -110,9 +111,11 @@ class SparkFunctionTransform(TransformComponent):
         for function in self.functions:
             if self._windows:
                 for window in self._windows:
-                    output_columns.append(self._get_output_name(function, window))
+                    output_columns.append(
+                        self._get_output_name(function.function, window)
+                    )
             else:
-                output_columns.append(self._get_output_name(function))
+                output_columns.append(self._get_output_name(function.function))
 
         return output_columns
 
@@ -129,15 +132,17 @@ class SparkFunctionTransform(TransformComponent):
             if self._windows:
                 for window in self._windows:
                     dataframe = dataframe.withColumn(
-                        self._get_output_name(function, window),
-                        function(self._parent.from_column or self._parent.name).over(
-                            window.get()
-                        ),
+                        self._get_output_name(function.function, window),
+                        function.function(self._parent.from_column or self._parent.name)
+                        .over(window.get())
+                        .cast(function.data_type.spark),
                     )
             else:
                 dataframe = dataframe.withColumn(
-                    self._get_output_name(function),
-                    function(self._parent.from_column or self._parent.name),
+                    self._get_output_name(function.function),
+                    function.function(
+                        self._parent.from_column or self._parent.name
+                    ).cast(function.data_type.spark),
                 )
 
         return dataframe

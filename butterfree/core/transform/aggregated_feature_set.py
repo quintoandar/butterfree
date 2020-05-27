@@ -344,7 +344,9 @@ class AggregatedFeatureSet(FeatureSet):
         return left.join(right, on=on, how=how)
 
     def _aggregate(self, dataframe, features, window=None, num_processors=None):
-        aggregations = [c.function for f in features for c in f.transformation.aggregations]
+        aggregations = [
+            c.function for f in features for c in f.transformation.aggregations
+        ]
 
         groupby = self.keys_columns.copy()
         if window is not None:
@@ -407,7 +409,7 @@ class AggregatedFeatureSet(FeatureSet):
 
         type = [c.data_type for f in features for c in f.transformation.aggregations]
         if pivot_values != [None]:
-            type =
+            type = len(pivot_values) * type
 
         select = [
             f"cast(`{old_name}` as {dt.typeName()}) as {new_name}"
@@ -440,16 +442,23 @@ class AggregatedFeatureSet(FeatureSet):
                 )
         pivot_values = self._pivot_values or [None]
         windows = self._windows or [None]
+
         for f in self.features:
             combination = itertools.product(
                 pivot_values, self._get_features_columns(f), windows
             )
-            for pv, fc, w in combination:
-                name = self._build_feature_column_name(fc, pivot_value=pv, window=w)
+            name = [
+                self._build_feature_column_name(fc, pivot_value=pv, window=w)
+                for pv, fc, w in combination
+            ]
+            type = (
+                len(pivot_values)
+                * len(windows)
+                * [fc.data_type.spark for fc in f.transformation.functions]
+            )
 
-                schema.append(
-                    {"column_name": name, "type": f.dtype.spark, "primary_key": False}
-                )
+            for n, dt in zip(name, type):
+                schema.append({"column_name": n, "type": dt, "primary_key": False})
 
         return schema
 

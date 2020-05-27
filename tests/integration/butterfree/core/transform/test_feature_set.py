@@ -9,6 +9,7 @@ from butterfree.core.transform.transformations import (
     CustomTransform,
     SparkFunctionTransform,
 )
+from butterfree.core.transform.utils.aggreagted_function import Function
 from butterfree.testing.dataframe import assert_dataframe_equality
 
 
@@ -36,9 +37,11 @@ class TestFeatureSet:
                 Feature(
                     name="feature1",
                     description="test",
-                    dtype=DataType.FLOAT,
                     transformation=SparkFunctionTransform(
-                        functions=[F.avg, F.stddev_pop]
+                        functions=[
+                            Function(F.avg, DataType.FLOAT),
+                            Function(F.stddev_pop, DataType.FLOAT),
+                        ]
                     ).with_window(
                         partition_by="id",
                         order_by=TIMESTAMP_COLUMN,
