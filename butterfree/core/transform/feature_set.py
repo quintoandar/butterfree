@@ -250,12 +250,7 @@ class FeatureSet:
         """
         schema = []
 
-        if any(
-            [
-                isinstance(feature.transformation, SparkFunctionTransform)
-                for feature in self.features
-            ]
-        ):
+        if self._has_spark_function_transform(self.features):
             for f in self.keys + [self.timestamp]:
                 for c in self._get_features_columns(f):
                     schema.append(
@@ -265,7 +260,6 @@ class FeatureSet:
                             "primary_key": True if isinstance(f, KeyFeature) else False,
                         }
                     )
-
             for f in self.features:
                 type = len(f.transformation._windows) * [
                     fc.data_type.spark for fc in f.transformation.functions
@@ -301,6 +295,24 @@ class FeatureSet:
         return any(
             [
                 isinstance(feature.transformation, AggregatedTransform)
+                for feature in features
+            ]
+        )
+
+    @staticmethod
+    def _has_spark_function_transform(features):
+        """Aggregated Transform mode check.
+
+        Checks if there's a rolling window mode within the scope of the
+        AggregatedTransform.
+
+        Returns:
+            True if there's a rolling window aggregation mode.
+
+        """
+        return any(
+            [
+                isinstance(feature.transformation, SparkFunctionTransform)
                 for feature in features
             ]
         )
