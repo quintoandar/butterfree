@@ -250,27 +250,7 @@ class FeatureSet:
         """
         schema = []
 
-        if self._has_spark_function_transform(self.features):
-            for f in self.keys + [self.timestamp]:
-                for c in self._get_features_columns(f):
-                    schema.append(
-                        {
-                            "column_name": c,
-                            "type": f.dtype.spark,
-                            "primary_key": True if isinstance(f, KeyFeature) else False,
-                        }
-                    )
-            for f in self.features:
-                type = len(f.transformation._windows) * [
-                    fc.data_type.spark for fc in f.transformation.functions
-                ]
-                name = self._get_features_columns(f)
-
-                for n, dt in zip(name, type):
-                    schema.append({"column_name": n, "type": dt, "primary_key": False})
-            return schema
-
-        for f in self.keys + [self.timestamp] + self.features:
+        for f in self.keys + [self.timestamp]:
             for c in self._get_features_columns(f):
                 schema.append(
                     {
@@ -279,6 +259,22 @@ class FeatureSet:
                         "primary_key": True if isinstance(f, KeyFeature) else False,
                     }
                 )
+
+        for f in self.features:
+            if isinstance(f.transformation, SparkFunctionTransform):
+                type = len(f.transformation._windows) * [
+                    fc.data_type.spark for fc in f.transformation.functions
+                ]
+                name = self._get_features_columns(f)
+
+                for n, dt in zip(name, type):
+                    schema.append({"column_name": n, "type": dt, "primary_key": False})
+            else:
+                for c in self._get_features_columns(f):
+                    schema.append(
+                        {"column_name": c, "type": f.dtype.spark, "primary_key": False}
+                    )
+
         return schema
 
     @staticmethod
@@ -295,24 +291,6 @@ class FeatureSet:
         return any(
             [
                 isinstance(feature.transformation, AggregatedTransform)
-                for feature in features
-            ]
-        )
-
-    @staticmethod
-    def _has_spark_function_transform(features):
-        """Aggregated Transform mode check.
-
-        Checks if there's a rolling window mode within the scope of the
-        AggregatedTransform.
-
-        Returns:
-            True if there's a rolling window aggregation mode.
-
-        """
-        return any(
-            [
-                isinstance(feature.transformation, SparkFunctionTransform)
                 for feature in features
             ]
         )
