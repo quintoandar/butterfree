@@ -261,19 +261,16 @@ class FeatureSet:
                 )
 
         for f in self.features:
-            if isinstance(f.transformation, SparkFunctionTransform):
-                type = len(f.transformation._windows) * [
-                    fc.data_type.spark for fc in f.transformation.functions
-                ]
-                name = self._get_features_columns(f)
+            name = self._get_features_columns(f)
+            type = (
+                len(f.transformation._windows)
+                * [fc.data_type.spark for fc in f.transformation.functions]
+                if isinstance(f.transformation, SparkFunctionTransform)
+                else len(name) * [f.dtype.spark]
+            )
 
-                for n, dt in zip(name, type):
-                    schema.append({"column_name": n, "type": dt, "primary_key": False})
-            else:
-                for c in self._get_features_columns(f):
-                    schema.append(
-                        {"column_name": c, "type": f.dtype.spark, "primary_key": False}
-                    )
+            for n, dt in zip(name, type):
+                schema.append({"column_name": n, "type": dt, "primary_key": False})
 
         return schema
 
