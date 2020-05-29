@@ -142,7 +142,7 @@ class OnlineFeatureStoreWriter(Writer):
 
         if self.debug_mode:
             spark_client.create_temporary_view(
-                name=f"online_feature_store__{feature_set.name}", dataframe=dataframe
+                dataframe=dataframe, name=f"online_feature_store__{feature_set.name}"
             )
             return
 

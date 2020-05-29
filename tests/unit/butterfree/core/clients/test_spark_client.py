@@ -3,6 +3,7 @@ from pyspark.sql import DataFrame
 from pyspark.sql.streaming import StreamingQuery
 
 from butterfree.core.clients import SparkClient
+from butterfree.testing.dataframe import assert_dataframe_equality
 
 
 def create_temp_view(dataframe: DataFrame, name):
@@ -200,3 +201,14 @@ class TestSparkClient:
                 format_="parquet",
                 mode="append",
             )
+
+    def test_create_temporary_view(self, target_df, spark_session):
+        # arrange
+        spark_client = SparkClient()
+
+        # act
+        spark_client.create_temporary_view(target_df, "temp_view")
+        result_df = spark_session.table("temp_view")
+
+        # assert
+        assert_dataframe_equality(target_df, result_df)

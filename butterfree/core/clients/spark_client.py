@@ -207,12 +207,12 @@ class SparkClient(AbstractClient):
             **options,
         )
 
-    def create_temporary_view(self, name: str, dataframe: DataFrame):
+    def create_temporary_view(self, dataframe: DataFrame, name: str):
         """Create a temporary view from a given dataframe.
 
         Args:
-            name: name of the temporary view.
             dataframe: dataframe to be be queried by the view.
+            name: name of the temporary view.
 
         """
         dataframe.createOrReplaceTempView(name)

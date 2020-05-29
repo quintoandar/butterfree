@@ -118,8 +118,8 @@ class HistoricalFeatureStoreWriter(Writer):
 
         if self.debug_mode:
             spark_client.create_temporary_view(
-                name=f"historical_feature_store__{feature_set.name}",
                 dataframe=dataframe,
+                name=f"historical_feature_store__{feature_set.name}",
             )
             return
 

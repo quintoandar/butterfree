@@ -4,6 +4,7 @@ import random
 import pytest
 from pyspark.sql.functions import spark_partition_id
 
+from butterfree.core.clients import SparkClient
 from butterfree.core.load.writers import HistoricalFeatureStoreWriter
 from butterfree.testing.dataframe import assert_dataframe_equality
 
@@ -40,6 +41,28 @@ class TestHistoricalFeatureStoreWriter:
             writer.PARTITION_BY == spark_client.write_table.call_args[1]["partition_by"]
         )
         assert feature_set.name == spark_client.write_table.call_args[1]["table_name"]
+
+    def test_write_in_debug_mode(
+        self,
+        feature_set_dataframe,
+        historical_feature_set_dataframe,
+        feature_set,
+        spark_session,
+    ):
+        # given
+        spark_client = SparkClient()
+        writer = HistoricalFeatureStoreWriter(debug_mode=True)
+
+        # when
+        writer.write(
+            feature_set=feature_set,
+            dataframe=feature_set_dataframe,
+            spark_client=spark_client,
+        )
+        result_df = spark_session.table(f"historical_feature_store__{feature_set.name}")
+
+        # then
+        assert_dataframe_equality(historical_feature_set_dataframe, result_df)
 
     def test_validate(self, feature_set_dataframe, mocker, feature_set):
         # given
