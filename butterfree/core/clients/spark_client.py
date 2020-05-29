@@ -61,7 +61,7 @@ class SparkClient(AbstractClient):
         df_reader = df_reader.schema(schema) if schema else df_reader
         return df_reader.format(format).options(**options).load()
 
-    def read_table(self, database: str, table: str) -> DataFrame:
+    def read_table(self, table: str, database: str = None) -> DataFrame:
         """Use the SparkSession.read interface to read a metastore table.
 
         Args:
@@ -72,15 +72,11 @@ class SparkClient(AbstractClient):
             Dataframe
 
         """
-        if not isinstance(database, str):
-            raise ValueError(
-                "database needs to be a string with the name of the metastore schema"
-            )
         if not isinstance(table, str):
             raise ValueError(
                 "table needs to be a string with the name of the registered table"
             )
-        return self.conn.read.table("{}.{}".format(database, table))
+        return self.conn.read.table(f"{database}.{table}" if database else table)
 
     def sql(self, query: str) -> DataFrame:
         """Run a query using Spark SQL.
@@ -210,3 +206,13 @@ class SparkClient(AbstractClient):
             path=path,
             **options,
         )
+
+    def create_temporary_view(self, dataframe: DataFrame, name: str):
+        """Create a temporary view from a given dataframe.
+
+        Args:
+            dataframe: dataframe to be be queried by the view.
+            name: name of the temporary view.
+
+        """
+        dataframe.createOrReplaceTempView(name)
