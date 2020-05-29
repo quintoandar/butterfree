@@ -1,3 +1,4 @@
+from pyspark.sql import functions
 from pyspark.sql.types import StringType, StructField, StructType
 from pytest import fixture
 
@@ -9,7 +10,7 @@ from butterfree.core.transform import FeatureSet
 from butterfree.core.transform.aggregated_feature_set import AggregatedFeatureSet
 from butterfree.core.transform.features import Feature, KeyFeature, TimestampFeature
 from butterfree.core.transform.transformations import AggregatedTransform
-from butterfree.core.transform.utils.aggreagted_function import Function
+from butterfree.core.transform.utils.functions import Functions
 
 
 @fixture
@@ -146,8 +147,8 @@ def test_feature_set():
                 description="test",
                 transformation=AggregatedTransform(
                     functions=[
-                        Function("avg", DataType.DOUBLE),
-                        Function("stddev_pop", DataType.DOUBLE),
+                        Functions(functions.avg, DataType.DOUBLE),
+                        Functions(functions.stddev_pop, DataType.DOUBLE),
                     ]
                 ),
             ),
@@ -155,7 +156,7 @@ def test_feature_set():
                 name="feature2",
                 description="test",
                 transformation=AggregatedTransform(
-                    functions=[Function("count", DataType.INTEGER)]
+                    functions=[Functions(functions.count, DataType.INTEGER)]
                 ),
             ),
         ],

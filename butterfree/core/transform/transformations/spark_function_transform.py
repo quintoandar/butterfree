@@ -7,7 +7,7 @@ from butterfree.core.transform.transformations.transform_component import (
     TransformComponent,
 )
 from butterfree.core.transform.utils import Window
-from butterfree.core.transform.utils.aggreagted_function import Function
+from butterfree.core.transform.utils.functions import Functions
 
 
 class SparkFunctionTransform(TransformComponent):
@@ -15,8 +15,6 @@ class SparkFunctionTransform(TransformComponent):
 
     Attributes:
         function: namedtuple with spark function and data type.
-         For more information check functions:
-         'https://spark.apache.org/docs/2.3.1/api/python/_modules/pyspark/sql/functions.html'.
 
     Example:
         It's necessary to declare the function method,
@@ -24,6 +22,8 @@ class SparkFunctionTransform(TransformComponent):
         >>> from butterfree.core.transform.transformations import SparkFunctionTransform
         >>> from butterfree.core.constants.columns import TIMESTAMP_COLUMN
         >>> from butterfree.core.transform.features import Feature
+        >>> from butterfree.core.transform.utils.functions import Functions
+        >>> from butterfree.core.constants.data_type import DataType
         >>> from pyspark import SparkContext
         >>> from pyspark.sql import session
         >>> from pyspark.sql.types import TimestampType
@@ -39,7 +39,8 @@ class SparkFunctionTransform(TransformComponent):
         >>> feature = Feature(
         ...    name="feature",
         ...    description="spark function transform",
-        ...    transformation=SparkFunctionTransform(functions=[functions.cos],)
+        ...    transformation=SparkFunctionTransform(
+        ...       functions=[Functions(functions.cos, DataType.DOUBLE)],)
         ...)
         >>> feature.transform(df).orderBy("timestamp").show()
         +---+-------------------+-------+--------------------+
@@ -55,7 +56,8 @@ class SparkFunctionTransform(TransformComponent):
         >>> feature_row_windows = Feature(
         ...    name="feature",
         ...    description="spark function transform with windows",
-        ...    transformation=SparkFunctionTransform(functions=[functions.avg],)
+        ...    transformation=SparkFunctionTransform(
+        ...       functions=[Functions(functions.avg, DataType.DOUBLE)],)
         ...                    .with_window(partition_by="id",
         ...                                 mode="row_windows",
         ...                                 window_definition=["2 events"],
@@ -76,7 +78,7 @@ class SparkFunctionTransform(TransformComponent):
 
     """
 
-    def __init__(self, functions: non_blank(List[Function])):
+    def __init__(self, functions: non_blank(List[Functions])):
         super().__init__()
         self.functions = functions
         self._windows = []
@@ -112,10 +114,10 @@ class SparkFunctionTransform(TransformComponent):
             if self._windows:
                 for window in self._windows:
                     output_columns.append(
-                        self._get_output_name(function.function_agg, window)
+                        self._get_output_name(function.function, window)
                     )
             else:
-                output_columns.append(self._get_output_name(function.function_agg))
+                output_columns.append(self._get_output_name(function.function))
 
         return output_columns
 
@@ -132,17 +134,15 @@ class SparkFunctionTransform(TransformComponent):
             if self._windows:
                 for window in self._windows:
                     dataframe = dataframe.withColumn(
-                        self._get_output_name(function.function_agg, window),
-                        function.function_agg(
-                            self._parent.from_column or self._parent.name
-                        )
+                        self._get_output_name(function.function, window),
+                        function.function(self._parent.from_column or self._parent.name)
                         .over(window.get())
                         .cast(function.data_type.spark),
                     )
             else:
                 dataframe = dataframe.withColumn(
-                    self._get_output_name(function.function_agg),
-                    function.function_agg(
+                    self._get_output_name(function.function),
+                    function.function(
                         self._parent.from_column or self._parent.name
                     ).cast(function.data_type.spark),
                 )

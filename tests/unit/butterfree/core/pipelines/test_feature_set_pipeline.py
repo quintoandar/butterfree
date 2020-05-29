@@ -23,7 +23,7 @@ from butterfree.core.transform.transformations import (
     AggregatedTransform,
     SparkFunctionTransform,
 )
-from butterfree.core.transform.utils.aggreagted_function import Function
+from butterfree.core.transform.utils.functions import Functions
 
 
 class TestFeatureSetPipeline:
@@ -66,8 +66,8 @@ class TestFeatureSetPipeline:
                         description="Average of something.",
                         transformation=SparkFunctionTransform(
                             functions=[
-                                Function(functions.avg, DataType.FLOAT),
-                                Function(functions.stddev_pop, DataType.FLOAT),
+                                Functions(functions.avg, DataType.FLOAT),
+                                Functions(functions.stddev_pop, DataType.FLOAT),
                             ],
                         ).with_window(
                             partition_by="user_id",
@@ -131,8 +131,8 @@ class TestFeatureSetPipeline:
                         description="Average of something.",
                         transformation=SparkFunctionTransform(
                             functions=[
-                                Function(functions.avg, DataType.FLOAT),
-                                Function(functions.stddev_pop, DataType.FLOAT),
+                                Functions(functions.avg, DataType.FLOAT),
+                                Functions(functions.stddev_pop, DataType.FLOAT),
                             ],
                         ).with_window(
                             partition_by="user_id",
@@ -186,8 +186,8 @@ class TestFeatureSetPipeline:
                         description="Average of something.",
                         transformation=SparkFunctionTransform(
                             functions=[
-                                Function(functions.avg, DataType.FLOAT),
-                                Function(functions.stddev_pop, DataType.FLOAT),
+                                Functions(functions.avg, DataType.FLOAT),
+                                Functions(functions.stddev_pop, DataType.FLOAT),
                             ],
                         ).with_window(
                             partition_by="user_id",
@@ -244,8 +244,8 @@ class TestFeatureSetPipeline:
                             description="Average of something.",
                             transformation=SparkFunctionTransform(
                                 functions=[
-                                    Function(functions.avg, DataType.FLOAT),
-                                    Function(functions.stddev_pop, DataType.FLOAT),
+                                    Functions(functions.avg, DataType.FLOAT),
+                                    Functions(functions.stddev_pop, DataType.FLOAT),
                                 ],
                             ).with_window(
                                 partition_by="user_id",
@@ -292,8 +292,8 @@ class TestFeatureSetPipeline:
                             description="Average of something.",
                             transformation=SparkFunctionTransform(
                                 functions=[
-                                    Function(functions.avg, DataType.FLOAT),
-                                    Function(functions.stddev_pop, DataType.FLOAT),
+                                    Functions(functions.avg, DataType.FLOAT),
+                                    Functions(functions.stddev_pop, DataType.FLOAT),
                                 ],
                             ).with_window(
                                 partition_by="user_id",
@@ -370,8 +370,8 @@ class TestFeatureSetPipeline:
                         description="Average of something.",
                         transformation=AggregatedTransform(
                             functions=[
-                                Function("avg", DataType.FLOAT),
-                                Function("stddev_pop", DataType.FLOAT),
+                                Functions(functions.avg, DataType.FLOAT),
+                                Functions(functions.stddev_pop, DataType.FLOAT),
                             ],
                         ),
                     ),

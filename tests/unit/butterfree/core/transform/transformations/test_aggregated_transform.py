@@ -4,7 +4,7 @@ from pyspark.sql import functions
 from butterfree.core.constants.data_type import DataType
 from butterfree.core.transform.features import Feature
 from butterfree.core.transform.transformations import AggregatedTransform
-from butterfree.core.transform.utils.aggreagted_function import Function
+from butterfree.core.transform.utils.functions import Functions
 
 
 class TestAggregatedTransform:
@@ -14,8 +14,8 @@ class TestAggregatedTransform:
             description="unit test",
             transformation=AggregatedTransform(
                 functions=[
-                    Function("avg", DataType.DOUBLE),
-                    Function("stddev_pop", DataType.DOUBLE),
+                    Functions(functions.avg, DataType.DOUBLE),
+                    Functions(functions.stddev_pop, DataType.DOUBLE),
                 ]
             ),
         )
@@ -31,8 +31,8 @@ class TestAggregatedTransform:
             description="unit test",
             transformation=AggregatedTransform(
                 functions=[
-                    Function("avg", DataType.DOUBLE),
-                    Function("stddev_pop", DataType.DOUBLE),
+                    Functions(functions.avg, DataType.DOUBLE),
+                    Functions(functions.stddev_pop, DataType.DOUBLE),
                 ]
             ),
         )
@@ -47,21 +47,23 @@ class TestAggregatedTransform:
         )
 
     def test_unsupported_aggregation(self, feature_set_dataframe):
-        with pytest.raises(KeyError):
+        with pytest.raises(TypeError):
             Feature(
                 name="feature1",
                 description="unit test",
                 transformation=AggregatedTransform(
-                    functions=[Function("median", DataType.DOUBLE)]
+                    functions=[Functions("median", DataType.DOUBLE)]
                 ),
             )
 
     def test_blank_aggregation(self, feature_set_dataframe):
-        with pytest.raises(ValueError, match="Aggregations must not be empty."):
+        with pytest.raises(ValueError):
             Feature(
                 name="feature1",
                 description="unit test",
-                transformation=AggregatedTransform(functions=[]),
+                transformation=AggregatedTransform(
+                    functions=[Functions(function="", data_type="")]
+                ),
             )
 
     def test_aggregations_with_filter_expression(self, spark_context):
@@ -71,9 +73,9 @@ class TestAggregatedTransform:
             description="unit test",
             transformation=AggregatedTransform(
                 functions=[
-                    Function("avg", DataType.DOUBLE),
-                    Function("min", DataType.DOUBLE),
-                    Function("max", DataType.DOUBLE),
+                    Functions(functions.avg, DataType.DOUBLE),
+                    Functions(functions.min, DataType.DOUBLE),
+                    Functions(functions.max, DataType.DOUBLE),
                 ],
                 filter_expression="type = 'a'",
             ),
@@ -86,7 +88,7 @@ class TestAggregatedTransform:
 
         # act
         output_aggregations = [
-            agg.function_agg for agg in test_feature.transformation.aggregations
+            agg.function for agg in test_feature.transformation.aggregations
         ]
 
         # assert

@@ -18,7 +18,7 @@ from butterfree.core.transform.transformations import (
     CustomTransform,
     SparkFunctionTransform,
 )
-from butterfree.core.transform.utils.aggreagted_function import Function
+from butterfree.core.transform.utils.functions import Functions
 from butterfree.testing.dataframe import assert_dataframe_equality
 
 
@@ -87,8 +87,8 @@ class TestFeatureSetPipeline:
                         description="test",
                         transformation=SparkFunctionTransform(
                             functions=[
-                                Function(F.avg, DataType.FLOAT),
-                                Function(F.stddev_pop, DataType.FLOAT),
+                                Functions(F.avg, DataType.FLOAT),
+                                Functions(F.stddev_pop, DataType.FLOAT),
                             ],
                         ).with_window(
                             partition_by="id",
@@ -122,10 +122,6 @@ class TestFeatureSetPipeline:
         # assert
         path = dbconfig.get_options("historical/entity/feature_set").get("path")
         df = spark_session.read.parquet(path).orderBy(TIMESTAMP_COLUMN)
-
-        target_df = fixed_windows_output_feature_set_dataframe.orderBy(
-            test_pipeline.feature_set.timestamp_column
-        )
 
         target_df = fixed_windows_output_feature_set_dataframe.orderBy(
             test_pipeline.feature_set.timestamp_column

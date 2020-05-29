@@ -1,18 +1,15 @@
 """Aggregated Transform entity."""
+from collections import namedtuple
 from typing import List
 
 from parameters_validation import non_blank
-from pyspark.sql import DataFrame, functions
+from pyspark.sql import DataFrame
 from pyspark.sql.functions import col, expr, when
 
 from butterfree.core.transform.transformations.transform_component import (
     TransformComponent,
 )
-from butterfree.core.transform.transformations.user_defined_functions import (
-    mode,
-    most_frequent_set,
-)
-from butterfree.core.transform.utils.aggreagted_function import Function
+from butterfree.core.transform.utils.functions import Functions
 
 
 class AggregatedTransform(TransformComponent):
@@ -44,14 +41,15 @@ class AggregatedTransform(TransformComponent):
         >>> from butterfree.core.transform.transformations import AggregatedTransform
         >>> from butterfree.core.transform.features import Feature
         >>> from butterfree.core.constants.data_type import DataType
-        >>> from butterfree.core.transform.utils.aggreagted_function import Function
+        >>> from butterfree.core.transform.utils.functions import Functions
+        >>> import pyspark.sql.functions as F
         >>> feature = Feature(
         ...     name="feature",
         ...     description="aggregated transform",
         ...     transformation=AggregatedTransform(
         ...         functions=[
-        ...                    Function("avg", DataType.DOUBLE),
-        ...                    Function("stddev_pop", DataType.DOUBLE)],
+        ...                    Functions(F.avg, DataType.DOUBLE),
+        ...                    Functions(F.stddev_pop, DataType.DOUBLE)],
         ...     ),
         ...     from_column="somenumber",
         ...)
@@ -62,57 +60,14 @@ class AggregatedTransform(TransformComponent):
     """
 
     def __init__(
-        self, functions: non_blank(List[Function]), filter_expression: str = None
+        self, functions: non_blank(List[Functions]), filter_expression: str = None
     ):
         super(AggregatedTransform, self).__init__()
         self.functions = functions
         self.filter_expression = filter_expression
 
-    __ALLOWED_AGGREGATIONS = {
-        "approx_count_distinct": functions.approx_count_distinct,
-        "avg": functions.avg,
-        "collect_list": functions.collect_list,
-        "collect_set": functions.collect_set,
-        "count": functions.count,
-        "first": functions.first,
-        "kurtosis": functions.kurtosis,
-        "last": functions.first,
-        "max": functions.max,
-        "min": functions.min,
-        "mode": mode,
-        "most_frequent_set": most_frequent_set,
-        "skewness": functions.skewness,
-        "stddev": functions.stddev,
-        "stddev_pop": functions.stddev_pop,
-        "sum": functions.sum,
-        "sum_distinct": functions.sumDistinct,
-        "variance": functions.variance,
-        "var_pop": functions.var_pop,
-    }
-
     @property
-    def functions(self) -> List[Function]:
-        """Aggregated functions to be used in the transformation."""
-        return self._functions
-
-    @functions.setter
-    def functions(self, value: List[Function]):
-        """Aggregated definitions to be used in the transformation."""
-        aggregations = []
-        if not value:
-            raise ValueError("Aggregations must not be empty.")
-        for agg in value:
-            if agg.function_agg not in self.allowed_aggregations:
-                raise KeyError(
-                    f"{agg.function_agg} is not supported. These are the allowed "
-                    f"aggregations that you can use: "
-                    f"{self.allowed_aggregations}"
-                )
-            aggregations.append(agg)
-        self._functions = aggregations
-
-    @property
-    def aggregations(self) -> List[Function]:
+    def aggregations(self) -> List[tuple]:
         """Aggregated spark columns."""
         column_name = self._parent.from_column or self._parent.name
 
@@ -123,26 +78,24 @@ class AggregatedTransform(TransformComponent):
             if self.filter_expression
             else column_name
         )
+        Function = namedtuple("Function", ["function", "data_type"])
+
         return [
-            Function(
-                self.__ALLOWED_AGGREGATIONS[f"{f.function_agg}"](expression),
-                f.data_type.spark,
-            )
-            for f in self.functions
+            Function(f.function(expression), f.data_type.spark,) for f in self.functions
         ]
 
-    @property
-    def allowed_aggregations(self) -> List[str]:
-        """Allowed aggregations to be used in the transformation."""
-        return list(self.__ALLOWED_AGGREGATIONS.keys())
-
     def _get_output_name(self, function):
-        return "__".join([self._parent.name, function])
+        base_name = (
+            "__".join([self._parent.name, function.__name__])
+            if hasattr(function, "__name__")
+            else self._parent_name
+        )
+        return base_name
 
     @property
     def output_columns(self) -> List[str]:
         """Columns names generated by the transformation."""
-        return [self._get_output_name(f.function_agg) for f in self.functions]
+        return [self._get_output_name(f.function) for f in self.functions]
 
     def transform(self, dataframe: DataFrame) -> DataFrame:
         """(NotImplemented) Performs a transformation to the feature pipeline.

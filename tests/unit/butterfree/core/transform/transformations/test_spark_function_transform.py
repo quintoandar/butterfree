@@ -4,7 +4,7 @@ from pyspark.sql import functions
 from butterfree.core.constants.data_type import DataType
 from butterfree.core.transform.features import Feature
 from butterfree.core.transform.transformations import SparkFunctionTransform
-from butterfree.core.transform.utils.aggreagted_function import Function
+from butterfree.core.transform.utils.functions import Functions
 from butterfree.testing.dataframe import assert_dataframe_equality
 
 
@@ -14,7 +14,7 @@ class TestSparkFunctionTransform:
             name="feature",
             description="unit test",
             transformation=SparkFunctionTransform(
-                functions=[Function(functions.cos, DataType.DOUBLE)],
+                functions=[Functions(functions.cos, DataType.DOUBLE)],
             ),
             from_column="feature1",
         )
@@ -30,7 +30,7 @@ class TestSparkFunctionTransform:
             name="feature1",
             description="unit test",
             transformation=SparkFunctionTransform(
-                functions=[Function(functions.avg, DataType.DOUBLE)],
+                functions=[Functions(functions.avg, DataType.DOUBLE)],
             ).with_window(
                 partition_by="id",
                 mode="row_windows",
@@ -47,7 +47,7 @@ class TestSparkFunctionTransform:
             name="feature1",
             description="unit test",
             transformation=SparkFunctionTransform(
-                functions=[Function(functions.avg, DataType.DOUBLE)],
+                functions=[Functions(functions.avg, DataType.DOUBLE)],
             ).with_window(
                 partition_by="id",
                 mode="fixed_windows",
@@ -76,7 +76,7 @@ class TestSparkFunctionTransform:
                 name="feature1",
                 description="unit test",
                 transformation=SparkFunctionTransform(
-                    functions=[Function(functions.avg, DataType.DOUBLE)],
+                    functions=[Functions(functions.avg, DataType.DOUBLE)],
                 ).with_window(
                     partition_by="id",
                     mode="fixed_windows",
@@ -90,7 +90,7 @@ class TestSparkFunctionTransform:
                 name="feature1",
                 description="unit test",
                 transformation=SparkFunctionTransform(
-                    functions=[Function(functions.avg, DataType.DOUBLE)],
+                    functions=[Functions(functions.avg, DataType.DOUBLE)],
                 ).with_window(
                     partition_by="id",
                     mode="fixed_windows",
@@ -105,7 +105,7 @@ class TestSparkFunctionTransform:
             name="feature1",
             description="unit test",
             transformation=SparkFunctionTransform(
-                functions=[Function(functions.avg, DataType.DOUBLE)],
+                functions=[Functions(functions.avg, DataType.DOUBLE)],
             ).with_window(
                 partition_by="id",
                 mode="fixed_windows",
@@ -124,7 +124,7 @@ class TestSparkFunctionTransform:
             name="feature1",
             description="unit test",
             transformation=SparkFunctionTransform(
-                functions=[Function(functions.avg, DataType.DOUBLE)],
+                functions=[Functions(functions.avg, DataType.DOUBLE)],
             ).with_window(
                 partition_by="id", mode="row_windows", window_definition=["2 events"],
             ),
