@@ -30,6 +30,7 @@ class HistoricalFeatureStoreWriter(Writer):
             count on the dataframe equal to 100000 records, if the feature store
             return a count equal to 995000 an error will not be thrown  .
             Use validation_threshold = 0 to not use tolerance in the validation.
+        debug_mode: "dry run" mode, write the result to a temporary view.
 
     Example:
         Simple example regarding HistoricalFeatureStoreWriter class instantiation.
@@ -88,6 +89,7 @@ class HistoricalFeatureStoreWriter(Writer):
         database=None,
         num_partitions=None,
         validation_threshold: float = DEFAULT_VALIDATION_THRESHOLD,
+        debug_mode: bool = False,
     ):
         self.db_config = db_config or S3Config()
         self.database = database or environment.get_variable(
@@ -95,9 +97,10 @@ class HistoricalFeatureStoreWriter(Writer):
         )
         self.num_partitions = num_partitions or DEFAULT_NUM_PARTITIONS
         self.validation_threshold = validation_threshold
+        self.debug_mode = debug_mode
 
     def write(
-        self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient
+        self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient,
     ):
         """Loads the data from a feature set into the Historical Feature Store.
 
@@ -106,10 +109,21 @@ class HistoricalFeatureStoreWriter(Writer):
             dataframe: spark dataframe containing data from a feature set.
             spark_client: client for spark connections with external services.
 
+        If the debug_mode is set to True, a temporary table with a name in the format:
+        historical_feature_store__{feature_set.name} will be created instead of writing
+        to the real historical feature store.
+
         """
-        s3_key = os.path.join("historical", feature_set.entity, feature_set.name)
         dataframe = self._create_partitions(dataframe)
 
+        if self.debug_mode:
+            spark_client.create_temporary_view(
+                dataframe=dataframe,
+                name=f"historical_feature_store__{feature_set.name}",
+            )
+            return
+
+        s3_key = os.path.join("historical", feature_set.entity, feature_set.name)
         spark_client.write_table(
             dataframe=dataframe,
             database=self.database,
@@ -144,11 +158,12 @@ class HistoricalFeatureStoreWriter(Writer):
                 feature set dataframe.
 
         """
-        table_name = "{}.{}".format(self.database, feature_set.name)
-        query_format_string = "SELECT COUNT(1) as row FROM {}"
-        query_count = query_format_string.format(table_name)
-
-        written_count = spark_client.sql(query=query_count).collect().pop()["row"]
+        table_name = (
+            f"{self.database}.{feature_set.name}"
+            if not self.debug_mode
+            else f"historical_feature_store__{feature_set.name}"
+        )
+        written_count = spark_client.read_table(table_name).count()
         dataframe_count = dataframe.count()
         self._assert_validation_count(table_name, written_count, dataframe_count)
 
