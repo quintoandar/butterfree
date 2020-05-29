@@ -117,8 +117,10 @@ class HistoricalFeatureStoreWriter(Writer):
         dataframe = self._create_partitions(dataframe)
 
         if self.debug_mode:
-            spark_client.create_temporary_view(dataframe=dataframe,
-                                               name=f"historical_feature_store__{feature_set.name}")
+            spark_client.create_temporary_view(
+                dataframe=dataframe,
+                name=f"historical_feature_store__{feature_set.name}",
+            )
             return
 
         s3_key = os.path.join("historical", feature_set.entity, feature_set.name)
