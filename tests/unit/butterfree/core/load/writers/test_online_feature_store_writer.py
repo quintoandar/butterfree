@@ -7,6 +7,7 @@ from pyspark.sql.streaming import StreamingQuery
 from butterfree.core.clients import SparkClient
 from butterfree.core.configs.db import CassandraConfig
 from butterfree.core.load.writers import OnlineFeatureStoreWriter
+from butterfree.testing.dataframe import assert_dataframe_equality
 
 
 class TestOnlineFeatureStoreWriter:
@@ -85,6 +86,28 @@ class TestOnlineFeatureStoreWriter:
             item in spark_client.write_dataframe.call_args[1].items()
             for item in writer.db_config.get_options(table=feature_set.entity).items()
         )
+
+    def test_write_in_debug_mode(
+        self,
+        feature_set_dataframe,
+        latest_feature_set_dataframe,
+        feature_set,
+        spark_session,
+    ):
+        # given
+        spark_client = SparkClient()
+        writer = OnlineFeatureStoreWriter(debug_mode=True)
+
+        # when
+        writer.write(
+            feature_set=feature_set,
+            dataframe=feature_set_dataframe,
+            spark_client=spark_client,
+        )
+        result_df = spark_session.table(f"online_feature_store__{feature_set.name}")
+
+        # then
+        assert_dataframe_equality(latest_feature_set_dataframe, result_df)
 
     @pytest.mark.parametrize("has_checkpoint", [True, False])
     def test_write_stream(self, feature_set, has_checkpoint, monkeypatch):
