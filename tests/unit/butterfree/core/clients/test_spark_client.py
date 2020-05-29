@@ -207,7 +207,7 @@ class TestSparkClient:
         spark_client = SparkClient()
 
         # act
-        spark_client.create_temporary_view("temp_view", target_df)
+        spark_client.create_temporary_view(target_df, "temp_view")
         result_df = spark_session.table("temp_view")
 
         # assert

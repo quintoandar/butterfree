@@ -141,9 +141,8 @@ class OnlineFeatureStoreWriter(Writer):
         )
 
         if self.debug_mode:
-            spark_client.create_temporary_view(
-                name=f"online_feature_store__{feature_set.name}", dataframe=dataframe
-            )
+            spark_client.create_temporary_view(dataframe=dataframe,
+                                               name=f"online_feature_store__{feature_set.name}")
             return
 
         for table in [feature_set.name, feature_set.entity]:
