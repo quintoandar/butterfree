@@ -74,7 +74,7 @@ class CassandraClient(AbstractClient):
         """
         if not self._session:
             raise RuntimeError("There's no session available for this query.")
-        self._session.execute(query)
+        return self._session.execute(query)
 
     def get_schema(self, table: str) -> list:
         """Returns desired table schema.
