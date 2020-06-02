@@ -1,3 +1,4 @@
+from pyspark.sql import functions
 from pyspark.sql.types import StringType, StructField, StructType
 from pytest import fixture
 
@@ -9,6 +10,7 @@ from butterfree.core.transform import FeatureSet
 from butterfree.core.transform.aggregated_feature_set import AggregatedFeatureSet
 from butterfree.core.transform.features import Feature, KeyFeature, TimestampFeature
 from butterfree.core.transform.transformations import AggregatedTransform
+from butterfree.core.transform.utils.function import Function
 
 
 @fixture
@@ -143,14 +145,19 @@ def test_feature_set():
             Feature(
                 name="feature1",
                 description="test",
-                dtype=DataType.DOUBLE,
-                transformation=AggregatedTransform(functions=["avg", "stddev_pop"]),
+                transformation=AggregatedTransform(
+                    functions=[
+                        Function(functions.avg, DataType.DOUBLE),
+                        Function(functions.stddev_pop, DataType.DOUBLE),
+                    ]
+                ),
             ),
             Feature(
                 name="feature2",
                 description="test",
-                dtype=DataType.DOUBLE,
-                transformation=AggregatedTransform(functions=["count"]),
+                transformation=AggregatedTransform(
+                    functions=[Function(functions.count, DataType.INTEGER)]
+                ),
             ),
         ],
         keys=[
@@ -195,12 +202,12 @@ def expected_schema():
         },
         {
             "column_name": "feature2__count_over_1_week_rolling_windows",
-            "type": DataType.DOUBLE.cassandra,
+            "type": DataType.INTEGER.cassandra,
             "primary_key": False,
         },
         {
             "column_name": "feature2__count_over_2_days_rolling_windows",
-            "type": DataType.DOUBLE.cassandra,
+            "type": DataType.INTEGER.cassandra,
             "primary_key": False,
         },
     ]
