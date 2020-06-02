@@ -18,7 +18,9 @@ from butterfree.core.transform.features import Feature, KeyFeature, TimestampFea
 from butterfree.core.transform.transformations import (
     AggregatedTransform,
     SparkFunctionTransform,
+    SQLExpressionTransform,
 )
+from butterfree.core.transform.utils.function import Function
 from butterfree.testing.dataframe import assert_dataframe_equality
 
 
@@ -330,8 +332,9 @@ class TestFeatureSet:
                     Feature(
                         name="feature1",
                         description="test",
-                        dtype=DataType.FLOAT,
-                        transformation=AggregatedTransform(functions=["avg"]),
+                        transformation=AggregatedTransform(
+                            functions=[Function(F.avg, DataType.FLOAT)]
+                        ),
                     ),
                 ],
                 keys=[key_id],
@@ -372,9 +375,11 @@ class TestFeatureSet:
                 Feature(
                     name="feature1",
                     description="test",
-                    dtype=DataType.FLOAT,
                     transformation=SparkFunctionTransform(
-                        functions=[F.avg, F.stddev_pop]
+                        functions=[
+                            Function(F.avg, DataType.FLOAT),
+                            Function(F.stddev_pop, DataType.FLOAT),
+                        ]
                     ).with_window(
                         partition_by="id",
                         order_by=TIMESTAMP_COLUMN,
@@ -396,3 +401,23 @@ class TestFeatureSet:
         schema = feature_set.get_schema()
 
         assert schema == expected_schema
+
+    def test_feature_without_datatype(self, key_id, timestamp_c, dataframe):
+        spark_client = SparkClient()
+        with pytest.raises(ValueError):
+            FeatureSet(
+                name="name",
+                entity="entity",
+                description="description",
+                features=[
+                    Feature(
+                        name="feature1",
+                        description="test",
+                        transformation=SQLExpressionTransform(
+                            expression="feature1 + a"
+                        ),
+                    ),
+                ],
+                keys=[key_id],
+                timestamp=timestamp_c,
+            ).construct(dataframe, spark_client)
