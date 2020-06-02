@@ -9,7 +9,7 @@ from butterfree.core.transform.transformations import (
     AggregatedTransform,
     H3HashTransform,
 )
-from butterfree.core.transform.utils.functions import Functions
+from butterfree.core.transform.utils.function import Function
 from butterfree.testing.dataframe import assert_dataframe_equality
 
 
@@ -39,7 +39,7 @@ class TestAggregatedFeatureSet:
                     description="test",
                     dtype=DataType.DOUBLE,
                     transformation=AggregatedTransform(
-                        functions=[Functions(F.avg, DataType.DOUBLE)]
+                        functions=[Function(F.avg, DataType.DOUBLE)]
                     ),
                 ),
                 Feature(
@@ -47,7 +47,7 @@ class TestAggregatedFeatureSet:
                     description="test",
                     dtype=DataType.FLOAT,
                     transformation=AggregatedTransform(
-                        functions=[Functions(F.count, DataType.BIGINT)]
+                        functions=[Function(F.count, DataType.BIGINT)]
                     ),
                 ),
             ],
@@ -88,8 +88,8 @@ class TestAggregatedFeatureSet:
                     description="test",
                     transformation=AggregatedTransform(
                         functions=[
-                            Functions(F.avg, DataType.DOUBLE),
-                            Functions(F.stddev_pop, DataType.DOUBLE),
+                            Function(F.avg, DataType.DOUBLE),
+                            Function(F.stddev_pop, DataType.DOUBLE),
                         ],
                     ),
                 ),
@@ -98,8 +98,8 @@ class TestAggregatedFeatureSet:
                     description="test",
                     transformation=AggregatedTransform(
                         functions=[
-                            Functions(F.avg, DataType.DOUBLE),
-                            Functions(F.stddev_pop, DataType.DOUBLE),
+                            Function(F.avg, DataType.DOUBLE),
+                            Function(F.stddev_pop, DataType.DOUBLE),
                         ],
                     ),
                 ),
@@ -145,8 +145,8 @@ class TestAggregatedFeatureSet:
                     description="test",
                     transformation=AggregatedTransform(
                         functions=[
-                            Functions(F.avg, DataType.DOUBLE),
-                            Functions(F.stddev_pop, DataType.DOUBLE),
+                            Function(F.avg, DataType.DOUBLE),
+                            Function(F.stddev_pop, DataType.DOUBLE),
                         ],
                     ),
                 ),
@@ -190,7 +190,7 @@ class TestAggregatedFeatureSet:
                     name="house_id",
                     description="Count of house ids over a day.",
                     transformation=AggregatedTransform(
-                        functions=[Functions(F.count, DataType.BIGINT)]
+                        functions=[Function(F.count, DataType.BIGINT)]
                     ),
                 ),
             ],
@@ -221,8 +221,8 @@ class TestAggregatedFeatureSet:
                     description="unit test",
                     transformation=AggregatedTransform(
                         functions=[
-                            Functions(F.avg, DataType.FLOAT),
-                            Functions(F.stddev_pop, DataType.DOUBLE),
+                            Function(F.avg, DataType.FLOAT),
+                            Function(F.stddev_pop, DataType.DOUBLE),
                         ],
                     ),
                     from_column="feature1",

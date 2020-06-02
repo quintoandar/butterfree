@@ -4,7 +4,7 @@ from pyspark.sql import functions
 from butterfree.core.constants.data_type import DataType
 from butterfree.core.transform.features import Feature
 from butterfree.core.transform.transformations import AggregatedTransform
-from butterfree.core.transform.utils.functions import Functions
+from butterfree.core.transform.utils.function import Function
 
 
 class TestAggregatedTransform:
@@ -14,8 +14,8 @@ class TestAggregatedTransform:
             description="unit test",
             transformation=AggregatedTransform(
                 functions=[
-                    Functions(functions.avg, DataType.DOUBLE),
-                    Functions(functions.stddev_pop, DataType.DOUBLE),
+                    Function(functions.avg, DataType.DOUBLE),
+                    Function(functions.stddev_pop, DataType.DOUBLE),
                 ]
             ),
         )
@@ -31,8 +31,8 @@ class TestAggregatedTransform:
             description="unit test",
             transformation=AggregatedTransform(
                 functions=[
-                    Functions(functions.avg, DataType.DOUBLE),
-                    Functions(functions.stddev_pop, DataType.DOUBLE),
+                    Function(functions.avg, DataType.DOUBLE),
+                    Function(functions.stddev_pop, DataType.DOUBLE),
                 ]
             ),
         )
@@ -52,7 +52,7 @@ class TestAggregatedTransform:
                 name="feature1",
                 description="unit test",
                 transformation=AggregatedTransform(
-                    functions=[Functions("median", DataType.DOUBLE)]
+                    functions=[Function("median", DataType.DOUBLE)]
                 ),
             )
 
@@ -62,7 +62,7 @@ class TestAggregatedTransform:
                 name="feature1",
                 description="unit test",
                 transformation=AggregatedTransform(
-                    functions=[Functions(function="", data_type="")]
+                    functions=[Function(func="", data_type="")]
                 ),
             )
 
@@ -73,9 +73,9 @@ class TestAggregatedTransform:
             description="unit test",
             transformation=AggregatedTransform(
                 functions=[
-                    Functions(functions.avg, DataType.DOUBLE),
-                    Functions(functions.min, DataType.DOUBLE),
-                    Functions(functions.max, DataType.DOUBLE),
+                    Function(functions.avg, DataType.DOUBLE),
+                    Function(functions.min, DataType.DOUBLE),
+                    Function(functions.max, DataType.DOUBLE),
                 ],
                 filter_expression="type = 'a'",
             ),

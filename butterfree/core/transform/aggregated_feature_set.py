@@ -43,7 +43,7 @@ class AggregatedFeatureSet(FeatureSet):
     ... )
     >>> from butterfree.core.constants.data_type import DataType
     >>> from butterfree.core.clients import SparkClient
-    >>> from butterfree.core.transform.utils.functions import Functions
+    >>> from butterfree.core.transform.utils.function import Function
     >>> import pyspark.sql.functions as F
     >>> client = SparkClient()
     >>> client.conn.conf.set("spark.sql.session.timeZone", "UTC")
@@ -68,8 +68,8 @@ class AggregatedFeatureSet(FeatureSet):
     ...            description="test",
     ...            transformation=AggregatedTransform(
     ...                 functions=[
-    ...                    Functions(F.avg, DataType.DOUBLE),
-    ...                    Functions(F.stddev_pop, DataType.DOUBLE)],
+    ...                    Function(F.avg, DataType.DOUBLE),
+    ...                    Function(F.stddev_pop, DataType.DOUBLE)],
     ...             ),
     ...             from_column="rent",
     ...        ),

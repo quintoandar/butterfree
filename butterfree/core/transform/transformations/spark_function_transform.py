@@ -7,7 +7,7 @@ from butterfree.core.transform.transformations.transform_component import (
     TransformComponent,
 )
 from butterfree.core.transform.utils import Window
-from butterfree.core.transform.utils.functions import Functions
+from butterfree.core.transform.utils.function import Function
 
 
 class SparkFunctionTransform(TransformComponent):
@@ -22,7 +22,7 @@ class SparkFunctionTransform(TransformComponent):
         >>> from butterfree.core.transform.transformations import SparkFunctionTransform
         >>> from butterfree.core.constants.columns import TIMESTAMP_COLUMN
         >>> from butterfree.core.transform.features import Feature
-        >>> from butterfree.core.transform.utils.functions import Functions
+        >>> from butterfree.core.transform.utils.function import Function
         >>> from butterfree.core.constants.data_type import DataType
         >>> from pyspark import SparkContext
         >>> from pyspark.sql import session
@@ -40,7 +40,7 @@ class SparkFunctionTransform(TransformComponent):
         ...    name="feature",
         ...    description="spark function transform",
         ...    transformation=SparkFunctionTransform(
-        ...       functions=[Functions(functions.cos, DataType.DOUBLE)],)
+        ...       functions=[Function(functions.cos, DataType.DOUBLE)],)
         ...)
         >>> feature.transform(df).orderBy("timestamp").show()
         +---+-------------------+-------+--------------------+
@@ -57,7 +57,7 @@ class SparkFunctionTransform(TransformComponent):
         ...    name="feature",
         ...    description="spark function transform with windows",
         ...    transformation=SparkFunctionTransform(
-        ...       functions=[Functions(functions.avg, DataType.DOUBLE)],)
+        ...       functions=[Function(functions.avg, DataType.DOUBLE)],)
         ...                    .with_window(partition_by="id",
         ...                                 mode="row_windows",
         ...                                 window_definition=["2 events"],
@@ -78,7 +78,7 @@ class SparkFunctionTransform(TransformComponent):
 
     """
 
-    def __init__(self, functions: non_blank(List[Functions])):
+    def __init__(self, functions: non_blank(List[Function])):
         super().__init__()
         self.functions = functions
         self._windows = []
@@ -113,11 +113,9 @@ class SparkFunctionTransform(TransformComponent):
         for function in self.functions:
             if self._windows:
                 for window in self._windows:
-                    output_columns.append(
-                        self._get_output_name(function.function, window)
-                    )
+                    output_columns.append(self._get_output_name(function.func, window))
             else:
-                output_columns.append(self._get_output_name(function.function))
+                output_columns.append(self._get_output_name(function.func))
 
         return output_columns
 
@@ -134,17 +132,17 @@ class SparkFunctionTransform(TransformComponent):
             if self._windows:
                 for window in self._windows:
                     dataframe = dataframe.withColumn(
-                        self._get_output_name(function.function, window),
-                        function.function(self._parent.from_column or self._parent.name)
+                        self._get_output_name(function.func, window),
+                        function.func(self._parent.from_column or self._parent.name)
                         .over(window.get())
                         .cast(function.data_type.spark),
                     )
             else:
                 dataframe = dataframe.withColumn(
-                    self._get_output_name(function.function),
-                    function.function(
-                        self._parent.from_column or self._parent.name
-                    ).cast(function.data_type.spark),
+                    self._get_output_name(function.func),
+                    function.func(self._parent.from_column or self._parent.name).cast(
+                        function.data_type.spark
+                    ),
                 )
 
         return dataframe

@@ -10,7 +10,7 @@ from butterfree.core.transform import FeatureSet
 from butterfree.core.transform.aggregated_feature_set import AggregatedFeatureSet
 from butterfree.core.transform.features import Feature, KeyFeature, TimestampFeature
 from butterfree.core.transform.transformations import AggregatedTransform
-from butterfree.core.transform.utils.functions import Functions
+from butterfree.core.transform.utils.function import Function
 
 
 @fixture
@@ -147,8 +147,8 @@ def test_feature_set():
                 description="test",
                 transformation=AggregatedTransform(
                     functions=[
-                        Functions(functions.avg, DataType.DOUBLE),
-                        Functions(functions.stddev_pop, DataType.DOUBLE),
+                        Function(functions.avg, DataType.DOUBLE),
+                        Function(functions.stddev_pop, DataType.DOUBLE),
                     ]
                 ),
             ),
@@ -156,7 +156,7 @@ def test_feature_set():
                 name="feature2",
                 description="test",
                 transformation=AggregatedTransform(
-                    functions=[Functions(functions.count, DataType.INTEGER)]
+                    functions=[Function(functions.count, DataType.INTEGER)]
                 ),
             ),
         ],
