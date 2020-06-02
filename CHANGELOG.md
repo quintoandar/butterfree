@@ -5,6 +5,18 @@ Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each 
 
 ## Unreleased
 
+## [0.10.0](https://github.com/quintoandar/butterfree/releases/tag/0.10.0)
+### Added
+* [MLOP-325] Debug Mode on Writers ([#155](https://github.com/quintoandar/butterfree/pull/155))
+* [MLOP-256] Create a checklist for Butterfree PRs ([#153](https://github.com/quintoandar/butterfree/pull/153))
+* [MLOP-252] Butterfree Examples - Simple Feature Set ([#157](https://github.com/quintoandar/butterfree/pull/157))
+
+### Changed
+* [MLOP-291] Associate Multiple Transforms to their Correspondents Types ([#154](https://github.com/quintoandar/butterfree/pull/154))
+
+### Fixed
+* Fix cassandra client ([#156](https://github.com/quintoandar/butterfree/pull/156))
+
 ## [0.9.2](https://github.com/quintoandar/butterfree/releases/tag/0.9.2)
 ### Added
 * Add most_frequent_set to allowed agg ([#150](https://github.com/quintoandar/butterfree/pull/150))
