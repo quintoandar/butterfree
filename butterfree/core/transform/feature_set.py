@@ -10,7 +10,10 @@ from pyspark.sql.dataframe import DataFrame
 from butterfree.core.clients import SparkClient
 from butterfree.core.constants.columns import TIMESTAMP_COLUMN
 from butterfree.core.transform.features import Feature, KeyFeature, TimestampFeature
-from butterfree.core.transform.transformations import AggregatedTransform
+from butterfree.core.transform.transformations import (
+    AggregatedTransform,
+    SparkFunctionTransform,
+)
 
 
 class FeatureSet:
@@ -41,6 +44,7 @@ class FeatureSet:
     ...     SparkFunctionTransform,
     ...     CustomTransform,
     ... )
+    >>> from butterfree.core.transform.utils.functions import Functions
     >>> import pyspark.sql.functions as F
 
     >>> def divide(df, fs, column1, column2):
@@ -57,7 +61,9 @@ class FeatureSet:
     ...            name="feature1",
     ...            description="test",
     ...            transformation=SparkFunctionTransform(
-    ...                 functions=[F.avg, F.stddev_pop]
+    ...                 functions=[
+    ...                            Functions(F.avg, DataType.DOUBLE),
+    ...                            Functions(F.stddev_pop, DataType.DOUBLE)]
     ...             ).with_window(
     ...                 partition_by="id",
     ...                 order_by=TIMESTAMP_COLUMN,
@@ -243,7 +249,8 @@ class FeatureSet:
 
         """
         schema = []
-        for f in self.keys + [self.timestamp] + self.features:
+
+        for f in self.keys + [self.timestamp]:
             for c in self._get_features_columns(f):
                 schema.append(
                     {
@@ -252,6 +259,19 @@ class FeatureSet:
                         "primary_key": True if isinstance(f, KeyFeature) else False,
                     }
                 )
+
+        for f in self.features:
+            name = self._get_features_columns(f)
+            type = (
+                len(f.transformation._windows)
+                * [fc.data_type.spark for fc in f.transformation.functions]
+                if isinstance(f.transformation, SparkFunctionTransform)
+                else len(name) * [f.dtype.spark]
+            )
+
+            for n, dt in zip(name, type):
+                schema.append({"column_name": n, "type": dt, "primary_key": False})
+
         return schema
 
     @staticmethod

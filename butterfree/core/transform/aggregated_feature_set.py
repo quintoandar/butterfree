@@ -43,6 +43,8 @@ class AggregatedFeatureSet(FeatureSet):
     ... )
     >>> from butterfree.core.constants.data_type import DataType
     >>> from butterfree.core.clients import SparkClient
+    >>> from butterfree.core.transform.utils.function import Function
+    >>> import pyspark.sql.functions as F
     >>> client = SparkClient()
     >>> client.conn.conf.set("spark.sql.session.timeZone", "UTC")
     >>> dataframe = client.conn.createDataFrame(
@@ -65,9 +67,10 @@ class AggregatedFeatureSet(FeatureSet):
     ...            name="feature1",
     ...            description="test",
     ...            transformation=AggregatedTransform(
-    ...                 functions=["avg", "stddev_pop"],
+    ...                 functions=[
+    ...                    Function(F.avg, DataType.DOUBLE),
+    ...                    Function(F.stddev_pop, DataType.DOUBLE)],
     ...             ),
-    ...             dtype=DataType.DOUBLE,
     ...             from_column="rent",
     ...        ),
     ...    ],
@@ -344,11 +347,9 @@ class AggregatedFeatureSet(FeatureSet):
         return left.join(right, on=on, how=how)
 
     def _aggregate(self, dataframe, features, window=None, num_processors=None):
-        aggregations = list(
-            itertools.chain.from_iterable(
-                [f.transformation.aggregations for f in features]
-            )
-        )
+        aggregations = [
+            c.function for f in features for c in f.transformation.aggregations
+        ]
 
         groupby = self.keys_columns.copy()
         if window is not None:
@@ -409,9 +410,13 @@ class AggregatedFeatureSet(FeatureSet):
             for pv, fc in itertools.product(pivot_values, base_columns)
         ]
 
+        type = [c.data_type for f in features for c in f.transformation.aggregations]
+        if pivot_values != [None]:
+            type = len(pivot_values) * type
+
         select = [
-            f"`{old_name}` as {new_name}"
-            for old_name, new_name in zip(old_columns, new_columns)
+            f"cast(`{old_name}` as {dt.typeName()}) as {new_name}"
+            for old_name, new_name, dt in zip(old_columns, new_columns, type)
         ]
         if self._windows:
             select.append(f"window.end as {self.timestamp_column}")
@@ -440,16 +445,23 @@ class AggregatedFeatureSet(FeatureSet):
                 )
         pivot_values = self._pivot_values or [None]
         windows = self._windows or [None]
+
         for f in self.features:
             combination = itertools.product(
                 pivot_values, self._get_features_columns(f), windows
             )
-            for pv, fc, w in combination:
-                name = self._build_feature_column_name(fc, pivot_value=pv, window=w)
+            name = [
+                self._build_feature_column_name(fc, pivot_value=pv, window=w)
+                for pv, fc, w in combination
+            ]
+            type = (
+                len(pivot_values)
+                * len(windows)
+                * [fc.data_type.spark for fc in f.transformation.functions]
+            )
 
-                schema.append(
-                    {"column_name": name, "type": f.dtype.spark, "primary_key": False}
-                )
+            for n, dt in zip(name, type):
+                schema.append({"column_name": n, "type": dt, "primary_key": False})
 
         return schema
 
