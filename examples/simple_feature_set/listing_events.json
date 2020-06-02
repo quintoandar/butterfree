@@ -1,0 +1,8 @@
+{"id": 1, "rent": 1300, "region_id":  1, "area":  50, "bedrooms": 1, "bathrooms": 1, "timestamp":  1588302000000}
+{"id": 1, "rent": 2000, "region_id":  1, "area":  50, "bedrooms": 1, "bathrooms": 1, "timestamp":  1588647600000}
+{"id": 2, "rent": 1500, "region_id":  2, "area":  100, "bedrooms": 2, "bathrooms": 1, "timestamp":  1588734000000}
+{"id": 2, "rent": 2500, "region_id":  2, "area":  100, "bedrooms": 2, "bathrooms": 1, "timestamp":  1589252400000}
+{"id": 3, "rent": 3000, "region_id":  3, "area":  150, "bedrooms": 2, "bathrooms": 2, "timestamp":  1589943600000}
+{"id": 4, "rent": 3200, "region_id":  4, "area":  175, "bedrooms": 2, "bathrooms": 2, "timestamp":  1589943600000}
+{"id": 5, "rent": 3200, "region_id":  5, "area":  250, "bedrooms": 3, "bathrooms": 3, "timestamp":  1590030000000}
+{"id": 6, "rent": 3200, "region_id":  6, "area":  225, "bedrooms": 2, "bathrooms": 3, "timestamp":  1590116400000}
