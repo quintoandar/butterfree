@@ -415,7 +415,7 @@ class AggregatedFeatureSet(FeatureSet):
             type = len(pivot_values) * type
 
         select = [
-            f"cast(`{old_name}` as {dt.typeName()}) as {new_name}"
+            f"cast(`{old_name}` as {dt.simpleString()}) as {new_name}"
             for old_name, new_name, dt in zip(old_columns, new_columns, type)
         ]
         if self._windows:
