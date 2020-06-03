@@ -27,6 +27,13 @@ Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each 
 ### Fixed
 * Fix cast to ArrayType ([#161](https://github.com/quintoandar/butterfree/pull/161))
 
+## [0.10.1](https://github.com/quintoandar/butterfree/releases/tag/0.10.1)
+### Added
+* [MLOP-253] Create notebook with spark functions transform and windows ([#160](https://github.com/quintoandar/butterfree/pull/160))
+
+### Fixed
+* Fix cast to ArrayType ([#161](https://github.com/quintoandar/butterfree/pull/161))
+
 ## [0.10.0](https://github.com/quintoandar/butterfree/releases/tag/0.10.0)
 ### Added
 * [MLOP-325] Debug Mode on Writers ([#155](https://github.com/quintoandar/butterfree/pull/155))
