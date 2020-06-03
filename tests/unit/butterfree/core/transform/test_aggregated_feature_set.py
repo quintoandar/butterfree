@@ -328,3 +328,57 @@ class TestAggregatedFeatureSet:
 
         # assert
         assert_dataframe_equality(target_df, output_df)
+
+    def test_feature_transform_with_data_type_array(self, spark_context, spark_session):
+        # arrange
+        input_data = [
+            {"id": 1, "timestamp": "2020-04-22T00:00:00+00:00", "feature": 10},
+            {"id": 1, "timestamp": "2020-04-22T00:00:00+00:00", "feature": 20},
+            {"id": 1, "timestamp": "2020-04-22T00:00:00+00:00", "feature": 30},
+            {"id": 2, "timestamp": "2020-04-22T00:00:00+00:00", "feature": 10},
+        ]
+        target_data = [
+            {
+                "id": 1,
+                "timestamp": "2020-04-22T00:00:00+00:00",
+                "feature__collect_set": [30.0, 20.0, 10.0],
+            },
+            {
+                "id": 2,
+                "timestamp": "2020-04-22T00:00:00+00:00",
+                "feature__collect_set": [10.0],
+            },
+        ]
+        input_df = create_df_from_collection(
+            input_data, spark_context, spark_session
+        ).withColumn("timestamp", functions.to_timestamp(functions.col("timestamp")))
+        target_df = create_df_from_collection(
+            target_data, spark_context, spark_session
+        ).withColumn("timestamp", functions.to_timestamp(functions.col("timestamp")))
+
+        fs = AggregatedFeatureSet(
+            name="name",
+            entity="entity",
+            description="description",
+            keys=[KeyFeature(name="id", description="test", dtype=DataType.INTEGER)],
+            timestamp=TimestampFeature(),
+            features=[
+                Feature(
+                    name="feature",
+                    description="aggregations with ",
+                    dtype=DataType.BIGINT,
+                    transformation=AggregatedTransform(
+                        functions=[
+                            Function(functions.collect_set, DataType.ARRAY_FLOAT),
+                        ],
+                    ),
+                    from_column="feature",
+                ),
+            ],
+        )
+
+        # act
+        output_df = fs.construct(input_df, SparkClient())
+
+        # assert
+        assert_dataframe_equality(target_df, output_df)
