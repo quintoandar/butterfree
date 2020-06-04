@@ -239,6 +239,11 @@ You can run unit tests, integration tests and style check in a single batch:
 make tests
 ```
 
+To test all notebook examples under `examples/` folder, you can run:
+```bash
+make test-examples
+```
+
 ### Code Style, PEP8 & Formatting
 
 TL;DR: Just run `make apply-style` before you commit.
