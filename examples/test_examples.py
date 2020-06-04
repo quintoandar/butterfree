@@ -1,6 +1,8 @@
+"""Script to test all notebooks under examples/ folder."""
+
 import os
 from pathlib import Path
-from subprocess import Popen, PIPE
+from subprocess import PIPE, Popen  # noqa S404
 
 if __name__ == "__main__":
     dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -15,7 +17,7 @@ if __name__ == "__main__":
     for path in example_notebook_paths:
         print(f"    >>> Running {path}")
 
-        p = Popen(
+        p = Popen(  # noqa S607, S603
             [
                 "jupyter",
                 "nbconvert",
