@@ -146,6 +146,11 @@ package:
 publish:
 	@bash ./publish.sh ${build}
 
+.PHONY: test-examples
+## run all the notebooks examples for testing
+test-examples:
+	@PYTHONPATH=. python examples/test_examples.py
+
 .DEFAULT_GOAL := help
 
 # Inspired by <http://marmelab.com/blog/2016/02/29/auto-documented-makefile.html>
