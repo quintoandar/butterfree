@@ -39,7 +39,33 @@ class TestFileReader:
         options = dict({"path": path}, **format_options if format_options else {})
 
         # assert
-        spark_client.read.assert_called_once_with(format, options, schema)
+        spark_client.read.assert_called_once_with(format=format, options=options, schema=schema, stream=False)
+        assert target_df.collect() == output_df.collect()
+
+    def test_consume_with_stream_without_schema(self, spark_client, target_df):
+        # arrange
+        path = "path/to/file.json"
+        format = "json"
+        schema = None
+        format_options = None
+        stream = True
+        options = dict({"path": path})
+
+        spark_client.read.return_value = target_df
+        file_reader = FileReader("test", path, format, schema, format_options, stream=stream)
+
+        # act
+        output_df = file_reader.consume(spark_client)
+
+        # assert
+
+        # assert call for schema infer
+        spark_client.read.assert_any_call(format=format,
+                                                  options=options)
+
+        spark_client.read.assert_called_with(format=format,
+                                                  options=options,
+                                                  schema=output_df.schema, stream=stream)
         assert target_df.collect() == output_df.collect()
 
     def test_json_file_with_schema(self):
