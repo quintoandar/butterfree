@@ -100,6 +100,7 @@ clean:
 	@find ./ -type d -name '.pytest_cache' -exec rm -rf {} +;
 	@find ./ -type d -name 'spark-warehouse' -exec rm -rf {} +;
 	@find ./ -type d -name 'metastore_db' -exec rm -rf {} +;
+	@find ./ -type d -name '.ipynb_checkpoints' -exec rm -rf {} +;
 	@find ./ -type f -name 'coverage-badge.svg' -exec rm -f {} \;
 	@find ./ -type f -name 'coverage.xml' -exec rm -f {} \;
 	@find ./ -type f -name '.coverage*' -exec rm -f {} \;
@@ -145,6 +146,11 @@ package:
 ## publishes quintoandar-butterfree package wheel to quintoandar's private package server
 publish:
 	@bash ./publish.sh ${build}
+
+.PHONY: test-examples
+## run all the notebooks examples for testing
+test-examples:
+	@PYTHONPATH=. python examples/test_examples.py
 
 .DEFAULT_GOAL := help
 

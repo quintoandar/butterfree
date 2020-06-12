@@ -208,7 +208,9 @@ class SparkClient(AbstractClient):
             **options,
         )
 
-    def create_temporary_view(self, dataframe: DataFrame, name: str) -> Optional[StreamingQuery]:
+    def create_temporary_view(
+        self, dataframe: DataFrame, name: str
+    ) -> Optional[StreamingQuery]:
         """Create a temporary view from a given dataframe.
 
         Args:
@@ -216,10 +218,8 @@ class SparkClient(AbstractClient):
             name: name of the temporary view.
 
         """
-        return dataframe.createOrReplaceTempView(
-            name
-        ) if not dataframe.isStreaming else dataframe.writeStream.format(
-            "memory"
-        ).queryName(
-            name
-        ).start()
+        return (
+            dataframe.createOrReplaceTempView(name)
+            if not dataframe.isStreaming
+            else dataframe.writeStream.format("memory").queryName(name).start()
+        )

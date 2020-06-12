@@ -110,9 +110,7 @@ class TestOnlineFeatureStoreWriter:
         assert_dataframe_equality(latest_feature_set_dataframe, result_df)
 
     def test_write_in_debug_and_stream_mode(
-        self,
-        feature_set,
-        spark_session,
+        self, feature_set, spark_session,
     ):
         # arrange
         spark_client = SparkClient()
@@ -135,7 +133,9 @@ class TestOnlineFeatureStoreWriter:
 
         # assert
         mocked_stream_df.format.assert_called_with("memory")
-        mocked_stream_df.queryName.assert_called_with(f"online_feature_store__{feature_set.name}")
+        mocked_stream_df.queryName.assert_called_with(
+            f"online_feature_store__{feature_set.name}"
+        )
         assert isinstance(handler, StreamingQuery)
 
     @pytest.mark.parametrize("has_checkpoint", [True, False])
