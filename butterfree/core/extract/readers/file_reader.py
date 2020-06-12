@@ -71,6 +71,7 @@ class FileReader(Reader):
         format: str,
         schema: StructType = None,
         format_options: dict = None,
+        stream: bool = False,
     ):
         super().__init__(id)
         if not isinstance(path, str):
@@ -83,9 +84,13 @@ class FileReader(Reader):
         self.options = dict(
             {"path": self.path}, **format_options if format_options else {}
         )
+        self.stream = stream
 
     def consume(self, client: SparkClient) -> DataFrame:
         """Extract data from files stored in defined path.
+
+        Try to auto-infer schema if in stream mode and not manually defining a
+        schema.
 
         Args:
             client: client responsible for connecting to Spark session.
@@ -94,4 +99,12 @@ class FileReader(Reader):
             Dataframe with all the files data.
 
         """
-        return client.read(self.format, self.options, self.schema)
+        schema = (
+            client.read(format=self.format, options=self.options,).schema
+            if (self.stream and not self.schema)
+            else self.schema
+        )
+
+        return client.read(
+            format=self.format, options=self.options, schema=schema, stream=self.stream,
+        )

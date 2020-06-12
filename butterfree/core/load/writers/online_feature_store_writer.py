@@ -91,6 +91,42 @@ class OnlineFeatureStoreWriter(Writer):
             .drop("rn")
         )
 
+    def _write_stream(
+        self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient
+    ):
+        """Writes the dataframe in streaming mode."""
+        checkpoint_path = (
+            os.path.join(
+                self.db_config.stream_checkpoint_path,
+                feature_set.entity,
+                feature_set.name,
+            )
+            if self.db_config.stream_checkpoint_path
+            else None
+        )
+
+        # TODO: strange behaviour here, returning in the first iteration
+        for table in [feature_set.name, feature_set.entity]:
+            streaming_handler = spark_client.write_stream(
+                dataframe,
+                processing_time=self.db_config.stream_processing_time,
+                output_mode=self.db_config.stream_output_mode,
+                checkpoint_path=checkpoint_path,
+                format_=self.db_config.format_,
+                mode=self.db_config.mode,
+                **self.db_config.get_options(table=table),
+            )
+            return streaming_handler
+
+    @staticmethod
+    def _write_in_debug_mode(
+        feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient
+    ):
+        """Creates a temporary table instead of writing to the real data source."""
+        return spark_client.create_temporary_view(
+            dataframe=dataframe, name=f"online_feature_store__{feature_set.name}"
+        )
+
     def write(
         self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient,
     ) -> Optional[StreamingQuery]:
@@ -106,49 +142,33 @@ class OnlineFeatureStoreWriter(Writer):
 
         If the debug_mode is set to True, a temporary table with a name in the format:
         online_feature_store__{feature_set.name} will be created instead of writing to
-        the real online feature store.
+        the real online feature store. If dataframe is streaming this temporary table
+        will be updated in real time.
 
         """
         if dataframe.isStreaming:
             if self.debug_mode:
-                raise NotImplementedError(
-                    "Writing stream df in debug_mod is not implemented yet."
+                return self._write_in_debug_mode(
+                    feature_set=feature_set,
+                    dataframe=dataframe,
+                    spark_client=spark_client,
                 )
-
-            checkpoint_path = (
-                os.path.join(
-                    self.db_config.stream_checkpoint_path,
-                    feature_set.entity,
-                    feature_set.name,
-                )
-                if self.db_config.stream_checkpoint_path
-                else None
+            return self._write_stream(
+                feature_set=feature_set, dataframe=dataframe, spark_client=spark_client
             )
-            for table in [feature_set.name, feature_set.entity]:
-                streaming_handler = spark_client.write_stream(
-                    dataframe,
-                    processing_time=self.db_config.stream_processing_time,
-                    output_mode=self.db_config.stream_output_mode,
-                    checkpoint_path=checkpoint_path,
-                    format_=self.db_config.format_,
-                    mode=self.db_config.mode,
-                    **self.db_config.get_options(table=table),
-                )
-                return streaming_handler
 
-        dataframe = self.filter_latest(
+        latest_df = self.filter_latest(
             dataframe=dataframe, id_columns=feature_set.keys_columns
         )
 
         if self.debug_mode:
-            spark_client.create_temporary_view(
-                dataframe=dataframe, name=f"online_feature_store__{feature_set.name}"
+            return self._write_in_debug_mode(
+                feature_set=feature_set, dataframe=latest_df, spark_client=spark_client
             )
-            return
 
         for table in [feature_set.name, feature_set.entity]:
             spark_client.write_dataframe(
-                dataframe=dataframe,
+                dataframe=latest_df,
                 format_=self.db_config.format_,
                 mode=self.db_config.mode,
                 **self.db_config.get_options(table=table),
