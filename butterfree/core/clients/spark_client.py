@@ -1,8 +1,9 @@
 """SparkClient entity."""
 
-from typing import List
+from typing import List, Optional
 
 from pyspark.sql import DataFrame, SparkSession
+from pyspark.sql.streaming import StreamingQuery
 from pyspark.sql.types import StructType
 
 from butterfree.core.clients.abstract_client import AbstractClient
@@ -207,7 +208,9 @@ class SparkClient(AbstractClient):
             **options,
         )
 
-    def create_temporary_view(self, dataframe: DataFrame, name: str):
+    def create_temporary_view(
+        self, dataframe: DataFrame, name: str
+    ) -> Optional[StreamingQuery]:
         """Create a temporary view from a given dataframe.
 
         Args:
@@ -215,4 +218,8 @@ class SparkClient(AbstractClient):
             name: name of the temporary view.
 
         """
-        dataframe.createOrReplaceTempView(name)
+        return (
+            dataframe.createOrReplaceTempView(name)
+            if not dataframe.isStreaming
+            else dataframe.writeStream.format("memory").queryName(name).start()
+        )
