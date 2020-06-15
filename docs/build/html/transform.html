@@ -1,0 +1,367 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Feature Sets &mdash; Butterfree 0.10.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Sink" href="load.html" />
+    <link rel="prev" title="Source" href="extract.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Butterfree
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.10.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="home.html">Welcome to the Butterfree Docs!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getstart.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="extract.html">Source</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Feature Sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#aggregated-feature-sets">Aggregated Feature Sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="load.html">Sink</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Butterfree</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Feature Sets</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/transform.md.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="feature-sets">
+<h1>Feature Sets<a class="headerlink" href="#feature-sets" title="Permalink to this headline">¶</a></h1>
+<p>Regarding the transform step, we can define a <code class="docutils literal notranslate"><span class="pre">FeatureSet</span></code> as a set of features in order to apply the suggested transformations to your data.</p>
+<p>It’s possible to use three different kinds of features:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">KeyFeature</span></code>: a <code class="docutils literal notranslate"><span class="pre">FeatureSet</span></code> must contain one or more <code class="docutils literal notranslate"><span class="pre">KeyFeatures</span></code>, which will be used as keys when storing the feature set dataframe as tables. The <code class="docutils literal notranslate"><span class="pre">FeatureSet</span></code> may validate keys are unique for the latest state of a feature set.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">TimestampFeature</span></code>: a <code class="docutils literal notranslate"><span class="pre">FeatureSet</span></code> must contain one <code class="docutils literal notranslate"><span class="pre">TimestampFeature</span></code>, which will be used as a time tag for the state of all features. By containing a timestamp feature, users may time travel over their features. The <code class="docutils literal notranslate"><span class="pre">FeatureSet</span></code> may validate that the set of keys and timestamp are unique for a feature set. By defining a timestamp column, the feature set will always contain a data column called “timestamp” of <code class="docutils literal notranslate"><span class="pre">TimestampType</span></code> (spark dtype).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Feature</span></code>: a <code class="docutils literal notranslate"><span class="pre">Feature</span></code> is the result of a transformation over one (or more) data columns over an input dataframe. Transformations can be as simple as renaming, casting types, mathematical expressions or complex functions/models. It can be instantiated as:</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">feature</span> <span class="o">=</span> <span class="n">Feature</span><span class="p">(</span>
+   <span class="n">name</span><span class="o">=</span><span class="s2">&quot;new_feature&quot;</span><span class="p">,</span>
+   <span class="n">description</span><span class="o">=</span><span class="s2">&quot;simple feature renaming&quot;</span><span class="p">,</span>
+   <span class="n">from_column</span><span class="o">=</span><span class="s2">&quot;feature&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>It’s possible to define the desired transformation to be applied over your input data by defining the <code class="docutils literal notranslate"><span class="pre">transformation</span></code> parameter within the <code class="docutils literal notranslate"><span class="pre">Feature</span></code> instantiation. The following transform components can be used in <code class="docutils literal notranslate"><span class="pre">Butterfree</span></code>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">SparkFunctionTransform</span></code>: this component can used when a <a class="reference external" href="https://spark.apache.org/docs/2.1.0/api/python/pyspark.sql.html#module-pyspark.sql.functions">pyspark sql function</a> needs to be used. It can be instantiated as:</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">feature</span> <span class="o">=</span> <span class="n">Feature</span><span class="p">(</span>
+   <span class="n">name</span><span class="o">=</span><span class="s2">&quot;feature&quot;</span><span class="p">,</span>
+   <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Spark function transform usage example&quot;</span><span class="p">,</span>
+   <span class="n">transformation</span><span class="o">=</span><span class="n">SparkFunctionTransform</span><span class="p">(</span>
+      <span class="n">functions</span><span class="o">=</span><span class="p">[</span><span class="n">Function</span><span class="p">(</span><span class="n">functions</span><span class="o">.</span><span class="n">cos</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">DOUBLE</span><span class="p">)])</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Feel free to check more <a class="reference external" href="https://github.com/quintoandar/butterfree/blob/staging/butterfree/core/transform/transformations/spark_function_transform.py">here</a>.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">SQLExpressionTransform</span></code>: as the name suggests, this component can used when an user wants to define the feature’s transformation using SQL. It can be instantiated as:</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">feature</span> <span class="o">=</span> <span class="n">Feature</span><span class="p">(</span>
+   <span class="n">name</span><span class="o">=</span><span class="s2">&quot;feature&quot;</span><span class="p">,</span>
+   <span class="n">description</span><span class="o">=</span><span class="s2">&quot;SQL expression transform usage example&quot;</span><span class="p">,</span>
+   <span class="n">transformation</span><span class="o">=</span><span class="n">SQLExpressionTransform</span><span class="p">(</span><span class="n">expression</span><span class="o">=</span><span class="s2">&quot;feature1/feature2&quot;</span><span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>You can found more info <a class="reference external" href="https://github.com/quintoandar/butterfree/blob/staging/butterfree/core/transform/transformations/sql_expression_transform.py">here</a>.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">CustomTransform</span></code>: this component can used when an user wants to define a custom transformation by defining a method. For instance:</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">divide</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">parent_feature</span><span class="p">,</span> <span class="n">column1</span><span class="p">,</span> <span class="n">column2</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">parent_feature</span><span class="o">.</span><span class="n">get_output_columns</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">withColumn</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">F</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="n">column1</span><span class="p">)</span> <span class="o">/</span> <span class="n">F</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="n">column2</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">df</span>
+
+<span class="n">feature</span> <span class="o">=</span> <span class="n">Feature</span><span class="p">(</span>
+   <span class="n">name</span><span class="o">=</span><span class="s2">&quot;feature&quot;</span><span class="p">,</span>
+   <span class="n">description</span><span class="o">=</span><span class="s2">&quot;custom transform usage example&quot;</span><span class="p">,</span>
+   <span class="n">transformation</span><span class="o">=</span><span class="n">CustomTransform</span><span class="p">(</span>
+       <span class="n">transformer</span><span class="o">=</span><span class="n">divide</span><span class="p">,</span> <span class="n">column1</span><span class="o">=</span><span class="s2">&quot;feature1&quot;</span><span class="p">,</span> <span class="n">column2</span><span class="o">=</span><span class="s2">&quot;feature2&quot;</span><span class="p">,</span>
+   <span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>You can take a look at the code <a class="reference external" href="https://github.com/quintoandar/butterfree/blob/staging/butterfree/core/transform/transformations/custom_transform.py">here</a>.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">H3HashTransform</span></code>: this component can used when an user wants to convert latitude and longitude values into a hash. You can learn more about H3 <a class="reference external" href="https://eng.uber.com/h3/">here</a>. For instance:</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">feature</span> <span class="o">=</span> <span class="n">Feature</span><span class="p">(</span>
+   <span class="n">name</span><span class="o">=</span><span class="s2">&quot;feature&quot;</span><span class="p">,</span>
+   <span class="n">description</span><span class="o">=</span><span class="s2">&quot;h3 hash transform usage example&quot;</span><span class="p">,</span>
+   <span class="n">transformation</span><span class="o">=</span><span class="n">H3HashTransform</span><span class="p">(</span>
+       <span class="n">h3_resolutions</span><span class="o">=</span><span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">12</span><span class="p">],</span>
+       <span class="n">lat_column</span><span class="o">=</span><span class="s2">&quot;lat&quot;</span><span class="p">,</span>
+       <span class="n">lng_column</span><span class="o">=</span><span class="s2">&quot;lng&quot;</span><span class="p">,</span>
+   <span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>You can read the code <a class="reference external" href="https://github.com/quintoandar/butterfree/blob/staging/butterfree/core/transform/transformations/h3_transform.py">here</a>.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">StackTransform</span></code>: this component can used when an user wants to create a stack column based on some given values. For instance:</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">feature</span> <span class="o">=</span> <span class="n">Feature</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;stack_ids&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;id_a and id_b stacked in a single column.&quot;</span><span class="p">,</span>
+    <span class="n">transformation</span><span class="o">=</span><span class="n">StackTransform</span><span class="p">(</span><span class="s2">&quot;id_a&quot;</span><span class="p">,</span> <span class="s2">&quot;id_b&quot;</span><span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Feel free to check it out <a class="reference external" href="https://github.com/quintoandar/butterfree/blob/staging/butterfree/core/transform/transformations/stack_transform.py">here</a>.</p>
+<p>Finally, an example of a <code class="docutils literal notranslate"><span class="pre">FeatureSet</span></code> is provided:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">feature_set</span> <span class="o">=</span> <span class="n">FeatureSet</span><span class="p">(</span>
+   <span class="n">name</span><span class="o">=</span><span class="s2">&quot;feature_set&quot;</span><span class="p">,</span>
+   <span class="n">entity</span><span class="o">=</span><span class="s2">&quot;entity&quot;</span><span class="p">,</span>
+   <span class="n">description</span><span class="o">=</span><span class="s2">&quot;description&quot;</span><span class="p">,</span>
+   <span class="n">features</span><span class="o">=</span><span class="p">[</span>
+       <span class="n">Feature</span><span class="p">(</span>
+           <span class="n">name</span><span class="o">=</span><span class="s2">&quot;feature1&quot;</span><span class="p">,</span>
+           <span class="n">description</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">,</span>
+           <span class="n">transformation</span><span class="o">=</span><span class="n">SparkFunctionTransform</span><span class="p">(</span>
+                <span class="n">functions</span><span class="o">=</span><span class="p">[</span>
+                           <span class="n">Function</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">avg</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">DOUBLE</span><span class="p">),</span>
+                           <span class="n">Function</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">stddev_pop</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">DOUBLE</span><span class="p">)]</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">with_window</span><span class="p">(</span>
+                <span class="n">partition_by</span><span class="o">=</span><span class="s2">&quot;id&quot;</span><span class="p">,</span>
+                <span class="n">order_by</span><span class="o">=</span><span class="n">TIMESTAMP_COLUMN</span><span class="p">,</span>
+                <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;fixed_windows&quot;</span><span class="p">,</span>
+                <span class="n">window_definition</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;2 minutes&quot;</span><span class="p">,</span> <span class="s2">&quot;15 minutes&quot;</span><span class="p">],</span>
+            <span class="p">),</span>
+       <span class="p">),</span>
+       <span class="n">Feature</span><span class="p">(</span>
+           <span class="n">name</span><span class="o">=</span><span class="s2">&quot;divided_feature&quot;</span><span class="p">,</span>
+           <span class="n">description</span><span class="o">=</span><span class="s2">&quot;unit test&quot;</span><span class="p">,</span>
+           <span class="n">transformation</span><span class="o">=</span><span class="n">CustomTransform</span><span class="p">(</span>
+               <span class="n">transformer</span><span class="o">=</span><span class="n">divide</span><span class="p">,</span> <span class="n">column1</span><span class="o">=</span><span class="s2">&quot;feature1&quot;</span><span class="p">,</span> <span class="n">column2</span><span class="o">=</span><span class="s2">&quot;feature2&quot;</span><span class="p">,</span>
+           <span class="p">),</span>
+       <span class="p">),</span>
+   <span class="p">],</span>
+   <span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="n">KeyFeature</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The user&#39;s Main ID or device ID&quot;</span><span class="p">)],</span>
+   <span class="n">timestamp</span><span class="o">=</span><span class="n">TimestampFeature</span><span class="p">(),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="aggregated-feature-sets">
+<h1>Aggregated Feature Sets<a class="headerlink" href="#aggregated-feature-sets" title="Permalink to this headline">¶</a></h1>
+<p>When an user desires to use aggregated features, an <code class="docutils literal notranslate"><span class="pre">AggregatedFeatureSet</span></code> can be used. Besides <code class="docutils literal notranslate"><span class="pre">KeyFeature</span></code>, <code class="docutils literal notranslate"><span class="pre">TimestampFeature</span></code> and <code class="docutils literal notranslate"><span class="pre">Feature</span></code> classes, we’re going to use a new component regarding the transformations, called <code class="docutils literal notranslate"><span class="pre">AggregatedTransform</span></code>.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">AggregatedTransform</span></code>:  this transformation needs to be used within an <code class="docutils literal notranslate"><span class="pre">AggregatedFeatureSet</span></code>. Unlike the other transformations, this class won’t have a transform method implemented. The idea behind aggregating is that, in spark, we should execute all aggregation functions after in a single groupby. So an <code class="docutils literal notranslate"><span class="pre">AggregateFeatureSet</span></code> will have many features with an associated <code class="docutils literal notranslate"><span class="pre">AggregatedTransform</span></code>. If each one of them needs to apply a <code class="docutils literal notranslate"><span class="pre">groupby.agg()</span></code>, then we must join all the results in the end, making this computation extremely slow. It’s important to say that the <code class="docutils literal notranslate"><span class="pre">AggregatedFeatureSet</span></code> can be used with both time and row windows.</p></li>
+</ul>
+<p>Some examples are provided below:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">feature_set</span> <span class="o">=</span> <span class="n">AggregatedFeatureSet</span><span class="p">(</span>
+   <span class="n">name</span><span class="o">=</span><span class="s2">&quot;aggregated_feature_set&quot;</span><span class="p">,</span>
+   <span class="n">entity</span><span class="o">=</span><span class="s2">&quot;entity&quot;</span><span class="p">,</span>
+   <span class="n">description</span><span class="o">=</span><span class="s2">&quot;description&quot;</span><span class="p">,</span>
+   <span class="n">features</span><span class="o">=</span><span class="p">[</span>
+       <span class="n">Feature</span><span class="p">(</span>
+           <span class="n">name</span><span class="o">=</span><span class="s2">&quot;feature1&quot;</span><span class="p">,</span>
+           <span class="n">description</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">,</span>
+           <span class="n">transformation</span><span class="o">=</span><span class="n">AggregatedTransform</span><span class="p">(</span>
+                <span class="n">functions</span><span class="o">=</span><span class="p">[</span>
+                   <span class="n">Function</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">avg</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">DOUBLE</span><span class="p">),</span>
+                   <span class="n">Function</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">stddev_pop</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">DOUBLE</span><span class="p">)],</span>
+            <span class="p">),</span>
+            <span class="n">from_column</span><span class="o">=</span><span class="s2">&quot;rent&quot;</span><span class="p">,</span>
+       <span class="p">),</span>
+   <span class="p">],</span>
+   <span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="n">KeyFeature</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;some key&quot;</span><span class="p">)],</span>
+   <span class="n">timestamp</span><span class="o">=</span><span class="n">TimestampFeature</span><span class="p">(</span><span class="n">from_column</span><span class="o">=</span><span class="s2">&quot;ts&quot;</span><span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>You could also add a time window, like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">feature_set</span><span class="o">.</span><span class="n">with_windows</span><span class="p">(</span><span class="n">definitions</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;3 days&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Also, you can add a <code class="docutils literal notranslate"><span class="pre">pivot</span></code> operation:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">feature_set</span><span class="o">.</span><span class="n">with_pivot</span><span class="p">(</span>
+    <span class="n">column</span><span class="o">=</span><span class="s2">&quot;status&quot;</span><span class="p">,</span>
+    <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;publicado&quot;</span><span class="p">,</span> <span class="s2">&quot;despublicado&quot;</span><span class="p">,</span> <span class="s2">&quot;alugado&quot;</span><span class="p">]</span>
+<span class="p">)</span><span class="o">.</span><span class="n">with_windows</span><span class="p">(</span><span class="n">definitions</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;1 day&quot;</span><span class="p">,</span> <span class="s2">&quot;2 weeks&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Please refer to <a class="reference external" href="https://github.com/quintoandar/butterfree/blob/staging/butterfree/core/transform/aggregated_feature_set.py">this</a> code in order to understand more. Also, check our <a class="reference external" href="https://github.com/quintoandar/butterfree/tree/staging/examples">examples section</a>.</p>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="load.html" class="btn btn-neutral float-right" title="Sink" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="extract.html" class="btn btn-neutral float-left" title="Source" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, QuintoAndar
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
