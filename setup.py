@@ -1,7 +1,7 @@
 from setuptools import find_packages, setup
 
 __package_name__ = "quintoandar-butterfree"
-__version__ = "0.10.1"
+__version__ = "0.10.2"
 __repository_url__ = "https://github.com/quintoandar/butterfree"
 
 with open("requirements.txt") as f:
