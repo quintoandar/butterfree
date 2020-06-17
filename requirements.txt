@@ -2,5 +2,5 @@ GitPython==3.0.5
 gitdb2==2.0.6
 parameters-validation==1.1.5
 pyspark==2.4.4
-PyYAML==5.3
+PyYAML==4.2b4
 cassandra-driver==3.22.0
