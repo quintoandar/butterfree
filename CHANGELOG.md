@@ -5,6 +5,16 @@ Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each 
 
 ## Unreleased
 
+## [0.10.2](https://github.com/quintoandar/butterfree/releases/tag/0.10.2)
+### Added
+* [MLOP-316] Test Notebook Examples Makefile Command ([#165](https://github.com/quintoandar/butterfree/pull/165))
+* [MLOP-254] Create notebook with aggregated feature set ([#164](https://github.com/quintoandar/butterfree/pull/164))
+* [MLOP-255] Stream Notebook Example ([#167](https://github.com/quintoandar/butterfree/pull/167))
+* [MLOP-325] Enable stream in FileReader and OnlineFeatureStoreWriter in Debug Mode ([#166](https://github.com/quintoandar/butterfree/pull/166))
+
+### Fixed
+* Fix PyYAML version. ([#169](https://github.com/quintoandar/butterfree/pull/169))
+
 ## [0.10.1](https://github.com/quintoandar/butterfree/releases/tag/0.10.1)
 ### Added
 * [MLOP-253] Create notebook with spark functions transform and windows ([#160](https://github.com/quintoandar/butterfree/pull/160))
