@@ -1,0 +1,626 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>butterfree.core.extract.readers package &mdash; Butterfree 0.10.3 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="butterfree.core.load package" href="butterfree.core.load.html" />
+    <link rel="prev" title="butterfree.core.extract.pre_processing package" href="butterfree.core.extract.pre_processing.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Butterfree
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.10.3
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="home.html">Welcome to the Butterfree Docs!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getstart.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="extract.html">Source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transform.html">Feature Sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transform.html#aggregated-feature-sets">Aggregated Feature Sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="load.html">Sink</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stream.html">Streaming Feature Sets in Butterfree</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">API Specification</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="butterfree.html">Butterfree</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="butterfree.html#packages">Packages</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="butterfree.core.html">butterfree.core package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="butterfree.testing.html">butterfree.testing package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="butterfree.html#module-butterfree">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Butterfree</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="modules.html">API Specification</a> &raquo;</li>
+        
+          <li><a href="butterfree.html">Butterfree</a> &raquo;</li>
+        
+          <li><a href="butterfree.core.html">butterfree.core package</a> &raquo;</li>
+        
+          <li><a href="butterfree.core.extract.html">butterfree.core.extract package</a> &raquo;</li>
+        
+      <li>butterfree.core.extract.readers package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/butterfree.core.extract.readers.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="butterfree-core-extract-readers-package">
+<h1>butterfree.core.extract.readers package<a class="headerlink" href="#butterfree-core-extract-readers-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-butterfree.core.extract.readers.file_reader">
+<span id="butterfree-core-extract-readers-file-reader-module"></span><h2>butterfree.core.extract.readers.file_reader module<a class="headerlink" href="#module-butterfree.core.extract.readers.file_reader" title="Permalink to this headline">¶</a></h2>
+<p>FileReader entity.</p>
+<dl class="py class">
+<dt id="butterfree.core.extract.readers.file_reader.FileReader">
+<em class="property">class </em><code class="sig-prename descclassname">butterfree.core.extract.readers.file_reader.</code><code class="sig-name descname">FileReader</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">path</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">format</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">schema</span><span class="p">:</span> <span class="n">pyspark.sql.types.StructType</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">format_options</span><span class="p">:</span> <span class="n">dict</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">stream</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.extract.readers.file_reader.FileReader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#butterfree.core.extract.readers.reader.Reader" title="butterfree.core.extract.readers.reader.Reader"><code class="xref py py-class docutils literal notranslate"><span class="pre">butterfree.core.extract.readers.reader.Reader</span></code></a></p>
+<p>Responsible for get data from files.</p>
+<dl class="py attribute">
+<dt id="butterfree.core.extract.readers.file_reader.FileReader.id">
+<code class="sig-name descname">id</code><a class="headerlink" href="#butterfree.core.extract.readers.file_reader.FileReader.id" title="Permalink to this definition">¶</a></dt>
+<dd><p>unique string id for register the reader as a view on the metastore.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="butterfree.core.extract.readers.file_reader.FileReader.path">
+<code class="sig-name descname">path</code><a class="headerlink" href="#butterfree.core.extract.readers.file_reader.FileReader.path" title="Permalink to this definition">¶</a></dt>
+<dd><p>file location.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="butterfree.core.extract.readers.file_reader.FileReader.format">
+<code class="sig-name descname">format</code><a class="headerlink" href="#butterfree.core.extract.readers.file_reader.FileReader.format" title="Permalink to this definition">¶</a></dt>
+<dd><p>can be one of the keys: json, parquet, orc, or csv.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="butterfree.core.extract.readers.file_reader.FileReader.schema">
+<code class="sig-name descname">schema</code><a class="headerlink" href="#butterfree.core.extract.readers.file_reader.FileReader.schema" title="Permalink to this definition">¶</a></dt>
+<dd><p>an optional pyspark.sql.types.StructType for the input schema.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="butterfree.core.extract.readers.file_reader.FileReader.format_options">
+<code class="sig-name descname">format_options</code><a class="headerlink" href="#butterfree.core.extract.readers.file_reader.FileReader.format_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>additional options required by some formats. Check docs:
+<a class="reference external" href="https://spark.apache.org/docs/latest/sql-data-sources-load-save-functions.html#manually-specifying-options">https://spark.apache.org/docs/latest/sql-data-sources-load-save-functions.html#manually-specifying-options</a></p>
+</dd></dl>
+
+<p class="rubric">Example</p>
+<p>Simple example regarding FileReader class instantiation.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">butterfree.core.extract.readers</span> <span class="kn">import</span> <span class="n">FileReader</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">butterfree.core.clients</span> <span class="kn">import</span> <span class="n">SparkClient</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">butterfree.core.extract.pre_processing</span> <span class="kn">import</span> <span class="nb">filter</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">spark_client</span> <span class="o">=</span> <span class="n">SparkClient</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">file_reader</span> <span class="o">=</span> <span class="n">FileReader</span><span class="p">(</span>
+<span class="gp">... </span>                <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;file_reader_id&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                <span class="n">path</span><span class="o">=</span><span class="s2">&quot;data_path&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;json&quot;</span>
+<span class="gp">... </span>              <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">file_reader</span><span class="o">.</span><span class="n">consume</span><span class="p">(</span><span class="n">spark_client</span><span class="p">)</span>
+</pre></div>
+</div>
+<blockquote>
+<div><p>However, we can define the schema and format_options,
+like header, and provide them to FileReader.</p>
+</div></blockquote>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">spark_client</span> <span class="o">=</span> <span class="n">SparkClient</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">schema_csv</span> <span class="o">=</span> <span class="n">StructType</span><span class="p">([</span>
+<span class="gp">... </span>           <span class="n">StructField</span><span class="p">(</span><span class="s2">&quot;column_a&quot;</span><span class="p">,</span> <span class="n">LongType</span><span class="p">()),</span>
+<span class="gp">... </span>           <span class="n">StructField</span><span class="p">(</span><span class="s2">&quot;column_b&quot;</span><span class="p">,</span> <span class="n">DoubleType</span><span class="p">()),</span>
+<span class="gp">... </span>           <span class="n">StructField</span><span class="p">(</span><span class="s2">&quot;coumn_c&quot;</span><span class="p">,</span> <span class="n">StringType</span><span class="p">())</span>
+<span class="gp">... </span>         <span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">file_reader</span> <span class="o">=</span> <span class="n">FileReader</span><span class="p">(</span>
+<span class="gp">... </span>                <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;file_reader_id&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                <span class="n">path</span><span class="o">=</span><span class="s2">&quot;data_path&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;csv&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                <span class="n">schema</span><span class="o">=</span><span class="n">schema_csv</span><span class="p">,</span>
+<span class="gp">... </span>                <span class="n">format_options</span><span class="o">=</span><span class="p">{</span>
+<span class="gp">... </span>                   <span class="s2">&quot;header&quot;</span><span class="p">:</span> <span class="kc">True</span>
+<span class="gp">... </span>                <span class="p">}</span>
+<span class="gp">... </span>              <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">file_reader</span><span class="o">.</span><span class="n">consume</span><span class="p">(</span><span class="n">spark_client</span><span class="p">)</span>
+</pre></div>
+</div>
+<blockquote>
+<div><p>This last method will use the Spark Client, as default, to read
+the desired file, loading data into a dataframe, according to
+FileReader class arguments.</p>
+<p>It’s also possible to define simple transformations within the
+reader’s scope:</p>
+</div></blockquote>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">file_reader</span><span class="o">.</span><span class="n">with_</span><span class="p">(</span><span class="nb">filter</span><span class="p">,</span> <span class="n">condition</span><span class="o">=</span><span class="s2">&quot;year = 2019&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="n">spark_client</span><span class="p">)</span>
+</pre></div>
+</div>
+<blockquote>
+<div><p>In this case, however, a temp view will be created, cointaining
+the transformed data.</p>
+</div></blockquote>
+<dl class="py method">
+<dt id="butterfree.core.extract.readers.file_reader.FileReader.consume">
+<code class="sig-name descname">consume</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">client</span><span class="p">:</span> <span class="n"><a class="reference internal" href="butterfree.core.clients.html#butterfree.core.clients.spark_client.SparkClient" title="butterfree.core.clients.spark_client.SparkClient">butterfree.core.clients.spark_client.SparkClient</a></span></em><span class="sig-paren">)</span> &#x2192; pyspark.sql.dataframe.DataFrame<a class="headerlink" href="#butterfree.core.extract.readers.file_reader.FileReader.consume" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract data from files stored in defined path.</p>
+<p>Try to auto-infer schema if in stream mode and not manually defining a
+schema.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>client</strong> – client responsible for connecting to Spark session.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Dataframe with all the files data.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-butterfree.core.extract.readers.kafka_reader">
+<span id="butterfree-core-extract-readers-kafka-reader-module"></span><h2>butterfree.core.extract.readers.kafka_reader module<a class="headerlink" href="#module-butterfree.core.extract.readers.kafka_reader" title="Permalink to this headline">¶</a></h2>
+<p>KafkaSource entity.</p>
+<dl class="py class">
+<dt id="butterfree.core.extract.readers.kafka_reader.KafkaReader">
+<em class="property">class </em><code class="sig-prename descclassname">butterfree.core.extract.readers.kafka_reader.</code><code class="sig-name descname">KafkaReader</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">topic</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">value_schema</span><span class="p">:</span> <span class="n">pyspark.sql.types.StructType</span></em>, <em class="sig-param"><span class="n">connection_string</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">topic_options</span><span class="p">:</span> <span class="n">dict</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">stream</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.extract.readers.kafka_reader.KafkaReader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#butterfree.core.extract.readers.reader.Reader" title="butterfree.core.extract.readers.reader.Reader"><code class="xref py py-class docutils literal notranslate"><span class="pre">butterfree.core.extract.readers.reader.Reader</span></code></a></p>
+<p>Responsible for get data from a Kafka topic.</p>
+<dl class="py attribute">
+<dt id="butterfree.core.extract.readers.kafka_reader.KafkaReader.id">
+<code class="sig-name descname">id</code><a class="headerlink" href="#butterfree.core.extract.readers.kafka_reader.KafkaReader.id" title="Permalink to this definition">¶</a></dt>
+<dd><p>unique string id for register the reader as a view on the metastore</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="butterfree.core.extract.readers.kafka_reader.KafkaReader.value_schema">
+<code class="sig-name descname">value_schema</code><a class="headerlink" href="#butterfree.core.extract.readers.kafka_reader.KafkaReader.value_schema" title="Permalink to this definition">¶</a></dt>
+<dd><p>expected schema of the default column named “value” from Kafka.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="butterfree.core.extract.readers.kafka_reader.KafkaReader.topic">
+<code class="sig-name descname">topic</code><a class="headerlink" href="#butterfree.core.extract.readers.kafka_reader.KafkaReader.topic" title="Permalink to this definition">¶</a></dt>
+<dd><p>string with the Kafka topic name to subscribe.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="butterfree.core.extract.readers.kafka_reader.KafkaReader.connection_string">
+<code class="sig-name descname">connection_string</code><a class="headerlink" href="#butterfree.core.extract.readers.kafka_reader.KafkaReader.connection_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>string with hosts and ports to connect.
+The string need to be in the format: host1:port,host2:port,…,hostN:portN.
+The argument is not necessary if is passed as a environment variable
+named KAFKA_CONSUMER_CONNECTION_STRING.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="butterfree.core.extract.readers.kafka_reader.KafkaReader.topic_options">
+<code class="sig-name descname">topic_options</code><a class="headerlink" href="#butterfree.core.extract.readers.kafka_reader.KafkaReader.topic_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>additional options for consuming from topic. See docs:
+<a class="reference external" href="https://spark.apache.org/docs/latest/structured-streaming-kafka-integration.html">https://spark.apache.org/docs/latest/structured-streaming-kafka-integration.html</a>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="butterfree.core.extract.readers.kafka_reader.KafkaReader.stream">
+<code class="sig-name descname">stream</code><a class="headerlink" href="#butterfree.core.extract.readers.kafka_reader.KafkaReader.stream" title="Permalink to this definition">¶</a></dt>
+<dd><p>flag to indicate the reading mode: stream or batch</p>
+</dd></dl>
+
+<dl class="simple">
+<dt>The default df schema coming from Kafka reader of Spark is the following:</dt><dd><p>key:string
+value:string
+topic:string
+partition:integer
+offset:long
+timestamp:timestamp
+timestampType:integer</p>
+</dd>
+</dl>
+<p>But using this reader and passing the desired schema under value_schema we would
+have the following result:</p>
+<p>With value_schema declared as:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">value_schema</span> <span class="o">=</span> <span class="n">StructType</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="p">[</span>
+<span class="gp">... </span>        <span class="n">StructField</span><span class="p">(</span><span class="s2">&quot;ts&quot;</span><span class="p">,</span> <span class="n">LongType</span><span class="p">(),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+<span class="gp">... </span>        <span class="n">StructField</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="n">LongType</span><span class="p">(),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+<span class="gp">... </span>        <span class="n">StructField</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="n">StringType</span><span class="p">(),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+<span class="gp">... </span>    <span class="p">]</span>
+<span class="gp">... </span><span class="p">)</span>
+</pre></div>
+</div>
+<dl>
+<dt>The output df schema would be:</dt><dd><p>ts:long
+id:long
+type:string
+kafka_metadata:struct</p>
+<blockquote>
+<div><p>key:string
+topic:string
+value:string
+partition:integer
+offset:long
+timestamp:timestamp
+timestampType:integer</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Instantiation example:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">butterfree.core.extract.readers</span> <span class="kn">import</span> <span class="n">KafkaReader</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">butterfree.core.clients</span> <span class="kn">import</span> <span class="n">SparkClient</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyspark.sql.types</span> <span class="kn">import</span> <span class="n">StructType</span><span class="p">,</span> <span class="n">StructField</span><span class="p">,</span> <span class="n">StringType</span><span class="p">,</span> <span class="n">LongType</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">spark_client</span> <span class="o">=</span> <span class="n">SparkClient</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">value_schema</span> <span class="o">=</span> <span class="n">StructType</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="p">[</span>
+<span class="gp">... </span>        <span class="n">StructField</span><span class="p">(</span><span class="s2">&quot;ts&quot;</span><span class="p">,</span> <span class="n">LongType</span><span class="p">(),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+<span class="gp">... </span>        <span class="n">StructField</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="n">LongType</span><span class="p">(),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+<span class="gp">... </span>        <span class="n">StructField</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="n">StringType</span><span class="p">(),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+<span class="gp">... </span>    <span class="p">]</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">kafka_reader</span> <span class="o">=</span> <span class="n">KafkaReader</span><span class="p">(</span>
+<span class="gp">... </span>                <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;kafka_reader_id&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                <span class="n">topic</span><span class="o">=</span><span class="s2">&quot;topic&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                <span class="n">value_schema</span><span class="o">=</span><span class="n">value_schema</span>
+<span class="gp">... </span>                <span class="n">connection_string</span><span class="o">=</span><span class="s2">&quot;host1:port,host2:port&quot;</span><span class="p">,</span>
+<span class="gp">... </span>               <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">kafka_reader</span><span class="o">.</span><span class="n">consume</span><span class="p">(</span><span class="n">spark_client</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This last method will use the Spark Client, as default, to read
+the desired topic, loading data into a dataframe, according to
+KafkaReader class arguments.</p>
+<p>In this case, however, a temp view will be created, containing
+the transformed data.</p>
+<dl class="py attribute">
+<dt id="butterfree.core.extract.readers.kafka_reader.KafkaReader.KAFKA_COLUMNS">
+<code class="sig-name descname">KAFKA_COLUMNS</code><em class="property"> = ['key', 'topic', 'value', 'partition', 'offset', 'timestamp', 'timestampType']</em><a class="headerlink" href="#butterfree.core.extract.readers.kafka_reader.KafkaReader.KAFKA_COLUMNS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="butterfree.core.extract.readers.kafka_reader.KafkaReader.consume">
+<code class="sig-name descname">consume</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">client</span><span class="p">:</span> <span class="n"><a class="reference internal" href="butterfree.core.clients.html#butterfree.core.clients.spark_client.SparkClient" title="butterfree.core.clients.spark_client.SparkClient">butterfree.core.clients.spark_client.SparkClient</a></span></em><span class="sig-paren">)</span> &#x2192; pyspark.sql.dataframe.DataFrame<a class="headerlink" href="#butterfree.core.extract.readers.kafka_reader.KafkaReader.consume" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract data from a kafka topic.</p>
+<p>When stream mode it will get all the new data arriving at the topic in a
+streaming dataframe. When not in stream mode it will get all data
+available in the kafka topic.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>client</strong> – client responsible for connecting to Spark session.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Dataframe with data from topic.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-butterfree.core.extract.readers.reader">
+<span id="butterfree-core-extract-readers-reader-module"></span><h2>butterfree.core.extract.readers.reader module<a class="headerlink" href="#module-butterfree.core.extract.readers.reader" title="Permalink to this headline">¶</a></h2>
+<p>Reader entity.</p>
+<dl class="py class">
+<dt id="butterfree.core.extract.readers.reader.Reader">
+<em class="property">class </em><code class="sig-prename descclassname">butterfree.core.extract.readers.reader.</code><code class="sig-name descname">Reader</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.extract.readers.reader.Reader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<p>Abstract base class for Readers.</p>
+<dl class="py attribute">
+<dt id="butterfree.core.extract.readers.reader.Reader.id">
+<code class="sig-name descname">id</code><a class="headerlink" href="#butterfree.core.extract.readers.reader.Reader.id" title="Permalink to this definition">¶</a></dt>
+<dd><p>unique string id for register the reader as a view on the metastore.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="butterfree.core.extract.readers.reader.Reader.transformations">
+<code class="sig-name descname">transformations</code><a class="headerlink" href="#butterfree.core.extract.readers.reader.Reader.transformations" title="Permalink to this definition">¶</a></dt>
+<dd><p>list os methods that will be applied over the dataframe
+after the raw data is extracted.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="butterfree.core.extract.readers.reader.Reader.build">
+<code class="sig-name descname">build</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">client</span><span class="p">:</span> <span class="n"><a class="reference internal" href="butterfree.core.clients.html#butterfree.core.clients.spark_client.SparkClient" title="butterfree.core.clients.spark_client.SparkClient">butterfree.core.clients.spark_client.SparkClient</a></span></em>, <em class="sig-param"><span class="n">columns</span><span class="p">:</span> <span class="n">List<span class="p">[</span>tuple<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.extract.readers.reader.Reader.build" title="Permalink to this definition">¶</a></dt>
+<dd><p>Register the data got from the reader in the Spark metastore.</p>
+<p>Create a temporary view in Spark metastore referencing the data
+extracted from the target origin after the application of all the
+defined pre-processing transformations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>client</strong> – client responsible for connecting to Spark session.</p></li>
+<li><p><strong>columns</strong> – list of tuples for renaming/filtering the dataset.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="butterfree.core.extract.readers.reader.Reader.consume">
+<em class="property">abstract </em><code class="sig-name descname">consume</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">client</span><span class="p">:</span> <span class="n"><a class="reference internal" href="butterfree.core.clients.html#butterfree.core.clients.spark_client.SparkClient" title="butterfree.core.clients.spark_client.SparkClient">butterfree.core.clients.spark_client.SparkClient</a></span></em><span class="sig-paren">)</span> &#x2192; pyspark.sql.dataframe.DataFrame<a class="headerlink" href="#butterfree.core.extract.readers.reader.Reader.consume" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract data from target origin.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>client</strong> – client responsible for connecting to Spark session.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Dataframe with all the data.</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Spark dataframe</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="butterfree.core.extract.readers.reader.Reader.with_">
+<code class="sig-name descname">with_</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">transformer</span><span class="p">:</span> <span class="n">Callable</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.extract.readers.reader.Reader.with_" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define a new transformation for the Reader.</p>
+<p>All the transformations are used when the method consume is called.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>transformer</strong> – method that receives a dataframe and output a
+dataframe.</p></li>
+<li><p><strong>*args</strong> – args for the transformer.</p></li>
+<li><p><strong>**kwargs</strong> – kwargs for the transformer.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Reader object with new transformation</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-butterfree.core.extract.readers.table_reader">
+<span id="butterfree-core-extract-readers-table-reader-module"></span><h2>butterfree.core.extract.readers.table_reader module<a class="headerlink" href="#module-butterfree.core.extract.readers.table_reader" title="Permalink to this headline">¶</a></h2>
+<p>TableSource entity.</p>
+<dl class="py class">
+<dt id="butterfree.core.extract.readers.table_reader.TableReader">
+<em class="property">class </em><code class="sig-prename descclassname">butterfree.core.extract.readers.table_reader.</code><code class="sig-name descname">TableReader</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">table</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">database</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.extract.readers.table_reader.TableReader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#butterfree.core.extract.readers.reader.Reader" title="butterfree.core.extract.readers.reader.Reader"><code class="xref py py-class docutils literal notranslate"><span class="pre">butterfree.core.extract.readers.reader.Reader</span></code></a></p>
+<p>Responsible for get data from tables registered in the metastore.</p>
+<dl class="py attribute">
+<dt id="butterfree.core.extract.readers.table_reader.TableReader.id">
+<code class="sig-name descname">id</code><a class="headerlink" href="#butterfree.core.extract.readers.table_reader.TableReader.id" title="Permalink to this definition">¶</a></dt>
+<dd><p>unique string id for register the reader as a view on the metastore.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="butterfree.core.extract.readers.table_reader.TableReader.database">
+<code class="sig-name descname">database</code><a class="headerlink" href="#butterfree.core.extract.readers.table_reader.TableReader.database" title="Permalink to this definition">¶</a></dt>
+<dd><p>name of the metastore database/schema.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="butterfree.core.extract.readers.table_reader.TableReader.table">
+<code class="sig-name descname">table</code><a class="headerlink" href="#butterfree.core.extract.readers.table_reader.TableReader.table" title="Permalink to this definition">¶</a></dt>
+<dd><p>name of the table.</p>
+</dd></dl>
+
+<p class="rubric">Example</p>
+<p>Simple example regarding TableReader class instantiation.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">butterfree.core.extract.readers</span> <span class="kn">import</span> <span class="n">TableReader</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">butterfree.core.clients</span> <span class="kn">import</span> <span class="n">SparkClient</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">butterfree.core.extract.pre_processing</span> <span class="kn">import</span> <span class="nb">filter</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">spark_client</span> <span class="o">=</span> <span class="n">SparkClient</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">table_reader</span> <span class="o">=</span> <span class="n">TableReader</span><span class="p">(</span>
+<span class="gp">... </span>                    <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;table_reader_id&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                    <span class="n">database</span><span class="o">=</span><span class="s2">&quot;table_reader_db&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                    <span class="n">table</span><span class="o">=</span><span class="s2">&quot;table_reader_table&quot;</span>
+<span class="gp">... </span>               <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">table_reader</span><span class="o">.</span><span class="n">consume</span><span class="p">(</span><span class="n">spark_client</span><span class="p">)</span>
+</pre></div>
+</div>
+<blockquote>
+<div><p>This last method will use the Spark Client, as default, to read
+the desired table, loading data into a dataframe, according to
+TableReader class arguments.</p>
+<p>It’s also possible to define simple transformations within the
+reader’s scope:</p>
+</div></blockquote>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">table_reader</span><span class="o">.</span><span class="n">with_</span><span class="p">(</span><span class="nb">filter</span><span class="p">,</span> <span class="n">condition</span><span class="o">=</span><span class="s2">&quot;year = 2019&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="n">spark_client</span><span class="p">)</span>
+</pre></div>
+</div>
+<blockquote>
+<div><p>In this case, however, a temp view will be created, cointaining
+the transformed data.</p>
+</div></blockquote>
+<dl class="py method">
+<dt id="butterfree.core.extract.readers.table_reader.TableReader.consume">
+<code class="sig-name descname">consume</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">client</span><span class="p">:</span> <span class="n"><a class="reference internal" href="butterfree.core.clients.html#butterfree.core.clients.spark_client.SparkClient" title="butterfree.core.clients.spark_client.SparkClient">butterfree.core.clients.spark_client.SparkClient</a></span></em><span class="sig-paren">)</span> &#x2192; pyspark.sql.dataframe.DataFrame<a class="headerlink" href="#butterfree.core.extract.readers.table_reader.TableReader.consume" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract data from a table in Spark metastore.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>client</strong> – client responsible for connecting to Spark session.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Dataframe with all the data from the table.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="butterfree.core.load.html" class="btn btn-neutral float-right" title="butterfree.core.load package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="butterfree.core.extract.pre_processing.html" class="btn btn-neutral float-left" title="butterfree.core.extract.pre_processing package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, QuintoAndar
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
