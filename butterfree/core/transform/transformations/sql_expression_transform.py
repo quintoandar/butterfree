@@ -23,6 +23,7 @@ class SQLExpressionTransform(TransformComponent):
         a "complete select statement", such as "select col_a * col_b from
         my_table", is not necessary, just the simple operations are
         required, for instance "col_a / col_b" or "col_a * col_b".
+
         >>> from butterfree.core.transform.features import Feature
         >>> from butterfree.core.transform.transformations import SQLExpressionTransform
         >>> from pyspark import SparkContext

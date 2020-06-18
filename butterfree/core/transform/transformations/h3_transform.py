@@ -46,9 +46,10 @@ class H3HashTransform(TransformComponent):
         lat_column: latitude column.
         lng_column: longitude column.
 
-        Example:
+    Example:
         It's necessary to declare the desired h3 resolutions and
         latitude and longitude columns.
+
         >>> from butterfree.core.transform.features import Feature
         >>> from butterfree.core.transform.transformations.h3_transform import (
         ... H3HashTransform

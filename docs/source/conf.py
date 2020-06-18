@@ -15,9 +15,9 @@
 #
 import os
 import sys
-sys.path.insert(0, os.path.abspath('.'))
-sys.path.insert(0, os.path.abspath('../'))
-sys.path.insert(0, os.path.abspath('..'))
+
+# sys.path.insert(0, os.path.abspath('.'))
+sys.path.insert(0, os.path.abspath("../.."))
 # import sphinx_rtd_theme
 
 
@@ -50,10 +50,6 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.coverage",
 ]
-
-napoleon_google_docstring = True
-napoleon_use_param = True
-napoleon_use_ivar = True
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
