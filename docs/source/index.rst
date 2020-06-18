@@ -12,3 +12,5 @@ Navigation
    extract
    transform
    load
+   stream
+   modules

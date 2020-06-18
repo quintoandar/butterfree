@@ -13,9 +13,11 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
+import os
+import sys
+sys.path.insert(0, os.path.abspath('.'))
+sys.path.insert(0, os.path.abspath('../'))
+sys.path.insert(0, os.path.abspath('..'))
 # import sphinx_rtd_theme
 
 
@@ -26,9 +28,9 @@ copyright = "2020, QuintoAndar"
 author = "QuintoAndar"
 
 # The short X.Y version
-version = "0.10.1"
+version = "0.10.3"
 # The full version, including alpha/beta/rc tags
-release = "0.10.1"
+release = "0.10.3"
 
 
 # -- General configuration ---------------------------------------------------
@@ -45,7 +47,13 @@ extensions = [
     "recommonmark",
     "sphinx_rtd_theme",
     "sphinx.ext.githubpages",
+    "sphinx.ext.napoleon",
+    "sphinx.ext.coverage",
 ]
+
+napoleon_google_docstring = True
+napoleon_use_param = True
+napoleon_use_ivar = True
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]

@@ -53,4 +53,4 @@ source = Source(
 )
 ```
 
-It's important to state the we have some pre-processing methods as well, such as filter and pivot. Fell free to check them [here](https://github.com/quintoandar/butterfree/tree/staging/butterfree/core/extract/pre_processing).
+It's important to state that we have some pre-processing methods as well, such as filter and pivot. Feel free to check them [here](https://github.com/quintoandar/butterfree/tree/staging/butterfree/core/extract/pre_processing).

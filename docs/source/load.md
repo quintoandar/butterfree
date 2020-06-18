@@ -34,3 +34,10 @@ writers = [OnlineFeatureStoreWriter(db_config=config)]
 `````
 
 You can see the writers [here](https://github.com/quintoandar/butterfree/tree/staging/butterfree/core/load/writers) and database configuration [here](https://github.com/quintoandar/butterfree/tree/staging/butterfree/core/configs/db).
+
+It's also important to highlight that our writers support a ```debug_mode``` option:
+```python
+writers = [HistoricalFeatureStoreWriter(debug_mode=True), OnlineFeatureStoreWriter(debug_mode=True)]
+sink = Sink(writers=writers)
+```
+When ```debug_mode``` assumes ```True```, then a temporary view will be created, therefore no data will be actually saved to both historical and online feature store. Feel free to check our [examples section](https://github.com/quintoandar/butterfree/tree/staging/examples), in order to learn more about how to use this mode.

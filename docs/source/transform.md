@@ -4,7 +4,7 @@ Regarding the transform step, we can define a ```FeatureSet``` as a set of featu
 
 It's possible to use three different kinds of features:
 
-* ```KeyFeature```: a ```FeatureSet``` must contain one or more ```KeyFeatures```, which will be used as keys when storing the feature set dataframe as tables. The ```FeatureSet``` may validate keys are unique for the latest state of a feature set.
+* ```KeyFeature```: a ```FeatureSet``` must contain one or more ```KeyFeatures```, which will be used as keys when storing the feature set dataframe as tables. The ```FeatureSet``` may validate keys that are unique for the latest state of a feature set.
 
 * ```TimestampFeature```: a ```FeatureSet``` must contain one ```TimestampFeature```, which will be used as a time tag for the state of all features. By containing a timestamp feature, users may time travel over their features. The ```FeatureSet``` may validate that the set of keys and timestamp are unique for a feature set. By defining a timestamp column, the feature set will always contain a data column called "timestamp" of ```TimestampType``` (spark dtype).
 
@@ -20,7 +20,7 @@ feature = Feature(
 
 It's possible to define the desired transformation to be applied over your input data by defining the ```transformation``` parameter within the ```Feature``` instantiation. The following transform components can be used in ```Butterfree```:
 
-* ```SparkFunctionTransform```: this component can used when a [pyspark sql function](https://spark.apache.org/docs/2.1.0/api/python/pyspark.sql.html#module-pyspark.sql.functions) needs to be used. It can be instantiated as:
+* ```SparkFunctionTransform```: this component can bem used when a [pyspark sql function](https://spark.apache.org/docs/2.1.0/api/python/pyspark.sql.html#module-pyspark.sql.functions) needs to be used. It can be instantiated as:
 
 ```python
 feature = Feature(
@@ -33,7 +33,7 @@ feature = Feature(
 
 Feel free to check more [here](https://github.com/quintoandar/butterfree/blob/staging/butterfree/core/transform/transformations/spark_function_transform.py).
 
-* ```SQLExpressionTransform```: as the name suggests, this component can used when an user wants to define the feature's transformation using SQL. It can be instantiated as:
+* ```SQLExpressionTransform```: as the name suggests, this component can be used when a user wants to define the feature's transformation using SQL. It can be instantiated as:
 
 ```python
 feature = Feature(
@@ -43,9 +43,9 @@ feature = Feature(
 )
 ```
 
-You can found more info [here](https://github.com/quintoandar/butterfree/blob/staging/butterfree/core/transform/transformations/sql_expression_transform.py).
+You can find more info [here](https://github.com/quintoandar/butterfree/blob/staging/butterfree/core/transform/transformations/sql_expression_transform.py).
 
-* ```CustomTransform```: this component can used when an user wants to define a custom transformation by defining a method. For instance:
+* ```CustomTransform```: this component can be used when an user wants to define a custom transformation by defining a method. For instance:
 
 ```python
 def divide(df, parent_feature, column1, column2):
@@ -64,7 +64,7 @@ feature = Feature(
 
 You can take a look at the code [here](https://github.com/quintoandar/butterfree/blob/staging/butterfree/core/transform/transformations/custom_transform.py).
 
-* ```H3HashTransform```: this component can used when an user wants to convert latitude and longitude values into a hash. You can learn more about H3 [here](https://eng.uber.com/h3/). For instance:
+* ```H3HashTransform```: this component can be used when an user wants to convert latitude and longitude values into a hash. You can learn more about H3 [here](https://eng.uber.com/h3/). For instance:
 
 ```python
 feature = Feature(
@@ -80,7 +80,7 @@ feature = Feature(
 
 You can read the code [here](https://github.com/quintoandar/butterfree/blob/staging/butterfree/core/transform/transformations/h3_transform.py).
 
-* ```StackTransform```: this component can used when an user wants to create a stack column based on some given values. For instance:
+* ```StackTransform```: this component can be used when an user wants to create a stack column based on some given values. For instance:
 
 ```python
 feature = Feature(
@@ -131,7 +131,7 @@ feature_set = FeatureSet(
 
 When an user desires to use aggregated features, an ```AggregatedFeatureSet``` can be used. Besides ```KeyFeature```, ```TimestampFeature``` and ```Feature``` classes, we're going to use a new component regarding the transformations, called ```AggregatedTransform```.
 
-* ```AggregatedTransform```:  this transformation needs to be used within an ```AggregatedFeatureSet```. Unlike the other transformations, this class won't have a transform method implemented. The idea behind aggregating is that, in spark, we should execute all aggregation functions after in a single groupby. So an ```AggregateFeatureSet``` will have many features with an associated ```AggregatedTransform```. If each one of them needs to apply a ```groupby.agg()```, then we must join all the results in the end, making this computation extremely slow. It's important to say that the ```AggregatedFeatureSet``` can be used with both time and row windows.
+* ```AggregatedTransform```:  this transformation needs to be used within an ```AggregatedFeatureSet```. Unlike the other transformations, this class won't have a transform method implemented. The idea behind aggregating is that, in spark, we should execute all aggregation functions after in a single group by. So an ```AggregateFeatureSet``` will have many features with an associated ```AggregatedTransform```. If each one of them needs to apply a ```groupby.agg()```, then we must join all the results in the end, making this computation extremely slow. It's important to say that the ```AggregatedFeatureSet``` can be used with both time and row windows.
 
 Some examples are provided below:
 
