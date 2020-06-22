@@ -19,7 +19,7 @@ class KafkaReader(Reader):
         value_schema: expected schema of the default column named "value" from Kafka.
         topic: string with the Kafka topic name to subscribe.
         connection_string: string with hosts and ports to connect.
-            The string need to be in the format: host1:port,host2:port,...,hostN:portN
+            The string need to be in the format: host1:port,host2:port,...,hostN:portN.
             The argument is not necessary if is passed as a environment variable
             named KAFKA_CONSUMER_CONNECTION_STRING.
         topic_options: additional options for consuming from topic. See docs:
@@ -39,6 +39,7 @@ class KafkaReader(Reader):
     have the following result:
 
     With value_schema declared as:
+
     >>> value_schema = StructType(
     ...     [
     ...         StructField("ts", LongType(), nullable=True),
@@ -61,6 +62,7 @@ class KafkaReader(Reader):
             timestampType:integer
 
     Instantiation example:
+
     >>> from butterfree.core.extract.readers import KafkaReader
     >>> from butterfree.core.clients import SparkClient
     >>> from pyspark.sql.types import StructType, StructField, StringType, LongType
