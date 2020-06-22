@@ -62,6 +62,7 @@ class StackTransform(TransformComponent):
 
         The StackTransform can be instantiated using a column pattern instead of
         the columns full names. Like this way:
+
         >>> feature = Feature(
         ...     name="stack_ids",
         ...     description="id_a and id_b stacked in a single column.",

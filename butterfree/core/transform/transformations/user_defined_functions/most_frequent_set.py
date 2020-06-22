@@ -14,6 +14,7 @@ def most_frequent_set(column):
         It's necessary to declare the desired aggregation method, (average,
         standard deviation and count are currently supported, as it can be
         seen in __ALLOWED_AGGREGATIONS) and define the most frequent set aggregation.
+
         >>> from pyspark import SparkContext
         >>> from pyspark.sql import session, Window
         >>> from pyspark.sql.functions import PandasUDFType, pandas_udf
@@ -33,9 +34,8 @@ def most_frequent_set(column):
         |  1|                      [1]|
         |  2|                   [2, 1]|
         +---+-------------------------+
-        >>> w = Window \
-        ...     .partitionBy('id') \
-        ...     .rowsBetween(Window.unboundedPreceding, Window.unboundedFollowing)
+        >>> w = Window.partitionBy('id').rowsBetween(
+        ...        Window.unboundedPreceding, Window.unboundedFollowing)
         >>> df.withColumn(
         ...     'most_viewed', most_frequent_set("column").over(w)
         ... ).show()
@@ -48,6 +48,7 @@ def most_frequent_set(column):
         |  2|     1|     [2, 1]|
         |  2|     2|     [2, 1]|
         +---+------+-----------+
+
         This example shows the mode aggregation. It returns a list with the most
         frequent values. It's important to notice, however, that if we want to
         use it in fixed_windows or row_windows mode, we'd need unbounded windows.

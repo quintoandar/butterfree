@@ -21,6 +21,7 @@ class CustomTransform(TransformComponent):
         a custom method that must always receive a dataframe and the
         parent feature as arguments and the custom arguments must be
         passed to the builder through *kwargs.
+
         >>> from butterfree.core.transform.transformations import CustomTransform
         >>> from butterfree.core.transform.features import Feature
         >>> from pyspark import SparkContext
