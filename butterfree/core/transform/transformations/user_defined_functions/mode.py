@@ -9,10 +9,12 @@ def mode(column):
 
     Attributes:
         column: desired data to be aggregated with mode.
+
     Example:
         It's necessary to declare the desired aggregation method, (average,
         standard deviation and count are currently supported, as it can be
         seen in __ALLOWED_AGGREGATIONS) and, finally, define the mode.
+
         >>> from pyspark import SparkContext
         >>> from pyspark.sql import session, Window
         >>> from pyspark.sql.functions import PandasUDFType, pandas_udf
@@ -32,9 +34,8 @@ def mode(column):
         |  1|           1|
         |  2|           2|
         +---+------------+
-        >>> w = Window \
-        ...     .partitionBy('id') \
-        ...     .rowsBetween(Window.unboundedPreceding, Window.unboundedFollowing)
+        >>> w = Window.partitionBy('id').rowsBetween(
+        ...       Window.unboundedPreceding, Window.unboundedFollowing)
         >>> df.withColumn('most_viewed', mode("column").over(w)).show()
         +---+------+-----------+
         | id|column|most_viewed|
@@ -45,6 +46,7 @@ def mode(column):
         |  2|     1|          2|
         |  2|     2|          2|
         +---+------+-----------+
+
         This example shows the mode aggregation. It's important to notice,
         however, that if we want to used in fixed_windows or row_windows mode,
         we'd need unbounded windows. For that reason, mode is meant to be used

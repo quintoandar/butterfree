@@ -19,6 +19,7 @@ class SparkFunctionTransform(TransformComponent):
     Example:
         It's necessary to declare the function method,
         Any spark and user defined functions are supported.
+
         >>> from butterfree.core.transform.transformations import SparkFunctionTransform
         >>> from butterfree.core.constants.columns import TIMESTAMP_COLUMN
         >>> from butterfree.core.transform.features import Feature
@@ -53,6 +54,7 @@ class SparkFunctionTransform(TransformComponent):
         +---+-------------------+-------+--------------------+
 
         We can use this transformation with windows.
+
         >>> feature_row_windows = Feature(
         ...    name="feature",
         ...    description="spark function transform with windows",
