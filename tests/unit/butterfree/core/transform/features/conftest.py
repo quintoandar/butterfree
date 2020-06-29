@@ -36,8 +36,8 @@ def feature_set_dataframe_ms(spark_context, spark_session):
 @fixture
 def feature_set_dataframe_date(spark_context, spark_session):
     data = [
-        {"id": 1, TIMESTAMP_COLUMN: "2020-02-07 00:00:00", "feature": 100},
-        {"id": 2, TIMESTAMP_COLUMN: "2020-02-08 00:00:00", "feature": 200},
+        {"id": 1, TIMESTAMP_COLUMN: "2020-02-07T00:00:00", "feature": 100},
+        {"id": 2, TIMESTAMP_COLUMN: "2020-02-08T00:00:00", "feature": 200},
     ]
     return spark_session.read.json(spark_context.parallelize(data, 1))
 
