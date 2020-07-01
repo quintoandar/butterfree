@@ -18,9 +18,8 @@ def most_frequent_set(column: pd.Series) -> list:
 
         >>> from pyspark import SparkContext
         >>> from pyspark.sql import session, Window
-        >>> from butterfree.core.transform.transformations.user_defined_functions import (
-        ...     most_frequent_set
-        ... )
+        >>> from butterfree.core.transform\
+        ...     .transformations.user_defined_functions import (most_frequent_set)
         >>> sc = SparkContext.getOrCreate()
         >>> spark = session.SparkSession(sc)
         >>> df = spark.createDataFrame(

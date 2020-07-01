@@ -19,9 +19,8 @@ def mode(column: pd.Series) -> str:
         >>> from pyspark import SparkContext
         >>> from pyspark.sql import session, Window
         >>> from pyspark.sql.functions import pandas_udf
-        >>> from butterfree.core.transform.transformations.user_defined_functions import (
-        ...     mode
-        ... )
+        >>> from butterfree.core.transform\
+        ...      .transformations.user_defined_functions import (mode)
         >>> sc = SparkContext.getOrCreate()
         >>> spark = session.SparkSession(sc)
         >>> df = spark.createDataFrame(
