@@ -167,7 +167,7 @@ class TestOnlineFeatureStoreWriter:
 
         # assert
         assert isinstance(stream_handler, StreamingQuery)
-        spark_client.write_stream.assert_called_with(
+        spark_client.write_stream.assert_any_call(
             dataframe,
             processing_time=cassandra_config.stream_processing_time,
             output_mode=cassandra_config.stream_output_mode,
