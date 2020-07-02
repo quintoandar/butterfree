@@ -95,18 +95,19 @@ class OnlineFeatureStoreWriter(Writer):
         self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient
     ):
         """Writes the dataframe in streaming mode."""
-        checkpoint_path = (
-            os.path.join(
-                self.db_config.stream_checkpoint_path,
-                feature_set.entity,
-                feature_set.name,
-            )
-            if self.db_config.stream_checkpoint_path
-            else None
-        )
-
-        # TODO: strange behaviour here, returning in the first iteration
+        # TODO: Refactor this logic using the Sink returning the Query Handler
         for table in [feature_set.name, feature_set.entity]:
+            checkpoint_path = (
+                os.path.join(
+                    self.db_config.stream_checkpoint_path,
+                    feature_set.entity,
+                    f"{feature_set.name}__on_entity"
+                    if table == feature_set.entity
+                    else table,
+                )
+                if self.db_config.stream_checkpoint_path
+                else None
+            )
             streaming_handler = spark_client.write_stream(
                 dataframe,
                 processing_time=self.db_config.stream_processing_time,
@@ -116,7 +117,7 @@ class OnlineFeatureStoreWriter(Writer):
                 mode=self.db_config.mode,
                 **self.db_config.get_options(table=table),
             )
-            return streaming_handler
+        return streaming_handler
 
     @staticmethod
     def _write_in_debug_mode(
@@ -166,6 +167,7 @@ class OnlineFeatureStoreWriter(Writer):
                 feature_set=feature_set, dataframe=latest_df, spark_client=spark_client
             )
 
+        # TODO: Refactor this logic using the Sink
         for table in [feature_set.name, feature_set.entity]:
             spark_client.write_dataframe(
                 dataframe=latest_df,
