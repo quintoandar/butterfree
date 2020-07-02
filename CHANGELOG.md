@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each release or unreleased log for a better organization.
 
 ## Unreleased
+## [0.10.3](https://github.com/quintoandar/butterfree/releases/tag/0.10.3)
+### Fixed
+* [MLOP-370] Bug in streaming feature sets ([#178](https://github.com/quintoandar/butterfree/pull/178))
+* [MLOP-342] Fix docstrings in the modules for documentation ([#173](https://github.com/quintoandar/butterfree/pull/173))
+* Fix PyYAML version ([#172](https://github.com/quintoandar/butterfree/pull/172))
 
 ## [0.10.2](https://github.com/quintoandar/butterfree/releases/tag/0.10.2)
 ### Added
