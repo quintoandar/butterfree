@@ -1,10 +1,11 @@
 """Method to compute most frequent set aggregation."""
-from pyspark.sql.functions import PandasUDFType, pandas_udf
+import pandas as pd
+from pyspark.sql.functions import pandas_udf
 from pyspark.sql.types import ArrayType, StringType
 
 
-@pandas_udf(ArrayType(StringType()), PandasUDFType.GROUPED_AGG)
-def most_frequent_set(column):
+@pandas_udf(ArrayType(StringType()))
+def most_frequent_set(column: pd.Series) -> list:
     """Computes the most frequent set aggregation.
 
     Attributes:
@@ -17,16 +18,13 @@ def most_frequent_set(column):
 
         >>> from pyspark import SparkContext
         >>> from pyspark.sql import session, Window
-        >>> from pyspark.sql.functions import PandasUDFType, pandas_udf
-        >>> from pyspark.sql.types import ArrayType, StringType
+        >>> from butterfree.core.transform\
+        ...     .transformations.user_defined_functions import (most_frequent_set)
         >>> sc = SparkContext.getOrCreate()
         >>> spark = session.SparkSession(sc)
         >>> df = spark.createDataFrame(
         >>>      [(1, 1), (1, 1), (2, 2), (2, 1), (2, 2)],
         >>>      ("id", "column"))
-        >>> @pandas_udf(ArrayType(StringType()), PandasUDFType.GROUPED_AGG)
-        ... def most_frequent_set(column):
-        ...    return column.astype(str).value_counts().index.tolist()
         >>> df.groupby("id").agg(most_frequent_set("column")).show()
         +---+-------------------------+
         | id|most_frequent_set(column)|
@@ -54,5 +52,6 @@ def most_frequent_set(column):
         use it in fixed_windows or row_windows mode, we'd need unbounded windows.
         For that reason, mode is meant to be used just in rolling_windows mode,
         initially. We intend to make it available to others modes soon.
+
     """
     return column.astype(str).value_counts().index.tolist()

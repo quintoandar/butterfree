@@ -1,10 +1,11 @@
 """Method to compute mode aggregation."""
-from pyspark.sql.functions import PandasUDFType, pandas_udf
+import pandas as pd
+from pyspark.sql.functions import pandas_udf
 from pyspark.sql.types import StringType
 
 
-@pandas_udf(StringType(), PandasUDFType.GROUPED_AGG)
-def mode(column):
+@pandas_udf(StringType())
+def mode(column: pd.Series) -> str:
     """Computes a mode aggregation.
 
     Attributes:
@@ -17,16 +18,14 @@ def mode(column):
 
         >>> from pyspark import SparkContext
         >>> from pyspark.sql import session, Window
-        >>> from pyspark.sql.functions import PandasUDFType, pandas_udf
-        >>> from pyspark.sql.types import StringType
+        >>> from pyspark.sql.functions import pandas_udf
+        >>> from butterfree.core.transform\
+        ...      .transformations.user_defined_functions import (mode)
         >>> sc = SparkContext.getOrCreate()
         >>> spark = session.SparkSession(sc)
         >>> df = spark.createDataFrame(
         >>>      [(1, 1), (1, 1), (2, 2), (2, 1), (2, 2)],
         >>>      ("id", "column"))
-        >>> @pandas_udf(StringType(), PandasUDFType.GROUPED_AGG)
-        ... def mode(column):
-        ...    return str(column.mode()[0])
         >>> df.groupby("id").agg(mode("column")).show()
         +---+------------+
         | id|mode(column)|
@@ -52,5 +51,6 @@ def mode(column):
         we'd need unbounded windows. For that reason, mode is meant to be used
         just in rolling_windows mode, initially. We intend to make it available
         to others modes soon.
+
     """
     return str(column.mode()[0])

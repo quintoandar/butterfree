@@ -1,6 +1,5 @@
 cmake==3.13.3
-pyspark-stubs==2.4.0.post7
 h3==3.4.3
-pyarrow==0.14.0
+pyarrow==0.15.1
 pandas==1.0.3
 jupyter==1.0.0
