@@ -1,3 +1,5 @@
+from unittest.mock import ANY, Mock
+
 import pytest
 
 from butterfree.core.clients import SparkClient
@@ -115,3 +117,44 @@ class TestSink:
         # then
         with pytest.raises(ValueError):
             Sink(writers=writer)
+
+    def test_flush_with_multiple_online_writers(
+        self, feature_set, feature_set_dataframe
+    ):
+        # arrange
+        spark_client = SparkClient()
+        spark_client.write_dataframe = Mock()
+
+        feature_set.entity = "my_entity"
+        feature_set.name = "my_feature_set"
+
+        online_feature_store_writer = OnlineFeatureStoreWriter()
+        online_feature_store_writer_on_entity = OnlineFeatureStoreWriter(
+            write_on_entity=True
+        )
+
+        sink = Sink(
+            writers=[online_feature_store_writer, online_feature_store_writer_on_entity]
+        )
+
+        # act
+        sink.flush(
+            dataframe=feature_set_dataframe,
+            feature_set=feature_set,
+            spark_client=spark_client,
+        )
+
+        # assert
+        spark_client.write_dataframe.assert_any_call(
+            dataframe=ANY,
+            format_=ANY,
+            mode=ANY,
+            **online_feature_store_writer.db_config.get_options(table="my_entity"),
+        )
+
+        spark_client.write_dataframe.assert_any_call(
+            dataframe=ANY,
+            format_=ANY,
+            mode=ANY,
+            **online_feature_store_writer.db_config.get_options(table="my_feature_set"),
+        )

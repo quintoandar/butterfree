@@ -59,9 +59,10 @@ class OnlineFeatureStoreWriter(Writer):
         according to OnlineFeatureStoreWriter class arguments.
     """
 
-    def __init__(self, db_config=None, debug_mode: bool = False):
+    def __init__(self, db_config=None, debug_mode: bool = False, write_on_entity=False):
         self.db_config = db_config or CassandraConfig()
         self.debug_mode = debug_mode
+        self.write_on_entity = write_on_entity
 
     @staticmethod
     def filter_latest(dataframe: DataFrame, id_columns: List[Any]):
@@ -92,40 +93,43 @@ class OnlineFeatureStoreWriter(Writer):
         )
 
     def _write_stream(
-        self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient
+        self,
+        feature_set: FeatureSet,
+        dataframe: DataFrame,
+        spark_client: SparkClient,
+        table_name: str,
     ):
         """Writes the dataframe in streaming mode."""
-        # TODO: Refactor this logic using the Sink returning the Query Handler
-        for table in [feature_set.name, feature_set.entity]:
-            checkpoint_path = (
-                os.path.join(
-                    self.db_config.stream_checkpoint_path,
-                    feature_set.entity,
-                    f"{feature_set.name}__on_entity"
-                    if table == feature_set.entity
-                    else table,
-                )
-                if self.db_config.stream_checkpoint_path
-                else None
+        checkpoint_folder = (
+            f"{feature_set.name}__on_entity" if self.write_on_entity else table_name
+        )
+        checkpoint_path = (
+            os.path.join(
+                self.db_config.stream_checkpoint_path,
+                feature_set.entity,
+                checkpoint_folder,
             )
-            streaming_handler = spark_client.write_stream(
-                dataframe,
-                processing_time=self.db_config.stream_processing_time,
-                output_mode=self.db_config.stream_output_mode,
-                checkpoint_path=checkpoint_path,
-                format_=self.db_config.format_,
-                mode=self.db_config.mode,
-                **self.db_config.get_options(table=table),
-            )
+            if self.db_config.stream_checkpoint_path
+            else None
+        )
+        streaming_handler = spark_client.write_stream(
+            dataframe,
+            processing_time=self.db_config.stream_processing_time,
+            output_mode=self.db_config.stream_output_mode,
+            checkpoint_path=checkpoint_path,
+            format_=self.db_config.format_,
+            mode=self.db_config.mode,
+            **self.db_config.get_options(table=table_name),
+        )
         return streaming_handler
 
     @staticmethod
     def _write_in_debug_mode(
-        feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient
+        table_name: str, dataframe: DataFrame, spark_client: SparkClient
     ):
         """Creates a temporary table instead of writing to the real data source."""
         return spark_client.create_temporary_view(
-            dataframe=dataframe, name=f"online_feature_store__{feature_set.name}"
+            dataframe=dataframe, name=f"online_feature_store__{table_name}"
         )
 
     def write(
@@ -142,20 +146,25 @@ class OnlineFeatureStoreWriter(Writer):
             Streaming handler if writing streaming df, None otherwise.
 
         If the debug_mode is set to True, a temporary table with a name in the format:
-        online_feature_store__{feature_set.name} will be created instead of writing to
+        `online_feature_store__my_feature_set` will be created instead of writing to
         the real online feature store. If dataframe is streaming this temporary table
         will be updated in real time.
 
         """
+        table_name = feature_set.entity if self.write_on_entity else feature_set.name
+
         if dataframe.isStreaming:
             if self.debug_mode:
                 return self._write_in_debug_mode(
-                    feature_set=feature_set,
+                    table_name=table_name,
                     dataframe=dataframe,
                     spark_client=spark_client,
                 )
             return self._write_stream(
-                feature_set=feature_set, dataframe=dataframe, spark_client=spark_client
+                feature_set=feature_set,
+                dataframe=dataframe,
+                spark_client=spark_client,
+                table_name=table_name,
             )
 
         latest_df = self.filter_latest(
@@ -164,17 +173,15 @@ class OnlineFeatureStoreWriter(Writer):
 
         if self.debug_mode:
             return self._write_in_debug_mode(
-                feature_set=feature_set, dataframe=latest_df, spark_client=spark_client
+                table_name=table_name, dataframe=latest_df, spark_client=spark_client
             )
 
-        # TODO: Refactor this logic using the Sink
-        for table in [feature_set.name, feature_set.entity]:
-            spark_client.write_dataframe(
-                dataframe=latest_df,
-                format_=self.db_config.format_,
-                mode=self.db_config.mode,
-                **self.db_config.get_options(table=table),
-            )
+        spark_client.write_dataframe(
+            dataframe=latest_df,
+            format_=self.db_config.format_,
+            mode=self.db_config.mode,
+            **self.db_config.get_options(table=table_name),
+        )
 
     def validate(self, feature_set: FeatureSet, dataframe, spark_client: SparkClient):
         """Calculate dataframe rows to validate data into Feature Store.
