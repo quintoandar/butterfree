@@ -147,6 +147,15 @@ package:
 publish:
 	@bash ./publish.sh ${build}
 
+.PHONY: update-docs
+## update Butterfree Docs for GitHubPages
+update-docs:
+	cd ./docs; rm -rf source/butterfree.*
+	cd ./docs; sphinx-apidoc -e -o source/ ../butterfree
+	cd ./docs; make clean
+	cd ./docs; make coverage
+	cd ./docs; make html
+
 .PHONY: test-examples
 ## run all the notebooks examples for testing
 test-examples:
