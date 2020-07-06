@@ -274,18 +274,20 @@ make checks
 
 ### API Documentation
 
-TL;DR: If you created a new class, changed a method or 
-just added new information in the docstrings, 
-you will need to update the API documentation 
-and it's super simple, just run `make update-docs` before you commit.
+If you created a new class, changed a method or
+just added new information in the documents and 
+these changes have already been to the master branch,
+you will need to update the API documentation
+and it's super simple, in the **documentation** branch 
+just bring the modifications from the master branch and run `make update-docs`.
 
 ```bash
 make update-docs
 ```
 
 No need to worry about modifying the `html files`, 
-everything is generated from [Sphinx](https://www.sphinx-doc.org/en/master/index.html) and hosted by [GithubPages](https://pages.github.com/).
-But your documentation changes will only be applied after a release to branch master.
+everything is generated from [Sphinx](https://www.sphinx-doc.org/en/master/index.html) and hosted by [ReadtheDocs](https://readthedocs.org/).
+But your documentation changes will only be applied after a merge to documentation branch.
 
 
 ## Git Flow
