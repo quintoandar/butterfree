@@ -21,6 +21,11 @@ class OnlineFeatureStoreWriter(Writer):
         db_config: Spark configuration for connect databases.
             For more information check the module 'butterfree.core.db.configs'.
         debug_mode: "dry run" mode, write the result to a temporary view.
+        write_to_entity: option to write the data to the entity table.
+            With this option set to True, the writer will write the feature set to
+            a table with the name equal to the entity name, defined on the feature set.
+            So, it won't write to a table with the name of the feature set, as it
+            normally does.
 
     Example:
         Simple example regarding OnlineFeatureStoreWriter class instantiation.
@@ -65,7 +70,7 @@ class OnlineFeatureStoreWriter(Writer):
         self.write_on_entity = write_on_entity
 
     @staticmethod
-    def filter_latest(dataframe: DataFrame, id_columns: List[Any]):
+    def filter_latest(dataframe: DataFrame, id_columns: List[Any]) -> DataFrame:
         """Filters latest data from the dataframe.
 
         Args:
@@ -98,7 +103,7 @@ class OnlineFeatureStoreWriter(Writer):
         dataframe: DataFrame,
         spark_client: SparkClient,
         table_name: str,
-    ):
+    ) -> StreamingQuery:
         """Writes the dataframe in streaming mode."""
         checkpoint_folder = (
             f"{feature_set.name}__on_entity" if self.write_on_entity else table_name
@@ -126,8 +131,8 @@ class OnlineFeatureStoreWriter(Writer):
     @staticmethod
     def _write_in_debug_mode(
         table_name: str, dataframe: DataFrame, spark_client: SparkClient
-    ):
-        """Creates a temporary table instead of writing to the real data source."""
+    ) -> Optional[StreamingQuery]:
+        """Creates a temporary table instead of writing to the real feature store."""
         return spark_client.create_temporary_view(
             dataframe=dataframe, name=f"online_feature_store__{table_name}"
         )
@@ -176,7 +181,7 @@ class OnlineFeatureStoreWriter(Writer):
                 table_name=table_name, dataframe=latest_df, spark_client=spark_client
             )
 
-        spark_client.write_dataframe(
+        return spark_client.write_dataframe(
             dataframe=latest_df,
             format_=self.db_config.format_,
             mode=self.db_config.mode,
