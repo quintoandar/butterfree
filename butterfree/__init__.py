@@ -18,7 +18,8 @@ from butterfree.core.load.writers import (
     OnlineFeatureStoreWriter,
 )
 from butterfree.core.pipelines.feature_set_pipeline import FeatureSetPipeline
-from butterfree.core.transform import AggregatedFeatureSet, FeatureSet
+from butterfree.core.transform import FeatureSet
+from butterfree.core.transform.aggregated_feature_set import AggregatedFeatureSet
 from butterfree.core.transform.features import Feature, KeyFeature, TimestampFeature
 from butterfree.core.transform.transformations import (
     AggregatedTransform,
@@ -39,3 +40,47 @@ from butterfree.testing.dataframe import (
     assert_dataframe_equality,
     create_df_from_collection,
 )
+
+__all__ = [
+    "AbstractClient",
+    "CassandraClient",
+    "SparkClient",
+    "AbstractWriteConfig",
+    "CassandraConfig",
+    "S3Config",
+    "DataType",
+    "repartition_df",
+    "repartition_sort_df",
+    "Source",
+    "explode_json_column",
+    "filter",
+    "forward_fill",
+    "pivot",
+    "replace",
+    "FileReader",
+    "KafkaReader",
+    "TableReader",
+    "Sink",
+    "HistoricalFeatureStoreWriter",
+    "OnlineFeatureStoreWriter",
+    "FeatureSetPipeline",
+    "AggregatedFeatureSet",
+    "FeatureSet",
+    "Feature",
+    "KeyFeature",
+    "TimestampFeature",
+    "AggregatedTransform",
+    "CustomTransform",
+    "H3HashTransform",
+    "SparkFunctionTransform",
+    "SQLExpressionTransform",
+    "StackTransform",
+    "mode",
+    "most_frequent_set",
+    "Function",
+    "Window",
+    "ValidateDataframe",
+    "assert_column_equality",
+    "assert_dataframe_equality",
+    "create_df_from_collection",
+]
