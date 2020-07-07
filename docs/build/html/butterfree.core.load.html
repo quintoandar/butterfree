@@ -1,0 +1,309 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>butterfree.core.load package &mdash; Butterfree 0.10.3 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="butterfree.core.load.writers package" href="butterfree.core.load.writers.html" />
+    <link rel="prev" title="butterfree.core.extract.source module" href="butterfree.core.extract.source.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Butterfree
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.10.3
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="home.html">Welcome to the Butterfree Docs!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getstart.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="extract.html">Source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transform.html">Feature Sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transform.html#aggregated-feature-sets">Aggregated Feature Sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="load.html">Sink</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stream.html">Streaming Feature Sets in Butterfree</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">API Specification</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="butterfree.html">butterfree package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="butterfree.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="butterfree.core.html">butterfree.core package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="butterfree.testing.html">butterfree.testing package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="butterfree.html#module-butterfree">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Butterfree</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="modules.html">API Specification</a> &raquo;</li>
+        
+          <li><a href="butterfree.html">butterfree package</a> &raquo;</li>
+        
+          <li><a href="butterfree.core.html">butterfree.core package</a> &raquo;</li>
+        
+      <li>butterfree.core.load package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/butterfree.core.load.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="butterfree-core-load-package">
+<h1>butterfree.core.load package<a class="headerlink" href="#butterfree-core-load-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="butterfree.core.load.writers.html">butterfree.core.load.writers package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="butterfree.core.load.writers.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="butterfree.core.load.writers.historical_feature_store_writer.html">butterfree.core.load.writers.historical_feature_store_writer module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="butterfree.core.load.writers.online_feature_store_writer.html">butterfree.core.load.writers.online_feature_store_writer module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="butterfree.core.load.writers.writer.html">butterfree.core.load.writers.writer module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="butterfree.core.load.writers.html#module-butterfree.core.load.writers">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="butterfree.core.load.sink.html">butterfree.core.load.sink module</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="module-butterfree.core.load">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-butterfree.core.load" title="Permalink to this headline">¶</a></h2>
+<p>Holds the Sink component of a feature set pipeline.</p>
+<dl class="py class">
+<dt id="butterfree.core.load.Sink">
+<em class="property">class </em><code class="sig-prename descclassname">butterfree.core.load.</code><code class="sig-name descname">Sink</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">writers</span><span class="p">:</span> <span class="n">List<span class="p">[</span><a class="reference internal" href="butterfree.core.load.writers.writer.html#butterfree.core.load.writers.writer.Writer" title="butterfree.core.load.writers.writer.Writer">butterfree.core.load.writers.writer.Writer</a><span class="p">]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.load.Sink" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Define the destinations for the feature set pipeline.</p>
+<p>A Sink is created from a set of writers. The main goal of the Sink is to
+trigger the load in each defined writers. After the load the entity can be
+used to make sure that all data was written properly using the validate
+method.</p>
+<dl class="py attribute">
+<dt id="butterfree.core.load.Sink.writers">
+<code class="sig-name descname">writers</code><a class="headerlink" href="#butterfree.core.load.Sink.writers" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of writers to run.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="butterfree.core.load.Sink.flush">
+<code class="sig-name descname">flush</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">feature_set</span><span class="p">:</span> <span class="n"><a class="reference internal" href="butterfree.core.transform.feature_set.html#butterfree.core.transform.feature_set.FeatureSet" title="butterfree.core.transform.feature_set.FeatureSet">butterfree.core.transform.feature_set.FeatureSet</a></span></em>, <em class="sig-param"><span class="n">dataframe</span><span class="p">:</span> <span class="n">pyspark.sql.dataframe.DataFrame</span></em>, <em class="sig-param"><span class="n">spark_client</span><span class="p">:</span> <span class="n"><a class="reference internal" href="butterfree.core.clients.spark_client.html#butterfree.core.clients.spark_client.SparkClient" title="butterfree.core.clients.spark_client.SparkClient">butterfree.core.clients.spark_client.SparkClient</a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.load.Sink.flush" title="Permalink to this definition">¶</a></dt>
+<dd><p>Trigger a write job in all the defined Writers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataframe</strong> – spark dataframe containing data from a feature set.</p></li>
+<li><p><strong>feature_set</strong> – object processed with feature set metadata.</p></li>
+<li><p><strong>spark_client</strong> – client used to run a query.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="butterfree.core.load.Sink.validate">
+<code class="sig-name descname">validate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">feature_set</span><span class="p">:</span> <span class="n"><a class="reference internal" href="butterfree.core.transform.feature_set.html#butterfree.core.transform.feature_set.FeatureSet" title="butterfree.core.transform.feature_set.FeatureSet">butterfree.core.transform.feature_set.FeatureSet</a></span></em>, <em class="sig-param"><span class="n">dataframe</span><span class="p">:</span> <span class="n">pyspark.sql.dataframe.DataFrame</span></em>, <em class="sig-param"><span class="n">spark_client</span><span class="p">:</span> <span class="n"><a class="reference internal" href="butterfree.core.clients.spark_client.html#butterfree.core.clients.spark_client.SparkClient" title="butterfree.core.clients.spark_client.SparkClient">butterfree.core.clients.spark_client.SparkClient</a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.load.Sink.validate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Trigger a validation job in all the defined Writers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataframe</strong> – spark dataframe containing data from a feature set.</p></li>
+<li><p><strong>feature_set</strong> – object processed with feature set metadata.</p></li>
+<li><p><strong>spark_client</strong> – client used to run a query.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>RuntimeError</strong> – if any on the Writers returns a failed validation.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="butterfree.core.load.writers.html" class="btn btn-neutral float-right" title="butterfree.core.load.writers package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="butterfree.core.extract.source.html" class="btn btn-neutral float-left" title="butterfree.core.extract.source module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, QuintoAndar
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

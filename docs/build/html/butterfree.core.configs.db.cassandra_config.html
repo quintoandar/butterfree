@@ -1,0 +1,387 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>butterfree.core.configs.db.cassandra_config module &mdash; Butterfree 0.10.3 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="butterfree.core.configs.db.s3_config module" href="butterfree.core.configs.db.s3_config.html" />
+    <link rel="prev" title="butterfree.core.configs.db.abstract_config module" href="butterfree.core.configs.db.abstract_config.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Butterfree
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.10.3
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="home.html">Welcome to the Butterfree Docs!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getstart.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="extract.html">Source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transform.html">Feature Sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transform.html#aggregated-feature-sets">Aggregated Feature Sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="load.html">Sink</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stream.html">Streaming Feature Sets in Butterfree</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">API Specification</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="butterfree.html">butterfree package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="butterfree.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="butterfree.core.html">butterfree.core package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="butterfree.testing.html">butterfree.testing package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="butterfree.html#module-butterfree">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Butterfree</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="modules.html">API Specification</a> &raquo;</li>
+        
+          <li><a href="butterfree.html">butterfree package</a> &raquo;</li>
+        
+          <li><a href="butterfree.core.html">butterfree.core package</a> &raquo;</li>
+        
+          <li><a href="butterfree.core.configs.html">butterfree.core.configs package</a> &raquo;</li>
+        
+          <li><a href="butterfree.core.configs.db.html">butterfree.core.configs.db package</a> &raquo;</li>
+        
+      <li>butterfree.core.configs.db.cassandra_config module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/butterfree.core.configs.db.cassandra_config.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-butterfree.core.configs.db.cassandra_config">
+<span id="butterfree-core-configs-db-cassandra-config-module"></span><h1>butterfree.core.configs.db.cassandra_config module<a class="headerlink" href="#module-butterfree.core.configs.db.cassandra_config" title="Permalink to this headline">¶</a></h1>
+<p>Holds configurations to read and write with Spark to Cassandra DB.</p>
+<dl class="py class">
+<dt id="butterfree.core.configs.db.cassandra_config.CassandraConfig">
+<em class="property">class </em><code class="sig-prename descclassname">butterfree.core.configs.db.cassandra_config.</code><code class="sig-name descname">CassandraConfig</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mode</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">format_</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">keyspace</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">stream_processing_time</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">stream_output_mode</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">stream_checkpoint_path</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.configs.db.cassandra_config.CassandraConfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="butterfree.core.configs.db.abstract_config.html#butterfree.core.configs.db.abstract_config.AbstractWriteConfig" title="butterfree.core.configs.db.abstract_config.AbstractWriteConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">butterfree.core.configs.db.abstract_config.AbstractWriteConfig</span></code></a></p>
+<p>Configuration for Spark to connect on Cassandra DB.</p>
+<p>References can be found
+[here](<a class="reference external" href="https://docs.databricks.com/data/data-sources/cassandra.html">https://docs.databricks.com/data/data-sources/cassandra.html</a>).</p>
+<dl class="py attribute">
+<dt id="butterfree.core.configs.db.cassandra_config.CassandraConfig.mode">
+<code class="sig-name descname">mode</code><a class="headerlink" href="#butterfree.core.configs.db.cassandra_config.CassandraConfig.mode" title="Permalink to this definition">¶</a></dt>
+<dd><p>write mode for Spark.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="butterfree.core.configs.db.cassandra_config.CassandraConfig.format_">
+<code class="sig-name descname">format_</code><a class="headerlink" href="#butterfree.core.configs.db.cassandra_config.CassandraConfig.format_" title="Permalink to this definition">¶</a></dt>
+<dd><p>write format for Spark.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="butterfree.core.configs.db.cassandra_config.CassandraConfig.keyspace">
+<code class="sig-name descname">keyspace</code><a class="headerlink" href="#butterfree.core.configs.db.cassandra_config.CassandraConfig.keyspace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cassandra DB keyspace to write data.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="butterfree.core.configs.db.cassandra_config.CassandraConfig.username">
+<code class="sig-name descname">username</code><a class="headerlink" href="#butterfree.core.configs.db.cassandra_config.CassandraConfig.username" title="Permalink to this definition">¶</a></dt>
+<dd><p>username to use in connection.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="butterfree.core.configs.db.cassandra_config.CassandraConfig.password">
+<code class="sig-name descname">password</code><a class="headerlink" href="#butterfree.core.configs.db.cassandra_config.CassandraConfig.password" title="Permalink to this definition">¶</a></dt>
+<dd><p>password to use in connection.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="butterfree.core.configs.db.cassandra_config.CassandraConfig.host">
+<code class="sig-name descname">host</code><a class="headerlink" href="#butterfree.core.configs.db.cassandra_config.CassandraConfig.host" title="Permalink to this definition">¶</a></dt>
+<dd><p>host to use in connection.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="butterfree.core.configs.db.cassandra_config.CassandraConfig.stream_processing_time">
+<code class="sig-name descname">stream_processing_time</code><a class="headerlink" href="#butterfree.core.configs.db.cassandra_config.CassandraConfig.stream_processing_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>processing time interval for streaming jobs.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="butterfree.core.configs.db.cassandra_config.CassandraConfig.stream_output_mode">
+<code class="sig-name descname">stream_output_mode</code><a class="headerlink" href="#butterfree.core.configs.db.cassandra_config.CassandraConfig.stream_output_mode" title="Permalink to this definition">¶</a></dt>
+<dd><p>specify the mode from writing streaming data.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="butterfree.core.configs.db.cassandra_config.CassandraConfig.stream_checkpoint_path">
+<code class="sig-name descname">stream_checkpoint_path</code><a class="headerlink" href="#butterfree.core.configs.db.cassandra_config.CassandraConfig.stream_checkpoint_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>path on S3 to save checkpoints for the stream job.</p>
+</dd></dl>
+
+<p>More information about processing_time, output_mode and checkpoint_path
+can be found in Spark documentation:
+[here](<a class="reference external" href="https://spark.apache.org/docs/latest/structured-streaming-programming-guide.html">https://spark.apache.org/docs/latest/structured-streaming-programming-guide.html</a>)</p>
+<dl class="py method">
+<dt id="id0">
+<em class="property">property </em><code class="sig-name descname">format_</code><a class="headerlink" href="#id0" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write format for Spark.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="butterfree.core.configs.db.cassandra_config.CassandraConfig.get_options">
+<code class="sig-name descname">get_options</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">table</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; dict<a class="headerlink" href="#butterfree.core.configs.db.cassandra_config.CassandraConfig.get_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get options for connect to Cassandra DB.</p>
+<p>Options will be a dictionary with the write and read configuration for
+spark to cassandra.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>table</strong> – table name (keyspace) into Cassandra DB.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Configuration to connect to Cassandra DB.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="id1">
+<em class="property">property </em><code class="sig-name descname">host</code><a class="headerlink" href="#id1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Host used in connection to Cassandra DB.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="id2">
+<em class="property">property </em><code class="sig-name descname">keyspace</code><a class="headerlink" href="#id2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cassandra DB keyspace to write data.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="id3">
+<em class="property">property </em><code class="sig-name descname">mode</code><a class="headerlink" href="#id3" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write mode for Spark.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="id4">
+<em class="property">property </em><code class="sig-name descname">password</code><a class="headerlink" href="#id4" title="Permalink to this definition">¶</a></dt>
+<dd><p>Password used in connection to Cassandra DB.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="id5">
+<em class="property">property </em><code class="sig-name descname">stream_checkpoint_path</code><a class="headerlink" href="#id5" title="Permalink to this definition">¶</a></dt>
+<dd><p>Path on S3 to save checkpoints for the stream job.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="id6">
+<em class="property">property </em><code class="sig-name descname">stream_output_mode</code><a class="headerlink" href="#id6" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specify the mode from writing streaming data.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="id7">
+<em class="property">property </em><code class="sig-name descname">stream_processing_time</code><a class="headerlink" href="#id7" title="Permalink to this definition">¶</a></dt>
+<dd><p>Processing time interval for streaming jobs.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="butterfree.core.configs.db.cassandra_config.CassandraConfig.translate">
+<code class="sig-name descname">translate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">schema</span></em><span class="sig-paren">)</span> &#x2192; List<span class="p">[</span>Dict<span class="p">]</span><a class="headerlink" href="#butterfree.core.configs.db.cassandra_config.CassandraConfig.translate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get feature set schema to be translated.</p>
+<p>The output will be a list of dictionaries regarding cassandra
+database schema.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>schema</strong> – feature set schema in spark.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Cassandra schema.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="id8">
+<em class="property">property </em><code class="sig-name descname">username</code><a class="headerlink" href="#id8" title="Permalink to this definition">¶</a></dt>
+<dd><p>Username used in connection to Cassandra DB.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="butterfree.core.configs.db.s3_config.html" class="btn btn-neutral float-right" title="butterfree.core.configs.db.s3_config module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="butterfree.core.configs.db.abstract_config.html" class="btn btn-neutral float-left" title="butterfree.core.configs.db.abstract_config module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, QuintoAndar
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

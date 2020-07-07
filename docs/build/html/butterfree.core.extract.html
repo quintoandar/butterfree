@@ -1,0 +1,341 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>butterfree.core.extract package &mdash; Butterfree 0.10.3 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="butterfree.core.extract.pre_processing package" href="butterfree.core.extract.pre_processing.html" />
+    <link rel="prev" title="butterfree.core.dataframe_service.repartition module" href="butterfree.core.dataframe_service.repartition.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Butterfree
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.10.3
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="home.html">Welcome to the Butterfree Docs!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getstart.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="extract.html">Source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transform.html">Feature Sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transform.html#aggregated-feature-sets">Aggregated Feature Sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="load.html">Sink</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stream.html">Streaming Feature Sets in Butterfree</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">API Specification</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="butterfree.html">butterfree package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="butterfree.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="butterfree.core.html">butterfree.core package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="butterfree.testing.html">butterfree.testing package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="butterfree.html#module-butterfree">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Butterfree</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="modules.html">API Specification</a> &raquo;</li>
+        
+          <li><a href="butterfree.html">butterfree package</a> &raquo;</li>
+        
+          <li><a href="butterfree.core.html">butterfree.core package</a> &raquo;</li>
+        
+      <li>butterfree.core.extract package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/butterfree.core.extract.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="butterfree-core-extract-package">
+<h1>butterfree.core.extract package<a class="headerlink" href="#butterfree-core-extract-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="butterfree.core.extract.pre_processing.html">butterfree.core.extract.pre_processing package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="butterfree.core.extract.pre_processing.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="butterfree.core.extract.pre_processing.explode_json_column_transform.html">butterfree.core.extract.pre_processing.explode_json_column_transform module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="butterfree.core.extract.pre_processing.filter_transform.html">butterfree.core.extract.pre_processing.filter_transform module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="butterfree.core.extract.pre_processing.forward_fill_transform.html">butterfree.core.extract.pre_processing.forward_fill_transform module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="butterfree.core.extract.pre_processing.pivot_transform.html">butterfree.core.extract.pre_processing.pivot_transform module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="butterfree.core.extract.pre_processing.replace_transform.html">butterfree.core.extract.pre_processing.replace_transform module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="butterfree.core.extract.pre_processing.html#module-butterfree.core.extract.pre_processing">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="butterfree.core.extract.readers.html">butterfree.core.extract.readers package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="butterfree.core.extract.readers.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="butterfree.core.extract.readers.file_reader.html">butterfree.core.extract.readers.file_reader module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="butterfree.core.extract.readers.kafka_reader.html">butterfree.core.extract.readers.kafka_reader module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="butterfree.core.extract.readers.reader.html">butterfree.core.extract.readers.reader module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="butterfree.core.extract.readers.table_reader.html">butterfree.core.extract.readers.table_reader module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="butterfree.core.extract.readers.html#module-butterfree.core.extract.readers">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="butterfree.core.extract.source.html">butterfree.core.extract.source module</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="module-butterfree.core.extract">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-butterfree.core.extract" title="Permalink to this headline">¶</a></h2>
+<p>The Source Component of a Feature Set.</p>
+<dl class="py class">
+<dt id="butterfree.core.extract.Source">
+<em class="property">class </em><code class="sig-prename descclassname">butterfree.core.extract.</code><code class="sig-name descname">Source</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">readers</span><span class="p">:</span> <span class="n">List<span class="p">[</span><a class="reference internal" href="butterfree.core.extract.readers.reader.html#butterfree.core.extract.readers.reader.Reader" title="butterfree.core.extract.readers.reader.Reader">butterfree.core.extract.readers.reader.Reader</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">query</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.extract.Source" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The definition of the the entry point data for the ETL pipeline.</p>
+<p>A FeatureSet (the next step in the pipeline) expects a single dataframe as
+input. This dataframe is built from a data composition of one or more
+readers defined in the Source. There is only one Source for pipeline.</p>
+<p>TODO refactor query into multiple query components
+TODO make it harder to do query injection</p>
+<dl class="py attribute">
+<dt id="butterfree.core.extract.Source.readers">
+<code class="sig-name descname">readers</code><a class="headerlink" href="#butterfree.core.extract.Source.readers" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of readers from where the source will get data.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="butterfree.core.extract.Source.query">
+<code class="sig-name descname">query</code><a class="headerlink" href="#butterfree.core.extract.Source.query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Spark SQL query to run against the readers.</p>
+</dd></dl>
+
+<p class="rubric">Example</p>
+<p>Simple example regarding Source class instantiation.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">butterfree.core.extract</span> <span class="kn">import</span> <span class="n">Source</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">butterfree.core.extract.readers</span> <span class="kn">import</span> <span class="n">TableReader</span><span class="p">,</span> <span class="n">FileReader</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">butterfree.core.clients</span> <span class="kn">import</span> <span class="n">SparkClient</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">spark_client</span> <span class="o">=</span> <span class="n">SparkClient</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span> <span class="o">=</span> <span class="n">Source</span><span class="p">(</span>
+<span class="gp">... </span>   <span class="n">readers</span><span class="o">=</span><span class="p">[</span>
+<span class="gp">... </span>       <span class="n">TableReader</span><span class="p">(</span>
+<span class="gp">... </span>           <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;table_reader_id&quot;</span><span class="p">,</span>
+<span class="gp">... </span>           <span class="n">database</span><span class="o">=</span><span class="s2">&quot;table_reader_db&quot;</span><span class="p">,</span>
+<span class="gp">... </span>           <span class="n">table</span><span class="o">=</span><span class="s2">&quot;table_reader_table&quot;</span><span class="p">,</span>
+<span class="gp">... </span>       <span class="p">),</span>
+<span class="gp">... </span>       <span class="n">FileReader</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;file_reader_id&quot;</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s2">&quot;data_sample_path&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;json&quot;</span><span class="p">),</span>
+<span class="gp">... </span>   <span class="p">],</span>
+<span class="gp">... </span>   <span class="n">query</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;select a.*, b.feature2 &quot;</span>
+<span class="gp">... </span>   <span class="sa">f</span><span class="s2">&quot;from table_reader_id a &quot;</span>
+<span class="gp">... </span>   <span class="sa">f</span><span class="s2">&quot;inner join file_reader_id b on a.id = b.id &quot;</span><span class="p">,</span>
+<span class="go">...)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">construct</span><span class="p">(</span><span class="n">spark_client</span><span class="p">)</span>
+</pre></div>
+</div>
+<blockquote>
+<div><p>This last method will use the Spark Client, as default, to create
+temporary views regarding each reader and, after, will run the
+desired query and return a dataframe.</p>
+</div></blockquote>
+<dl class="py method">
+<dt id="butterfree.core.extract.Source.construct">
+<code class="sig-name descname">construct</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">client</span><span class="p">:</span> <span class="n"><a class="reference internal" href="butterfree.core.clients.spark_client.html#butterfree.core.clients.spark_client.SparkClient" title="butterfree.core.clients.spark_client.SparkClient">butterfree.core.clients.spark_client.SparkClient</a></span></em><span class="sig-paren">)</span> &#x2192; pyspark.sql.dataframe.DataFrame<a class="headerlink" href="#butterfree.core.extract.Source.construct" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct an entry point dataframe for a feature set.</p>
+<p>This method will assemble multiple readers, by building each one and
+querying them using a Spark SQL.</p>
+<p>After that, there’s the caching of the dataframe, however since cache()
+in Spark is lazy, an action is triggered in order to force persistence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>client</strong> – client responsible for connecting to Spark session.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>DataFrame with the query result against all readers.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="butterfree.core.extract.pre_processing.html" class="btn btn-neutral float-right" title="butterfree.core.extract.pre_processing package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="butterfree.core.dataframe_service.repartition.html" class="btn btn-neutral float-left" title="butterfree.core.dataframe_service.repartition module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, QuintoAndar
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
