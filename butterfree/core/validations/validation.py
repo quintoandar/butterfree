@@ -15,7 +15,13 @@ class Validation(ABC):
     def __init__(self, dataframe: DataFrame = None):
         self.dataframe = dataframe
 
-    def input(self, dataframe):
+    def input(self, dataframe) -> __class__:
+        """Input a dataframe to check.
+
+        Args:
+            dataframe: data to check.
+
+        """
         self.dataframe = dataframe
         return self
 

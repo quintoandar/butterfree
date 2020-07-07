@@ -20,7 +20,8 @@ class Sink:
     method.
 
     Attributes:
-        writers: list of writers to run.
+        writers: list of Writers to use to load the data.
+        validation: validation to check the data before starting to write.
 
     """
 
@@ -29,7 +30,8 @@ class Sink:
         self.validation = validation
 
     @property
-    def writers(self):
+    def writers(self) -> List[Writer]:
+        """List of Writers to use to load the data."""
         return self._writers
 
     @writers.setter
@@ -41,6 +43,7 @@ class Sink:
 
     @property
     def validation(self):
+        """Validation to check the data before starting to write."""
         return self._validation
 
     @validation.setter
