@@ -272,6 +272,24 @@ You can check Flake 8 and Black by running the following within the project root
 make checks
 ```
 
+### API Documentation
+
+If you created a new class, changed a method or
+just added new information in the documents and 
+these changes have already been to the master branch,
+you will need to update the API documentation
+and it's super simple, in the **documentation** branch 
+just bring the modifications from the master branch and run `make update-docs`.
+
+```bash
+make update-docs
+```
+
+No need to worry about modifying the `html files`, 
+everything is generated from [Sphinx](https://www.sphinx-doc.org/en/master/index.html) and hosted by [ReadtheDocs](https://readthedocs.org/).
+But your documentation changes will only be applied after a merge to documentation branch.
+
+
 ## Git Flow
 
 Releasing is pretty easy with our CI/CD. But make sure to follow our git flow
