@@ -1,18 +1,19 @@
 butterfree.core.transform.transformations.user\_defined\_functions package
 ==========================================================================
 
-butterfree.core.transform.transformations.user\_defined\_functions.mode module
-------------------------------------------------------------------------------
+Submodules
+----------
 
-.. automodule:: butterfree.core.transform.transformations.user_defined_functions.mode
-   :members:
-   :undoc-members:
-   :show-inheritance:
+.. toctree::
+   :maxdepth: 4
 
-butterfree.core.transform.transformations.user\_defined\_functions.most\_frequent\_set module
----------------------------------------------------------------------------------------------
+   butterfree.core.transform.transformations.user_defined_functions.mode
+   butterfree.core.transform.transformations.user_defined_functions.most_frequent_set
 
-.. automodule:: butterfree.core.transform.transformations.user_defined_functions.most_frequent_set
+Module contents
+---------------
+
+.. automodule:: butterfree.core.transform.transformations.user_defined_functions
    :members:
    :undoc-members:
    :show-inheritance:

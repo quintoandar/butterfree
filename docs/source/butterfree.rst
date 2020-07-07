@@ -1,10 +1,11 @@
-Butterfree
-==========
+butterfree package
+==================
 
-Packages
+Subpackages
 -----------
 
 .. toctree::
+   :maxdepth: 4
 
    butterfree.core
    butterfree.testing

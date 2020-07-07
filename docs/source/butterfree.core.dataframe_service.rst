@@ -1,10 +1,18 @@
 butterfree.core.dataframe\_service package
 ==========================================
 
-butterfree.core.dataframe\_service.repartition module
------------------------------------------------------
+Submodules
+----------
 
-.. automodule:: butterfree.core.dataframe_service.repartition
+.. toctree::
+   :maxdepth: 4
+
+   butterfree.core.dataframe_service.repartition
+
+Module contents
+---------------
+
+.. automodule:: butterfree.core.dataframe_service
    :members:
    :undoc-members:
    :show-inheritance:

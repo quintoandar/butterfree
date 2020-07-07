@@ -1,26 +1,20 @@
 butterfree.core.clients package
 ===============================
 
-butterfree.core.clients.abstract\_client module
------------------------------------------------
+Submodules
+----------
 
-.. automodule:: butterfree.core.clients.abstract_client
-   :members:
-   :undoc-members:
-   :show-inheritance:
+.. toctree::
+   :maxdepth: 4
 
-butterfree.core.clients.cassandra\_client module
-------------------------------------------------
+   butterfree.core.clients.abstract_client
+   butterfree.core.clients.cassandra_client
+   butterfree.core.clients.spark_client
 
-.. automodule:: butterfree.core.clients.cassandra_client
-   :members:
-   :undoc-members:
-   :show-inheritance:
+Module contents
+---------------
 
-butterfree.core.clients.spark\_client module
---------------------------------------------
-
-.. automodule:: butterfree.core.clients.spark_client
+.. automodule:: butterfree.core.clients
    :members:
    :undoc-members:
    :show-inheritance:

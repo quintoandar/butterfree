@@ -1,26 +1,20 @@
 butterfree.core.transform.utils package
 =======================================
 
-butterfree.core.transform.utils.date\_range module
---------------------------------------------------
+Submodules
+----------
 
-.. automodule:: butterfree.core.transform.utils.date_range
-   :members:
-   :undoc-members:
-   :show-inheritance:
+.. toctree::
+   :maxdepth: 4
 
-butterfree.core.transform.utils.function module
------------------------------------------------
+   butterfree.core.transform.utils.date_range
+   butterfree.core.transform.utils.function
+   butterfree.core.transform.utils.window_spec
 
-.. automodule:: butterfree.core.transform.utils.function
-   :members:
-   :undoc-members:
-   :show-inheritance:
+Module contents
+---------------
 
-butterfree.core.transform.utils.window\_spec module
----------------------------------------------------
-
-.. automodule:: butterfree.core.transform.utils.window_spec
+.. automodule:: butterfree.core.transform.utils
    :members:
    :undoc-members:
    :show-inheritance:

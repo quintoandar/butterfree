@@ -35,7 +35,7 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="butterfree.core.configs package" href="butterfree.core.configs.html" />
+    <link rel="next" title="butterfree.core.clients.abstract_client module" href="butterfree.core.clients.abstract_client.html" />
     <link rel="prev" title="butterfree.core package" href="butterfree.core.html" /> 
 </head>
 
@@ -93,8 +93,8 @@
 <li class="toctree-l1"><a class="reference internal" href="load.html">Sink</a></li>
 <li class="toctree-l1"><a class="reference internal" href="stream.html">Streaming Feature Sets in Butterfree</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">API Specification</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="butterfree.html">Butterfree</a><ul class="current">
-<li class="toctree-l3 current"><a class="reference internal" href="butterfree.html#packages">Packages</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="butterfree.html">butterfree package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="butterfree.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l4 current"><a class="reference internal" href="butterfree.core.html">butterfree.core package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="butterfree.testing.html">butterfree.testing package</a></li>
 </ul>
@@ -151,7 +151,7 @@
         
           <li><a href="modules.html">API Specification</a> &raquo;</li>
         
-          <li><a href="butterfree.html">Butterfree</a> &raquo;</li>
+          <li><a href="butterfree.html">butterfree package</a> &raquo;</li>
         
           <li><a href="butterfree.core.html">butterfree.core package</a> &raquo;</li>
         
@@ -176,23 +176,33 @@
             
   <div class="section" id="butterfree-core-clients-package">
 <h1>butterfree.core.clients package<a class="headerlink" href="#butterfree-core-clients-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="module-butterfree.core.clients.abstract_client">
-<span id="butterfree-core-clients-abstract-client-module"></span><h2>butterfree.core.clients.abstract_client module<a class="headerlink" href="#module-butterfree.core.clients.abstract_client" title="Permalink to this headline">¶</a></h2>
-<p>Abstract class for database clients.</p>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="butterfree.core.clients.abstract_client.html">butterfree.core.clients.abstract_client module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="butterfree.core.clients.cassandra_client.html">butterfree.core.clients.cassandra_client module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="butterfree.core.clients.spark_client.html">butterfree.core.clients.spark_client module</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="module-butterfree.core.clients">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-butterfree.core.clients" title="Permalink to this headline">¶</a></h2>
+<p>Holds connection clients.</p>
 <dl class="py class">
-<dt id="butterfree.core.clients.abstract_client.AbstractClient">
-<em class="property">class </em><code class="sig-prename descclassname">butterfree.core.clients.abstract_client.</code><code class="sig-name descname">AbstractClient</code><a class="headerlink" href="#butterfree.core.clients.abstract_client.AbstractClient" title="Permalink to this definition">¶</a></dt>
+<dt id="butterfree.core.clients.AbstractClient">
+<em class="property">class </em><code class="sig-prename descclassname">butterfree.core.clients.</code><code class="sig-name descname">AbstractClient</code><a class="headerlink" href="#butterfree.core.clients.AbstractClient" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
 <p>Abstract base class for database clients.</p>
 <dl class="py method">
-<dt id="butterfree.core.clients.abstract_client.AbstractClient.conn">
-<em class="property">abstract property </em><code class="sig-name descname">conn</code><a class="headerlink" href="#butterfree.core.clients.abstract_client.AbstractClient.conn" title="Permalink to this definition">¶</a></dt>
+<dt id="butterfree.core.clients.AbstractClient.conn">
+<em class="property">abstract property </em><code class="sig-name descname">conn</code><a class="headerlink" href="#butterfree.core.clients.AbstractClient.conn" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a connection object.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="butterfree.core.clients.abstract_client.AbstractClient.sql">
-<em class="property">abstract </em><code class="sig-name descname">sql</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.clients.abstract_client.AbstractClient.sql" title="Permalink to this definition">¶</a></dt>
+<dt id="butterfree.core.clients.AbstractClient.sql">
+<em class="property">abstract </em><code class="sig-name descname">sql</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.clients.AbstractClient.sql" title="Permalink to this definition">¶</a></dt>
 <dd><p>Runs a query.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -206,52 +216,48 @@
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-butterfree.core.clients.cassandra_client">
-<span id="butterfree-core-clients-cassandra-client-module"></span><h2>butterfree.core.clients.cassandra_client module<a class="headerlink" href="#module-butterfree.core.clients.cassandra_client" title="Permalink to this headline">¶</a></h2>
-<p>CassandraClient entity.</p>
 <dl class="py class">
-<dt id="butterfree.core.clients.cassandra_client.CassandraClient">
-<em class="property">class </em><code class="sig-prename descclassname">butterfree.core.clients.cassandra_client.</code><code class="sig-name descname">CassandraClient</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cassandra_host</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">cassandra_key_space</span></em>, <em class="sig-param"><span class="n">cassandra_user</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">cassandra_password</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.clients.cassandra_client.CassandraClient" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#butterfree.core.clients.abstract_client.AbstractClient" title="butterfree.core.clients.abstract_client.AbstractClient"><code class="xref py py-class docutils literal notranslate"><span class="pre">butterfree.core.clients.abstract_client.AbstractClient</span></code></a></p>
+<dt id="butterfree.core.clients.CassandraClient">
+<em class="property">class </em><code class="sig-prename descclassname">butterfree.core.clients.</code><code class="sig-name descname">CassandraClient</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cassandra_host</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">cassandra_key_space</span></em>, <em class="sig-param"><span class="n">cassandra_user</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">cassandra_password</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.clients.CassandraClient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="butterfree.core.clients.abstract_client.html#butterfree.core.clients.abstract_client.AbstractClient" title="butterfree.core.clients.abstract_client.AbstractClient"><code class="xref py py-class docutils literal notranslate"><span class="pre">butterfree.core.clients.abstract_client.AbstractClient</span></code></a></p>
 <p>Cassandra Client.</p>
 <dl class="py attribute">
-<dt id="butterfree.core.clients.cassandra_client.CassandraClient.cassandra_user">
-<code class="sig-name descname">cassandra_user</code><a class="headerlink" href="#butterfree.core.clients.cassandra_client.CassandraClient.cassandra_user" title="Permalink to this definition">¶</a></dt>
+<dt id="butterfree.core.clients.CassandraClient.cassandra_user">
+<code class="sig-name descname">cassandra_user</code><a class="headerlink" href="#butterfree.core.clients.CassandraClient.cassandra_user" title="Permalink to this definition">¶</a></dt>
 <dd><p>username to use in connection.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="butterfree.core.clients.cassandra_client.CassandraClient.cassandra_password">
-<code class="sig-name descname">cassandra_password</code><a class="headerlink" href="#butterfree.core.clients.cassandra_client.CassandraClient.cassandra_password" title="Permalink to this definition">¶</a></dt>
+<dt id="butterfree.core.clients.CassandraClient.cassandra_password">
+<code class="sig-name descname">cassandra_password</code><a class="headerlink" href="#butterfree.core.clients.CassandraClient.cassandra_password" title="Permalink to this definition">¶</a></dt>
 <dd><p>password to use in connection.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="butterfree.core.clients.cassandra_client.CassandraClient.cassandra_key_space">
-<code class="sig-name descname">cassandra_key_space</code><a class="headerlink" href="#butterfree.core.clients.cassandra_client.CassandraClient.cassandra_key_space" title="Permalink to this definition">¶</a></dt>
+<dt id="butterfree.core.clients.CassandraClient.cassandra_key_space">
+<code class="sig-name descname">cassandra_key_space</code><a class="headerlink" href="#butterfree.core.clients.CassandraClient.cassandra_key_space" title="Permalink to this definition">¶</a></dt>
 <dd><p>key space used in connection.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="butterfree.core.clients.cassandra_client.CassandraClient.cassandra_host">
-<code class="sig-name descname">cassandra_host</code><a class="headerlink" href="#butterfree.core.clients.cassandra_client.CassandraClient.cassandra_host" title="Permalink to this definition">¶</a></dt>
+<dt id="butterfree.core.clients.CassandraClient.cassandra_host">
+<code class="sig-name descname">cassandra_host</code><a class="headerlink" href="#butterfree.core.clients.CassandraClient.cassandra_host" title="Permalink to this definition">¶</a></dt>
 <dd><p>cassandra endpoint used in connection.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="butterfree.core.clients.cassandra_client.CassandraClient.conn">
-<em class="property">property </em><code class="sig-name descname">conn</code><a class="headerlink" href="#butterfree.core.clients.cassandra_client.CassandraClient.conn" title="Permalink to this definition">¶</a></dt>
+<dt id="butterfree.core.clients.CassandraClient.conn">
+<em class="property">property </em><code class="sig-name descname">conn</code><a class="headerlink" href="#butterfree.core.clients.CassandraClient.conn" title="Permalink to this definition">¶</a></dt>
 <dd><p>Establishes a Cassandra connection.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="butterfree.core.clients.cassandra_client.CassandraClient.create_table">
-<code class="sig-name descname">create_table</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">columns</span><span class="p">:</span> <span class="n">dict</span></em>, <em class="sig-param"><span class="n">table</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#butterfree.core.clients.cassandra_client.CassandraClient.create_table" title="Permalink to this definition">¶</a></dt>
+<dt id="butterfree.core.clients.CassandraClient.create_table">
+<code class="sig-name descname">create_table</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">columns</span><span class="p">:</span> <span class="n">dict</span></em>, <em class="sig-param"><span class="n">table</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#butterfree.core.clients.CassandraClient.create_table" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a table.</p>
 <dl class="py attribute">
-<dt id="butterfree.core.clients.cassandra_client.CassandraClient.columns">
-<code class="sig-name descname">columns</code><a class="headerlink" href="#butterfree.core.clients.cassandra_client.CassandraClient.columns" title="Permalink to this definition">¶</a></dt>
+<dt id="butterfree.core.clients.CassandraClient.columns">
+<code class="sig-name descname">columns</code><a class="headerlink" href="#butterfree.core.clients.CassandraClient.columns" title="Permalink to this definition">¶</a></dt>
 <dd><p>a list dictionaries in the format
 [{“column_name”: “example1”, type: “cql_type”, primary_key: True}, …]</p>
 </dd></dl>
@@ -259,12 +265,12 @@
 </dd></dl>
 
 <dl class="py method">
-<dt id="butterfree.core.clients.cassandra_client.CassandraClient.get_schema">
-<code class="sig-name descname">get_schema</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">table</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; list<a class="headerlink" href="#butterfree.core.clients.cassandra_client.CassandraClient.get_schema" title="Permalink to this definition">¶</a></dt>
+<dt id="butterfree.core.clients.CassandraClient.get_schema">
+<code class="sig-name descname">get_schema</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">table</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; list<a class="headerlink" href="#butterfree.core.clients.CassandraClient.get_schema" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns desired table schema.</p>
 <dl class="py attribute">
-<dt id="butterfree.core.clients.cassandra_client.CassandraClient.table">
-<code class="sig-name descname">table</code><a class="headerlink" href="#butterfree.core.clients.cassandra_client.CassandraClient.table" title="Permalink to this definition">¶</a></dt>
+<dt id="butterfree.core.clients.CassandraClient.table">
+<code class="sig-name descname">table</code><a class="headerlink" href="#butterfree.core.clients.CassandraClient.table" title="Permalink to this definition">¶</a></dt>
 <dd><p>desired table.</p>
 </dd></dl>
 
@@ -277,12 +283,12 @@
 </dd></dl>
 
 <dl class="py method">
-<dt id="butterfree.core.clients.cassandra_client.CassandraClient.sql">
-<code class="sig-name descname">sql</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.clients.cassandra_client.CassandraClient.sql" title="Permalink to this definition">¶</a></dt>
+<dt id="butterfree.core.clients.CassandraClient.sql">
+<code class="sig-name descname">sql</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.clients.CassandraClient.sql" title="Permalink to this definition">¶</a></dt>
 <dd><p>Executes desired query.</p>
 <dl class="py attribute">
-<dt id="butterfree.core.clients.cassandra_client.CassandraClient.query">
-<code class="sig-name descname">query</code><a class="headerlink" href="#butterfree.core.clients.cassandra_client.CassandraClient.query" title="Permalink to this definition">¶</a></dt>
+<dt id="butterfree.core.clients.CassandraClient.query">
+<code class="sig-name descname">query</code><a class="headerlink" href="#butterfree.core.clients.CassandraClient.query" title="Permalink to this definition">¶</a></dt>
 <dd><p>desired query.</p>
 </dd></dl>
 
@@ -290,19 +296,15 @@
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-butterfree.core.clients.spark_client">
-<span id="butterfree-core-clients-spark-client-module"></span><h2>butterfree.core.clients.spark_client module<a class="headerlink" href="#module-butterfree.core.clients.spark_client" title="Permalink to this headline">¶</a></h2>
-<p>SparkClient entity.</p>
 <dl class="py class">
-<dt id="butterfree.core.clients.spark_client.SparkClient">
-<em class="property">class </em><code class="sig-prename descclassname">butterfree.core.clients.spark_client.</code><code class="sig-name descname">SparkClient</code><a class="headerlink" href="#butterfree.core.clients.spark_client.SparkClient" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#butterfree.core.clients.abstract_client.AbstractClient" title="butterfree.core.clients.abstract_client.AbstractClient"><code class="xref py py-class docutils literal notranslate"><span class="pre">butterfree.core.clients.abstract_client.AbstractClient</span></code></a></p>
+<dt id="butterfree.core.clients.SparkClient">
+<em class="property">class </em><code class="sig-prename descclassname">butterfree.core.clients.</code><code class="sig-name descname">SparkClient</code><a class="headerlink" href="#butterfree.core.clients.SparkClient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="butterfree.core.clients.abstract_client.html#butterfree.core.clients.abstract_client.AbstractClient" title="butterfree.core.clients.abstract_client.AbstractClient"><code class="xref py py-class docutils literal notranslate"><span class="pre">butterfree.core.clients.abstract_client.AbstractClient</span></code></a></p>
 <p>Handle Spark session connection.</p>
 <p>Get query results with SQL, reads and writes data on external systems.</p>
 <dl class="py method">
-<dt id="butterfree.core.clients.spark_client.SparkClient.conn">
-<em class="property">property </em><code class="sig-name descname">conn</code><a class="headerlink" href="#butterfree.core.clients.spark_client.SparkClient.conn" title="Permalink to this definition">¶</a></dt>
+<dt id="butterfree.core.clients.SparkClient.conn">
+<em class="property">property </em><code class="sig-name descname">conn</code><a class="headerlink" href="#butterfree.core.clients.SparkClient.conn" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets or creates an SparkSession.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -312,8 +314,8 @@
 </dd></dl>
 
 <dl class="py method">
-<dt id="butterfree.core.clients.spark_client.SparkClient.create_temporary_view">
-<code class="sig-name descname">create_temporary_view</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dataframe</span><span class="p">:</span> <span class="n">pyspark.sql.dataframe.DataFrame</span></em>, <em class="sig-param"><span class="n">name</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; Optional<span class="p">[</span>pyspark.sql.streaming.StreamingQuery<span class="p">]</span><a class="headerlink" href="#butterfree.core.clients.spark_client.SparkClient.create_temporary_view" title="Permalink to this definition">¶</a></dt>
+<dt id="butterfree.core.clients.SparkClient.create_temporary_view">
+<code class="sig-name descname">create_temporary_view</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dataframe</span><span class="p">:</span> <span class="n">pyspark.sql.dataframe.DataFrame</span></em>, <em class="sig-param"><span class="n">name</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; Optional<span class="p">[</span>pyspark.sql.streaming.StreamingQuery<span class="p">]</span><a class="headerlink" href="#butterfree.core.clients.SparkClient.create_temporary_view" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a temporary view from a given dataframe.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -326,8 +328,8 @@
 </dd></dl>
 
 <dl class="py method">
-<dt id="butterfree.core.clients.spark_client.SparkClient.read">
-<code class="sig-name descname">read</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">format</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">options</span><span class="p">:</span> <span class="n">dict</span></em>, <em class="sig-param"><span class="n">schema</span><span class="p">:</span> <span class="n">pyspark.sql.types.StructType</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">stream</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span> &#x2192; pyspark.sql.dataframe.DataFrame<a class="headerlink" href="#butterfree.core.clients.spark_client.SparkClient.read" title="Permalink to this definition">¶</a></dt>
+<dt id="butterfree.core.clients.SparkClient.read">
+<code class="sig-name descname">read</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">format</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">options</span><span class="p">:</span> <span class="n">dict</span></em>, <em class="sig-param"><span class="n">schema</span><span class="p">:</span> <span class="n">pyspark.sql.types.StructType</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">stream</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span> &#x2192; pyspark.sql.dataframe.DataFrame<a class="headerlink" href="#butterfree.core.clients.SparkClient.read" title="Permalink to this definition">¶</a></dt>
 <dd><p>Use the SparkSession.read interface to load data into a dataframe.</p>
 <dl class="simple">
 <dt>Check docs for more information:</dt><dd><p><a class="reference external" href="https://spark.apache.org/docs/latest/sql-data-sources-load-save-functions.html#generic-loadsave-functions">https://spark.apache.org/docs/latest/sql-data-sources-load-save-functions.html#generic-loadsave-functions</a></p>
@@ -349,8 +351,8 @@
 </dd></dl>
 
 <dl class="py method">
-<dt id="butterfree.core.clients.spark_client.SparkClient.read_table">
-<code class="sig-name descname">read_table</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">table</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">database</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; pyspark.sql.dataframe.DataFrame<a class="headerlink" href="#butterfree.core.clients.spark_client.SparkClient.read_table" title="Permalink to this definition">¶</a></dt>
+<dt id="butterfree.core.clients.SparkClient.read_table">
+<code class="sig-name descname">read_table</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">table</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">database</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; pyspark.sql.dataframe.DataFrame<a class="headerlink" href="#butterfree.core.clients.SparkClient.read_table" title="Permalink to this definition">¶</a></dt>
 <dd><p>Use the SparkSession.read interface to read a metastore table.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -366,8 +368,8 @@
 </dd></dl>
 
 <dl class="py method">
-<dt id="butterfree.core.clients.spark_client.SparkClient.sql">
-<code class="sig-name descname">sql</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; pyspark.sql.dataframe.DataFrame<a class="headerlink" href="#butterfree.core.clients.spark_client.SparkClient.sql" title="Permalink to this definition">¶</a></dt>
+<dt id="butterfree.core.clients.SparkClient.sql">
+<code class="sig-name descname">sql</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; pyspark.sql.dataframe.DataFrame<a class="headerlink" href="#butterfree.core.clients.SparkClient.sql" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run a query using Spark SQL.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -380,8 +382,8 @@
 </dd></dl>
 
 <dl class="py method">
-<dt id="butterfree.core.clients.spark_client.SparkClient.write_dataframe">
-<em class="property">static </em><code class="sig-name descname">write_dataframe</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dataframe</span><span class="p">:</span> <span class="n">pyspark.sql.dataframe.DataFrame</span></em>, <em class="sig-param"><span class="n">format_</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">mode</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.clients.spark_client.SparkClient.write_dataframe" title="Permalink to this definition">¶</a></dt>
+<dt id="butterfree.core.clients.SparkClient.write_dataframe">
+<em class="property">static </em><code class="sig-name descname">write_dataframe</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dataframe</span><span class="p">:</span> <span class="n">pyspark.sql.dataframe.DataFrame</span></em>, <em class="sig-param"><span class="n">format_</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">mode</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.clients.SparkClient.write_dataframe" title="Permalink to this definition">¶</a></dt>
 <dd><p>Receive a spark DataFrame and write it.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -398,8 +400,8 @@
 </dd></dl>
 
 <dl class="py method">
-<dt id="butterfree.core.clients.spark_client.SparkClient.write_stream">
-<code class="sig-name descname">write_stream</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dataframe</span><span class="p">:</span> <span class="n">pyspark.sql.dataframe.DataFrame</span></em>, <em class="sig-param"><span class="n">processing_time</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">output_mode</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">checkpoint_path</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">format_</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">mode</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.clients.spark_client.SparkClient.write_stream" title="Permalink to this definition">¶</a></dt>
+<dt id="butterfree.core.clients.SparkClient.write_stream">
+<code class="sig-name descname">write_stream</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dataframe</span><span class="p">:</span> <span class="n">pyspark.sql.dataframe.DataFrame</span></em>, <em class="sig-param"><span class="n">processing_time</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">output_mode</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">checkpoint_path</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">format_</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">mode</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.clients.SparkClient.write_stream" title="Permalink to this definition">¶</a></dt>
 <dd><p>Starts streaming data writing job.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -435,8 +437,8 @@ can be found in Spark documentation:
 </dd></dl>
 
 <dl class="py method">
-<dt id="butterfree.core.clients.spark_client.SparkClient.write_table">
-<em class="property">static </em><code class="sig-name descname">write_table</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dataframe</span><span class="p">:</span> <span class="n">pyspark.sql.dataframe.DataFrame</span></em>, <em class="sig-param"><span class="n">database</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">table_name</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">path</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">format_</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mode</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">partition_by</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.clients.spark_client.SparkClient.write_table" title="Permalink to this definition">¶</a></dt>
+<dt id="butterfree.core.clients.SparkClient.write_table">
+<em class="property">static </em><code class="sig-name descname">write_table</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dataframe</span><span class="p">:</span> <span class="n">pyspark.sql.dataframe.DataFrame</span></em>, <em class="sig-param"><span class="n">database</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">table_name</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">path</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">format_</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mode</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">partition_by</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.clients.SparkClient.write_table" title="Permalink to this definition">¶</a></dt>
 <dd><p>Receive a spark DataFrame and write it as a table in metastore.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -469,7 +471,7 @@ can be found in Spark documentation:
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="butterfree.core.configs.html" class="btn btn-neutral float-right" title="butterfree.core.configs package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="butterfree.core.clients.abstract_client.html" class="btn btn-neutral float-right" title="butterfree.core.clients.abstract_client module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="butterfree.core.html" class="btn btn-neutral float-left" title="butterfree.core package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

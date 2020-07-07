@@ -5,23 +5,25 @@ Subpackages
 -----------
 
 .. toctree::
+   :maxdepth: 4
 
    butterfree.core.transform.features
    butterfree.core.transform.transformations
    butterfree.core.transform.utils
 
-butterfree.core.transform.aggregated\_feature\_set module
----------------------------------------------------------
+Submodules
+----------
 
-.. automodule:: butterfree.core.transform.aggregated_feature_set
-   :members:
-   :undoc-members:
-   :show-inheritance:
+.. toctree::
+   :maxdepth: 4
 
-butterfree.core.transform.feature\_set module
----------------------------------------------
+   butterfree.core.transform.aggregated_feature_set
+   butterfree.core.transform.feature_set
 
-.. automodule:: butterfree.core.transform.feature_set
+Module contents
+---------------
+
+.. automodule:: butterfree.core.transform
    :members:
    :undoc-members:
    :show-inheritance:

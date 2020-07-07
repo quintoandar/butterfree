@@ -1,26 +1,20 @@
 butterfree.core.configs.db package
 ==================================
 
-butterfree.core.configs.db.abstract\_config module
---------------------------------------------------
+Submodules
+----------
 
-.. automodule:: butterfree.core.configs.db.abstract_config
-   :members:
-   :undoc-members:
-   :show-inheritance:
+.. toctree::
+   :maxdepth: 4
 
-butterfree.core.configs.db.cassandra\_config module
----------------------------------------------------
+   butterfree.core.configs.db.abstract_config
+   butterfree.core.configs.db.cassandra_config
+   butterfree.core.configs.db.s3_config
 
-.. automodule:: butterfree.core.configs.db.cassandra_config
-   :members:
-   :undoc-members:
-   :show-inheritance:
+Module contents
+---------------
 
-butterfree.core.configs.db.s3\_config module
---------------------------------------------
-
-.. automodule:: butterfree.core.configs.db.s3_config
+.. automodule:: butterfree.core.configs.db
    :members:
    :undoc-members:
    :show-inheritance:

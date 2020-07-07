@@ -5,13 +5,22 @@ Subpackages
 -----------
 
 .. toctree::
+   :maxdepth: 4
 
    butterfree.core.load.writers
 
-butterfree.core.load.sink module
---------------------------------
+Submodules
+----------
 
-.. automodule:: butterfree.core.load.sink
+.. toctree::
+   :maxdepth: 4
+
+   butterfree.core.load.sink
+
+Module contents
+---------------
+
+.. automodule:: butterfree.core.load
    :members:
    :undoc-members:
    :show-inheritance:

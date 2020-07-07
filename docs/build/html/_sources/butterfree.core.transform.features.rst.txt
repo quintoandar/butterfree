@@ -1,26 +1,20 @@
 butterfree.core.transform.features package
 ==========================================
 
-butterfree.core.transform.features.feature module
--------------------------------------------------
+Submodules
+----------
 
-.. automodule:: butterfree.core.transform.features.feature
-   :members:
-   :undoc-members:
-   :show-inheritance:
+.. toctree::
+   :maxdepth: 4
 
-butterfree.core.transform.features.key\_feature module
-------------------------------------------------------
+   butterfree.core.transform.features.feature
+   butterfree.core.transform.features.key_feature
+   butterfree.core.transform.features.timestamp_feature
 
-.. automodule:: butterfree.core.transform.features.key_feature
-   :members:
-   :undoc-members:
-   :show-inheritance:
+Module contents
+---------------
 
-butterfree.core.transform.features.timestamp\_feature module
-------------------------------------------------------------
-
-.. automodule:: butterfree.core.transform.features.timestamp_feature
+.. automodule:: butterfree.core.transform.features
    :members:
    :undoc-members:
    :show-inheritance:

@@ -35,8 +35,8 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="butterfree.core.transform package" href="butterfree.core.transform.html" />
-    <link rel="prev" title="butterfree.core.load.writers package" href="butterfree.core.load.writers.html" /> 
+    <link rel="next" title="butterfree.core.pipelines.feature_set_pipeline module" href="butterfree.core.pipelines.feature_set_pipeline.html" />
+    <link rel="prev" title="butterfree.core.load.sink module" href="butterfree.core.load.sink.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -93,8 +93,8 @@
 <li class="toctree-l1"><a class="reference internal" href="load.html">Sink</a></li>
 <li class="toctree-l1"><a class="reference internal" href="stream.html">Streaming Feature Sets in Butterfree</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">API Specification</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="butterfree.html">Butterfree</a><ul class="current">
-<li class="toctree-l3 current"><a class="reference internal" href="butterfree.html#packages">Packages</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="butterfree.html">butterfree package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="butterfree.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l4 current"><a class="reference internal" href="butterfree.core.html">butterfree.core package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="butterfree.testing.html">butterfree.testing package</a></li>
 </ul>
@@ -151,7 +151,7 @@
         
           <li><a href="modules.html">API Specification</a> &raquo;</li>
         
-          <li><a href="butterfree.html">Butterfree</a> &raquo;</li>
+          <li><a href="butterfree.html">butterfree package</a> &raquo;</li>
         
           <li><a href="butterfree.core.html">butterfree.core package</a> &raquo;</li>
         
@@ -176,35 +176,43 @@
             
   <div class="section" id="butterfree-core-pipelines-package">
 <h1>butterfree.core.pipelines package<a class="headerlink" href="#butterfree-core-pipelines-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="module-butterfree.core.pipelines.feature_set_pipeline">
-<span id="butterfree-core-pipelines-feature-set-pipeline-module"></span><h2>butterfree.core.pipelines.feature_set_pipeline module<a class="headerlink" href="#module-butterfree.core.pipelines.feature_set_pipeline" title="Permalink to this headline">¶</a></h2>
-<p>FeatureSetPipeline entity.</p>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="butterfree.core.pipelines.feature_set_pipeline.html">butterfree.core.pipelines.feature_set_pipeline module</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="module-butterfree.core.pipelines">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-butterfree.core.pipelines" title="Permalink to this headline">¶</a></h2>
+<p>ETL Pipelines.</p>
 <dl class="py class">
-<dt id="butterfree.core.pipelines.feature_set_pipeline.FeatureSetPipeline">
-<em class="property">class </em><code class="sig-prename descclassname">butterfree.core.pipelines.feature_set_pipeline.</code><code class="sig-name descname">FeatureSetPipeline</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">source</span><span class="p">:</span> <span class="n"><a class="reference internal" href="butterfree.core.extract.html#butterfree.core.extract.source.Source" title="butterfree.core.extract.source.Source">butterfree.core.extract.source.Source</a></span></em>, <em class="sig-param"><span class="n">feature_set</span><span class="p">:</span> <span class="n"><a class="reference internal" href="butterfree.core.transform.html#butterfree.core.transform.feature_set.FeatureSet" title="butterfree.core.transform.feature_set.FeatureSet">butterfree.core.transform.feature_set.FeatureSet</a></span></em>, <em class="sig-param"><span class="n">sink</span><span class="p">:</span> <span class="n"><a class="reference internal" href="butterfree.core.load.html#butterfree.core.load.sink.Sink" title="butterfree.core.load.sink.Sink">butterfree.core.load.sink.Sink</a></span></em>, <em class="sig-param"><span class="n">spark_client</span><span class="p">:</span> <span class="n"><a class="reference internal" href="butterfree.core.clients.html#butterfree.core.clients.spark_client.SparkClient" title="butterfree.core.clients.spark_client.SparkClient">butterfree.core.clients.spark_client.SparkClient</a></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.pipelines.feature_set_pipeline.FeatureSetPipeline" title="Permalink to this definition">¶</a></dt>
+<dt id="butterfree.core.pipelines.FeatureSetPipeline">
+<em class="property">class </em><code class="sig-prename descclassname">butterfree.core.pipelines.</code><code class="sig-name descname">FeatureSetPipeline</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">source</span><span class="p">:</span> <span class="n"><a class="reference internal" href="butterfree.core.extract.source.html#butterfree.core.extract.source.Source" title="butterfree.core.extract.source.Source">butterfree.core.extract.source.Source</a></span></em>, <em class="sig-param"><span class="n">feature_set</span><span class="p">:</span> <span class="n"><a class="reference internal" href="butterfree.core.transform.feature_set.html#butterfree.core.transform.feature_set.FeatureSet" title="butterfree.core.transform.feature_set.FeatureSet">butterfree.core.transform.feature_set.FeatureSet</a></span></em>, <em class="sig-param"><span class="n">sink</span><span class="p">:</span> <span class="n"><a class="reference internal" href="butterfree.core.load.sink.html#butterfree.core.load.sink.Sink" title="butterfree.core.load.sink.Sink">butterfree.core.load.sink.Sink</a></span></em>, <em class="sig-param"><span class="n">spark_client</span><span class="p">:</span> <span class="n"><a class="reference internal" href="butterfree.core.clients.spark_client.html#butterfree.core.clients.spark_client.SparkClient" title="butterfree.core.clients.spark_client.SparkClient">butterfree.core.clients.spark_client.SparkClient</a></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.pipelines.FeatureSetPipeline" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Defines a ETL pipeline for the construction of a feature set.</p>
 <dl class="py attribute">
-<dt id="butterfree.core.pipelines.feature_set_pipeline.FeatureSetPipeline.source">
-<code class="sig-name descname">source</code><a class="headerlink" href="#butterfree.core.pipelines.feature_set_pipeline.FeatureSetPipeline.source" title="Permalink to this definition">¶</a></dt>
+<dt id="butterfree.core.pipelines.FeatureSetPipeline.source">
+<code class="sig-name descname">source</code><a class="headerlink" href="#butterfree.core.pipelines.FeatureSetPipeline.source" title="Permalink to this definition">¶</a></dt>
 <dd><p>source of the data, the entry point of the pipeline.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="butterfree.core.pipelines.feature_set_pipeline.FeatureSetPipeline.feature_set">
-<code class="sig-name descname">feature_set</code><a class="headerlink" href="#butterfree.core.pipelines.feature_set_pipeline.FeatureSetPipeline.feature_set" title="Permalink to this definition">¶</a></dt>
+<dt id="butterfree.core.pipelines.FeatureSetPipeline.feature_set">
+<code class="sig-name descname">feature_set</code><a class="headerlink" href="#butterfree.core.pipelines.FeatureSetPipeline.feature_set" title="Permalink to this definition">¶</a></dt>
 <dd><p>feature set composed by features and context metadata.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="butterfree.core.pipelines.feature_set_pipeline.FeatureSetPipeline.sink">
-<code class="sig-name descname">sink</code><a class="headerlink" href="#butterfree.core.pipelines.feature_set_pipeline.FeatureSetPipeline.sink" title="Permalink to this definition">¶</a></dt>
+<dt id="butterfree.core.pipelines.FeatureSetPipeline.sink">
+<code class="sig-name descname">sink</code><a class="headerlink" href="#butterfree.core.pipelines.FeatureSetPipeline.sink" title="Permalink to this definition">¶</a></dt>
 <dd><p>sink used to write the output dataframe in the desired locations.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="butterfree.core.pipelines.feature_set_pipeline.FeatureSetPipeline.spark_client">
-<code class="sig-name descname">spark_client</code><a class="headerlink" href="#butterfree.core.pipelines.feature_set_pipeline.FeatureSetPipeline.spark_client" title="Permalink to this definition">¶</a></dt>
+<dt id="butterfree.core.pipelines.FeatureSetPipeline.spark_client">
+<code class="sig-name descname">spark_client</code><a class="headerlink" href="#butterfree.core.pipelines.FeatureSetPipeline.spark_client" title="Permalink to this definition">¶</a></dt>
 <dd><p>client used to access Spark connection.</p>
 </dd></dl>
 
@@ -313,8 +321,8 @@ to the specified locations.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="butterfree.core.pipelines.feature_set_pipeline.FeatureSetPipeline.run">
-<code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">end_date</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">partition_by</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">order_by</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">num_processors</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.pipelines.feature_set_pipeline.FeatureSetPipeline.run" title="Permalink to this definition">¶</a></dt>
+<dt id="butterfree.core.pipelines.FeatureSetPipeline.run">
+<code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">end_date</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">partition_by</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">order_by</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">num_processors</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.pipelines.FeatureSetPipeline.run" title="Permalink to this definition">¶</a></dt>
 <dd><p>Runs the defined feature set pipeline.</p>
 <p>The pipeline consists in the following steps:
 - Constructs the input dataframe from the data source.
@@ -356,10 +364,10 @@ soon. Use only if strictly necessary.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="butterfree.core.transform.html" class="btn btn-neutral float-right" title="butterfree.core.transform package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="butterfree.core.pipelines.feature_set_pipeline.html" class="btn btn-neutral float-right" title="butterfree.core.pipelines.feature_set_pipeline module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="butterfree.core.load.writers.html" class="btn btn-neutral float-left" title="butterfree.core.load.writers package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="butterfree.core.load.sink.html" class="btn btn-neutral float-left" title="butterfree.core.load.sink module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

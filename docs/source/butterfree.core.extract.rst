@@ -5,14 +5,23 @@ Subpackages
 -----------
 
 .. toctree::
+   :maxdepth: 4
 
    butterfree.core.extract.pre_processing
    butterfree.core.extract.readers
 
-butterfree.core.extract.source module
--------------------------------------
+Submodules
+----------
 
-.. automodule:: butterfree.core.extract.source
+.. toctree::
+   :maxdepth: 4
+
+   butterfree.core.extract.source
+
+Module contents
+---------------
+
+.. automodule:: butterfree.core.extract
    :members:
    :undoc-members:
    :show-inheritance:

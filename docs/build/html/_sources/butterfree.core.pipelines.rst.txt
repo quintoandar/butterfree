@@ -1,10 +1,18 @@
 butterfree.core.pipelines package
 =================================
 
-butterfree.core.pipelines.feature\_set\_pipeline module
--------------------------------------------------------
+Submodules
+----------
 
-.. automodule:: butterfree.core.pipelines.feature_set_pipeline
+.. toctree::
+   :maxdepth: 4
+
+   butterfree.core.pipelines.feature_set_pipeline
+
+Module contents
+---------------
+
+.. automodule:: butterfree.core.pipelines
    :members:
    :undoc-members:
    :show-inheritance:

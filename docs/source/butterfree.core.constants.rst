@@ -1,26 +1,20 @@
 butterfree.core.constants package
 =================================
 
-butterfree.core.constants.columns module
-----------------------------------------
+Submodules
+----------
 
-.. automodule:: butterfree.core.constants.columns
-   :members:
-   :undoc-members:
-   :show-inheritance:
+.. toctree::
+   :maxdepth: 4
 
-butterfree.core.constants.data\_type module
--------------------------------------------
+   butterfree.core.constants.columns
+   butterfree.core.constants.data_type
+   butterfree.core.constants.spark_constants
 
-.. automodule:: butterfree.core.constants.data_type
-   :members:
-   :undoc-members:
-   :show-inheritance:
+Module contents
+---------------
 
-butterfree.core.constants.spark\_constants module
--------------------------------------------------
-
-.. automodule:: butterfree.core.constants.spark_constants
+.. automodule:: butterfree.core.constants
    :members:
    :undoc-members:
    :show-inheritance:

@@ -1,26 +1,20 @@
 butterfree.core.load.writers package
 ====================================
 
-butterfree.core.load.writers.historical\_feature\_store\_writer module
-----------------------------------------------------------------------
+Submodules
+----------
 
-.. automodule:: butterfree.core.load.writers.historical_feature_store_writer
-   :members:
-   :undoc-members:
-   :show-inheritance:
+.. toctree::
+   :maxdepth: 4
 
-butterfree.core.load.writers.online\_feature\_store\_writer module
-------------------------------------------------------------------
+   butterfree.core.load.writers.historical_feature_store_writer
+   butterfree.core.load.writers.online_feature_store_writer
+   butterfree.core.load.writers.writer
 
-.. automodule:: butterfree.core.load.writers.online_feature_store_writer
-   :members:
-   :undoc-members:
-   :show-inheritance:
+Module contents
+---------------
 
-butterfree.core.load.writers.writer module
-------------------------------------------
-
-.. automodule:: butterfree.core.load.writers.writer
+.. automodule:: butterfree.core.load.writers
    :members:
    :undoc-members:
    :show-inheritance:
