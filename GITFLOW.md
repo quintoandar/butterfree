@@ -94,6 +94,15 @@ If there are any issues, fixes should be committed (or merged in) to the release
 - A tag will automatically be triggered in our CI/CD. This tag/release will use the version for its title and push a new version
 of Butterfree's python package to our private server.
 
+### Update API Documentation
+
+If new information was added in the documentation in the release. You will need to update our hosted API Documentation. It's super simple, in the **documentation** branch  just bring the modifications from the master branch and run:
+
+```bash
+make update-docs
+```
+
+No need to worry about modifying the `html files`,  everything is generated from [Sphinx](https://www.sphinx-doc.org/en/master/index.html) and hosted by [ReadtheDocs](https://readthedocs.org/). But your documentation changes will only be applied after a merge to documentation branch.
 
 
 ## Hotfixes
