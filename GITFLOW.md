@@ -3,7 +3,7 @@ Based on [markreid's notes](https://gist.github.com/markreid/12e7c2203916b93d23c
 
 ## Features
 
-A feature is based off the `staging` branch and merged back into the `staging` branch.
+A feature is based on the `staging` branch and merged back into the `staging` branch.
 It will eventually get into `master` when we make a release.
 
 
@@ -42,7 +42,7 @@ git push --force-with-lease
 
 ### GitHub workflow
 
-- Open a Pull Request against `staging`. Check our PR guidelines [here](https://guidelines.quintoandar.com.br/#/pull-requests/?id=pull-requests).
+- Open a Pull Request against `staging`. Check our PR guidelines [here](https://github.com/quintoandar/butterfree/blob/master/CONTRIBUTING.md#pull-request-guideline).
 - When the Pull Request has been approved, merge using `squash and merge`, adding the Jira task number and a brief description:
 ie, `[MLOP-169] Enable stream pipelines in Butterfree`.
 - This squashes all your commits into a single clean commit. Remember to clean detailed descriptions, otherwise our git logs will be a mess.
@@ -73,7 +73,7 @@ git fetch
 git pull origin staging
 git checkout -b release/0.4.0
 
-# finalise the change log, dump the version into setup.py, then:
+# finalize the changelog, dump the version into setup.py, then:
 git add CHANGELOG.md
 git commit -m "release 0.4.0"
 
@@ -92,8 +92,17 @@ If there are any issues, fixes should be committed (or merged in) to the release
 - **DO NOT SQUASH MERGE**. We don't want a single commit for the release, we want to maintain the feature commits in the history.
 - Repeat the steps above against `staging` (may need to rebase first).
 - A tag will automatically be triggered in our CI/CD. This tag/release will use the version for its title and push a new version
-of butterfree's python package to our private server.
+of Butterfree's python package to our private server.
 
+### Update API Documentation
+
+If new information was added in the documentation in the release. You will need to update our hosted API Documentation. It's super simple, in the **documentation** branch  just bring the modifications from the master branch and run:
+
+```bash
+make update-docs
+```
+
+No need to worry about modifying the `html files`,  everything is generated from [Sphinx](https://www.sphinx-doc.org/en/master/index.html) and hosted by [ReadtheDocs](https://readthedocs.org/). But your documentation changes will only be applied after a merge to documentation branch.
 
 
 ## Hotfixes
@@ -116,7 +125,7 @@ git commit -m "fix the problem"
 git push
 ```
 
-Don't remember to update the Changelog and the version in `setup.py`.
+Don't forget to update the Changelog and the version in `setup.py`.
 
 ### Github workflow
 
@@ -124,6 +133,6 @@ Don't remember to update the Changelog and the version in `setup.py`.
 - When the PR's approved and the code is tested, `squash and merge` to squash your commits into a single commit.
 - Open a Pull Request against `staging` (may need to rebase first).
 - A tag will automatically be triggered in our CI/CD. This tag/release will use the version for its title and push a new version
-of butterfree's python package to our private server.
+of Butterfree's python package to our private server.
 
 You may always update the tag/release description with the changelog.
