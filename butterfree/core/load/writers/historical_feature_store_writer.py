@@ -19,16 +19,16 @@ class HistoricalFeatureStoreWriter(Writer):
     """Enable writing feature sets into the Historical Feature Store.
 
     Attributes:
-        db_config: configuration with spark for databases or AWS S3 (default).
+        db_config: Datalake configuration for Spark, by default on AWS S3.
             For more information check module 'butterfree.core.db.configs'.
-        database: database to use in Spark metastore.
+        database: database name to use in Spark metastore.
             By default FEATURE_STORE_HISTORICAL_DATABASE environment variable.
-        num_partitions: value to use in repartition df before save.
+        num_partitions: value to use when applying repartition on the df before save.
         validation_threshold: lower and upper tolerance to using in count validation.
             The default value is defined in DEFAULT_VALIDATION_THRESHOLD property.
             For example: with a validation_threshold = 0.01 and a given calculated
             count on the dataframe equal to 100000 records, if the feature store
-            return a count equal to 995000 an error will not be thrown  .
+            return a count equal to 995000 an error will not be thrown.
             Use validation_threshold = 0 to not use tolerance in the validation.
         debug_mode: "dry run" mode, write the result to a temporary view.
 
@@ -46,10 +46,9 @@ class HistoricalFeatureStoreWriter(Writer):
         like write mode, file format and S3 bucket,
         and provide them to HistoricalFeatureStoreWriter.
     >>> spark_client = SparkClient()
-    >>> config = S3Config(bucket="wonka.s3.forno.data.quintoandar.com.br",
-        ...               mode="append",
+    >>> config = S3Config(bucket="my_s3_bucket_name",
+        ...               mode="overwrite",
         ...               format_="parquet")
-
     >>> writer = HistoricalFeatureStoreWriter(db_config=config)
     >>> writer.write(feature_set=feature_set,
        ...           dataframe=dataframe,
@@ -57,22 +56,21 @@ class HistoricalFeatureStoreWriter(Writer):
         For what settings you can use on S3Config and default settings,
         to read S3Config class.
 
-        We can instantiate HistoricalFeatureStoreWriter class to validate the writers,
-        using the default or custom configs.
+        We can instantiate HistoricalFeatureStoreWriter class to validate the df
+        to be written.
     >>> spark_client = SparkClient()
     >>> writer = HistoricalFeatureStoreWriter()
     >>> writer.validate(feature_set=feature_set,
        ...              dataframe=dataframe,
        ...              spark_client=spark_client)
 
-        Both methods (writer and validate) will need the Spark Client,
-        Feature Set and DataFrame, to write or to validate, according to
-        HistoricalFeatureStoreWriter class arguments.
+        Both methods (write and validate) will need the Spark Client, Feature Set
+        and DataFrame, to write or to validate, according to the Writer's arguments.
 
-        P.S.: When load, the HistoricalFeatureStoreWrite partitions
-        the data to improving queries performance.
-        The partition are stored in separate folders in AWS S3,
-        and to partition the data based on time (per year, month and day).
+        P.S.: When writing, the HistoricalFeatureStoreWrite partitions the data to
+        improve queries performance. The data is stored in partition folders in AWS S3
+        based on time (per year, month and day).
+
     """
 
     PARTITION_BY = [
