@@ -7,3 +7,6 @@ PyYAML==5.3
 cassandra-driver==3.22.0
 cmake==3.13.3
 h3==3.4.3
+pyarrow==0.15.1
+pandas==1.0.3
+jupyter==1.0.0
