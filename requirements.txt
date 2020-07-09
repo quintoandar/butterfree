@@ -4,3 +4,5 @@ parameters-validation==1.1.5
 pyspark==3.0.0
 PyYAML==5.3
 cassandra-driver==3.22.0
+cmake==3.13.3
+h3==3.4.3
