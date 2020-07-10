@@ -36,7 +36,6 @@ def pivot(
     Example:
 
         >>> dataframe.orderBy("ts", "id", "amenity").show()
-
         +---+---+-------+-----+
         | id| ts|amenity|  has|
         +---+---+-------+-----+
@@ -52,7 +51,6 @@ def pivot(
 
         >>> pivoted = pivot(dataframe, ["id", "ts"], "amenity", "has", functions.first)
         >>> pivoted.orderBy("ts", "id").show()
-
         +---+---+-------+------+----+-----+
         | id| ts|balcony|fridge|oven| pool|
         +---+---+-------+------+----+-----+
@@ -78,7 +76,6 @@ def pivot(
         ...     with_forward_fill=True
         ...)
         >>> pivoted.orderBy("ts", "id").show()
-
         +---+---+-------+------+----+-----+
         | id| ts|balcony|fridge|oven| pool|
         +---+---+-------+------+----+-----+
@@ -110,7 +107,6 @@ def pivot(
         ...     mock_type="int"
         ...)
         >>> pivoted.orderBy("ts", "id").show()
-
         +---+---+-------+------+----+-----+
         | id| ts|balcony|fridge|oven| pool|
         +---+---+-------+------+----+-----+
