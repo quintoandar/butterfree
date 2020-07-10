@@ -25,7 +25,9 @@ def forward_fill(
         filled_column: new column name. Optional. When none, operation will be inplace.
 
     Example:
+
         >>> dataframe.orderBy("ts", "sensor_type", "location").show()
+
         +-----------+-------------------+--------+-----------+
         |sensor_type|                 ts|location|temperature|
         +-----------+-------------------+--------+-----------+
@@ -42,6 +44,7 @@ def forward_fill(
         |          2|2017-09-09 14:00:00|   shade|   18.61258|
         |          2|2017-09-09 14:00:00|     sun|       null|
         +-----------+-------------------+--------+-----------+
+
         >>> filled_df = forward_fill(
         ...     dataframe,
         ...     ["sensor_type", "location"],
@@ -50,6 +53,7 @@ def forward_fill(
         ...     "temperature_filled"
         ... )
         >>> filled_df.orderBy("ts", "sensor_type", "location").show()
+
         +-----------+-------------------+--------+-----------+------------------+
         |sensor_type|                 ts|location|temperature|temperature_filled|
         +-----------+-------------------+--------+-----------+------------------+
@@ -66,6 +70,7 @@ def forward_fill(
         |          2|2017-09-09 14:00:00|   shade|   18.61258|          18.61258|
         |          2|2017-09-09 14:00:00|     sun|       null|           25.4986|
         +-----------+-------------------+--------+-----------+------------------+
+
         >>> # inplace forward fill
         >>> filled_df = forward_fill(
         ...     dataframe,
@@ -74,6 +79,7 @@ def forward_fill(
         ...     "temperature"
         ... )
         >>> filled_df.orderBy("ts", "sensor_type", "location").show()
+
         +-----------+-------------------+--------+-----------+
         |sensor_type|                 ts|location|temperature|
         +-----------+-------------------+--------+-----------+

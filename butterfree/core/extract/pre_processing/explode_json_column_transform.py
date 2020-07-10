@@ -11,6 +11,7 @@ def explode_json_column(
     """Create new columns extracting properties from a JSON column.
 
     Example:
+
     >>> from pyspark import SparkContext
     >>> from pyspark.sql import session
     >>> from butterfree.testing.dataframe import create_df_from_collection
@@ -27,7 +28,9 @@ def explode_json_column(
     >>> data = [{"json_column": '{"a": 123, "b": "abc", "c": "123", "d": [1, 2, 3]}'}]
     >>> df = create_df_from_collection(data, spark_context, spark_session)
     >>> df.collect()
+
     [Row(json_column='{"a": 123, "b": "abc", "c": "123", "d": [1, 2, 3]}')]
+
     >>> json_column_schema = StructType(
     ... [
     ...    StructField("a", IntegerType()),
@@ -38,6 +41,7 @@ def explode_json_column(
     >>> explode_json_column(
     ...     df, column='json_column', json_schema=json_column_schema
     ... ).collect()
+
     [
         Row(
             json_column='{"a": 123, "b": "abc", "c": "123", "d": [1, 2, 3]}',

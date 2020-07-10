@@ -36,6 +36,7 @@ class HistoricalFeatureStoreWriter(Writer):
         Simple example regarding HistoricalFeatureStoreWriter class instantiation.
         We can instantiate this class without db configurations, so the class get the
         S3Config() where it provides default configurations about AWS S3 service.
+
     >>> spark_client = SparkClient()
     >>> writer = HistoricalFeatureStoreWriter()
     >>> writer.write(feature_set=feature_set,
@@ -45,6 +46,7 @@ class HistoricalFeatureStoreWriter(Writer):
         However, we can define the db configurations,
         like write mode, file format and S3 bucket,
         and provide them to HistoricalFeatureStoreWriter.
+
     >>> spark_client = SparkClient()
     >>> config = S3Config(bucket="my_s3_bucket_name",
         ...               mode="overwrite",
@@ -53,11 +55,13 @@ class HistoricalFeatureStoreWriter(Writer):
     >>> writer.write(feature_set=feature_set,
        ...           dataframe=dataframe,
        ...           spark_client=spark_client)
+
         For what settings you can use on S3Config and default settings,
         to read S3Config class.
 
         We can instantiate HistoricalFeatureStoreWriter class to validate the df
         to be written.
+
     >>> spark_client = SparkClient()
     >>> writer = HistoricalFeatureStoreWriter()
     >>> writer.validate(feature_set=feature_set,
