@@ -4,12 +4,24 @@ butterfree.core.constants package
 Submodules
 ----------
 
-.. toctree::
-   :maxdepth: 4
 
-   butterfree.core.constants.columns
-   butterfree.core.constants.data_type
-   butterfree.core.constants.spark_constants
+.. automodule:: butterfree.core.constants.columns
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+.. automodule:: butterfree.core.constants.data_type
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+.. automodule:: butterfree.core.constants.spark_constants
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 
 Module contents
 ---------------

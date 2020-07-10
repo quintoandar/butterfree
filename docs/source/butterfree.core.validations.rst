@@ -4,10 +4,12 @@ butterfree.core.validations package
 Submodules
 ----------
 
-.. toctree::
-   :maxdepth: 4
 
-   butterfree.core.validations.validate_dataframe
+.. automodule:: butterfree.core.validations.validate_dataframe
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 
 Module contents
 ---------------

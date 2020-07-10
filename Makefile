@@ -151,7 +151,7 @@ publish:
 ## update Butterfree Docs for GitHubPages
 update-docs:
 	cd ./docs; rm -rf source/butterfree.*
-	cd ./docs; sphinx-apidoc -e -o source/ ../butterfree
+	cd ./docs; sphinx-apidoc -T -E -o source/ ../butterfree
 	cd ./docs; make clean
 	cd ./docs; make coverage
 	cd ./docs; make html

@@ -36,7 +36,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="butterfree.core.configs.db package" href="butterfree.core.configs.db.html" />
-    <link rel="prev" title="butterfree.core.clients.spark_client module" href="butterfree.core.clients.spark_client.html" /> 
+    <link rel="prev" title="butterfree.core.clients package" href="butterfree.core.clients.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -181,25 +181,179 @@
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="butterfree.core.configs.db.html">butterfree.core.configs.db package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="butterfree.core.configs.db.html#submodules">Submodules</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="butterfree.core.configs.db.abstract_config.html">butterfree.core.configs.db.abstract_config module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="butterfree.core.configs.db.cassandra_config.html">butterfree.core.configs.db.cassandra_config module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="butterfree.core.configs.db.s3_config.html">butterfree.core.configs.db.s3_config module</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="butterfree.core.configs.db.html#module-butterfree.core.configs.db.abstract_config">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="butterfree.core.configs.db.html#module-butterfree.core.configs.db">Module contents</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
-<div class="section" id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="butterfree.core.configs.environment.html">butterfree.core.configs.environment module</a></li>
+<div class="section" id="module-butterfree.core.configs.environment">
+<span id="submodules"></span><h2>Submodules<a class="headerlink" href="#module-butterfree.core.configs.environment" title="Permalink to this headline">¶</a></h2>
+<p>Holds functions for managing the running environment.</p>
+<dl class="py exception">
+<dt id="butterfree.core.configs.environment.UnspecifiedVariableError">
+<em class="property">exception </em><code class="sig-prename descclassname">butterfree.core.configs.environment.</code><code class="sig-name descname">UnspecifiedVariableError</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">variable_name</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.configs.environment.UnspecifiedVariableError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">RuntimeError</span></code></p>
+<p>Environment variables not set error.</p>
+<dl class="py attribute">
+<dt id="butterfree.core.configs.environment.UnspecifiedVariableError.variable_name">
+<code class="sig-name descname">variable_name</code><a class="headerlink" href="#butterfree.core.configs.environment.UnspecifiedVariableError.variable_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>environment variable name.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="butterfree.core.configs.environment.describe_environment">
+<code class="sig-prename descclassname">butterfree.core.configs.environment.</code><code class="sig-name descname">describe_environment</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">bash_formatting</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#butterfree.core.configs.environment.describe_environment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Describes the current running environment.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bash_formatting</strong> – boolean indicating whether or not to use bash
+formatting markups.</p></li>
+<li><p><strong>*</strong> – TODO</p></li>
 </ul>
-</div>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Descriptions of the current running environment in human-readable</dt><dd><p>format.</p>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="butterfree.core.configs.environment.describe_variable">
+<code class="sig-prename descclassname">butterfree.core.configs.environment.</code><code class="sig-name descname">describe_variable</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">variable_name</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">bash_formatting</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#butterfree.core.configs.environment.describe_variable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Describes an environment variable.</p>
+<p>The description will state the variable’s name, current value and origin,
+where the origin may be the running environment or the specification
+default.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>variable_name</strong> – environment variable name.</p></li>
+<li><p><strong>bash_formatting</strong> – boolean indicating whether or not to use bash
+formatting markups.</p></li>
+<li><p><strong>*</strong> – TODO</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Description of the requested environment variable in human-readable</dt><dd><p>format.</p>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="butterfree.core.configs.environment.get_current_environment">
+<code class="sig-prename descclassname">butterfree.core.configs.environment.</code><code class="sig-name descname">get_current_environment</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#butterfree.core.configs.environment.get_current_environment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets current environment tag.</p>
+<p>It is expected to assume one of these values: “dev”, “forno”, “staging” or
+“prod”. The default is “dev”.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the value of the “ENVIRONMENT” environment variable.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="butterfree.core.configs.environment.get_environment_specification">
+<code class="sig-prename descclassname">butterfree.core.configs.environment.</code><code class="sig-name descname">get_environment_specification</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; dict<a class="headerlink" href="#butterfree.core.configs.environment.get_environment_specification" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets environment specification from a default file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>filename</strong> – name of the file</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Environment specification</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="butterfree.core.configs.environment.get_variable">
+<code class="sig-prename descclassname">butterfree.core.configs.environment.</code><code class="sig-name descname">get_variable</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">variable_name</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">default_value</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#butterfree.core.configs.environment.get_variable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets an environment variable.</p>
+<p>The variable comes from it’s explicitly declared value in the running
+environment or from the default value declared in the environment.yaml
+specification or from the default_value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>variable_name</strong> – environment variable name.</p></li>
+<li><p><strong>default_value</strong> – default value to use in case no value is set in the
+environment nor in the environment.yaml specification file.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The variable’s string value</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="butterfree.core.configs.environment.is_development">
+<code class="sig-prename descclassname">butterfree.core.configs.environment.</code><code class="sig-name descname">is_development</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#butterfree.core.configs.environment.is_development" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if is development environment.</p>
+<dl class="simple">
+<dt>Checks whether the running environment tag refers to a development env or</dt><dd><p>not.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>True for development environment, False if don’t</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="butterfree.core.configs.environment.is_homolog">
+<code class="sig-prename descclassname">butterfree.core.configs.environment.</code><code class="sig-name descname">is_homolog</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#butterfree.core.configs.environment.is_homolog" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if is homolog environment.</p>
+<p>Checks whether the running environment tag refers to a homolog env or not.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>True for homolog environment, False if don’t</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="butterfree.core.configs.environment.is_production">
+<code class="sig-prename descclassname">butterfree.core.configs.environment.</code><code class="sig-name descname">is_production</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#butterfree.core.configs.environment.is_production" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if is production environment.</p>
+<dl class="simple">
+<dt>Checks whether the running environment tag refers to a production env or</dt><dd><p>not.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>True for production environment, False if don’t</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="butterfree.core.configs.environment.is_staging">
+<code class="sig-prename descclassname">butterfree.core.configs.environment.</code><code class="sig-name descname">is_staging</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#butterfree.core.configs.environment.is_staging" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if is staging environment.</p>
+<p>Checks whether the running environment tag refers to a staging env or not.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>True for staging environment, False if don’t</p>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
 <div class="section" id="module-butterfree.core.configs">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-butterfree.core.configs" title="Permalink to this headline">¶</a></h2>
@@ -218,7 +372,7 @@
         <a href="butterfree.core.configs.db.html" class="btn btn-neutral float-right" title="butterfree.core.configs.db package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="butterfree.core.clients.spark_client.html" class="btn btn-neutral float-left" title="butterfree.core.clients.spark_client module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="butterfree.core.clients.html" class="btn btn-neutral float-left" title="butterfree.core.clients package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

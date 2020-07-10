@@ -36,7 +36,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="butterfree.core.transform.transformations.user_defined_functions package" href="butterfree.core.transform.transformations.user_defined_functions.html" />
-    <link rel="prev" title="butterfree.core.transform.features.timestamp_feature module" href="butterfree.core.transform.features.timestamp_feature.html" /> 
+    <link rel="prev" title="butterfree.core.transform.features package" href="butterfree.core.transform.features.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -183,40 +183,20 @@
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="butterfree.core.transform.transformations.user_defined_functions.html">butterfree.core.transform.transformations.user_defined_functions package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="butterfree.core.transform.transformations.user_defined_functions.html#submodules">Submodules</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="butterfree.core.transform.transformations.user_defined_functions.mode.html">butterfree.core.transform.transformations.user_defined_functions.mode module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="butterfree.core.transform.transformations.user_defined_functions.most_frequent_set.html">butterfree.core.transform.transformations.user_defined_functions.most_frequent_set module</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="butterfree.core.transform.transformations.user_defined_functions.html#module-butterfree.core.transform.transformations.user_defined_functions.mode">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="butterfree.core.transform.transformations.user_defined_functions.html#module-butterfree.core.transform.transformations.user_defined_functions">Module contents</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
-<div class="section" id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="butterfree.core.transform.transformations.aggregated_transform.html">butterfree.core.transform.transformations.aggregated_transform module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="butterfree.core.transform.transformations.custom_transform.html">butterfree.core.transform.transformations.custom_transform module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="butterfree.core.transform.transformations.h3_transform.html">butterfree.core.transform.transformations.h3_transform module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="butterfree.core.transform.transformations.spark_function_transform.html">butterfree.core.transform.transformations.spark_function_transform module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="butterfree.core.transform.transformations.sql_expression_transform.html">butterfree.core.transform.transformations.sql_expression_transform module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="butterfree.core.transform.transformations.stack_transform.html">butterfree.core.transform.transformations.stack_transform module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="butterfree.core.transform.transformations.transform_component.html">butterfree.core.transform.transformations.transform_component module</a></li>
-</ul>
-</div>
-</div>
-<div class="section" id="module-butterfree.core.transform.transformations">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-butterfree.core.transform.transformations" title="Permalink to this headline">¶</a></h2>
-<p>Holds all transformations to be used by Features.</p>
-<p>A transformation must inherit from a TransformComponent and handle data modification,
-renaming and cast types using parent’s (a Feature) information.</p>
+<div class="section" id="module-butterfree.core.transform.transformations.aggregated_transform">
+<span id="submodules"></span><h2>Submodules<a class="headerlink" href="#module-butterfree.core.transform.transformations.aggregated_transform" title="Permalink to this headline">¶</a></h2>
+<p>Aggregated Transform entity.</p>
 <dl class="py class">
-<dt id="butterfree.core.transform.transformations.AggregatedTransform">
-<em class="property">class </em><code class="sig-prename descclassname">butterfree.core.transform.transformations.</code><code class="sig-name descname">AggregatedTransform</code><span class="sig-paren">(</span><em class="sig-param">functions: parameters_validation.parameter_validation_decorator.parameter_validation.&lt;locals&gt;.func_partial.&lt;locals&gt;.validation_partial</em>, <em class="sig-param">filter_expression: str = None</em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.transform.transformations.AggregatedTransform" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="butterfree.core.transform.transformations.transform_component.html#butterfree.core.transform.transformations.transform_component.TransformComponent" title="butterfree.core.transform.transformations.transform_component.TransformComponent"><code class="xref py py-class docutils literal notranslate"><span class="pre">butterfree.core.transform.transformations.transform_component.TransformComponent</span></code></a></p>
+<dt id="butterfree.core.transform.transformations.aggregated_transform.AggregatedTransform">
+<em class="property">class </em><code class="sig-prename descclassname">butterfree.core.transform.transformations.aggregated_transform.</code><code class="sig-name descname">AggregatedTransform</code><span class="sig-paren">(</span><em class="sig-param">functions: parameters_validation.parameter_validation_decorator.parameter_validation.&lt;locals&gt;.func_partial.&lt;locals&gt;.validation_partial</em>, <em class="sig-param">filter_expression: str = None</em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.transform.transformations.aggregated_transform.AggregatedTransform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#butterfree.core.transform.transformations.transform_component.TransformComponent" title="butterfree.core.transform.transformations.transform_component.TransformComponent"><code class="xref py py-class docutils literal notranslate"><span class="pre">butterfree.core.transform.transformations.transform_component.TransformComponent</span></code></a></p>
 <p>Specifies an aggregation.</p>
 <p>This transformation needs to be used within an AggregatedFeatureSet. Unlike the
 other transformations, this class won’t have a transform method implemented.</p>
@@ -226,6 +206,598 @@ with AggregatedTransform. If each one of them needs to apply a groupby.agg(), th
 we must join all the results in the end, making this computation extremely slow.</p>
 <p>Now, the AggregateFeatureSet will collect all Features’ AggregatedTransform
 definitions and run, at once, a groupby.agg(<a href="#id1"><span class="problematic" id="id2">*</span></a>aggregations).</p>
+<p>This class helps defining on a feature, which aggregation function will be applied
+to build a new aggregated column. Allowed aggregations are registered under the</p>
+<blockquote>
+<div><p>allowed_aggregations property.</p>
+</div></blockquote>
+<dl class="py attribute">
+<dt id="butterfree.core.transform.transformations.aggregated_transform.AggregatedTransform.functions">
+<code class="sig-name descname">functions</code><a class="headerlink" href="#butterfree.core.transform.transformations.aggregated_transform.AggregatedTransform.functions" title="Permalink to this definition">¶</a></dt>
+<dd><p>namedtuple with aggregation function and data type.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="butterfree.core.transform.transformations.aggregated_transform.AggregatedTransform.filter_expression">
+<code class="sig-name descname">filter_expression</code><a class="headerlink" href="#butterfree.core.transform.transformations.aggregated_transform.AggregatedTransform.filter_expression" title="Permalink to this definition">¶</a></dt>
+<dd><p>sql boolean expression to be used inside agg function.
+The filter expression can be used to aggregate some column only with
+records that obey certain condition. Has the same behaviour of the
+following SQL expression: <cite>agg(case when filter_expression then col end)</cite></p>
+</dd></dl>
+
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">butterfree.core.transform.transformations</span> <span class="kn">import</span> <span class="n">AggregatedTransform</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">butterfree.core.transform.features</span> <span class="kn">import</span> <span class="n">Feature</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">butterfree.core.constants.data_type</span> <span class="kn">import</span> <span class="n">DataType</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">butterfree.core.transform.utils.function</span> <span class="kn">import</span> <span class="n">Function</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pyspark.sql.functions</span> <span class="k">as</span> <span class="nn">F</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">feature</span> <span class="o">=</span> <span class="n">Feature</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;feature&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;aggregated transform&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">transformation</span><span class="o">=</span><span class="n">AggregatedTransform</span><span class="p">(</span>
+<span class="gp">... </span>        <span class="n">functions</span><span class="o">=</span><span class="p">[</span>
+<span class="gp">... </span>                   <span class="n">Function</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">avg</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">DOUBLE</span><span class="p">),</span>
+<span class="gp">... </span>                   <span class="n">Function</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">stddev_pop</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">DOUBLE</span><span class="p">)],</span>
+<span class="gp">... </span>    <span class="p">),</span>
+<span class="gp">... </span>    <span class="n">from_column</span><span class="o">=</span><span class="s2">&quot;somenumber&quot;</span><span class="p">,</span>
+<span class="go">...)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">feature</span><span class="o">.</span><span class="n">get_output_columns</span><span class="p">()</span>
+<span class="go">[&#39;feature__avg&#39;, &#39;feature__stddev_pop&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">feature</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">anydf</span><span class="p">)</span>
+<span class="go">NotImplementedError: ...</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt id="butterfree.core.transform.transformations.aggregated_transform.AggregatedTransform.aggregations">
+<em class="property">property </em><code class="sig-name descname">aggregations</code><a class="headerlink" href="#butterfree.core.transform.transformations.aggregated_transform.AggregatedTransform.aggregations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Aggregated spark columns.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="butterfree.core.transform.transformations.aggregated_transform.AggregatedTransform.output_columns">
+<em class="property">property </em><code class="sig-name descname">output_columns</code><a class="headerlink" href="#butterfree.core.transform.transformations.aggregated_transform.AggregatedTransform.output_columns" title="Permalink to this definition">¶</a></dt>
+<dd><p>Columns names generated by the transformation.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="butterfree.core.transform.transformations.aggregated_transform.AggregatedTransform.transform">
+<code class="sig-name descname">transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dataframe</span><span class="p">:</span> <span class="n">pyspark.sql.dataframe.DataFrame</span></em><span class="sig-paren">)</span> &#x2192; pyspark.sql.dataframe.DataFrame<a class="headerlink" href="#butterfree.core.transform.transformations.aggregated_transform.AggregatedTransform.transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>(NotImplemented) Performs a transformation to the feature pipeline.</p>
+<p>For the AggregatedTransform, the transformation won’t be applied without
+using an AggregatedFeatureSet.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dataframe</strong> – input dataframe.</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>NotImplementedError.</strong> – </p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-butterfree.core.transform.transformations.custom_transform"></span><p>CustomTransform entity.</p>
+<dl class="py class">
+<dt id="butterfree.core.transform.transformations.custom_transform.CustomTransform">
+<em class="property">class </em><code class="sig-prename descclassname">butterfree.core.transform.transformations.custom_transform.</code><code class="sig-name descname">CustomTransform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">transformer</span><span class="p">:</span> <span class="n">Callable</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.transform.transformations.custom_transform.CustomTransform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#butterfree.core.transform.transformations.transform_component.TransformComponent" title="butterfree.core.transform.transformations.transform_component.TransformComponent"><code class="xref py py-class docutils literal notranslate"><span class="pre">butterfree.core.transform.transformations.transform_component.TransformComponent</span></code></a></p>
+<p>Defines a Custom Transform.</p>
+<dl class="py attribute">
+<dt id="butterfree.core.transform.transformations.custom_transform.CustomTransform.transformer">
+<code class="sig-name descname">transformer</code><a class="headerlink" href="#butterfree.core.transform.transformations.custom_transform.CustomTransform.transformer" title="Permalink to this definition">¶</a></dt>
+<dd><p>function to use for transforming the dataframe</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt>
+<code class="sig-name descname">\*\*kwargs</code></dt>
+<dd><p>kwargs for the transformer</p>
+</dd></dl>
+
+<p class="rubric">Example</p>
+<p>It’s necessary to instantiate the CustomTransform class using
+a custom method that must always receive a dataframe and the
+parent feature as arguments and the custom arguments must be
+passed to the builder through <a href="#id3"><span class="problematic" id="id4">*</span></a>kwargs.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">butterfree.core.transform.transformations</span> <span class="kn">import</span> <span class="n">CustomTransform</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">butterfree.core.transform.features</span> <span class="kn">import</span> <span class="n">Feature</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyspark</span> <span class="kn">import</span> <span class="n">SparkContext</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyspark.sql</span> <span class="kn">import</span> <span class="n">session</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pyspark.sql.functions</span> <span class="k">as</span> <span class="nn">F</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sc</span> <span class="o">=</span> <span class="n">SparkContext</span><span class="o">.</span><span class="n">getOrCreate</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">spark</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">SparkSession</span><span class="p">(</span><span class="n">sc</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">createDataFrame</span><span class="p">([(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;2016-04-11 11:31:11&quot;</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">200</span><span class="p">),</span>
+<span class="gp">... </span>                            <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;2016-04-11 11:44:12&quot;</span><span class="p">,</span> <span class="mi">300</span><span class="p">,</span> <span class="mi">300</span><span class="p">),</span>
+<span class="gp">... </span>                            <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;2016-04-11 11:46:24&quot;</span><span class="p">,</span> <span class="mi">400</span><span class="p">,</span> <span class="mi">400</span><span class="p">),</span>
+<span class="gp">... </span>                            <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;2016-04-11 12:03:21&quot;</span><span class="p">,</span> <span class="mi">500</span><span class="p">,</span> <span class="mi">500</span><span class="p">)]</span>
+<span class="gp">... </span>                          <span class="p">)</span><span class="o">.</span><span class="n">toDF</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;timestamp&quot;</span><span class="p">,</span> <span class="s2">&quot;feature1&quot;</span><span class="p">,</span> <span class="s2">&quot;feature2&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">divide</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">parent_feature</span><span class="p">,</span> <span class="n">column1</span><span class="p">,</span> <span class="n">column2</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">name</span> <span class="o">=</span> <span class="n">parent_feature</span><span class="o">.</span><span class="n">get_output_columns</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">... </span>    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">withColumn</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">F</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="n">column1</span><span class="p">)</span> <span class="o">/</span> <span class="n">F</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="n">column2</span><span class="p">))</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="n">df</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">feature</span> <span class="o">=</span> <span class="n">Feature</span><span class="p">(</span>
+<span class="gp">... </span>   <span class="n">name</span><span class="o">=</span><span class="s2">&quot;feature&quot;</span><span class="p">,</span>
+<span class="gp">... </span>   <span class="n">description</span><span class="o">=</span><span class="s2">&quot;custom transform usage example&quot;</span><span class="p">,</span>
+<span class="gp">... </span>   <span class="n">transformation</span><span class="o">=</span><span class="n">CustomTransform</span><span class="p">(</span>
+<span class="gp">... </span>       <span class="n">transformer</span><span class="o">=</span><span class="n">divide</span><span class="p">,</span> <span class="n">column1</span><span class="o">=</span><span class="s2">&quot;feature1&quot;</span><span class="p">,</span> <span class="n">column2</span><span class="o">=</span><span class="s2">&quot;feature2&quot;</span><span class="p">,</span>
+<span class="gp">... </span>   <span class="p">)</span>
+<span class="go">...)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">feature</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="o">.</span><span class="n">orderBy</span><span class="p">(</span><span class="s2">&quot;timestamp&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="go">+--------+--------+---+-------------------+--------+</span>
+<span class="go">|feature1|feature2| id|          timestamp|feature|</span>
+<span class="go">+--------+--------+---+-------------------+--------+</span>
+<span class="go">|     200|     200|  1|2016-04-11 11:31:11|    1.0|</span>
+<span class="go">|     300|     300|  1|2016-04-11 11:44:12|    1.0|</span>
+<span class="go">|     400|     400|  1|2016-04-11 11:46:24|    1.0|</span>
+<span class="go">|     500|     500|  1|2016-04-11 12:03:21|    1.0|</span>
+<span class="go">+--------+--------+---+-------------------+--------+</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt id="butterfree.core.transform.transformations.custom_transform.CustomTransform.output_columns">
+<em class="property">property </em><code class="sig-name descname">output_columns</code><a class="headerlink" href="#butterfree.core.transform.transformations.custom_transform.CustomTransform.output_columns" title="Permalink to this definition">¶</a></dt>
+<dd><p>Columns generated by transformation.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="butterfree.core.transform.transformations.custom_transform.CustomTransform.transform">
+<code class="sig-name descname">transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dataframe</span><span class="p">:</span> <span class="n">pyspark.sql.dataframe.DataFrame</span></em><span class="sig-paren">)</span> &#x2192; pyspark.sql.dataframe.DataFrame<a class="headerlink" href="#butterfree.core.transform.transformations.custom_transform.CustomTransform.transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a transformation to the feature pipeline.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dataframe</strong> – input dataframe to be transformed.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Transformed dataframe.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="id0">
+<em class="property">property </em><code class="sig-name descname">transformer</code><a class="headerlink" href="#id0" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to use for transforming the dataframe.</p>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-butterfree.core.transform.transformations.h3_transform"></span><p>H3 Transform entity.</p>
+<dl class="py class">
+<dt id="butterfree.core.transform.transformations.h3_transform.H3HashTransform">
+<em class="property">class </em><code class="sig-prename descclassname">butterfree.core.transform.transformations.h3_transform.</code><code class="sig-name descname">H3HashTransform</code><span class="sig-paren">(</span><em class="sig-param">h3_resolutions: parameters_validation.parameter_validation_decorator.parameter_validation.&lt;locals&gt;.func_partial.&lt;locals&gt;.validation_partial</em>, <em class="sig-param">lat_column: parameters_validation.parameter_validation_decorator.parameter_validation.&lt;locals&gt;.func_partial.&lt;locals&gt;.validation_partial</em>, <em class="sig-param">lng_column: parameters_validation.parameter_validation_decorator.parameter_validation.&lt;locals&gt;.func_partial.&lt;locals&gt;.validation_partial</em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.transform.transformations.h3_transform.H3HashTransform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#butterfree.core.transform.transformations.transform_component.TransformComponent" title="butterfree.core.transform.transformations.transform_component.TransformComponent"><code class="xref py py-class docutils literal notranslate"><span class="pre">butterfree.core.transform.transformations.transform_component.TransformComponent</span></code></a></p>
+<p>Defines a H3 hash transformation.</p>
+<dl class="py attribute">
+<dt id="butterfree.core.transform.transformations.h3_transform.H3HashTransform.h3_resolutions">
+<code class="sig-name descname">h3_resolutions</code><a class="headerlink" href="#butterfree.core.transform.transformations.h3_transform.H3HashTransform.h3_resolutions" title="Permalink to this definition">¶</a></dt>
+<dd><p>h3 resolutions from 6 to 12.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="butterfree.core.transform.transformations.h3_transform.H3HashTransform.lat_column">
+<code class="sig-name descname">lat_column</code><a class="headerlink" href="#butterfree.core.transform.transformations.h3_transform.H3HashTransform.lat_column" title="Permalink to this definition">¶</a></dt>
+<dd><p>latitude column.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="butterfree.core.transform.transformations.h3_transform.H3HashTransform.lng_column">
+<code class="sig-name descname">lng_column</code><a class="headerlink" href="#butterfree.core.transform.transformations.h3_transform.H3HashTransform.lng_column" title="Permalink to this definition">¶</a></dt>
+<dd><p>longitude column.</p>
+</dd></dl>
+
+<p class="rubric">Example</p>
+<p>It’s necessary to declare the desired h3 resolutions and
+latitude and longitude columns.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">butterfree.core.transform.features</span> <span class="kn">import</span> <span class="n">Feature</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">butterfree.core.transform.transformations.h3_transform</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="gp">... </span><span class="n">H3HashTransform</span>
+<span class="go">...)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyspark</span> <span class="kn">import</span> <span class="n">SparkContext</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyspark.sql</span> <span class="kn">import</span> <span class="n">session</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sc</span> <span class="o">=</span> <span class="n">SparkContext</span><span class="o">.</span><span class="n">getOrCreate</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">spark</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">SparkSession</span><span class="p">(</span><span class="n">sc</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">createDataFrame</span><span class="p">([(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="o">-</span><span class="mf">23.554190</span><span class="p">,</span> <span class="o">-</span><span class="mf">46.670723</span><span class="p">),</span>
+<span class="gp">... </span>                            <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">300</span><span class="p">,</span> <span class="o">-</span><span class="mf">23.554190</span><span class="p">,</span> <span class="o">-</span><span class="mf">46.670723</span><span class="p">),</span>
+<span class="gp">... </span>                            <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">400</span><span class="p">,</span> <span class="o">-</span><span class="mf">23.554190</span><span class="p">,</span> <span class="o">-</span><span class="mf">46.670723</span><span class="p">),</span>
+<span class="gp">... </span>                            <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">500</span><span class="p">,</span> <span class="o">-</span><span class="mf">23.554190</span><span class="p">,</span> <span class="o">-</span><span class="mf">46.670723</span><span class="p">)]</span>
+<span class="gp">... </span>                          <span class="p">)</span><span class="o">.</span><span class="n">toDF</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;feature&quot;</span><span class="p">,</span> <span class="s2">&quot;lat&quot;</span><span class="p">,</span> <span class="s2">&quot;lng&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">feature</span> <span class="o">=</span> <span class="n">Feature</span><span class="p">(</span>
+<span class="gp">... </span>   <span class="n">name</span><span class="o">=</span><span class="s2">&quot;feature&quot;</span><span class="p">,</span>
+<span class="gp">... </span>   <span class="n">description</span><span class="o">=</span><span class="s2">&quot;h3 hash transform usage example&quot;</span><span class="p">,</span>
+<span class="gp">... </span>   <span class="n">transformation</span><span class="o">=</span><span class="n">H3HashTransform</span><span class="p">(</span>
+<span class="gp">... </span>       <span class="n">h3_resolutions</span><span class="o">=</span><span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">12</span><span class="p">],</span>
+<span class="gp">... </span>       <span class="n">lat_column</span><span class="o">=</span><span class="s2">&quot;lat&quot;</span><span class="p">,</span>
+<span class="gp">... </span>       <span class="n">lng_column</span><span class="o">=</span><span class="s2">&quot;lng&quot;</span><span class="p">,</span>
+<span class="gp">... </span>   <span class="p">)</span>
+<span class="go">...)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">feature</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="go">+-------+---+---------+----------+-------------------+-------------------+</span>
+<span class="go">|feature| id|      lat|       lng|lat_lng__h3_hash__6|lat_lng__h3_hash__7|</span>
+<span class="go">+-------+---+---------+----------+-------------------+-------------------+</span>
+<span class="go">|    200|  1|-23.55419|-46.670723|    86a8100efffffff|    87a8100eaffffff|</span>
+<span class="go">|    300|  1|-23.55419|-46.670723|    86a8100efffffff|    87a8100eaffffff|</span>
+<span class="go">|    400|  1|-23.55419|-46.670723|    86a8100efffffff|    87a8100eaffffff|</span>
+<span class="go">|    500|  1|-23.55419|-46.670723|    86a8100efffffff|    87a8100eaffffff|</span>
+<span class="go">+-------+---+---------+----------+-------------------+-------------------+</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt id="butterfree.core.transform.transformations.h3_transform.H3HashTransform.output_columns">
+<em class="property">property </em><code class="sig-name descname">output_columns</code><a class="headerlink" href="#butterfree.core.transform.transformations.h3_transform.H3HashTransform.output_columns" title="Permalink to this definition">¶</a></dt>
+<dd><p>Columns generated by the transformation.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="butterfree.core.transform.transformations.h3_transform.H3HashTransform.transform">
+<code class="sig-name descname">transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dataframe</span><span class="p">:</span> <span class="n">pyspark.sql.dataframe.DataFrame</span></em><span class="sig-paren">)</span> &#x2192; pyspark.sql.dataframe.DataFrame<a class="headerlink" href="#butterfree.core.transform.transformations.h3_transform.H3HashTransform.transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a transformation to the feature pipeline.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dataframe</strong> – input dataframe.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Transformed dataframe.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="butterfree.core.transform.transformations.h3_transform.H3HashTransform.with_stack">
+<code class="sig-name descname">with_stack</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.transform.transformations.h3_transform.H3HashTransform.with_stack" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a final Stack step to the transformation.</p>
+<p>A new column will be created stacking all the the resolution columns
+generated by H3. The name of this column will be the parent name of
+H3Transform, for example, the name of the KeyFeature that has the H3
+as a transformation.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="butterfree.core.transform.transformations.h3_transform.define_h3">
+<code class="sig-prename descclassname">butterfree.core.transform.transformations.h3_transform.</code><code class="sig-name descname">define_h3</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.transform.transformations.h3_transform.define_h3" title="Permalink to this definition">¶</a></dt>
+<dd><p>UDF for h3 hash retrieval.</p>
+<dl class="py attribute">
+<dt id="butterfree.core.transform.transformations.h3_transform.lat">
+<code class="sig-prename descclassname">butterfree.core.transform.transformations.h3_transform.</code><code class="sig-name descname">lat</code><a class="headerlink" href="#butterfree.core.transform.transformations.h3_transform.lat" title="Permalink to this definition">¶</a></dt>
+<dd><p>latitude column.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="butterfree.core.transform.transformations.h3_transform.lng">
+<code class="sig-prename descclassname">butterfree.core.transform.transformations.h3_transform.</code><code class="sig-name descname">lng</code><a class="headerlink" href="#butterfree.core.transform.transformations.h3_transform.lng" title="Permalink to this definition">¶</a></dt>
+<dd><p>longitude column.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="butterfree.core.transform.transformations.h3_transform.resolution">
+<code class="sig-prename descclassname">butterfree.core.transform.transformations.h3_transform.</code><code class="sig-name descname">resolution</code><a class="headerlink" href="#butterfree.core.transform.transformations.h3_transform.resolution" title="Permalink to this definition">¶</a></dt>
+<dd><p>desired h3 resolution.</p>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-butterfree.core.transform.transformations.spark_function_transform"></span><p>Spark Function Transform entity.</p>
+<dl class="py class">
+<dt id="butterfree.core.transform.transformations.spark_function_transform.SparkFunctionTransform">
+<em class="property">class </em><code class="sig-prename descclassname">butterfree.core.transform.transformations.spark_function_transform.</code><code class="sig-name descname">SparkFunctionTransform</code><span class="sig-paren">(</span><em class="sig-param">functions: parameters_validation.parameter_validation_decorator.parameter_validation.&lt;locals&gt;.func_partial.&lt;locals&gt;.validation_partial</em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.transform.transformations.spark_function_transform.SparkFunctionTransform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#butterfree.core.transform.transformations.transform_component.TransformComponent" title="butterfree.core.transform.transformations.transform_component.TransformComponent"><code class="xref py py-class docutils literal notranslate"><span class="pre">butterfree.core.transform.transformations.transform_component.TransformComponent</span></code></a></p>
+<p>Defines an Spark Function.</p>
+<dl class="py attribute">
+<dt id="butterfree.core.transform.transformations.spark_function_transform.SparkFunctionTransform.function">
+<code class="sig-name descname">function</code><a class="headerlink" href="#butterfree.core.transform.transformations.spark_function_transform.SparkFunctionTransform.function" title="Permalink to this definition">¶</a></dt>
+<dd><p>namedtuple with spark function and data type.</p>
+</dd></dl>
+
+<p class="rubric">Example</p>
+<p>It’s necessary to declare the function method,
+Any spark and user defined functions are supported.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">butterfree.core.transform.transformations</span> <span class="kn">import</span> <span class="n">SparkFunctionTransform</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">butterfree.core.constants.columns</span> <span class="kn">import</span> <span class="n">TIMESTAMP_COLUMN</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">butterfree.core.transform.features</span> <span class="kn">import</span> <span class="n">Feature</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">butterfree.core.transform.utils.function</span> <span class="kn">import</span> <span class="n">Function</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">butterfree.core.constants.data_type</span> <span class="kn">import</span> <span class="n">DataType</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyspark</span> <span class="kn">import</span> <span class="n">SparkContext</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyspark.sql</span> <span class="kn">import</span> <span class="n">session</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyspark.sql.types</span> <span class="kn">import</span> <span class="n">TimestampType</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyspark.sql</span> <span class="kn">import</span> <span class="n">functions</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sc</span> <span class="o">=</span> <span class="n">SparkContext</span><span class="o">.</span><span class="n">getOrCreate</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">spark</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">SparkSession</span><span class="p">(</span><span class="n">sc</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">createDataFrame</span><span class="p">([(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;2016-04-11 11:31:11&quot;</span><span class="p">,</span> <span class="mi">200</span><span class="p">),</span>
+<span class="gp">... </span>                            <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;2016-04-11 11:44:12&quot;</span><span class="p">,</span> <span class="mi">300</span><span class="p">),</span>
+<span class="gp">... </span>                            <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;2016-04-11 11:46:24&quot;</span><span class="p">,</span> <span class="mi">400</span><span class="p">),</span>
+<span class="gp">... </span>                            <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;2016-04-11 12:03:21&quot;</span><span class="p">,</span> <span class="mi">500</span><span class="p">)]</span>
+<span class="gp">... </span>                          <span class="p">)</span><span class="o">.</span><span class="n">toDF</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;timestamp&quot;</span><span class="p">,</span> <span class="s2">&quot;feature&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">withColumn</span><span class="p">(</span><span class="s2">&quot;timestamp&quot;</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">timestamp</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">TimestampType</span><span class="p">()))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">feature</span> <span class="o">=</span> <span class="n">Feature</span><span class="p">(</span>
+<span class="gp">... </span>   <span class="n">name</span><span class="o">=</span><span class="s2">&quot;feature&quot;</span><span class="p">,</span>
+<span class="gp">... </span>   <span class="n">description</span><span class="o">=</span><span class="s2">&quot;spark function transform&quot;</span><span class="p">,</span>
+<span class="gp">... </span>   <span class="n">transformation</span><span class="o">=</span><span class="n">SparkFunctionTransform</span><span class="p">(</span>
+<span class="gp">... </span>      <span class="n">functions</span><span class="o">=</span><span class="p">[</span><span class="n">Function</span><span class="p">(</span><span class="n">functions</span><span class="o">.</span><span class="n">cos</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">DOUBLE</span><span class="p">)],)</span>
+<span class="go">...)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">feature</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="o">.</span><span class="n">orderBy</span><span class="p">(</span><span class="s2">&quot;timestamp&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="go">+---+-------------------+-------+--------------------+</span>
+<span class="go">| id|          timestamp|feature|        feature__cos|</span>
+<span class="go">+---+-------------------+-------+--------------------+</span>
+<span class="go">|  1|2016-04-11 11:31:11|    200|  0.4871876750070059|</span>
+<span class="go">|  1|2016-04-11 11:44:12|    300|-0.02209661927868...|</span>
+<span class="go">|  1|2016-04-11 11:46:24|    400|  -0.525296338642536|</span>
+<span class="go">|  1|2016-04-11 12:03:21|    500|  -0.883849273431478|</span>
+<span class="go">+---+-------------------+-------+--------------------+</span>
+</pre></div>
+</div>
+<p>We can use this transformation with windows.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">feature_row_windows</span> <span class="o">=</span> <span class="n">Feature</span><span class="p">(</span>
+<span class="gp">... </span>   <span class="n">name</span><span class="o">=</span><span class="s2">&quot;feature&quot;</span><span class="p">,</span>
+<span class="gp">... </span>   <span class="n">description</span><span class="o">=</span><span class="s2">&quot;spark function transform with windows&quot;</span><span class="p">,</span>
+<span class="gp">... </span>   <span class="n">transformation</span><span class="o">=</span><span class="n">SparkFunctionTransform</span><span class="p">(</span>
+<span class="gp">... </span>      <span class="n">functions</span><span class="o">=</span><span class="p">[</span><span class="n">Function</span><span class="p">(</span><span class="n">functions</span><span class="o">.</span><span class="n">avg</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">DOUBLE</span><span class="p">)],)</span>
+<span class="gp">... </span>                   <span class="o">.</span><span class="n">with_window</span><span class="p">(</span><span class="n">partition_by</span><span class="o">=</span><span class="s2">&quot;id&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                                <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;row_windows&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                                <span class="n">window_definition</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;2 events&quot;</span><span class="p">],</span>
+<span class="gp">... </span>  <span class="p">)</span>
+<span class="go">...)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">feature_row_windows</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="o">.</span><span class="n">orderBy</span><span class="p">(</span><span class="s2">&quot;timestamp&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="go">+--------+-----------------------+---------------------------------------+</span>
+<span class="go">|feature | id|          timestamp| feature_avg_over_2_events_row_windows|</span>
+<span class="go">+--------+---+-------------------+--------------------------------------+</span>
+<span class="go">|     200|  1|2016-04-11 11:31:11|                                 200.0|</span>
+<span class="go">|     300|  1|2016-04-11 11:44:12|                                 250.0|</span>
+<span class="go">|     400|  1|2016-04-11 11:46:24|                                 350.0|</span>
+<span class="go">|     500|  1|2016-04-11 12:03:21|                                 450.0|</span>
+<span class="go">+--------+---+-------------------+--------------------------------------+</span>
+</pre></div>
+</div>
+<p>It’s important to notice that transformation doesn’t affect the
+dataframe granularity.</p>
+<dl class="py method">
+<dt id="butterfree.core.transform.transformations.spark_function_transform.SparkFunctionTransform.output_columns">
+<em class="property">property </em><code class="sig-name descname">output_columns</code><a class="headerlink" href="#butterfree.core.transform.transformations.spark_function_transform.SparkFunctionTransform.output_columns" title="Permalink to this definition">¶</a></dt>
+<dd><p>Columns generated by the transformation.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="butterfree.core.transform.transformations.spark_function_transform.SparkFunctionTransform.transform">
+<code class="sig-name descname">transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dataframe</span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.transform.transformations.spark_function_transform.SparkFunctionTransform.transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a transformation to the feature pipeline.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dataframe</strong> – input dataframe.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Transformed dataframe.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="butterfree.core.transform.transformations.spark_function_transform.SparkFunctionTransform.with_window">
+<code class="sig-name descname">with_window</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">partition_by</span></em>, <em class="sig-param"><span class="n">order_by</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mode</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">window_definition</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.transform.transformations.spark_function_transform.SparkFunctionTransform.with_window" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a list with windows defined.</p>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-butterfree.core.transform.transformations.sql_expression_transform"></span><p>SQL Expression Transform entity.</p>
+<dl class="py class">
+<dt id="butterfree.core.transform.transformations.sql_expression_transform.SQLExpressionTransform">
+<em class="property">class </em><code class="sig-prename descclassname">butterfree.core.transform.transformations.sql_expression_transform.</code><code class="sig-name descname">SQLExpressionTransform</code><span class="sig-paren">(</span><em class="sig-param">expression: parameters_validation.parameter_validation_decorator.parameter_validation.&lt;locals&gt;.func_partial.&lt;locals&gt;.validation_partial</em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.transform.transformations.sql_expression_transform.SQLExpressionTransform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#butterfree.core.transform.transformations.transform_component.TransformComponent" title="butterfree.core.transform.transformations.transform_component.TransformComponent"><code class="xref py py-class docutils literal notranslate"><span class="pre">butterfree.core.transform.transformations.transform_component.TransformComponent</span></code></a></p>
+<p>Defines an SQL Expression Transformation.</p>
+<dl class="py attribute">
+<dt id="butterfree.core.transform.transformations.sql_expression_transform.SQLExpressionTransform.expression">
+<code class="sig-name descname">expression</code><a class="headerlink" href="#butterfree.core.transform.transformations.sql_expression_transform.SQLExpressionTransform.expression" title="Permalink to this definition">¶</a></dt>
+<dd><p>SQL expression defined by the user.</p>
+</dd></dl>
+
+<p class="rubric">Example</p>
+<p>It’s necessary to declare the custom SQL query, such that it
+corresponds to operations between existing columns in the dataframe.
+Besides, the usage of SparkSQL functions is also allowed. Finally,
+a “complete select statement”, such as “select col_a * col_b from
+my_table”, is not necessary, just the simple operations are
+required, for instance “col_a / col_b” or “col_a * col_b”.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">butterfree.core.transform.features</span> <span class="kn">import</span> <span class="n">Feature</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">butterfree.core.transform.transformations</span> <span class="kn">import</span> <span class="n">SQLExpressionTransform</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyspark</span> <span class="kn">import</span> <span class="n">SparkContext</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyspark.sql</span> <span class="kn">import</span> <span class="n">session</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pyspark.sql.functions</span> <span class="k">as</span> <span class="nn">F</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sc</span> <span class="o">=</span> <span class="n">SparkContext</span><span class="o">.</span><span class="n">getOrCreate</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">spark</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">SparkSession</span><span class="p">(</span><span class="n">sc</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">createDataFrame</span><span class="p">([(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;2016-04-11 11:31:11&quot;</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">200</span><span class="p">),</span>
+<span class="gp">... </span>                            <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;2016-04-11 11:44:12&quot;</span><span class="p">,</span> <span class="mi">300</span><span class="p">,</span> <span class="mi">300</span><span class="p">),</span>
+<span class="gp">... </span>                            <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;2016-04-11 11:46:24&quot;</span><span class="p">,</span> <span class="mi">400</span><span class="p">,</span> <span class="mi">400</span><span class="p">),</span>
+<span class="gp">... </span>                            <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;2016-04-11 12:03:21&quot;</span><span class="p">,</span> <span class="mi">500</span><span class="p">,</span> <span class="mi">500</span><span class="p">)]</span>
+<span class="gp">... </span>                          <span class="p">)</span><span class="o">.</span><span class="n">toDF</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;timestamp&quot;</span><span class="p">,</span> <span class="s2">&quot;feature1&quot;</span><span class="p">,</span> <span class="s2">&quot;feature2&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">feature</span> <span class="o">=</span> <span class="n">Feature</span><span class="p">(</span>
+<span class="gp">... </span>   <span class="n">name</span><span class="o">=</span><span class="s2">&quot;feature&quot;</span><span class="p">,</span>
+<span class="gp">... </span>   <span class="n">description</span><span class="o">=</span><span class="s2">&quot;SQL expression transform usage example&quot;</span><span class="p">,</span>
+<span class="gp">... </span>   <span class="n">transformation</span><span class="o">=</span><span class="n">SQLExpressionTransform</span><span class="p">(</span><span class="n">expression</span><span class="o">=</span><span class="s2">&quot;feature1/feature2&quot;</span><span class="p">),</span>
+<span class="go">...)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">feature</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="o">.</span><span class="n">orderBy</span><span class="p">(</span><span class="s2">&quot;timestamp&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="go">+--------+--------+---+-------------------+----------------------+</span>
+<span class="go">|feature1|feature2| id|          timestamp|feature1_over_feature2|</span>
+<span class="go">+--------+--------+---+-------------------+----------------------+</span>
+<span class="go">|     200|     200|  1|2016-04-11 11:31:11|                   1.0|</span>
+<span class="go">|     300|     300|  1|2016-04-11 11:44:12|                   1.0|</span>
+<span class="go">|     400|     400|  1|2016-04-11 11:46:24|                   1.0|</span>
+<span class="go">|     500|     500|  1|2016-04-11 12:03:21|                   1.0|</span>
+<span class="go">+--------+--------+---+-------------------+----------------------+</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt id="butterfree.core.transform.transformations.sql_expression_transform.SQLExpressionTransform.output_columns">
+<em class="property">property </em><code class="sig-name descname">output_columns</code><a class="headerlink" href="#butterfree.core.transform.transformations.sql_expression_transform.SQLExpressionTransform.output_columns" title="Permalink to this definition">¶</a></dt>
+<dd><p>Columns generated by the transformation.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="butterfree.core.transform.transformations.sql_expression_transform.SQLExpressionTransform.transform">
+<code class="sig-name descname">transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dataframe</span><span class="p">:</span> <span class="n">pyspark.sql.dataframe.DataFrame</span></em><span class="sig-paren">)</span> &#x2192; pyspark.sql.dataframe.DataFrame<a class="headerlink" href="#butterfree.core.transform.transformations.sql_expression_transform.SQLExpressionTransform.transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a transformation to the feature pipeline.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dataframe</strong> – input dataframe.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Transformed dataframe.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-butterfree.core.transform.transformations.stack_transform"></span><p>Stack Transform entity.</p>
+<dl class="py class">
+<dt id="butterfree.core.transform.transformations.stack_transform.StackTransform">
+<em class="property">class </em><code class="sig-prename descclassname">butterfree.core.transform.transformations.stack_transform.</code><code class="sig-name descname">StackTransform</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">columns_names</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">is_regex</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.transform.transformations.stack_transform.StackTransform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#butterfree.core.transform.transformations.transform_component.TransformComponent" title="butterfree.core.transform.transformations.transform_component.TransformComponent"><code class="xref py py-class docutils literal notranslate"><span class="pre">butterfree.core.transform.transformations.transform_component.TransformComponent</span></code></a></p>
+<p>Defines a Stack transformation.</p>
+<p>For instantiation it is needed the name of the columns or a pattern to use
+to find the columns that need to be stacked. This transform generates just
+one column as output.</p>
+<dl class="py attribute">
+<dt id="butterfree.core.transform.transformations.stack_transform.StackTransform.columns_names">
+<code class="sig-name descname">columns_names</code><a class="headerlink" href="#butterfree.core.transform.transformations.stack_transform.StackTransform.columns_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>full names or patterns to search for target columns on
+the dataframe.
+By default a single <cite>*</cite> character is considered a wildcard and can
+be anywhere in the string, multiple wildcards are not supported.
+Strings can also start with an <cite>!</cite> (exclamation mark), it indicates
+a negation, be it a regular string or simple pattern.
+When parameter :param is_regex: is <cite>True</cite>, simple patterns wildcards
+and negation are disabled and all strings are interpreted as regular
+expressions.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="butterfree.core.transform.transformations.stack_transform.StackTransform.is_regex">
+<code class="sig-name descname">is_regex</code><a class="headerlink" href="#butterfree.core.transform.transformations.stack_transform.StackTransform.is_regex" title="Permalink to this definition">¶</a></dt>
+<dd><p>boolean flag to indicate if columns_names passed are a Python
+regex string patterns.</p>
+</dd></dl>
+
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyspark</span> <span class="kn">import</span> <span class="n">SparkContext</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyspark.sql</span> <span class="kn">import</span> <span class="n">session</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">butterfree.testing.dataframe</span> <span class="kn">import</span> <span class="n">create_df_from_collection</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">butterfree.core.transform.transformations</span> <span class="kn">import</span> <span class="n">StackTransform</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">butterfree.core.transform.features</span> <span class="kn">import</span> <span class="n">Feature</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">spark_context</span> <span class="o">=</span> <span class="n">SparkContext</span><span class="o">.</span><span class="n">getOrCreate</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">spark_session</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">SparkSession</span><span class="p">(</span><span class="n">spark_context</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="p">[</span>
+<span class="gp">... </span>   <span class="p">{</span><span class="s2">&quot;feature&quot;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span> <span class="s2">&quot;id_a&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;id_b&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
+<span class="gp">... </span>   <span class="p">{</span><span class="s2">&quot;feature&quot;</span><span class="p">:</span> <span class="mi">120</span><span class="p">,</span> <span class="s2">&quot;id_a&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;id_b&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">},</span>
+<span class="gp">... </span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">create_df_from_collection</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">spark_context</span><span class="p">,</span> <span class="n">spark_session</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+<span class="go">[Row(feature=100, id_a=1, id_b=2), Row(feature=120, id_a=3, id_b=4)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">feature</span> <span class="o">=</span> <span class="n">Feature</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;stack_ids&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;id_a and id_b stacked in a single column.&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">transformation</span><span class="o">=</span><span class="n">StackTransform</span><span class="p">(</span><span class="s2">&quot;id_a&quot;</span><span class="p">,</span> <span class="s2">&quot;id_b&quot;</span><span class="p">),</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">feature</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+<span class="go">[</span>
+<span class="go">    Row(feature=100, id_a=1, id_b=2, stack_ids=1),</span>
+<span class="go">    Row(feature=100, id_a=1, id_b=2, stack_ids=2),</span>
+<span class="go">    Row(feature=120, id_a=3, id_b=4, stack_ids=3),</span>
+<span class="go">    Row(feature=120, id_a=3, id_b=4, stack_ids=4)</span>
+<span class="go">]</span>
+</pre></div>
+</div>
+<p>The StackTransform can be instantiated using a column pattern instead of
+the columns full names. Like this way:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">feature</span> <span class="o">=</span> <span class="n">Feature</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;stack_ids&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;id_a and id_b stacked in a single column.&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">transformation</span><span class="o">=</span><span class="n">StackTransform</span><span class="p">(</span><span class="n">columns_prefix</span><span class="o">=</span><span class="s2">&quot;id_*&quot;</span><span class="p">),</span>
+<span class="gp">... </span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt id="butterfree.core.transform.transformations.stack_transform.StackTransform.output_columns">
+<em class="property">property </em><code class="sig-name descname">output_columns</code><a class="headerlink" href="#butterfree.core.transform.transformations.stack_transform.StackTransform.output_columns" title="Permalink to this definition">¶</a></dt>
+<dd><p>Columns generated by the transformation.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="butterfree.core.transform.transformations.stack_transform.StackTransform.transform">
+<code class="sig-name descname">transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dataframe</span><span class="p">:</span> <span class="n">pyspark.sql.dataframe.DataFrame</span></em><span class="sig-paren">)</span> &#x2192; pyspark.sql.dataframe.DataFrame<a class="headerlink" href="#butterfree.core.transform.transformations.stack_transform.StackTransform.transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a transformation to the feature pipeline.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dataframe</strong> – input dataframe.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Transformed dataframe.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-butterfree.core.transform.transformations.transform_component"></span><p>Transform Abstract Class.</p>
+<dl class="py class">
+<dt id="butterfree.core.transform.transformations.transform_component.TransformComponent">
+<em class="property">class </em><code class="sig-prename descclassname">butterfree.core.transform.transformations.transform_component.</code><code class="sig-name descname">TransformComponent</code><a class="headerlink" href="#butterfree.core.transform.transformations.transform_component.TransformComponent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<p>Defines an abstract class for Transform entities.</p>
+<dl class="py attribute">
+<dt id="butterfree.core.transform.transformations.transform_component.TransformComponent.parent">
+<code class="sig-name descname">parent</code><a class="headerlink" href="#butterfree.core.transform.transformations.transform_component.TransformComponent.parent" title="Permalink to this definition">¶</a></dt>
+<dd><p>parent transform component.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="butterfree.core.transform.transformations.transform_component.TransformComponent.output_columns">
+<em class="property">abstract property </em><code class="sig-name descname">output_columns</code><a class="headerlink" href="#butterfree.core.transform.transformations.transform_component.TransformComponent.output_columns" title="Permalink to this definition">¶</a></dt>
+<dd><p>Columns generated by the transformation.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="id5">
+<em class="property">property </em><code class="sig-name descname">parent</code><a class="headerlink" href="#id5" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parent transform component.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="butterfree.core.transform.transformations.transform_component.TransformComponent.transform">
+<em class="property">abstract </em><code class="sig-name descname">transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dataframe</span><span class="p">:</span> <span class="n">pyspark.sql.dataframe.DataFrame</span></em><span class="sig-paren">)</span> &#x2192; pyspark.sql.dataframe.DataFrame<a class="headerlink" href="#butterfree.core.transform.transformations.transform_component.TransformComponent.transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a transformation to the feature pipeline.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dataframe</strong> – input dataframe.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Transformed dataframe.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-butterfree.core.transform.transformations">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-butterfree.core.transform.transformations" title="Permalink to this headline">¶</a></h2>
+<p>Holds all transformations to be used by Features.</p>
+<p>A transformation must inherit from a TransformComponent and handle data modification,
+renaming and cast types using parent’s (a Feature) information.</p>
+<dl class="py class">
+<dt id="butterfree.core.transform.transformations.AggregatedTransform">
+<em class="property">class </em><code class="sig-prename descclassname">butterfree.core.transform.transformations.</code><code class="sig-name descname">AggregatedTransform</code><span class="sig-paren">(</span><em class="sig-param">functions: parameters_validation.parameter_validation_decorator.parameter_validation.&lt;locals&gt;.func_partial.&lt;locals&gt;.validation_partial</em>, <em class="sig-param">filter_expression: str = None</em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.transform.transformations.AggregatedTransform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#butterfree.core.transform.transformations.transform_component.TransformComponent" title="butterfree.core.transform.transformations.transform_component.TransformComponent"><code class="xref py py-class docutils literal notranslate"><span class="pre">butterfree.core.transform.transformations.transform_component.TransformComponent</span></code></a></p>
+<p>Specifies an aggregation.</p>
+<p>This transformation needs to be used within an AggregatedFeatureSet. Unlike the
+other transformations, this class won’t have a transform method implemented.</p>
+<p>The idea behing aggregating is that, in spark, we should execute all aggregation
+functions after a single groupby. So an AggregateFeatureSet will have many Features
+with AggregatedTransform. If each one of them needs to apply a groupby.agg(), then
+we must join all the results in the end, making this computation extremely slow.</p>
+<p>Now, the AggregateFeatureSet will collect all Features’ AggregatedTransform
+definitions and run, at once, a groupby.agg(<a href="#id6"><span class="problematic" id="id7">*</span></a>aggregations).</p>
 <p>This class helps defining on a feature, which aggregation function will be applied
 to build a new aggregated column. Allowed aggregations are registered under the</p>
 <blockquote>
@@ -301,7 +873,7 @@ using an AggregatedFeatureSet.</p>
 <dl class="py class">
 <dt id="butterfree.core.transform.transformations.CustomTransform">
 <em class="property">class </em><code class="sig-prename descclassname">butterfree.core.transform.transformations.</code><code class="sig-name descname">CustomTransform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">transformer</span><span class="p">:</span> <span class="n">Callable</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.transform.transformations.CustomTransform" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="butterfree.core.transform.transformations.transform_component.html#butterfree.core.transform.transformations.transform_component.TransformComponent" title="butterfree.core.transform.transformations.transform_component.TransformComponent"><code class="xref py py-class docutils literal notranslate"><span class="pre">butterfree.core.transform.transformations.transform_component.TransformComponent</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#butterfree.core.transform.transformations.transform_component.TransformComponent" title="butterfree.core.transform.transformations.transform_component.TransformComponent"><code class="xref py py-class docutils literal notranslate"><span class="pre">butterfree.core.transform.transformations.transform_component.TransformComponent</span></code></a></p>
 <p>Defines a Custom Transform.</p>
 <dl class="py attribute">
 <dt id="butterfree.core.transform.transformations.CustomTransform.transformer">
@@ -319,7 +891,7 @@ using an AggregatedFeatureSet.</p>
 <p>It’s necessary to instantiate the CustomTransform class using
 a custom method that must always receive a dataframe and the
 parent feature as arguments and the custom arguments must be
-passed to the builder through <a href="#id3"><span class="problematic" id="id4">*</span></a>kwargs.</p>
+passed to the builder through <a href="#id8"><span class="problematic" id="id9">*</span></a>kwargs.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">butterfree.core.transform.transformations</span> <span class="kn">import</span> <span class="n">CustomTransform</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">butterfree.core.transform.features</span> <span class="kn">import</span> <span class="n">Feature</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyspark</span> <span class="kn">import</span> <span class="n">SparkContext</span>
@@ -375,8 +947,8 @@ passed to the builder through <a href="#id3"><span class="problematic" id="id4">
 </dd></dl>
 
 <dl class="py method">
-<dt id="id0">
-<em class="property">property </em><code class="sig-name descname">transformer</code><a class="headerlink" href="#id0" title="Permalink to this definition">¶</a></dt>
+<dt id="id10">
+<em class="property">property </em><code class="sig-name descname">transformer</code><a class="headerlink" href="#id10" title="Permalink to this definition">¶</a></dt>
 <dd><p>Function to use for transforming the dataframe.</p>
 </dd></dl>
 
@@ -385,7 +957,7 @@ passed to the builder through <a href="#id3"><span class="problematic" id="id4">
 <dl class="py class">
 <dt id="butterfree.core.transform.transformations.H3HashTransform">
 <em class="property">class </em><code class="sig-prename descclassname">butterfree.core.transform.transformations.</code><code class="sig-name descname">H3HashTransform</code><span class="sig-paren">(</span><em class="sig-param">h3_resolutions: parameters_validation.parameter_validation_decorator.parameter_validation.&lt;locals&gt;.func_partial.&lt;locals&gt;.validation_partial</em>, <em class="sig-param">lat_column: parameters_validation.parameter_validation_decorator.parameter_validation.&lt;locals&gt;.func_partial.&lt;locals&gt;.validation_partial</em>, <em class="sig-param">lng_column: parameters_validation.parameter_validation_decorator.parameter_validation.&lt;locals&gt;.func_partial.&lt;locals&gt;.validation_partial</em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.transform.transformations.H3HashTransform" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="butterfree.core.transform.transformations.transform_component.html#butterfree.core.transform.transformations.transform_component.TransformComponent" title="butterfree.core.transform.transformations.transform_component.TransformComponent"><code class="xref py py-class docutils literal notranslate"><span class="pre">butterfree.core.transform.transformations.transform_component.TransformComponent</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#butterfree.core.transform.transformations.transform_component.TransformComponent" title="butterfree.core.transform.transformations.transform_component.TransformComponent"><code class="xref py py-class docutils literal notranslate"><span class="pre">butterfree.core.transform.transformations.transform_component.TransformComponent</span></code></a></p>
 <p>Defines a H3 hash transformation.</p>
 <dl class="py attribute">
 <dt id="butterfree.core.transform.transformations.H3HashTransform.h3_resolutions">
@@ -476,7 +1048,7 @@ as a transformation.</p>
 <dl class="py class">
 <dt id="butterfree.core.transform.transformations.SQLExpressionTransform">
 <em class="property">class </em><code class="sig-prename descclassname">butterfree.core.transform.transformations.</code><code class="sig-name descname">SQLExpressionTransform</code><span class="sig-paren">(</span><em class="sig-param">expression: parameters_validation.parameter_validation_decorator.parameter_validation.&lt;locals&gt;.func_partial.&lt;locals&gt;.validation_partial</em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.transform.transformations.SQLExpressionTransform" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="butterfree.core.transform.transformations.transform_component.html#butterfree.core.transform.transformations.transform_component.TransformComponent" title="butterfree.core.transform.transformations.transform_component.TransformComponent"><code class="xref py py-class docutils literal notranslate"><span class="pre">butterfree.core.transform.transformations.transform_component.TransformComponent</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#butterfree.core.transform.transformations.transform_component.TransformComponent" title="butterfree.core.transform.transformations.transform_component.TransformComponent"><code class="xref py py-class docutils literal notranslate"><span class="pre">butterfree.core.transform.transformations.transform_component.TransformComponent</span></code></a></p>
 <p>Defines an SQL Expression Transformation.</p>
 <dl class="py attribute">
 <dt id="butterfree.core.transform.transformations.SQLExpressionTransform.expression">
@@ -544,7 +1116,7 @@ required, for instance “col_a / col_b” or “col_a * col_b”.</p>
 <dl class="py class">
 <dt id="butterfree.core.transform.transformations.SparkFunctionTransform">
 <em class="property">class </em><code class="sig-prename descclassname">butterfree.core.transform.transformations.</code><code class="sig-name descname">SparkFunctionTransform</code><span class="sig-paren">(</span><em class="sig-param">functions: parameters_validation.parameter_validation_decorator.parameter_validation.&lt;locals&gt;.func_partial.&lt;locals&gt;.validation_partial</em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.transform.transformations.SparkFunctionTransform" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="butterfree.core.transform.transformations.transform_component.html#butterfree.core.transform.transformations.transform_component.TransformComponent" title="butterfree.core.transform.transformations.transform_component.TransformComponent"><code class="xref py py-class docutils literal notranslate"><span class="pre">butterfree.core.transform.transformations.transform_component.TransformComponent</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#butterfree.core.transform.transformations.transform_component.TransformComponent" title="butterfree.core.transform.transformations.transform_component.TransformComponent"><code class="xref py py-class docutils literal notranslate"><span class="pre">butterfree.core.transform.transformations.transform_component.TransformComponent</span></code></a></p>
 <p>Defines an Spark Function.</p>
 <dl class="py attribute">
 <dt id="butterfree.core.transform.transformations.SparkFunctionTransform.function">
@@ -644,7 +1216,7 @@ dataframe granularity.</p>
 <dl class="py class">
 <dt id="butterfree.core.transform.transformations.StackTransform">
 <em class="property">class </em><code class="sig-prename descclassname">butterfree.core.transform.transformations.</code><code class="sig-name descname">StackTransform</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">columns_names</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">is_regex</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.transform.transformations.StackTransform" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="butterfree.core.transform.transformations.transform_component.html#butterfree.core.transform.transformations.transform_component.TransformComponent" title="butterfree.core.transform.transformations.transform_component.TransformComponent"><code class="xref py py-class docutils literal notranslate"><span class="pre">butterfree.core.transform.transformations.transform_component.TransformComponent</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#butterfree.core.transform.transformations.transform_component.TransformComponent" title="butterfree.core.transform.transformations.transform_component.TransformComponent"><code class="xref py py-class docutils literal notranslate"><span class="pre">butterfree.core.transform.transformations.transform_component.TransformComponent</span></code></a></p>
 <p>Defines a Stack transformation.</p>
 <p>For instantiation it is needed the name of the columns or a pattern to use
 to find the columns that need to be stacked. This transform generates just
@@ -748,8 +1320,8 @@ the columns full names. Like this way:</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="id5">
-<em class="property">property </em><code class="sig-name descname">parent</code><a class="headerlink" href="#id5" title="Permalink to this definition">¶</a></dt>
+<dt id="id11">
+<em class="property">property </em><code class="sig-name descname">parent</code><a class="headerlink" href="#id11" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parent transform component.</p>
 </dd></dl>
 
@@ -783,7 +1355,7 @@ the columns full names. Like this way:</p>
         <a href="butterfree.core.transform.transformations.user_defined_functions.html" class="btn btn-neutral float-right" title="butterfree.core.transform.transformations.user_defined_functions package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="butterfree.core.transform.features.timestamp_feature.html" class="btn btn-neutral float-left" title="butterfree.core.transform.features.timestamp_feature module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="butterfree.core.transform.features.html" class="btn btn-neutral float-left" title="butterfree.core.transform.features package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

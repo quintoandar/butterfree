@@ -4,11 +4,18 @@ butterfree.core.transform.transformations.user\_defined\_functions package
 Submodules
 ----------
 
-.. toctree::
-   :maxdepth: 4
 
-   butterfree.core.transform.transformations.user_defined_functions.mode
-   butterfree.core.transform.transformations.user_defined_functions.most_frequent_set
+.. automodule:: butterfree.core.transform.transformations.user_defined_functions.mode
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+.. automodule:: butterfree.core.transform.transformations.user_defined_functions.most_frequent_set
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 
 Module contents
 ---------------

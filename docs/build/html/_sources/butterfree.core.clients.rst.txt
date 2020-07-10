@@ -4,12 +4,24 @@ butterfree.core.clients package
 Submodules
 ----------
 
-.. toctree::
-   :maxdepth: 4
 
-   butterfree.core.clients.abstract_client
-   butterfree.core.clients.cassandra_client
-   butterfree.core.clients.spark_client
+.. automodule:: butterfree.core.clients.abstract_client
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+.. automodule:: butterfree.core.clients.cassandra_client
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+.. automodule:: butterfree.core.clients.spark_client
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 
 Module contents
 ---------------

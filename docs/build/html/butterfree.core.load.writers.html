@@ -35,7 +35,7 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="butterfree.core.load.writers.historical_feature_store_writer module" href="butterfree.core.load.writers.historical_feature_store_writer.html" />
+    <link rel="next" title="butterfree.core.pipelines package" href="butterfree.core.pipelines.html" />
     <link rel="prev" title="butterfree.core.load package" href="butterfree.core.load.html" /> 
 </head>
 
@@ -178,15 +178,341 @@
             
   <div class="section" id="butterfree-core-load-writers-package">
 <h1>butterfree.core.load.writers package<a class="headerlink" href="#butterfree-core-load-writers-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="butterfree.core.load.writers.historical_feature_store_writer.html">butterfree.core.load.writers.historical_feature_store_writer module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="butterfree.core.load.writers.online_feature_store_writer.html">butterfree.core.load.writers.online_feature_store_writer module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="butterfree.core.load.writers.writer.html">butterfree.core.load.writers.writer module</a></li>
-</ul>
+<div class="section" id="module-butterfree.core.load.writers.historical_feature_store_writer">
+<span id="submodules"></span><h2>Submodules<a class="headerlink" href="#module-butterfree.core.load.writers.historical_feature_store_writer" title="Permalink to this headline">¶</a></h2>
+<p>Holds the Historical Feature Store writer class.</p>
+<dl class="py class">
+<dt id="butterfree.core.load.writers.historical_feature_store_writer.HistoricalFeatureStoreWriter">
+<em class="property">class </em><code class="sig-prename descclassname">butterfree.core.load.writers.historical_feature_store_writer.</code><code class="sig-name descname">HistoricalFeatureStoreWriter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">db_config</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">database</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">num_partitions</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">validation_threshold</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">0.01</span></em>, <em class="sig-param"><span class="n">debug_mode</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.load.writers.historical_feature_store_writer.HistoricalFeatureStoreWriter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#butterfree.core.load.writers.writer.Writer" title="butterfree.core.load.writers.writer.Writer"><code class="xref py py-class docutils literal notranslate"><span class="pre">butterfree.core.load.writers.writer.Writer</span></code></a></p>
+<p>Enable writing feature sets into the Historical Feature Store.</p>
+<dl class="py attribute">
+<dt id="butterfree.core.load.writers.historical_feature_store_writer.HistoricalFeatureStoreWriter.db_config">
+<code class="sig-name descname">db_config</code><a class="headerlink" href="#butterfree.core.load.writers.historical_feature_store_writer.HistoricalFeatureStoreWriter.db_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>configuration with spark for databases or AWS S3 (default).
+For more information check module ‘butterfree.core.db.configs’.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="butterfree.core.load.writers.historical_feature_store_writer.HistoricalFeatureStoreWriter.database">
+<code class="sig-name descname">database</code><a class="headerlink" href="#butterfree.core.load.writers.historical_feature_store_writer.HistoricalFeatureStoreWriter.database" title="Permalink to this definition">¶</a></dt>
+<dd><p>database to use in Spark metastore.
+By default FEATURE_STORE_HISTORICAL_DATABASE environment variable.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="butterfree.core.load.writers.historical_feature_store_writer.HistoricalFeatureStoreWriter.num_partitions">
+<code class="sig-name descname">num_partitions</code><a class="headerlink" href="#butterfree.core.load.writers.historical_feature_store_writer.HistoricalFeatureStoreWriter.num_partitions" title="Permalink to this definition">¶</a></dt>
+<dd><p>value to use in repartition df before save.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="butterfree.core.load.writers.historical_feature_store_writer.HistoricalFeatureStoreWriter.validation_threshold">
+<code class="sig-name descname">validation_threshold</code><a class="headerlink" href="#butterfree.core.load.writers.historical_feature_store_writer.HistoricalFeatureStoreWriter.validation_threshold" title="Permalink to this definition">¶</a></dt>
+<dd><p>lower and upper tolerance to using in count validation.
+The default value is defined in DEFAULT_VALIDATION_THRESHOLD property.
+For example: with a validation_threshold = 0.01 and a given calculated
+count on the dataframe equal to 100000 records, if the feature store
+return a count equal to 995000 an error will not be thrown  .
+Use validation_threshold = 0 to not use tolerance in the validation.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="butterfree.core.load.writers.historical_feature_store_writer.HistoricalFeatureStoreWriter.debug_mode">
+<code class="sig-name descname">debug_mode</code><a class="headerlink" href="#butterfree.core.load.writers.historical_feature_store_writer.HistoricalFeatureStoreWriter.debug_mode" title="Permalink to this definition">¶</a></dt>
+<dd><p>“dry run” mode, write the result to a temporary view.</p>
+</dd></dl>
+
+<p class="rubric">Example</p>
+<p>Simple example regarding HistoricalFeatureStoreWriter class instantiation.
+We can instantiate this class without db configurations, so the class get the
+S3Config() where it provides default configurations about AWS S3 service.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">spark_client</span> <span class="o">=</span> <span class="n">SparkClient</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">writer</span> <span class="o">=</span> <span class="n">HistoricalFeatureStoreWriter</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">feature_set</span><span class="o">=</span><span class="n">feature_set</span><span class="p">,</span>
+<span class="go">   ...           dataframe=dataframe,</span>
+<span class="go">   ...           spark_client=spark_client)</span>
+</pre></div>
 </div>
+<blockquote>
+<div><p>However, we can define the db configurations,
+like write mode, file format and S3 bucket,
+and provide them to HistoricalFeatureStoreWriter.</p>
+</div></blockquote>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">spark_client</span> <span class="o">=</span> <span class="n">SparkClient</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config</span> <span class="o">=</span> <span class="n">S3Config</span><span class="p">(</span><span class="n">bucket</span><span class="o">=</span><span class="s2">&quot;wonka.s3.forno.data.quintoandar.com.br&quot;</span><span class="p">,</span>
+<span class="go">    ...               mode=&quot;append&quot;,</span>
+<span class="go">    ...               format_=&quot;parquet&quot;)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">writer</span> <span class="o">=</span> <span class="n">HistoricalFeatureStoreWriter</span><span class="p">(</span><span class="n">db_config</span><span class="o">=</span><span class="n">config</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">feature_set</span><span class="o">=</span><span class="n">feature_set</span><span class="p">,</span>
+<span class="go">   ...           dataframe=dataframe,</span>
+<span class="go">   ...           spark_client=spark_client)</span>
+<span class="go">    For what settings you can use on S3Config and default settings,</span>
+<span class="go">    to read S3Config class.</span>
+</pre></div>
+</div>
+<blockquote>
+<div><p>We can instantiate HistoricalFeatureStoreWriter class to validate the writers,
+using the default or custom configs.</p>
+</div></blockquote>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">spark_client</span> <span class="o">=</span> <span class="n">SparkClient</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">writer</span> <span class="o">=</span> <span class="n">HistoricalFeatureStoreWriter</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">writer</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">feature_set</span><span class="o">=</span><span class="n">feature_set</span><span class="p">,</span>
+<span class="go">   ...              dataframe=dataframe,</span>
+<span class="go">   ...              spark_client=spark_client)</span>
+</pre></div>
+</div>
+<blockquote>
+<div><p>Both methods (writer and validate) will need the Spark Client,
+Feature Set and DataFrame, to write or to validate, according to
+HistoricalFeatureStoreWriter class arguments.</p>
+<p>P.S.: When load, the HistoricalFeatureStoreWrite partitions
+the data to improving queries performance.
+The partition are stored in separate folders in AWS S3,
+and to partition the data based on time (per year, month and day).</p>
+</div></blockquote>
+<dl class="py attribute">
+<dt id="butterfree.core.load.writers.historical_feature_store_writer.HistoricalFeatureStoreWriter.DEFAULT_VALIDATION_THRESHOLD">
+<code class="sig-name descname">DEFAULT_VALIDATION_THRESHOLD</code><em class="property"> = 0.01</em><a class="headerlink" href="#butterfree.core.load.writers.historical_feature_store_writer.HistoricalFeatureStoreWriter.DEFAULT_VALIDATION_THRESHOLD" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="butterfree.core.load.writers.historical_feature_store_writer.HistoricalFeatureStoreWriter.PARTITION_BY">
+<code class="sig-name descname">PARTITION_BY</code><em class="property"> = ['year', 'month', 'day']</em><a class="headerlink" href="#butterfree.core.load.writers.historical_feature_store_writer.HistoricalFeatureStoreWriter.PARTITION_BY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="butterfree.core.load.writers.historical_feature_store_writer.HistoricalFeatureStoreWriter.validate">
+<code class="sig-name descname">validate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">feature_set</span><span class="p">:</span> <span class="n"><a class="reference internal" href="butterfree.core.transform.html#butterfree.core.transform.feature_set.FeatureSet" title="butterfree.core.transform.feature_set.FeatureSet">butterfree.core.transform.feature_set.FeatureSet</a></span></em>, <em class="sig-param"><span class="n">dataframe</span><span class="p">:</span> <span class="n">pyspark.sql.dataframe.DataFrame</span></em>, <em class="sig-param"><span class="n">spark_client</span><span class="p">:</span> <span class="n"><a class="reference internal" href="butterfree.core.clients.html#butterfree.core.clients.spark_client.SparkClient" title="butterfree.core.clients.spark_client.SparkClient">butterfree.core.clients.spark_client.SparkClient</a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.load.writers.historical_feature_store_writer.HistoricalFeatureStoreWriter.validate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate dataframe rows to validate data into Feature Store.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>feature_set</strong> – object processed with feature_set informations.</p></li>
+<li><p><strong>dataframe</strong> – spark dataframe containing data from a feature set.</p></li>
+<li><p><strong>spark_client</strong> – client for spark connections with external services.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>AssertionError</strong> – if count of written data doesn’t match count in current
+    feature set dataframe.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="butterfree.core.load.writers.historical_feature_store_writer.HistoricalFeatureStoreWriter.write">
+<code class="sig-name descname">write</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">feature_set</span><span class="p">:</span> <span class="n"><a class="reference internal" href="butterfree.core.transform.html#butterfree.core.transform.feature_set.FeatureSet" title="butterfree.core.transform.feature_set.FeatureSet">butterfree.core.transform.feature_set.FeatureSet</a></span></em>, <em class="sig-param"><span class="n">dataframe</span><span class="p">:</span> <span class="n">pyspark.sql.dataframe.DataFrame</span></em>, <em class="sig-param"><span class="n">spark_client</span><span class="p">:</span> <span class="n"><a class="reference internal" href="butterfree.core.clients.html#butterfree.core.clients.spark_client.SparkClient" title="butterfree.core.clients.spark_client.SparkClient">butterfree.core.clients.spark_client.SparkClient</a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.load.writers.historical_feature_store_writer.HistoricalFeatureStoreWriter.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads the data from a feature set into the Historical Feature Store.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>feature_set</strong> – object processed with feature_set informations.</p></li>
+<li><p><strong>dataframe</strong> – spark dataframe containing data from a feature set.</p></li>
+<li><p><strong>spark_client</strong> – client for spark connections with external services.</p></li>
+</ul>
+</dd>
+</dl>
+<p>If the debug_mode is set to True, a temporary table with a name in the format:
+historical_feature_store__{feature_set.name} will be created instead of writing
+to the real historical feature store.</p>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-butterfree.core.load.writers.online_feature_store_writer"></span><p>Holds the Online Feature Store writer class.</p>
+<dl class="py class">
+<dt id="butterfree.core.load.writers.online_feature_store_writer.OnlineFeatureStoreWriter">
+<em class="property">class </em><code class="sig-prename descclassname">butterfree.core.load.writers.online_feature_store_writer.</code><code class="sig-name descname">OnlineFeatureStoreWriter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">db_config</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">debug_mode</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.load.writers.online_feature_store_writer.OnlineFeatureStoreWriter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#butterfree.core.load.writers.writer.Writer" title="butterfree.core.load.writers.writer.Writer"><code class="xref py py-class docutils literal notranslate"><span class="pre">butterfree.core.load.writers.writer.Writer</span></code></a></p>
+<p>Enable writing feature sets into the Online Feature Store.</p>
+<dl class="py attribute">
+<dt id="butterfree.core.load.writers.online_feature_store_writer.OnlineFeatureStoreWriter.db_config">
+<code class="sig-name descname">db_config</code><a class="headerlink" href="#butterfree.core.load.writers.online_feature_store_writer.OnlineFeatureStoreWriter.db_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Spark configuration for connect databases.
+For more information check the module ‘butterfree.core.db.configs’.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="butterfree.core.load.writers.online_feature_store_writer.OnlineFeatureStoreWriter.debug_mode">
+<code class="sig-name descname">debug_mode</code><a class="headerlink" href="#butterfree.core.load.writers.online_feature_store_writer.OnlineFeatureStoreWriter.debug_mode" title="Permalink to this definition">¶</a></dt>
+<dd><p>“dry run” mode, write the result to a temporary view.</p>
+</dd></dl>
+
+<p class="rubric">Example</p>
+<p>Simple example regarding OnlineFeatureStoreWriter class instantiation.
+We can instantiate this class without db configurations, so the class get the
+CassandraConfig() where it provides default configurations about CassandraDB.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">spark_client</span> <span class="o">=</span> <span class="n">SparkClient</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">writer</span> <span class="o">=</span> <span class="n">OnlineFeatureStoreWriter</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">feature_set</span><span class="o">=</span><span class="n">feature_set</span><span class="p">,</span>
+<span class="go">   ...           dataframe=dataframe,</span>
+<span class="go">   ...           spark_client=spark_client)</span>
+</pre></div>
+</div>
+<blockquote>
+<div><p>However, we can define the db configurations and provide them to
+OnlineFeatureStoreWriter.</p>
+</div></blockquote>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">spark_client</span> <span class="o">=</span> <span class="n">SparkClient</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config</span> <span class="o">=</span> <span class="n">CassandraConfig</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;overwrite&quot;</span><span class="p">,</span>
+<span class="go">    ...                      format_=&quot;parquet&quot;,</span>
+<span class="go">    ...                      keyspace=&quot;keyspace_name&quot;)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">writer</span> <span class="o">=</span> <span class="n">OnlineFeatureStoreWriter</span><span class="p">(</span><span class="n">db_config</span><span class="o">=</span><span class="n">config</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">feature_set</span><span class="o">=</span><span class="n">feature_set</span><span class="p">,</span>
+<span class="go">   ...           dataframe=dataframe,</span>
+<span class="go">   ...           spark_client=spark_client)</span>
+<span class="go">    For what settings you can use on CassandraConfig and default settings,</span>
+<span class="go">    to read CassandraConfig class.</span>
+</pre></div>
+</div>
+<blockquote>
+<div><p>We can instantiate OnlineFeatureStoreWriter class to validate the writers,
+using the default or custom configs.</p>
+</div></blockquote>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">spark_client</span> <span class="o">=</span> <span class="n">SparkClient</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">writer</span> <span class="o">=</span> <span class="n">OnlineFeatureStoreWriter</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">writer</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">feature_set</span><span class="o">=</span><span class="n">feature_set</span><span class="p">,</span>
+<span class="go">   ...              dataframe=dataframe,</span>
+<span class="go">   ...              spark_client=spark_client)</span>
+</pre></div>
+</div>
+<blockquote>
+<div><p>Both methods (writer and validate) will need the Spark Client,
+Feature Set and DataFrame, to write or to validate,
+according to OnlineFeatureStoreWriter class arguments.</p>
+</div></blockquote>
+<dl class="py method">
+<dt id="butterfree.core.load.writers.online_feature_store_writer.OnlineFeatureStoreWriter.filter_latest">
+<em class="property">static </em><code class="sig-name descname">filter_latest</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dataframe</span><span class="p">:</span> <span class="n">pyspark.sql.dataframe.DataFrame</span></em>, <em class="sig-param"><span class="n">id_columns</span><span class="p">:</span> <span class="n">List<span class="p">[</span>Any<span class="p">]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.load.writers.online_feature_store_writer.OnlineFeatureStoreWriter.filter_latest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filters latest data from the dataframe.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataframe</strong> – spark dataframe containing data from a feature set.</p></li>
+<li><p><strong>id_columns</strong> – unique identifier column set for this feature set.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>contains only latest data for each unique id in the</dt><dd><p>feature set.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dataframe</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="butterfree.core.load.writers.online_feature_store_writer.OnlineFeatureStoreWriter.get_db_schema">
+<code class="sig-name descname">get_db_schema</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">feature_set</span><span class="p">:</span> <span class="n"><a class="reference internal" href="butterfree.core.transform.html#butterfree.core.transform.feature_set.FeatureSet" title="butterfree.core.transform.feature_set.FeatureSet">butterfree.core.transform.feature_set.FeatureSet</a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.load.writers.online_feature_store_writer.OnlineFeatureStoreWriter.get_db_schema" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get desired database schema.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>feature_set</strong> – object processed with feature set metadata.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Desired database schema.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="butterfree.core.load.writers.online_feature_store_writer.OnlineFeatureStoreWriter.validate">
+<code class="sig-name descname">validate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">feature_set</span><span class="p">:</span> <span class="n"><a class="reference internal" href="butterfree.core.transform.html#butterfree.core.transform.feature_set.FeatureSet" title="butterfree.core.transform.feature_set.FeatureSet">butterfree.core.transform.feature_set.FeatureSet</a></span></em>, <em class="sig-param"><span class="n">dataframe</span></em>, <em class="sig-param"><span class="n">spark_client</span><span class="p">:</span> <span class="n"><a class="reference internal" href="butterfree.core.clients.html#butterfree.core.clients.spark_client.SparkClient" title="butterfree.core.clients.spark_client.SparkClient">butterfree.core.clients.spark_client.SparkClient</a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.load.writers.online_feature_store_writer.OnlineFeatureStoreWriter.validate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate dataframe rows to validate data into Feature Store.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>feature_set</strong> – object processed with feature set metadata.</p></li>
+<li><p><strong>dataframe</strong> – Spark dataframe containing data from a feature set.</p></li>
+<li><p><strong>spark_client</strong> – client for Spark connections with external services.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>AssertionError</strong> – if validation fails.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="butterfree.core.load.writers.online_feature_store_writer.OnlineFeatureStoreWriter.write">
+<code class="sig-name descname">write</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">feature_set</span><span class="p">:</span> <span class="n"><a class="reference internal" href="butterfree.core.transform.html#butterfree.core.transform.feature_set.FeatureSet" title="butterfree.core.transform.feature_set.FeatureSet">butterfree.core.transform.feature_set.FeatureSet</a></span></em>, <em class="sig-param"><span class="n">dataframe</span><span class="p">:</span> <span class="n">pyspark.sql.dataframe.DataFrame</span></em>, <em class="sig-param"><span class="n">spark_client</span><span class="p">:</span> <span class="n"><a class="reference internal" href="butterfree.core.clients.html#butterfree.core.clients.spark_client.SparkClient" title="butterfree.core.clients.spark_client.SparkClient">butterfree.core.clients.spark_client.SparkClient</a></span></em><span class="sig-paren">)</span> &#x2192; Optional<span class="p">[</span>pyspark.sql.streaming.StreamingQuery<span class="p">]</span><a class="headerlink" href="#butterfree.core.load.writers.online_feature_store_writer.OnlineFeatureStoreWriter.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads the latest data from a feature set into the Feature Store.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>feature_set</strong> – object processed with feature set metadata.</p></li>
+<li><p><strong>dataframe</strong> – Spark dataframe containing data from a feature set.</p></li>
+<li><p><strong>spark_client</strong> – client for Spark connections with external services.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Streaming handler if writing streaming df, None otherwise.</p>
+</dd>
+</dl>
+<p>If the debug_mode is set to True, a temporary table with a name in the format:
+online_feature_store__{feature_set.name} will be created instead of writing to
+the real online feature store. If dataframe is streaming this temporary table
+will be updated in real time.</p>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-butterfree.core.load.writers.writer"></span><p>Writer entity.</p>
+<dl class="py class">
+<dt id="butterfree.core.load.writers.writer.Writer">
+<em class="property">class </em><code class="sig-prename descclassname">butterfree.core.load.writers.writer.</code><code class="sig-name descname">Writer</code><a class="headerlink" href="#butterfree.core.load.writers.writer.Writer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<p>Abstract base class for Writers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>spark_client</strong> – client for spark connections with external services.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="butterfree.core.load.writers.writer.Writer.validate">
+<em class="property">abstract </em><code class="sig-name descname">validate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">feature_set</span><span class="p">:</span> <span class="n"><a class="reference internal" href="butterfree.core.transform.html#butterfree.core.transform.feature_set.FeatureSet" title="butterfree.core.transform.feature_set.FeatureSet">butterfree.core.transform.feature_set.FeatureSet</a></span></em>, <em class="sig-param"><span class="n">dataframe</span><span class="p">:</span> <span class="n">pyspark.sql.dataframe.DataFrame</span></em>, <em class="sig-param"><span class="n">spark_client</span><span class="p">:</span> <span class="n"><a class="reference internal" href="butterfree.core.clients.html#butterfree.core.clients.spark_client.SparkClient" title="butterfree.core.clients.spark_client.SparkClient">butterfree.core.clients.spark_client.SparkClient</a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.load.writers.writer.Writer.validate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate dataframe rows to validate data into Feature Store.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>feature_set</strong> – object processed with feature set metadata.</p></li>
+<li><p><strong>dataframe</strong> – Spark dataframe containing data from a feature set.</p></li>
+<li><p><strong>spark_client</strong> – client for Spark connections with external services.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>AssertionError</strong> – if validation fails.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="butterfree.core.load.writers.writer.Writer.write">
+<em class="property">abstract </em><code class="sig-name descname">write</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">feature_set</span><span class="p">:</span> <span class="n"><a class="reference internal" href="butterfree.core.transform.html#butterfree.core.transform.feature_set.FeatureSet" title="butterfree.core.transform.feature_set.FeatureSet">butterfree.core.transform.feature_set.FeatureSet</a></span></em>, <em class="sig-param"><span class="n">dataframe</span><span class="p">:</span> <span class="n">pyspark.sql.dataframe.DataFrame</span></em>, <em class="sig-param"><span class="n">spark_client</span><span class="p">:</span> <span class="n"><a class="reference internal" href="butterfree.core.clients.html#butterfree.core.clients.spark_client.SparkClient" title="butterfree.core.clients.spark_client.SparkClient">butterfree.core.clients.spark_client.SparkClient</a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.load.writers.writer.Writer.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads the data from a feature set into the Feature Store.</p>
+<p>Feature Store could be Online or Historical.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>feature_set</strong> – object processed with feature set metadata.</p></li>
+<li><p><strong>dataframe</strong> – Spark dataframe containing data from a feature set.</p></li>
+<li><p><strong>spark_client</strong> – client for Spark connections with external services.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="module-butterfree.core.load.writers">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-butterfree.core.load.writers" title="Permalink to this headline">¶</a></h2>
@@ -194,7 +520,7 @@
 <dl class="py class">
 <dt id="butterfree.core.load.writers.HistoricalFeatureStoreWriter">
 <em class="property">class </em><code class="sig-prename descclassname">butterfree.core.load.writers.</code><code class="sig-name descname">HistoricalFeatureStoreWriter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">db_config</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">database</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">num_partitions</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">validation_threshold</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">0.01</span></em>, <em class="sig-param"><span class="n">debug_mode</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.load.writers.HistoricalFeatureStoreWriter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="butterfree.core.load.writers.writer.html#butterfree.core.load.writers.writer.Writer" title="butterfree.core.load.writers.writer.Writer"><code class="xref py py-class docutils literal notranslate"><span class="pre">butterfree.core.load.writers.writer.Writer</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#butterfree.core.load.writers.writer.Writer" title="butterfree.core.load.writers.writer.Writer"><code class="xref py py-class docutils literal notranslate"><span class="pre">butterfree.core.load.writers.writer.Writer</span></code></a></p>
 <p>Enable writing feature sets into the Historical Feature Store.</p>
 <dl class="py attribute">
 <dt id="butterfree.core.load.writers.HistoricalFeatureStoreWriter.db_config">
@@ -295,7 +621,7 @@ and to partition the data based on time (per year, month and day).</p>
 
 <dl class="py method">
 <dt id="butterfree.core.load.writers.HistoricalFeatureStoreWriter.validate">
-<code class="sig-name descname">validate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">feature_set</span><span class="p">:</span> <span class="n"><a class="reference internal" href="butterfree.core.transform.feature_set.html#butterfree.core.transform.feature_set.FeatureSet" title="butterfree.core.transform.feature_set.FeatureSet">butterfree.core.transform.feature_set.FeatureSet</a></span></em>, <em class="sig-param"><span class="n">dataframe</span><span class="p">:</span> <span class="n">pyspark.sql.dataframe.DataFrame</span></em>, <em class="sig-param"><span class="n">spark_client</span><span class="p">:</span> <span class="n"><a class="reference internal" href="butterfree.core.clients.spark_client.html#butterfree.core.clients.spark_client.SparkClient" title="butterfree.core.clients.spark_client.SparkClient">butterfree.core.clients.spark_client.SparkClient</a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.load.writers.HistoricalFeatureStoreWriter.validate" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">validate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">feature_set</span><span class="p">:</span> <span class="n"><a class="reference internal" href="butterfree.core.transform.html#butterfree.core.transform.feature_set.FeatureSet" title="butterfree.core.transform.feature_set.FeatureSet">butterfree.core.transform.feature_set.FeatureSet</a></span></em>, <em class="sig-param"><span class="n">dataframe</span><span class="p">:</span> <span class="n">pyspark.sql.dataframe.DataFrame</span></em>, <em class="sig-param"><span class="n">spark_client</span><span class="p">:</span> <span class="n"><a class="reference internal" href="butterfree.core.clients.html#butterfree.core.clients.spark_client.SparkClient" title="butterfree.core.clients.spark_client.SparkClient">butterfree.core.clients.spark_client.SparkClient</a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.load.writers.HistoricalFeatureStoreWriter.validate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate dataframe rows to validate data into Feature Store.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -314,7 +640,7 @@ and to partition the data based on time (per year, month and day).</p>
 
 <dl class="py method">
 <dt id="butterfree.core.load.writers.HistoricalFeatureStoreWriter.write">
-<code class="sig-name descname">write</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">feature_set</span><span class="p">:</span> <span class="n"><a class="reference internal" href="butterfree.core.transform.feature_set.html#butterfree.core.transform.feature_set.FeatureSet" title="butterfree.core.transform.feature_set.FeatureSet">butterfree.core.transform.feature_set.FeatureSet</a></span></em>, <em class="sig-param"><span class="n">dataframe</span><span class="p">:</span> <span class="n">pyspark.sql.dataframe.DataFrame</span></em>, <em class="sig-param"><span class="n">spark_client</span><span class="p">:</span> <span class="n"><a class="reference internal" href="butterfree.core.clients.spark_client.html#butterfree.core.clients.spark_client.SparkClient" title="butterfree.core.clients.spark_client.SparkClient">butterfree.core.clients.spark_client.SparkClient</a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.load.writers.HistoricalFeatureStoreWriter.write" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">write</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">feature_set</span><span class="p">:</span> <span class="n"><a class="reference internal" href="butterfree.core.transform.html#butterfree.core.transform.feature_set.FeatureSet" title="butterfree.core.transform.feature_set.FeatureSet">butterfree.core.transform.feature_set.FeatureSet</a></span></em>, <em class="sig-param"><span class="n">dataframe</span><span class="p">:</span> <span class="n">pyspark.sql.dataframe.DataFrame</span></em>, <em class="sig-param"><span class="n">spark_client</span><span class="p">:</span> <span class="n"><a class="reference internal" href="butterfree.core.clients.html#butterfree.core.clients.spark_client.SparkClient" title="butterfree.core.clients.spark_client.SparkClient">butterfree.core.clients.spark_client.SparkClient</a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.load.writers.HistoricalFeatureStoreWriter.write" title="Permalink to this definition">¶</a></dt>
 <dd><p>Loads the data from a feature set into the Historical Feature Store.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -335,7 +661,7 @@ to the real historical feature store.</p>
 <dl class="py class">
 <dt id="butterfree.core.load.writers.OnlineFeatureStoreWriter">
 <em class="property">class </em><code class="sig-prename descclassname">butterfree.core.load.writers.</code><code class="sig-name descname">OnlineFeatureStoreWriter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">db_config</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">debug_mode</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.load.writers.OnlineFeatureStoreWriter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="butterfree.core.load.writers.writer.html#butterfree.core.load.writers.writer.Writer" title="butterfree.core.load.writers.writer.Writer"><code class="xref py py-class docutils literal notranslate"><span class="pre">butterfree.core.load.writers.writer.Writer</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#butterfree.core.load.writers.writer.Writer" title="butterfree.core.load.writers.writer.Writer"><code class="xref py py-class docutils literal notranslate"><span class="pre">butterfree.core.load.writers.writer.Writer</span></code></a></p>
 <p>Enable writing feature sets into the Online Feature Store.</p>
 <dl class="py attribute">
 <dt id="butterfree.core.load.writers.OnlineFeatureStoreWriter.db_config">
@@ -421,7 +747,7 @@ according to OnlineFeatureStoreWriter class arguments.</p>
 
 <dl class="py method">
 <dt id="butterfree.core.load.writers.OnlineFeatureStoreWriter.get_db_schema">
-<code class="sig-name descname">get_db_schema</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">feature_set</span><span class="p">:</span> <span class="n"><a class="reference internal" href="butterfree.core.transform.feature_set.html#butterfree.core.transform.feature_set.FeatureSet" title="butterfree.core.transform.feature_set.FeatureSet">butterfree.core.transform.feature_set.FeatureSet</a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.load.writers.OnlineFeatureStoreWriter.get_db_schema" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_db_schema</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">feature_set</span><span class="p">:</span> <span class="n"><a class="reference internal" href="butterfree.core.transform.html#butterfree.core.transform.feature_set.FeatureSet" title="butterfree.core.transform.feature_set.FeatureSet">butterfree.core.transform.feature_set.FeatureSet</a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.load.writers.OnlineFeatureStoreWriter.get_db_schema" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get desired database schema.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -435,7 +761,7 @@ according to OnlineFeatureStoreWriter class arguments.</p>
 
 <dl class="py method">
 <dt id="butterfree.core.load.writers.OnlineFeatureStoreWriter.validate">
-<code class="sig-name descname">validate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">feature_set</span><span class="p">:</span> <span class="n"><a class="reference internal" href="butterfree.core.transform.feature_set.html#butterfree.core.transform.feature_set.FeatureSet" title="butterfree.core.transform.feature_set.FeatureSet">butterfree.core.transform.feature_set.FeatureSet</a></span></em>, <em class="sig-param"><span class="n">dataframe</span></em>, <em class="sig-param"><span class="n">spark_client</span><span class="p">:</span> <span class="n"><a class="reference internal" href="butterfree.core.clients.spark_client.html#butterfree.core.clients.spark_client.SparkClient" title="butterfree.core.clients.spark_client.SparkClient">butterfree.core.clients.spark_client.SparkClient</a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.load.writers.OnlineFeatureStoreWriter.validate" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">validate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">feature_set</span><span class="p">:</span> <span class="n"><a class="reference internal" href="butterfree.core.transform.html#butterfree.core.transform.feature_set.FeatureSet" title="butterfree.core.transform.feature_set.FeatureSet">butterfree.core.transform.feature_set.FeatureSet</a></span></em>, <em class="sig-param"><span class="n">dataframe</span></em>, <em class="sig-param"><span class="n">spark_client</span><span class="p">:</span> <span class="n"><a class="reference internal" href="butterfree.core.clients.html#butterfree.core.clients.spark_client.SparkClient" title="butterfree.core.clients.spark_client.SparkClient">butterfree.core.clients.spark_client.SparkClient</a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.load.writers.OnlineFeatureStoreWriter.validate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate dataframe rows to validate data into Feature Store.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -453,7 +779,7 @@ according to OnlineFeatureStoreWriter class arguments.</p>
 
 <dl class="py method">
 <dt id="butterfree.core.load.writers.OnlineFeatureStoreWriter.write">
-<code class="sig-name descname">write</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">feature_set</span><span class="p">:</span> <span class="n"><a class="reference internal" href="butterfree.core.transform.feature_set.html#butterfree.core.transform.feature_set.FeatureSet" title="butterfree.core.transform.feature_set.FeatureSet">butterfree.core.transform.feature_set.FeatureSet</a></span></em>, <em class="sig-param"><span class="n">dataframe</span><span class="p">:</span> <span class="n">pyspark.sql.dataframe.DataFrame</span></em>, <em class="sig-param"><span class="n">spark_client</span><span class="p">:</span> <span class="n"><a class="reference internal" href="butterfree.core.clients.spark_client.html#butterfree.core.clients.spark_client.SparkClient" title="butterfree.core.clients.spark_client.SparkClient">butterfree.core.clients.spark_client.SparkClient</a></span></em><span class="sig-paren">)</span> &#x2192; Optional<span class="p">[</span>pyspark.sql.streaming.StreamingQuery<span class="p">]</span><a class="headerlink" href="#butterfree.core.load.writers.OnlineFeatureStoreWriter.write" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">write</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">feature_set</span><span class="p">:</span> <span class="n"><a class="reference internal" href="butterfree.core.transform.html#butterfree.core.transform.feature_set.FeatureSet" title="butterfree.core.transform.feature_set.FeatureSet">butterfree.core.transform.feature_set.FeatureSet</a></span></em>, <em class="sig-param"><span class="n">dataframe</span><span class="p">:</span> <span class="n">pyspark.sql.dataframe.DataFrame</span></em>, <em class="sig-param"><span class="n">spark_client</span><span class="p">:</span> <span class="n"><a class="reference internal" href="butterfree.core.clients.html#butterfree.core.clients.spark_client.SparkClient" title="butterfree.core.clients.spark_client.SparkClient">butterfree.core.clients.spark_client.SparkClient</a></span></em><span class="sig-paren">)</span> &#x2192; Optional<span class="p">[</span>pyspark.sql.streaming.StreamingQuery<span class="p">]</span><a class="headerlink" href="#butterfree.core.load.writers.OnlineFeatureStoreWriter.write" title="Permalink to this definition">¶</a></dt>
 <dd><p>Loads the latest data from a feature set into the Feature Store.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -486,7 +812,7 @@ will be updated in real time.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="butterfree.core.load.writers.historical_feature_store_writer.html" class="btn btn-neutral float-right" title="butterfree.core.load.writers.historical_feature_store_writer module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="butterfree.core.pipelines.html" class="btn btn-neutral float-right" title="butterfree.core.pipelines package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="butterfree.core.load.html" class="btn btn-neutral float-left" title="butterfree.core.load package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

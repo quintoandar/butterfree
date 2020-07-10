@@ -36,7 +36,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="butterfree.core.extract.pre_processing package" href="butterfree.core.extract.pre_processing.html" />
-    <link rel="prev" title="butterfree.core.dataframe_service.repartition module" href="butterfree.core.dataframe_service.repartition.html" /> 
+    <link rel="prev" title="butterfree.core.dataframe_service package" href="butterfree.core.dataframe_service.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -181,45 +181,97 @@
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="butterfree.core.extract.pre_processing.html">butterfree.core.extract.pre_processing package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="butterfree.core.extract.pre_processing.html#submodules">Submodules</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="butterfree.core.extract.pre_processing.explode_json_column_transform.html">butterfree.core.extract.pre_processing.explode_json_column_transform module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="butterfree.core.extract.pre_processing.filter_transform.html">butterfree.core.extract.pre_processing.filter_transform module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="butterfree.core.extract.pre_processing.forward_fill_transform.html">butterfree.core.extract.pre_processing.forward_fill_transform module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="butterfree.core.extract.pre_processing.pivot_transform.html">butterfree.core.extract.pre_processing.pivot_transform module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="butterfree.core.extract.pre_processing.replace_transform.html">butterfree.core.extract.pre_processing.replace_transform module</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="butterfree.core.extract.pre_processing.html#module-butterfree.core.extract.pre_processing.explode_json_column_transform">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="butterfree.core.extract.pre_processing.html#module-butterfree.core.extract.pre_processing">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="butterfree.core.extract.readers.html">butterfree.core.extract.readers package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="butterfree.core.extract.readers.html#submodules">Submodules</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="butterfree.core.extract.readers.file_reader.html">butterfree.core.extract.readers.file_reader module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="butterfree.core.extract.readers.kafka_reader.html">butterfree.core.extract.readers.kafka_reader module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="butterfree.core.extract.readers.reader.html">butterfree.core.extract.readers.reader module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="butterfree.core.extract.readers.table_reader.html">butterfree.core.extract.readers.table_reader module</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="butterfree.core.extract.readers.html#module-butterfree.core.extract.readers.file_reader">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="butterfree.core.extract.readers.html#module-butterfree.core.extract.readers">Module contents</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
-<div class="section" id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="butterfree.core.extract.source.html">butterfree.core.extract.source module</a></li>
-</ul>
+<div class="section" id="module-butterfree.core.extract.source">
+<span id="submodules"></span><h2>Submodules<a class="headerlink" href="#module-butterfree.core.extract.source" title="Permalink to this headline">¶</a></h2>
+<p>Holds the SourceSelector class.</p>
+<dl class="py class">
+<dt id="butterfree.core.extract.source.Source">
+<em class="property">class </em><code class="sig-prename descclassname">butterfree.core.extract.source.</code><code class="sig-name descname">Source</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">readers</span><span class="p">:</span> <span class="n">List<span class="p">[</span><a class="reference internal" href="butterfree.core.extract.readers.html#butterfree.core.extract.readers.reader.Reader" title="butterfree.core.extract.readers.reader.Reader">butterfree.core.extract.readers.reader.Reader</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">query</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.extract.source.Source" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The definition of the the entry point data for the ETL pipeline.</p>
+<p>A FeatureSet (the next step in the pipeline) expects a single dataframe as
+input. This dataframe is built from a data composition of one or more
+readers defined in the Source. There is only one Source for pipeline.</p>
+<p>TODO refactor query into multiple query components
+TODO make it harder to do query injection</p>
+<dl class="py attribute">
+<dt id="butterfree.core.extract.source.Source.readers">
+<code class="sig-name descname">readers</code><a class="headerlink" href="#butterfree.core.extract.source.Source.readers" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of readers from where the source will get data.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="butterfree.core.extract.source.Source.query">
+<code class="sig-name descname">query</code><a class="headerlink" href="#butterfree.core.extract.source.Source.query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Spark SQL query to run against the readers.</p>
+</dd></dl>
+
+<p class="rubric">Example</p>
+<p>Simple example regarding Source class instantiation.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">butterfree.core.extract</span> <span class="kn">import</span> <span class="n">Source</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">butterfree.core.extract.readers</span> <span class="kn">import</span> <span class="n">TableReader</span><span class="p">,</span> <span class="n">FileReader</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">butterfree.core.clients</span> <span class="kn">import</span> <span class="n">SparkClient</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">spark_client</span> <span class="o">=</span> <span class="n">SparkClient</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">source</span> <span class="o">=</span> <span class="n">Source</span><span class="p">(</span>
+<span class="gp">... </span>   <span class="n">readers</span><span class="o">=</span><span class="p">[</span>
+<span class="gp">... </span>       <span class="n">TableReader</span><span class="p">(</span>
+<span class="gp">... </span>           <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;table_reader_id&quot;</span><span class="p">,</span>
+<span class="gp">... </span>           <span class="n">database</span><span class="o">=</span><span class="s2">&quot;table_reader_db&quot;</span><span class="p">,</span>
+<span class="gp">... </span>           <span class="n">table</span><span class="o">=</span><span class="s2">&quot;table_reader_table&quot;</span><span class="p">,</span>
+<span class="gp">... </span>       <span class="p">),</span>
+<span class="gp">... </span>       <span class="n">FileReader</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;file_reader_id&quot;</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s2">&quot;data_sample_path&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;json&quot;</span><span class="p">),</span>
+<span class="gp">... </span>   <span class="p">],</span>
+<span class="gp">... </span>   <span class="n">query</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;select a.*, b.feature2 &quot;</span>
+<span class="gp">... </span>   <span class="sa">f</span><span class="s2">&quot;from table_reader_id a &quot;</span>
+<span class="gp">... </span>   <span class="sa">f</span><span class="s2">&quot;inner join file_reader_id b on a.id = b.id &quot;</span><span class="p">,</span>
+<span class="go">...)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">construct</span><span class="p">(</span><span class="n">spark_client</span><span class="p">)</span>
+</pre></div>
 </div>
+<blockquote>
+<div><p>This last method will use the Spark Client, as default, to create
+temporary views regarding each reader and, after, will run the
+desired query and return a dataframe.</p>
+</div></blockquote>
+<dl class="py method">
+<dt id="butterfree.core.extract.source.Source.construct">
+<code class="sig-name descname">construct</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">client</span><span class="p">:</span> <span class="n"><a class="reference internal" href="butterfree.core.clients.html#butterfree.core.clients.spark_client.SparkClient" title="butterfree.core.clients.spark_client.SparkClient">butterfree.core.clients.spark_client.SparkClient</a></span></em><span class="sig-paren">)</span> &#x2192; pyspark.sql.dataframe.DataFrame<a class="headerlink" href="#butterfree.core.extract.source.Source.construct" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct an entry point dataframe for a feature set.</p>
+<p>This method will assemble multiple readers, by building each one and
+querying them using a Spark SQL.</p>
+<p>After that, there’s the caching of the dataframe, however since cache()
+in Spark is lazy, an action is triggered in order to force persistence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>client</strong> – client responsible for connecting to Spark session.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>DataFrame with the query result against all readers.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="module-butterfree.core.extract">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-butterfree.core.extract" title="Permalink to this headline">¶</a></h2>
 <p>The Source Component of a Feature Set.</p>
 <dl class="py class">
 <dt id="butterfree.core.extract.Source">
-<em class="property">class </em><code class="sig-prename descclassname">butterfree.core.extract.</code><code class="sig-name descname">Source</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">readers</span><span class="p">:</span> <span class="n">List<span class="p">[</span><a class="reference internal" href="butterfree.core.extract.readers.reader.html#butterfree.core.extract.readers.reader.Reader" title="butterfree.core.extract.readers.reader.Reader">butterfree.core.extract.readers.reader.Reader</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">query</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.extract.Source" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">butterfree.core.extract.</code><code class="sig-name descname">Source</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">readers</span><span class="p">:</span> <span class="n">List<span class="p">[</span><a class="reference internal" href="butterfree.core.extract.readers.html#butterfree.core.extract.readers.reader.Reader" title="butterfree.core.extract.readers.reader.Reader">butterfree.core.extract.readers.reader.Reader</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">query</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.extract.Source" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>The definition of the the entry point data for the ETL pipeline.</p>
 <p>A FeatureSet (the next step in the pipeline) expects a single dataframe as
@@ -268,7 +320,7 @@ desired query and return a dataframe.</p>
 </div></blockquote>
 <dl class="py method">
 <dt id="butterfree.core.extract.Source.construct">
-<code class="sig-name descname">construct</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">client</span><span class="p">:</span> <span class="n"><a class="reference internal" href="butterfree.core.clients.spark_client.html#butterfree.core.clients.spark_client.SparkClient" title="butterfree.core.clients.spark_client.SparkClient">butterfree.core.clients.spark_client.SparkClient</a></span></em><span class="sig-paren">)</span> &#x2192; pyspark.sql.dataframe.DataFrame<a class="headerlink" href="#butterfree.core.extract.Source.construct" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">construct</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">client</span><span class="p">:</span> <span class="n"><a class="reference internal" href="butterfree.core.clients.html#butterfree.core.clients.spark_client.SparkClient" title="butterfree.core.clients.spark_client.SparkClient">butterfree.core.clients.spark_client.SparkClient</a></span></em><span class="sig-paren">)</span> &#x2192; pyspark.sql.dataframe.DataFrame<a class="headerlink" href="#butterfree.core.extract.Source.construct" title="Permalink to this definition">¶</a></dt>
 <dd><p>Construct an entry point dataframe for a feature set.</p>
 <p>This method will assemble multiple readers, by building each one and
 querying them using a Spark SQL.</p>
@@ -300,7 +352,7 @@ in Spark is lazy, an action is triggered in order to force persistence.</p>
         <a href="butterfree.core.extract.pre_processing.html" class="btn btn-neutral float-right" title="butterfree.core.extract.pre_processing package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="butterfree.core.dataframe_service.repartition.html" class="btn btn-neutral float-left" title="butterfree.core.dataframe_service.repartition module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="butterfree.core.dataframe_service.html" class="btn btn-neutral float-left" title="butterfree.core.dataframe_service package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

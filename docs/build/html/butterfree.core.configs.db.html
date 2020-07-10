@@ -35,7 +35,7 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="butterfree.core.configs.db.abstract_config module" href="butterfree.core.configs.db.abstract_config.html" />
+    <link rel="next" title="butterfree.core.constants package" href="butterfree.core.constants.html" />
     <link rel="prev" title="butterfree.core.configs package" href="butterfree.core.configs.html" /> 
 </head>
 
@@ -178,15 +178,308 @@
             
   <div class="section" id="butterfree-core-configs-db-package">
 <h1>butterfree.core.configs.db package<a class="headerlink" href="#butterfree-core-configs-db-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="butterfree.core.configs.db.abstract_config.html">butterfree.core.configs.db.abstract_config module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="butterfree.core.configs.db.cassandra_config.html">butterfree.core.configs.db.cassandra_config module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="butterfree.core.configs.db.s3_config.html">butterfree.core.configs.db.s3_config module</a></li>
+<div class="section" id="module-butterfree.core.configs.db.abstract_config">
+<span id="submodules"></span><h2>Submodules<a class="headerlink" href="#module-butterfree.core.configs.db.abstract_config" title="Permalink to this headline">¶</a></h2>
+<p>Abstract classes for database configurations with spark.</p>
+<dl class="py class">
+<dt id="butterfree.core.configs.db.abstract_config.AbstractWriteConfig">
+<em class="property">class </em><code class="sig-prename descclassname">butterfree.core.configs.db.abstract_config.</code><code class="sig-name descname">AbstractWriteConfig</code><a class="headerlink" href="#butterfree.core.configs.db.abstract_config.AbstractWriteConfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<p>Abstract class for database write configurations with spark.</p>
+<dl class="py method">
+<dt id="butterfree.core.configs.db.abstract_config.AbstractWriteConfig.format_">
+<em class="property">abstract property </em><code class="sig-name descname">format_</code><a class="headerlink" href="#butterfree.core.configs.db.abstract_config.AbstractWriteConfig.format_" title="Permalink to this definition">¶</a></dt>
+<dd><p>Config option “format” for spark write.</p>
+<p>Args:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>format.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="butterfree.core.configs.db.abstract_config.AbstractWriteConfig.get_options">
+<em class="property">abstract </em><code class="sig-name descname">get_options</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span> &#x2192; dict<a class="headerlink" href="#butterfree.core.configs.db.abstract_config.AbstractWriteConfig.get_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get connection options configuration defined in the entity.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>*args</strong> – args to use in the options</p></li>
+<li><p><strong>**kwargs</strong> – kwargs to use in the options</p></li>
 </ul>
-</div>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Connection options configuration.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="butterfree.core.configs.db.abstract_config.AbstractWriteConfig.mode">
+<em class="property">abstract property </em><code class="sig-name descname">mode</code><a class="headerlink" href="#butterfree.core.configs.db.abstract_config.AbstractWriteConfig.mode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Config option “mode” for spark write.</p>
+<p>Args:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>mode.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="butterfree.core.configs.db.abstract_config.AbstractWriteConfig.translate">
+<em class="property">abstract </em><code class="sig-name descname">translate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">schema</span></em><span class="sig-paren">)</span> &#x2192; List<span class="p">[</span>Dict<span class="p">]</span><a class="headerlink" href="#butterfree.core.configs.db.abstract_config.AbstractWriteConfig.translate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Translate feature set spark schema to the corresponding database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>schema</strong> – feature set schema</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Corresponding database schema.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-butterfree.core.configs.db.cassandra_config"></span><p>Holds configurations to read and write with Spark to Cassandra DB.</p>
+<dl class="py class">
+<dt id="butterfree.core.configs.db.cassandra_config.CassandraConfig">
+<em class="property">class </em><code class="sig-prename descclassname">butterfree.core.configs.db.cassandra_config.</code><code class="sig-name descname">CassandraConfig</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mode</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">format_</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">keyspace</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">stream_processing_time</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">stream_output_mode</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">stream_checkpoint_path</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.configs.db.cassandra_config.CassandraConfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#butterfree.core.configs.db.abstract_config.AbstractWriteConfig" title="butterfree.core.configs.db.abstract_config.AbstractWriteConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">butterfree.core.configs.db.abstract_config.AbstractWriteConfig</span></code></a></p>
+<p>Configuration for Spark to connect on Cassandra DB.</p>
+<p>References can be found
+[here](<a class="reference external" href="https://docs.databricks.com/data/data-sources/cassandra.html">https://docs.databricks.com/data/data-sources/cassandra.html</a>).</p>
+<dl class="py attribute">
+<dt id="butterfree.core.configs.db.cassandra_config.CassandraConfig.mode">
+<code class="sig-name descname">mode</code><a class="headerlink" href="#butterfree.core.configs.db.cassandra_config.CassandraConfig.mode" title="Permalink to this definition">¶</a></dt>
+<dd><p>write mode for Spark.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="butterfree.core.configs.db.cassandra_config.CassandraConfig.format_">
+<code class="sig-name descname">format_</code><a class="headerlink" href="#butterfree.core.configs.db.cassandra_config.CassandraConfig.format_" title="Permalink to this definition">¶</a></dt>
+<dd><p>write format for Spark.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="butterfree.core.configs.db.cassandra_config.CassandraConfig.keyspace">
+<code class="sig-name descname">keyspace</code><a class="headerlink" href="#butterfree.core.configs.db.cassandra_config.CassandraConfig.keyspace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cassandra DB keyspace to write data.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="butterfree.core.configs.db.cassandra_config.CassandraConfig.username">
+<code class="sig-name descname">username</code><a class="headerlink" href="#butterfree.core.configs.db.cassandra_config.CassandraConfig.username" title="Permalink to this definition">¶</a></dt>
+<dd><p>username to use in connection.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="butterfree.core.configs.db.cassandra_config.CassandraConfig.password">
+<code class="sig-name descname">password</code><a class="headerlink" href="#butterfree.core.configs.db.cassandra_config.CassandraConfig.password" title="Permalink to this definition">¶</a></dt>
+<dd><p>password to use in connection.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="butterfree.core.configs.db.cassandra_config.CassandraConfig.host">
+<code class="sig-name descname">host</code><a class="headerlink" href="#butterfree.core.configs.db.cassandra_config.CassandraConfig.host" title="Permalink to this definition">¶</a></dt>
+<dd><p>host to use in connection.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="butterfree.core.configs.db.cassandra_config.CassandraConfig.stream_processing_time">
+<code class="sig-name descname">stream_processing_time</code><a class="headerlink" href="#butterfree.core.configs.db.cassandra_config.CassandraConfig.stream_processing_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>processing time interval for streaming jobs.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="butterfree.core.configs.db.cassandra_config.CassandraConfig.stream_output_mode">
+<code class="sig-name descname">stream_output_mode</code><a class="headerlink" href="#butterfree.core.configs.db.cassandra_config.CassandraConfig.stream_output_mode" title="Permalink to this definition">¶</a></dt>
+<dd><p>specify the mode from writing streaming data.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="butterfree.core.configs.db.cassandra_config.CassandraConfig.stream_checkpoint_path">
+<code class="sig-name descname">stream_checkpoint_path</code><a class="headerlink" href="#butterfree.core.configs.db.cassandra_config.CassandraConfig.stream_checkpoint_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>path on S3 to save checkpoints for the stream job.</p>
+</dd></dl>
+
+<p>More information about processing_time, output_mode and checkpoint_path
+can be found in Spark documentation:
+[here](<a class="reference external" href="https://spark.apache.org/docs/latest/structured-streaming-programming-guide.html">https://spark.apache.org/docs/latest/structured-streaming-programming-guide.html</a>)</p>
+<dl class="py method">
+<dt id="id0">
+<em class="property">property </em><code class="sig-name descname">format_</code><a class="headerlink" href="#id0" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write format for Spark.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="butterfree.core.configs.db.cassandra_config.CassandraConfig.get_options">
+<code class="sig-name descname">get_options</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">table</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; dict<a class="headerlink" href="#butterfree.core.configs.db.cassandra_config.CassandraConfig.get_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get options for connect to Cassandra DB.</p>
+<p>Options will be a dictionary with the write and read configuration for
+spark to cassandra.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>table</strong> – table name (keyspace) into Cassandra DB.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Configuration to connect to Cassandra DB.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="id1">
+<em class="property">property </em><code class="sig-name descname">host</code><a class="headerlink" href="#id1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Host used in connection to Cassandra DB.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="id2">
+<em class="property">property </em><code class="sig-name descname">keyspace</code><a class="headerlink" href="#id2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cassandra DB keyspace to write data.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="id3">
+<em class="property">property </em><code class="sig-name descname">mode</code><a class="headerlink" href="#id3" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write mode for Spark.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="id4">
+<em class="property">property </em><code class="sig-name descname">password</code><a class="headerlink" href="#id4" title="Permalink to this definition">¶</a></dt>
+<dd><p>Password used in connection to Cassandra DB.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="id5">
+<em class="property">property </em><code class="sig-name descname">stream_checkpoint_path</code><a class="headerlink" href="#id5" title="Permalink to this definition">¶</a></dt>
+<dd><p>Path on S3 to save checkpoints for the stream job.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="id6">
+<em class="property">property </em><code class="sig-name descname">stream_output_mode</code><a class="headerlink" href="#id6" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specify the mode from writing streaming data.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="id7">
+<em class="property">property </em><code class="sig-name descname">stream_processing_time</code><a class="headerlink" href="#id7" title="Permalink to this definition">¶</a></dt>
+<dd><p>Processing time interval for streaming jobs.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="butterfree.core.configs.db.cassandra_config.CassandraConfig.translate">
+<code class="sig-name descname">translate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">schema</span></em><span class="sig-paren">)</span> &#x2192; List<span class="p">[</span>Dict<span class="p">]</span><a class="headerlink" href="#butterfree.core.configs.db.cassandra_config.CassandraConfig.translate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get feature set schema to be translated.</p>
+<p>The output will be a list of dictionaries regarding cassandra
+database schema.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>schema</strong> – feature set schema in spark.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Cassandra schema.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="id8">
+<em class="property">property </em><code class="sig-name descname">username</code><a class="headerlink" href="#id8" title="Permalink to this definition">¶</a></dt>
+<dd><p>Username used in connection to Cassandra DB.</p>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-butterfree.core.configs.db.s3_config"></span><p>Holds configurations to read and write with Spark to AWS S3.</p>
+<dl class="py class">
+<dt id="butterfree.core.configs.db.s3_config.S3Config">
+<em class="property">class </em><code class="sig-prename descclassname">butterfree.core.configs.db.s3_config.</code><code class="sig-name descname">S3Config</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bucket</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mode</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">format_</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.configs.db.s3_config.S3Config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#butterfree.core.configs.db.abstract_config.AbstractWriteConfig" title="butterfree.core.configs.db.abstract_config.AbstractWriteConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">butterfree.core.configs.db.abstract_config.AbstractWriteConfig</span></code></a></p>
+<p>Configuration for Spark metastore database stored on AWS S3.</p>
+<dl class="py attribute">
+<dt id="butterfree.core.configs.db.s3_config.S3Config.database">
+<code class="sig-name descname">database</code><a class="headerlink" href="#butterfree.core.configs.db.s3_config.S3Config.database" title="Permalink to this definition">¶</a></dt>
+<dd><p>database name.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="butterfree.core.configs.db.s3_config.S3Config.mode">
+<code class="sig-name descname">mode</code><a class="headerlink" href="#butterfree.core.configs.db.s3_config.S3Config.mode" title="Permalink to this definition">¶</a></dt>
+<dd><p>writing mode used be writers.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="butterfree.core.configs.db.s3_config.S3Config.format_">
+<code class="sig-name descname">format_</code><a class="headerlink" href="#butterfree.core.configs.db.s3_config.S3Config.format_" title="Permalink to this definition">¶</a></dt>
+<dd><p>expected stored file format.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="butterfree.core.configs.db.s3_config.S3Config.path">
+<code class="sig-name descname">path</code><a class="headerlink" href="#butterfree.core.configs.db.s3_config.S3Config.path" title="Permalink to this definition">¶</a></dt>
+<dd><p>database root location.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="butterfree.core.configs.db.s3_config.S3Config.partition_by">
+<code class="sig-name descname">partition_by</code><a class="headerlink" href="#butterfree.core.configs.db.s3_config.S3Config.partition_by" title="Permalink to this definition">¶</a></dt>
+<dd><p>partition column to use when writing.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="butterfree.core.configs.db.s3_config.S3Config.bucket">
+<em class="property">property </em><code class="sig-name descname">bucket</code><a class="headerlink" href="#butterfree.core.configs.db.s3_config.S3Config.bucket" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bucket name.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="id9">
+<em class="property">property </em><code class="sig-name descname">format_</code><a class="headerlink" href="#id9" title="Permalink to this definition">¶</a></dt>
+<dd><p>Expected stored file format.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="butterfree.core.configs.db.s3_config.S3Config.get_options">
+<code class="sig-name descname">get_options</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; dict<a class="headerlink" href="#butterfree.core.configs.db.s3_config.S3Config.get_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get options for AWS S3.</p>
+<p>Options will be a dictionary with the write and read configuration for
+Spark to AWS S3.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>key</strong> – path to save data into AWS S3 bucket.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Options configuration for AWS S3.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="id10">
+<em class="property">property </em><code class="sig-name descname">mode</code><a class="headerlink" href="#id10" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writing mode used be writers.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="butterfree.core.configs.db.s3_config.S3Config.translate">
+<code class="sig-name descname">translate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">schema</span></em><span class="sig-paren">)</span> &#x2192; List<span class="p">[</span>Dict<span class="p">]</span><a class="headerlink" href="#butterfree.core.configs.db.s3_config.S3Config.translate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Translate feature set spark schema to the corresponding database.</p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="module-butterfree.core.configs.db">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-butterfree.core.configs.db" title="Permalink to this headline">¶</a></h2>
@@ -262,7 +555,7 @@
 <dl class="py class">
 <dt id="butterfree.core.configs.db.CassandraConfig">
 <em class="property">class </em><code class="sig-prename descclassname">butterfree.core.configs.db.</code><code class="sig-name descname">CassandraConfig</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mode</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">format_</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">keyspace</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">stream_processing_time</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">stream_output_mode</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">stream_checkpoint_path</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.configs.db.CassandraConfig" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="butterfree.core.configs.db.abstract_config.html#butterfree.core.configs.db.abstract_config.AbstractWriteConfig" title="butterfree.core.configs.db.abstract_config.AbstractWriteConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">butterfree.core.configs.db.abstract_config.AbstractWriteConfig</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#butterfree.core.configs.db.abstract_config.AbstractWriteConfig" title="butterfree.core.configs.db.abstract_config.AbstractWriteConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">butterfree.core.configs.db.abstract_config.AbstractWriteConfig</span></code></a></p>
 <p>Configuration for Spark to connect on Cassandra DB.</p>
 <p>References can be found
 [here](<a class="reference external" href="https://docs.databricks.com/data/data-sources/cassandra.html">https://docs.databricks.com/data/data-sources/cassandra.html</a>).</p>
@@ -324,8 +617,8 @@
 can be found in Spark documentation:
 [here](<a class="reference external" href="https://spark.apache.org/docs/latest/structured-streaming-programming-guide.html">https://spark.apache.org/docs/latest/structured-streaming-programming-guide.html</a>)</p>
 <dl class="py method">
-<dt id="id0">
-<em class="property">property </em><code class="sig-name descname">format_</code><a class="headerlink" href="#id0" title="Permalink to this definition">¶</a></dt>
+<dt id="id11">
+<em class="property">property </em><code class="sig-name descname">format_</code><a class="headerlink" href="#id11" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write format for Spark.</p>
 </dd></dl>
 
@@ -346,44 +639,44 @@ spark to cassandra.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="id1">
-<em class="property">property </em><code class="sig-name descname">host</code><a class="headerlink" href="#id1" title="Permalink to this definition">¶</a></dt>
+<dt id="id12">
+<em class="property">property </em><code class="sig-name descname">host</code><a class="headerlink" href="#id12" title="Permalink to this definition">¶</a></dt>
 <dd><p>Host used in connection to Cassandra DB.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="id2">
-<em class="property">property </em><code class="sig-name descname">keyspace</code><a class="headerlink" href="#id2" title="Permalink to this definition">¶</a></dt>
+<dt id="id13">
+<em class="property">property </em><code class="sig-name descname">keyspace</code><a class="headerlink" href="#id13" title="Permalink to this definition">¶</a></dt>
 <dd><p>Cassandra DB keyspace to write data.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="id3">
-<em class="property">property </em><code class="sig-name descname">mode</code><a class="headerlink" href="#id3" title="Permalink to this definition">¶</a></dt>
+<dt id="id14">
+<em class="property">property </em><code class="sig-name descname">mode</code><a class="headerlink" href="#id14" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write mode for Spark.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="id4">
-<em class="property">property </em><code class="sig-name descname">password</code><a class="headerlink" href="#id4" title="Permalink to this definition">¶</a></dt>
+<dt id="id15">
+<em class="property">property </em><code class="sig-name descname">password</code><a class="headerlink" href="#id15" title="Permalink to this definition">¶</a></dt>
 <dd><p>Password used in connection to Cassandra DB.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="id5">
-<em class="property">property </em><code class="sig-name descname">stream_checkpoint_path</code><a class="headerlink" href="#id5" title="Permalink to this definition">¶</a></dt>
+<dt id="id16">
+<em class="property">property </em><code class="sig-name descname">stream_checkpoint_path</code><a class="headerlink" href="#id16" title="Permalink to this definition">¶</a></dt>
 <dd><p>Path on S3 to save checkpoints for the stream job.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="id6">
-<em class="property">property </em><code class="sig-name descname">stream_output_mode</code><a class="headerlink" href="#id6" title="Permalink to this definition">¶</a></dt>
+<dt id="id17">
+<em class="property">property </em><code class="sig-name descname">stream_output_mode</code><a class="headerlink" href="#id17" title="Permalink to this definition">¶</a></dt>
 <dd><p>Specify the mode from writing streaming data.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="id7">
-<em class="property">property </em><code class="sig-name descname">stream_processing_time</code><a class="headerlink" href="#id7" title="Permalink to this definition">¶</a></dt>
+<dt id="id18">
+<em class="property">property </em><code class="sig-name descname">stream_processing_time</code><a class="headerlink" href="#id18" title="Permalink to this definition">¶</a></dt>
 <dd><p>Processing time interval for streaming jobs.</p>
 </dd></dl>
 
@@ -404,8 +697,8 @@ database schema.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="id8">
-<em class="property">property </em><code class="sig-name descname">username</code><a class="headerlink" href="#id8" title="Permalink to this definition">¶</a></dt>
+<dt id="id19">
+<em class="property">property </em><code class="sig-name descname">username</code><a class="headerlink" href="#id19" title="Permalink to this definition">¶</a></dt>
 <dd><p>Username used in connection to Cassandra DB.</p>
 </dd></dl>
 
@@ -414,7 +707,7 @@ database schema.</p>
 <dl class="py class">
 <dt id="butterfree.core.configs.db.S3Config">
 <em class="property">class </em><code class="sig-prename descclassname">butterfree.core.configs.db.</code><code class="sig-name descname">S3Config</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bucket</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mode</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">format_</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.configs.db.S3Config" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="butterfree.core.configs.db.abstract_config.html#butterfree.core.configs.db.abstract_config.AbstractWriteConfig" title="butterfree.core.configs.db.abstract_config.AbstractWriteConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">butterfree.core.configs.db.abstract_config.AbstractWriteConfig</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#butterfree.core.configs.db.abstract_config.AbstractWriteConfig" title="butterfree.core.configs.db.abstract_config.AbstractWriteConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">butterfree.core.configs.db.abstract_config.AbstractWriteConfig</span></code></a></p>
 <p>Configuration for Spark metastore database stored on AWS S3.</p>
 <dl class="py attribute">
 <dt id="butterfree.core.configs.db.S3Config.database">
@@ -453,8 +746,8 @@ database schema.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="id9">
-<em class="property">property </em><code class="sig-name descname">format_</code><a class="headerlink" href="#id9" title="Permalink to this definition">¶</a></dt>
+<dt id="id20">
+<em class="property">property </em><code class="sig-name descname">format_</code><a class="headerlink" href="#id20" title="Permalink to this definition">¶</a></dt>
 <dd><p>Expected stored file format.</p>
 </dd></dl>
 
@@ -475,8 +768,8 @@ Spark to AWS S3.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="id10">
-<em class="property">property </em><code class="sig-name descname">mode</code><a class="headerlink" href="#id10" title="Permalink to this definition">¶</a></dt>
+<dt id="id21">
+<em class="property">property </em><code class="sig-name descname">mode</code><a class="headerlink" href="#id21" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writing mode used be writers.</p>
 </dd></dl>
 
@@ -499,7 +792,7 @@ Spark to AWS S3.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="butterfree.core.configs.db.abstract_config.html" class="btn btn-neutral float-right" title="butterfree.core.configs.db.abstract_config module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="butterfree.core.constants.html" class="btn btn-neutral float-right" title="butterfree.core.constants package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="butterfree.core.configs.html" class="btn btn-neutral float-left" title="butterfree.core.configs package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

@@ -4,12 +4,24 @@ butterfree.core.transform.utils package
 Submodules
 ----------
 
-.. toctree::
-   :maxdepth: 4
 
-   butterfree.core.transform.utils.date_range
-   butterfree.core.transform.utils.function
-   butterfree.core.transform.utils.window_spec
+.. automodule:: butterfree.core.transform.utils.date_range
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+.. automodule:: butterfree.core.transform.utils.function
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+.. automodule:: butterfree.core.transform.utils.window_spec
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 
 Module contents
 ---------------

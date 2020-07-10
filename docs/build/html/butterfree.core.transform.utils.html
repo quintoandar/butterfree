@@ -35,8 +35,8 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="butterfree.core.transform.utils.date_range module" href="butterfree.core.transform.utils.date_range.html" />
-    <link rel="prev" title="butterfree.core.transform.transformations.transform_component module" href="butterfree.core.transform.transformations.transform_component.html" /> 
+    <link rel="next" title="butterfree.core.validations package" href="butterfree.core.validations.html" />
+    <link rel="prev" title="butterfree.core.transform.transformations.user_defined_functions package" href="butterfree.core.transform.transformations.user_defined_functions.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -178,15 +178,145 @@
             
   <div class="section" id="butterfree-core-transform-utils-package">
 <h1>butterfree.core.transform.utils package<a class="headerlink" href="#butterfree-core-transform-utils-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="butterfree.core.transform.utils.date_range.html">butterfree.core.transform.utils.date_range module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="butterfree.core.transform.utils.function.html">butterfree.core.transform.utils.function module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="butterfree.core.transform.utils.window_spec.html">butterfree.core.transform.utils.window_spec module</a></li>
+<div class="section" id="module-butterfree.core.transform.utils.date_range">
+<span id="submodules"></span><h2>Submodules<a class="headerlink" href="#module-butterfree.core.transform.utils.date_range" title="Permalink to this headline">¶</a></h2>
+<p>Utils for date range generation.</p>
+<dl class="py function">
+<dt id="butterfree.core.transform.utils.date_range.get_date_range">
+<code class="sig-prename descclassname">butterfree.core.transform.utils.date_range.</code><code class="sig-name descname">get_date_range</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">client</span><span class="p">:</span> <span class="n"><a class="reference internal" href="butterfree.core.clients.html#butterfree.core.clients.spark_client.SparkClient" title="butterfree.core.clients.spark_client.SparkClient">butterfree.core.clients.spark_client.SparkClient</a></span></em>, <em class="sig-param"><span class="n">start_date</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>datetime.datetime<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">end_date</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>datetime.datetime<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">step</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.transform.utils.date_range.get_date_range" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a date range dataframe.</p>
+<p>The dataframe returning from this method will containing a single column
+TIMESTAMP_COLUMN, of timestamp type, with dates between start and end.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>client</strong> – a spark client.</p></li>
+<li><p><strong>start_date</strong> – range beginning value (inclusive).</p></li>
+<li><p><strong>end_date</strong> – range last value (exclusive)</p></li>
+<li><p><strong>step</strong> – optional step, in seconds.</p></li>
 </ul>
-</div>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A single column date range spark dataframe.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="module-butterfree.core.transform.utils.function"></span><p>Utils for custom or spark function to generation namedtuple.</p>
+<dl class="py class">
+<dt id="butterfree.core.transform.utils.function.Function">
+<em class="property">class </em><code class="sig-prename descclassname">butterfree.core.transform.utils.function.</code><code class="sig-name descname">Function</code><span class="sig-paren">(</span><em class="sig-param">func: parameters_validation.parameter_validation_decorator.parameter_validation.&lt;locals&gt;.func_partial.&lt;locals&gt;.validation_partial</em>, <em class="sig-param">data_type: parameters_validation.parameter_validation_decorator.parameter_validation.&lt;locals&gt;.func_partial.&lt;locals&gt;.validation_partial</em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.transform.utils.function.Function" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Define a class Function.</p>
+<dl class="simple">
+<dt>Like a namedtuple:</dt><dd><p>Function = namedtuple(“Function”, [“function”, “data_type”]).</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="butterfree.core.transform.utils.function.Function.func">
+<code class="sig-name descname">func</code><a class="headerlink" href="#butterfree.core.transform.utils.function.Function.func" title="Permalink to this definition">¶</a></dt>
+<dd><p>custom or spark functions, such as avg, std, count.
+For more information check spark functions:</p>
+<blockquote>
+<div><p>‘<a class="reference external" href="https://spark.apache.org/docs/2.3.1/api/python/_modules/pyspark/sql/functions.html">https://spark.apache.org/docs/2.3.1/api/python/_modules/pyspark/sql/functions.html</a>’</p>
+</div></blockquote>
+<dl class="simple">
+<dt>For custom functions, look the path:</dt><dd><p>‘butterfree/core/transform/transformations/user_defined_functions’.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="butterfree.core.transform.utils.function.Function.data_type">
+<code class="sig-name descname">data_type</code><a class="headerlink" href="#butterfree.core.transform.utils.function.Function.data_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>data type for the output columns.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="id0">
+<em class="property">property </em><code class="sig-name descname">data_type</code><a class="headerlink" href="#id0" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to be used in the transformation.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="id1">
+<em class="property">property </em><code class="sig-name descname">func</code><a class="headerlink" href="#id1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to be used in the transformation.</p>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-butterfree.core.transform.utils.window_spec"></span><p>Holds function for defining window in DataFrames.</p>
+<dl class="py class">
+<dt id="butterfree.core.transform.utils.window_spec.FrameBoundaries">
+<em class="property">class </em><code class="sig-prename descclassname">butterfree.core.transform.utils.window_spec.</code><code class="sig-name descname">FrameBoundaries</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mode</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">window_definition</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.transform.utils.window_spec.FrameBoundaries" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Utility functions for defining the frame boundaries.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mode</strong> – available modes to be used in time aggregations.</p></li>
+<li><p><strong>window_definition</strong> – time ranges to be used in the windows,</p></li>
+<li><p><strong>can be second</strong> (<em>it</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="butterfree.core.transform.utils.window_spec.FrameBoundaries.get">
+<code class="sig-name descname">get</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">w</span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.transform.utils.window_spec.FrameBoundaries.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns window with or without the frame boundaries.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="butterfree.core.transform.utils.window_spec.FrameBoundaries.window_size">
+<em class="property">property </em><code class="sig-name descname">window_size</code><a class="headerlink" href="#butterfree.core.transform.utils.window_spec.FrameBoundaries.window_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns window size.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="butterfree.core.transform.utils.window_spec.FrameBoundaries.window_unit">
+<em class="property">property </em><code class="sig-name descname">window_unit</code><a class="headerlink" href="#butterfree.core.transform.utils.window_spec.FrameBoundaries.window_unit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns window unit.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="butterfree.core.transform.utils.window_spec.Window">
+<em class="property">class </em><code class="sig-prename descclassname">butterfree.core.transform.utils.window_spec.</code><code class="sig-name descname">Window</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">partition_by</span></em>, <em class="sig-param"><span class="n">order_by</span></em>, <em class="sig-param"><span class="n">mode</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">window_definition</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.transform.utils.window_spec.Window" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Utility functions for defining a window specification.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>partition_by</strong> – he partitioning defined.</p></li>
+<li><p><strong>order_by</strong> – the ordering defined.</p></li>
+<li><p><strong>mode</strong> – available modes to be used in time aggregations.</p></li>
+<li><p><strong>window_definition</strong> – time ranges to be used in the windows, it can be second(s),
+minute(s), hour(s), day(s), week(s) and year(s),</p></li>
+</ul>
+</dd>
+</dl>
+<p>Use the static methods in <a class="reference internal" href="#butterfree.core.transform.utils.window_spec.Window" title="butterfree.core.transform.utils.window_spec.Window"><code class="xref py py-class docutils literal notranslate"><span class="pre">Window</span></code></a> to create a <code class="xref py py-class docutils literal notranslate"><span class="pre">WindowSpec</span></code>.</p>
+<dl class="py attribute">
+<dt id="butterfree.core.transform.utils.window_spec.Window.SLIDE_DURATION">
+<code class="sig-name descname">SLIDE_DURATION</code><em class="property"> = '1 day'</em><a class="headerlink" href="#butterfree.core.transform.utils.window_spec.Window.SLIDE_DURATION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="butterfree.core.transform.utils.window_spec.Window.get">
+<code class="sig-name descname">get</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.transform.utils.window_spec.Window.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines a common window to be used both in time and rows windows.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="butterfree.core.transform.utils.window_spec.Window.get_name">
+<code class="sig-name descname">get_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#butterfree.core.transform.utils.window_spec.Window.get_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return window suffix name based on passed criteria.</p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="module-butterfree.core.transform.utils">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-butterfree.core.transform.utils" title="Permalink to this headline">¶</a></h2>
@@ -238,10 +368,10 @@ minute(s), hour(s), day(s), week(s) and year(s),</p></li>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="butterfree.core.transform.utils.date_range.html" class="btn btn-neutral float-right" title="butterfree.core.transform.utils.date_range module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="butterfree.core.validations.html" class="btn btn-neutral float-right" title="butterfree.core.validations package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="butterfree.core.transform.transformations.transform_component.html" class="btn btn-neutral float-left" title="butterfree.core.transform.transformations.transform_component module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="butterfree.core.transform.transformations.user_defined_functions.html" class="btn btn-neutral float-left" title="butterfree.core.transform.transformations.user_defined_functions package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

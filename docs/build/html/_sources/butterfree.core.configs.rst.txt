@@ -12,10 +12,12 @@ Subpackages
 Submodules
 ----------
 
-.. toctree::
-   :maxdepth: 4
 
-   butterfree.core.configs.environment
+.. automodule:: butterfree.core.configs.environment
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 
 Module contents
 ---------------

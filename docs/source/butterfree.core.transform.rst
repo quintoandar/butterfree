@@ -14,11 +14,18 @@ Subpackages
 Submodules
 ----------
 
-.. toctree::
-   :maxdepth: 4
 
-   butterfree.core.transform.aggregated_feature_set
-   butterfree.core.transform.feature_set
+.. automodule:: butterfree.core.transform.aggregated_feature_set
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+.. automodule:: butterfree.core.transform.feature_set
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 
 Module contents
 ---------------
