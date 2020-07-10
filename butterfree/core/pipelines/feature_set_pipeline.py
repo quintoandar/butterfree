@@ -20,6 +20,7 @@ class FeatureSetPipeline:
     Example:
         This an example regarding the feature set pipeline definition. All
         sources, feature set (and its features) and writers are defined.
+
         >>> import os
 
         >>> from butterfree.core.pipelines import FeatureSetPipeline
