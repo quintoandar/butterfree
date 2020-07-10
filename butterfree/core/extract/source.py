@@ -24,6 +24,7 @@ class Source:
 
     Example:
         Simple example regarding Source class instantiation.
+
     >>> from butterfree.core.extract import Source
     >>> from butterfree.core.extract.readers import TableReader, FileReader
     >>> from butterfree.core.clients import SparkClient

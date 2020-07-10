@@ -16,6 +16,7 @@ class TableReader(Reader):
 
     Example:
         Simple example regarding TableReader class instantiation.
+
     >>> from butterfree.core.extract.readers import TableReader
     >>> from butterfree.core.clients import SparkClient
     >>> from butterfree.core.extract.pre_processing import filter
@@ -33,6 +34,7 @@ class TableReader(Reader):
 
         It's also possible to define simple transformations within the
         reader's scope:
+
     >>> table_reader.with_(filter, condition="year = 2019").build(spark_client)
 
         In this case, however, a temp view will be created, cointaining

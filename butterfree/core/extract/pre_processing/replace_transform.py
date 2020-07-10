@@ -9,6 +9,7 @@ def replace(dataframe: DataFrame, column, replace_dict):
     """Replace values of a string column in the dataframe using a dict.
 
     Example:
+
     >>> from butterfree.core.extract.pre_processing import replace
     ... from butterfree.testing.dataframe import (
     ...     assert_dataframe_equality,
@@ -23,9 +24,12 @@ def replace(dataframe: DataFrame, column, replace_dict):
     ... ]
     >>> input_df = create_df_from_collection(input_data, spark_context, spark_session)
     >>> input_df.collect()
+
     [Row(id=1, type='a'), Row(id=2, type='b'), Row(id=3, type='c')]
+
     >>> replace_dict = {"a": "type_a", "b": "type_b"}
     >>> replace(input_df, "type", replace_dict).collect()
+
     [Row(id=1, type='type_a'), Row(id=2, type='type_b'), Row(id=3, type='c')]
 
     Args:
