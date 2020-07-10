@@ -20,6 +20,7 @@ class FileReader(Reader):
 
     Example:
         Simple example regarding FileReader class instantiation.
+
     >>> from butterfree.core.extract.readers import FileReader
     >>> from butterfree.core.clients import SparkClient
     >>> from butterfree.core.extract.pre_processing import filter
@@ -33,6 +34,7 @@ class FileReader(Reader):
 
         However, we can define the schema and format_options,
         like header, and provide them to FileReader.
+
     >>> spark_client = SparkClient()
     >>> schema_csv = StructType([
     ...            StructField("column_a", LongType()),
@@ -57,6 +59,7 @@ class FileReader(Reader):
 
         It's also possible to define simple transformations within the
         reader's scope:
+
     >>> file_reader.with_(filter, condition="year = 2019").build(spark_client)
 
         In this case, however, a temp view will be created, cointaining

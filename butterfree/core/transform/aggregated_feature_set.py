@@ -30,6 +30,7 @@ class AggregatedFeatureSet(FeatureSet):
     Example:
         This an example regarding the aggregated feature set definition. All features
         and its transformations are defined.
+
     >>> from butterfree.core.transform.aggregated_feature_set import (
     ...       AggregatedFeatureSet
     ... )

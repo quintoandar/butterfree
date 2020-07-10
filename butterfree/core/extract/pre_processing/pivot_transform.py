@@ -34,6 +34,7 @@ def pivot(
             operation.
 
     Example:
+
         >>> dataframe.orderBy("ts", "id", "amenity").show()
         +---+---+-------+-----+
         | id| ts|amenity|  has|
@@ -47,6 +48,7 @@ def pivot(
         |  1|  4|   pool| true|
         |  1|  5|balcony| true|
         +---+---+-------+-----+
+
         >>> pivoted = pivot(dataframe, ["id", "ts"], "amenity", "has", functions.first)
         >>> pivoted.orderBy("ts", "id").show()
         +---+---+-------+------+----+-----+
