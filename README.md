@@ -15,7 +15,7 @@ To understand the main concepts of Feature Store modeling and library main featu
 To learn how to use Butterfree in practice, see [Butterfree's notebook examples](https://github.com/quintoandar/butterfree/tree/master/examples)  
 
 ## Requirements and Installation
-Butterfree depends on **Python 3.6+** and it is **Spark 3.0 ready** :heavy-check-mark:
+Butterfree depends on **Python 3.6+** and it is **Spark 3.0 ready** :heavy_check_mark:
 
 [Python Package Index](https://quintoandar.github.io/python-package-server/) hosts reference to a pip-installable module of this library, using it is as straightforward as including it on your project's requirements.
 
@@ -36,7 +36,7 @@ pip install git+https://github.com/quintoandar/butterfree.git@staging
 ```
 
 ## Documentation
-The official documentation is hosted on [Read the Docs](https://quintoandar-butterfree.readthedocs-hosted.com/en/stable/)
+The official documentation is hosted on [Read the Docs](https://quintoandar-butterfree.readthedocs-hosted.com/en/latest/home.html)
 
 ## License
 TBD
