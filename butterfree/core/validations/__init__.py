@@ -1,5 +1,5 @@
 """Holds dataframe validate for multiple destinations."""
 
-from butterfree.core.validations.validate_dataframe import ValidateDataframe
+from butterfree.core.validations.basic_validaton import BasicValidation
 
-__all__ = ["ValidateDataframe"]
+__all__ = ["BasicValidation"]
