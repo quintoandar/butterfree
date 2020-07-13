@@ -172,6 +172,6 @@ class TestCassandraConfig:
             username="username", password="password", host="host", keyspace="keyspace"
         )
         assert cassandra_config.username == "username"
-        assert cassandra_config.password == "password"
+        assert cassandra_config.password == "password"  # noqa: S106
         assert cassandra_config.host == "host"
         assert cassandra_config.keyspace == "keyspace"
