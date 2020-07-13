@@ -168,10 +168,10 @@ class TestCassandraConfig:
         assert cassandra_config.stream_checkpoint_path == value
 
     def test_set_credentials_on_instantiation(self):
-        cassandra_config = CassandraConfig(
+        cassandra_config = CassandraConfig(  # noqa: S106
             username="username", password="password", host="host", keyspace="keyspace"
         )
         assert cassandra_config.username == "username"
-        assert cassandra_config.password == "password"  # noqa: S106
+        assert cassandra_config.password == "password"
         assert cassandra_config.host == "host"
         assert cassandra_config.keyspace == "keyspace"
