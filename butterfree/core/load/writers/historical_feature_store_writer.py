@@ -85,6 +85,8 @@ class HistoricalFeatureStoreWriter(Writer):
 
     DEFAULT_VALIDATION_THRESHOLD = 0.01
 
+    __name__ = "Historical Feature Store Writer"
+
     def __init__(
         self,
         db_config=None,

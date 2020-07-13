@@ -2,7 +2,7 @@ from unittest.mock import Mock
 
 import pytest
 from pyspark.sql import functions as F
-from pyspark.sql.types import FloatType, LongType, TimestampType
+from pyspark.sql.types import DoubleType, FloatType, LongType, TimestampType
 from tests.unit.butterfree.core.transform.conftest import (
     feature_add,
     feature_divide,
@@ -10,6 +10,7 @@ from tests.unit.butterfree.core.transform.conftest import (
     timestamp_c,
 )
 
+from butterfree import AggregatedFeatureSet
 from butterfree.core.clients import SparkClient
 from butterfree.core.constants.columns import TIMESTAMP_COLUMN
 from butterfree.core.constants.data_type import DataType
@@ -357,12 +358,12 @@ class TestFeatureSet:
             },
             {
                 "column_name": "feature1__stddev_pop_over_2_minutes_fixed_windows",
-                "type": FloatType(),
+                "type": DoubleType(),
                 "primary_key": False,
             },
             {
                 "column_name": "feature1__stddev_pop_over_15_minutes_fixed_windows",
-                "type": FloatType(),
+                "type": DoubleType(),
                 "primary_key": False,
             },
         ]
@@ -378,7 +379,7 @@ class TestFeatureSet:
                     transformation=SparkFunctionTransform(
                         functions=[
                             Function(F.avg, DataType.FLOAT),
-                            Function(F.stddev_pop, DataType.FLOAT),
+                            Function(F.stddev_pop, DataType.DOUBLE),
                         ]
                     ).with_window(
                         partition_by="id",
