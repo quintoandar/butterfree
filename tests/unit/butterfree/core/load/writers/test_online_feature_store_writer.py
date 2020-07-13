@@ -84,7 +84,7 @@ class TestOnlineFeatureStoreWriter:
         # are in the called args in write_dataframe
         assert all(
             item in spark_client.write_dataframe.call_args[1].items()
-            for item in writer.db_config.get_options(table=feature_set.entity).items()
+            for item in writer.db_config.get_options(table=feature_set.name).items()
         )
 
     def test_write_in_debug_mode(
@@ -184,3 +184,41 @@ class TestOnlineFeatureStoreWriter:
         schema = writer.get_db_schema(test_feature_set)
 
         assert schema == expected_schema
+
+    def test_write_stream_on_entity(self, feature_set, monkeypatch):
+        """Test write method with stream dataframe and write_to_entity enabled.
+
+        The main purpose of this test is assert the correct setup of stream checkpoint
+        path and if the target table name is the entity.
+
+        """
+
+        # arrange
+        spark_client = SparkClient()
+        spark_client.write_stream = Mock()
+        spark_client.write_stream.return_value = Mock(spec=StreamingQuery)
+
+        dataframe = Mock(spec=DataFrame)
+        dataframe.isStreaming = True
+
+        feature_set.entity = "my_entity"
+        feature_set.name = "my_feature_set"
+        monkeypatch.setenv("STREAM_CHECKPOINT_PATH", "test")
+        target_checkpoint_path = "test/my_entity/my_feature_set__on_entity"
+
+        writer = OnlineFeatureStoreWriter(write_to_entity=True)
+
+        # act
+        stream_handler = writer.write(feature_set, dataframe, spark_client)
+
+        # assert
+        assert isinstance(stream_handler, StreamingQuery)
+        spark_client.write_stream.assert_called_with(
+            dataframe,
+            processing_time=writer.db_config.stream_processing_time,
+            output_mode=writer.db_config.stream_output_mode,
+            checkpoint_path=target_checkpoint_path,
+            format_=writer.db_config.format_,
+            mode=writer.db_config.mode,
+            **writer.db_config.get_options(table="my_entity"),
+        )

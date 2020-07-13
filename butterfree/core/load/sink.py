@@ -2,11 +2,13 @@
 from typing import List
 
 from pyspark.sql.dataframe import DataFrame
+from pyspark.sql.streaming import StreamingQuery
 
 from butterfree.core.clients import SparkClient
 from butterfree.core.load.writers.writer import Writer
 from butterfree.core.transform import FeatureSet
-from butterfree.core.validations.validate_dataframe import ValidateDataframe
+from butterfree.core.validations.basic_validaton import BasicValidation
+from butterfree.core.validations.validation import Validation
 
 
 class Sink:
@@ -18,15 +20,35 @@ class Sink:
     method.
 
     Attributes:
-        writers: list of writers to run.
+        writers: list of Writers to use to load the data.
+        validation: validation to check the data before starting to write.
 
     """
 
-    def __init__(self, writers: List[Writer]):
-        if not writers:
-            raise ValueError("The writers list can't be empty.")
+    def __init__(self, writers: List[Writer], validation: Validation = None):
+        self.writers = writers
+        self.validation = validation
+
+    @property
+    def writers(self) -> List[Writer]:
+        """List of Writers to use to load the data."""
+        return self._writers
+
+    @writers.setter
+    def writers(self, value: List[Writer]):
+        if not value or not all(isinstance(writer, Writer) for writer in value):
+            raise ValueError("Writers needs to be a list of Writer instances.")
         else:
-            self.writers = writers
+            self._writers = value
+
+    @property
+    def validation(self):
+        """Validation to check the data before starting to write."""
+        return self._validation
+
+    @validation.setter
+    def validation(self, value: Validation):
+        self._validation = value or BasicValidation()
 
     def validate(
         self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient
@@ -60,7 +82,7 @@ class Sink:
 
     def flush(
         self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient
-    ):
+    ) -> List[StreamingQuery]:
         """Trigger a write job in all the defined Writers.
 
         Args:
@@ -68,11 +90,17 @@ class Sink:
             feature_set: object processed with feature set metadata.
             spark_client: client used to run a query.
 
-        """
-        validate_dataframe = ValidateDataframe(dataframe)
-        validate_dataframe.checks()
+        Returns:
+            Streaming handlers for each defined writer, if writing streaming dfs.
 
-        for writer in self.writers:
+        """
+        self.validation.input(dataframe).check()
+
+        handlers = [
             writer.write(
                 feature_set=feature_set, dataframe=dataframe, spark_client=spark_client
             )
+            for writer in self.writers
+        ]
+
+        return [handler for handler in handlers if handler]

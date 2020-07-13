@@ -1,22 +1,24 @@
-"""Check dataframe's informations to write in Loader."""
+"""Validation implementing basic checks over the dataframe."""
+
 from pyspark.sql.dataframe import DataFrame
 
 from butterfree.core.constants.columns import TIMESTAMP_COLUMN
+from butterfree.core.validations.validation import Validation
 
 
-class ValidateDataframe:
-    """Validate dataframe before to save.
+class BasicValidation(Validation):
+    """Basic validation suite for Feature Set's dataframe.
 
     Attributes:
         dataframe: object to be verified
 
     """
 
-    def __init__(self, dataframe: DataFrame):
-        self.dataframe = dataframe
+    def __init__(self, dataframe: DataFrame = None):
+        super().__init__(dataframe)
 
-    def checks(self):
-        """Call a set validate functions.
+    def check(self):
+        """Check basic validation properties about the dataframe.
 
         Raises:
             ValueError: if any of the verifications fail
@@ -30,7 +32,7 @@ class ValidateDataframe:
         """Check dataframe's ts column.
 
         Raises:
-            ValueError: if dataframe don't have a column named ts
+            ValueError: if dataframe don't have a column named ts.
 
         """
         if TIMESTAMP_COLUMN not in self.dataframe.columns:
