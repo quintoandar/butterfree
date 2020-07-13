@@ -137,7 +137,7 @@ class TestSink:
 
         online_feature_store_writer = OnlineFeatureStoreWriter()
         online_feature_store_writer_on_entity = OnlineFeatureStoreWriter(
-            write_on_entity=True
+            write_to_entity=True
         )
 
         sink = Sink(
@@ -174,7 +174,7 @@ class TestSink:
 
         online_feature_store_writer = OnlineFeatureStoreWriter()
         online_feature_store_writer_on_entity = OnlineFeatureStoreWriter(
-            write_on_entity=True
+            write_to_entity=True
         )
 
         sink = Sink(

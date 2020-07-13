@@ -23,8 +23,8 @@ class OnlineFeatureStoreWriter(Writer):
         debug_mode: "dry run" mode, write the result to a temporary view.
         write_to_entity: option to write the data to the entity table.
             With this option set to True, the writer will write the feature set to
-            a table with the name equal to the entity name, defined on the feature set.
-            So, it won't write to a table with the name of the feature set, as it
+            a table with the name equal to the entity name, defined on the pipeline.
+            So, it WILL NOT write to a table with the name of the feature set, as it
             normally does.
 
     Example:
@@ -64,10 +64,10 @@ class OnlineFeatureStoreWriter(Writer):
         according to OnlineFeatureStoreWriter class arguments.
     """
 
-    def __init__(self, db_config=None, debug_mode: bool = False, write_on_entity=False):
+    def __init__(self, db_config=None, debug_mode: bool = False, write_to_entity=False):
         self.db_config = db_config or CassandraConfig()
         self.debug_mode = debug_mode
-        self.write_on_entity = write_on_entity
+        self.write_to_entity = write_to_entity
 
     @staticmethod
     def filter_latest(dataframe: DataFrame, id_columns: List[Any]) -> DataFrame:
@@ -106,7 +106,7 @@ class OnlineFeatureStoreWriter(Writer):
     ) -> StreamingQuery:
         """Writes the dataframe in streaming mode."""
         checkpoint_folder = (
-            f"{feature_set.name}__on_entity" if self.write_on_entity else table_name
+            f"{feature_set.name}__on_entity" if self.write_to_entity else table_name
         )
         checkpoint_path = (
             os.path.join(
@@ -156,7 +156,7 @@ class OnlineFeatureStoreWriter(Writer):
         will be updated in real time.
 
         """
-        table_name = feature_set.entity if self.write_on_entity else feature_set.name
+        table_name = feature_set.entity if self.write_to_entity else feature_set.name
 
         if dataframe.isStreaming:
             if self.debug_mode:

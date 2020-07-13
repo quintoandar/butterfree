@@ -186,7 +186,7 @@ class TestOnlineFeatureStoreWriter:
         assert schema == expected_schema
 
     def test_write_stream_on_entity(self, feature_set, monkeypatch):
-        """Test write method with stream dataframe and write_on_entity enabled.
+        """Test write method with stream dataframe and write_to_entity enabled.
 
         The main purpose of this test is assert the correct setup of stream checkpoint
         path and if the target table name is the entity.
@@ -206,7 +206,7 @@ class TestOnlineFeatureStoreWriter:
         monkeypatch.setenv("STREAM_CHECKPOINT_PATH", "test")
         target_checkpoint_path = "test/my_entity/my_feature_set__on_entity"
 
-        writer = OnlineFeatureStoreWriter(write_on_entity=True)
+        writer = OnlineFeatureStoreWriter(write_to_entity=True)
 
         # act
         stream_handler = writer.write(feature_set, dataframe, spark_client)
