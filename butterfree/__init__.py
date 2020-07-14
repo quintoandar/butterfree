@@ -34,7 +34,7 @@ from butterfree.core.transform.transformations.user_defined_functions import (
     most_frequent_set,
 )
 from butterfree.core.transform.utils import Function, Window
-from butterfree.core.validations import ValidateDataframe
+from butterfree.core.validations import BasicValidation
 from butterfree.testing.dataframe import (
     assert_column_equality,
     assert_dataframe_equality,
@@ -79,7 +79,7 @@ __all__ = [
     "most_frequent_set",
     "Function",
     "Window",
-    "ValidateDataframe",
+    "BasicValidation",
     "assert_column_equality",
     "assert_dataframe_equality",
     "create_df_from_collection",
