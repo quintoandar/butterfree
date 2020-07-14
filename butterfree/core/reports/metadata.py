@@ -167,13 +167,13 @@ class Metadata:
         """Generate markdown file."""
         params = self._construct()
 
-        mdFile = MdUtils(file_name=params._name)
-        mdFile.new_header(level=1, title=str(params._name).capitalize())
-        mdFile.new_header(level=2, title="Description")
-        mdFile.new_paragraph(params._desc_feature_set)
-        mdFile.new_line()
-        mdFile.new_header(level=2, title="Feature Set Pipeline")
-        mdFile.new_header(level=3, title="Source")
+        markdown = MdUtils(file_name=params._name)
+        markdown.new_header(level=1, title=str(params._name).capitalize())
+        markdown.new_header(level=2, title="Description")
+        markdown.new_paragraph(params._desc_feature_set)
+        markdown.new_line()
+        markdown.new_header(level=2, title="Feature Set Pipeline")
+        markdown.new_header(level=3, title="Source")
 
         source = ["Reader", "Location"]
         for r, l in params._source:
@@ -181,8 +181,8 @@ class Metadata:
 
         count_rows = len(source) // 2
 
-        mdFile.new_table(columns=2, rows=count_rows, text=source, text_align="center")
-        mdFile.new_header(level=3, title="Sink")
+        markdown.new_table(columns=2, rows=count_rows, text=source, text_align="center")
+        markdown.new_header(level=3, title="Sink")
 
         sink = ["Writer"]
         for w in params._sink:
@@ -190,8 +190,8 @@ class Metadata:
 
         count_rows = len(sink)
 
-        mdFile.new_table(columns=1, rows=count_rows, text=sink, text_align="center")
-        mdFile.new_header(level=3, title="Features")
+        markdown.new_table(columns=1, rows=count_rows, text=sink, text_align="center")
+        markdown.new_header(level=3, title="Features")
 
         features = ["Column name", "Data type", "Description"]
         for c, desc in params._features:
@@ -199,9 +199,11 @@ class Metadata:
 
         count_rows = len(features) // 3
 
-        mdFile.new_table(columns=3, rows=count_rows, text=features, text_align="center")
+        markdown.new_table(
+            columns=3, rows=count_rows, text=features, text_align="center"
+        )
 
         if self.save:
-            mdFile.create_md_file()
+            markdown.create_md_file()
         else:
-            return mdFile.file_data_text
+            return markdown.file_data_text
