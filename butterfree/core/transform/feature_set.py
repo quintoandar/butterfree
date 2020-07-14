@@ -266,11 +266,9 @@ class FeatureSet:
 
             type = []
             if isinstance(f.transformation, SparkFunctionTransform):
+                windows = f.transformation._windows or [None]
                 for fc in f.transformation.functions:
-                    if f.transformation._windows:
-                        for _ in f.transformation._windows:
-                            type.append(fc.data_type.spark)
-                    else:
+                    for _ in range(len(windows)):
                         type.append(fc.data_type.spark)
             else:
                 type.append(f.dtype.spark)

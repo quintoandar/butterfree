@@ -116,17 +116,17 @@ class Metadata:
 
         for feature in self.feature_set.feature_set.features:
             if isinstance(feature.transformation, SparkFunctionTransform):
+                windows = feature.transformation._windows or [None]
                 for _ in feature.transformation.functions:
-                    if feature.transformation._windows:
-                        for _ in feature.transformation._windows:
-                            desc_feature.append(feature.description)
-                    else:
+                    for _ in range(len(windows)):
                         desc_feature.append(feature.description)
+
             elif isinstance(feature.transformation, AggregatedTransform):
                 pivot_values = self.feature_set.feature_set._pivot_values or [None]
                 windows = self.feature_set.feature_set._windows or [None]
-                for _ in range(len(pivot_values) * len(windows)):
-                    desc_feature.append(feature.description)
+                for _ in feature.transformation.functions:
+                    for _ in range(len(pivot_values) * len(windows)):
+                        desc_feature.append(feature.description)
             else:
                 desc_feature.append(feature.description)
 
