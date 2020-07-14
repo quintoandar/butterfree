@@ -11,7 +11,6 @@ from butterfree import (
     SparkFunctionTransform,
     TableReader,
 )
-
 from butterfree.core.transform.transformations import AggregatedTransform
 
 
