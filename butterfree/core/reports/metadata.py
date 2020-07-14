@@ -3,13 +3,9 @@
 import json
 
 from mdutils import MdUtils
-from typing import List
 
 from butterfree import FeatureSetPipeline, FileReader, KafkaReader, TableReader
-from butterfree.core.transform.transformations import (
-    AggregatedTransform,
-    SparkFunctionTransform,
-)
+from butterfree.core.transform.aggregated_feature_set import AggregatedFeatureSet
 
 
 class Metadata:
@@ -93,7 +89,10 @@ class Metadata:
         self._sink = []
         self._features = []
 
-    def _construct_source(self) -> List:
+    def _construct(self):
+        self._name = self.feature_set.feature_set.name
+        self._desc_feature_set = self.feature_set.feature_set.description
+
         source = []
         for reader in self.feature_set.source.readers:
             if isinstance(reader, TableReader):
@@ -103,45 +102,35 @@ class Metadata:
             if isinstance(reader, KafkaReader):
                 source.append((reader.__name__, reader.topic))
 
-        return source
+        self._source = source
 
-    def _construct_sink(self) -> List:
+        self._sink = [writer.__name__ for writer in self.feature_set.sink.writers]
 
-        return [writer.__name__ for writer in self.feature_set.sink.writers]
-
-    def _construct_feature(self) -> List:
         desc_feature = [
             feature.description for feature in self.feature_set.feature_set.keys
         ]
         desc_feature.append(self.feature_set.feature_set.timestamp.description)
 
         for feature in self.feature_set.feature_set.features:
-            if isinstance(feature.transformation, SparkFunctionTransform):
-                windows = feature.transformation._windows or [None]
-                for _ in feature.transformation.functions:
-                    for _ in range(len(windows)):
-                        desc_feature.append(feature.description)
-
-            elif isinstance(feature.transformation, AggregatedTransform):
-                pivot_values = self.feature_set.feature_set._pivot_values or [None]
-                windows = self.feature_set.feature_set._windows or [None]
-                for _ in feature.transformation.functions:
-                    for _ in range(len(pivot_values) * len(windows)):
-                        desc_feature.append(feature.description)
-            else:
-                desc_feature.append(feature.description)
+            windows = feature.transformation._windows or (
+                self.feature_set.feature_set._windows
+                if isinstance(self.feature_set.feature_set, AggregatedFeatureSet)
+                else [None]
+            )
+            pivot_values = (
+                self.feature_set.feature_set._pivot_values
+                if isinstance(self.feature_set.feature_set, AggregatedFeatureSet)
+                else [None]
+            )
+            desc_feature += [
+                feature.description
+                for _ in feature.transformation.functions
+                for _ in range(len(pivot_values) * len(windows))
+            ] or [feature.description]
 
         schema = self.feature_set.feature_set.get_schema()
 
-        return [(column, desc) for column, desc in zip(schema, desc_feature)]
-
-
-    def _construct(self):
-        self._name = self.feature_set.feature_set.name
-        self._desc_feature_set = self.feature_set.feature_set.description
-        self._source = self._construct_source()
-        self._sink = self._construct_sink()
-        self._features = self._construct_feature()
+        self._features = [(column, desc) for column, desc in zip(schema, desc_feature)]
 
         return self
 
