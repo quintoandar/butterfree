@@ -40,6 +40,7 @@ from butterfree.testing.dataframe import (
     assert_dataframe_equality,
     create_df_from_collection,
 )
+from butterfree.core.reports.metadata import Metadata
 
 __all__ = [
     "AbstractClient",
@@ -83,4 +84,5 @@ __all__ = [
     "assert_column_equality",
     "assert_dataframe_equality",
     "create_df_from_collection",
+    "Metadata"
 ]

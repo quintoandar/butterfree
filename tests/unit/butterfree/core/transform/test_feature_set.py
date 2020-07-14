@@ -10,7 +10,6 @@ from tests.unit.butterfree.core.transform.conftest import (
     timestamp_c,
 )
 
-from butterfree import AggregatedFeatureSet
 from butterfree.core.clients import SparkClient
 from butterfree.core.constants.columns import TIMESTAMP_COLUMN
 from butterfree.core.constants.data_type import DataType
