@@ -3,6 +3,7 @@
 import json
 
 from mdutils import MdUtils
+from typing import List
 
 from butterfree import FeatureSetPipeline, FileReader, KafkaReader, TableReader
 from butterfree.core.transform.transformations import (
@@ -92,10 +93,7 @@ class Metadata:
         self._sink = []
         self._features = []
 
-    def _construct(self):
-        self._name = self.feature_set.feature_set.name
-        self._desc_feature_set = self.feature_set.feature_set.description
-
+    def _construct_source(self) -> List:
         source = []
         for reader in self.feature_set.source.readers:
             if isinstance(reader, TableReader):
@@ -105,10 +103,13 @@ class Metadata:
             if isinstance(reader, KafkaReader):
                 source.append((reader.__name__, reader.topic))
 
-        self._source = source
+        return source
 
-        self._sink = [writer.__name__ for writer in self.feature_set.sink.writers]
+    def _construct_sink(self) -> List:
 
+        return [writer.__name__ for writer in self.feature_set.sink.writers]
+
+    def _construct_feature(self) -> List:
         desc_feature = [
             feature.description for feature in self.feature_set.feature_set.keys
         ]
@@ -132,7 +133,15 @@ class Metadata:
 
         schema = self.feature_set.feature_set.get_schema()
 
-        self._features = [(column, desc) for column, desc in zip(schema, desc_feature)]
+        return [(column, desc) for column, desc in zip(schema, desc_feature)]
+
+
+    def _construct(self):
+        self._name = self.feature_set.feature_set.name
+        self._desc_feature_set = self.feature_set.feature_set.description
+        self._source = self._construct_source()
+        self._sink = self._construct_sink()
+        self._features = self._construct_feature()
 
         return self
 
