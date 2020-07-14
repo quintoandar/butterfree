@@ -4,14 +4,11 @@ import json
 
 from mdutils import MdUtils
 
-from butterfree import (
-    FeatureSetPipeline,
-    FileReader,
-    KafkaReader,
+from butterfree import FeatureSetPipeline, FileReader, KafkaReader, TableReader
+from butterfree.core.transform.transformations import (
+    AggregatedTransform,
     SparkFunctionTransform,
-    TableReader,
 )
-from butterfree.core.transform.transformations import AggregatedTransform
 
 
 class Metadata:
