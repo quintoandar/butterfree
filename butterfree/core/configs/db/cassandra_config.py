@@ -123,9 +123,7 @@ class CassandraConfig(AbstractWriteConfig):
 
     @stream_processing_time.setter
     def stream_processing_time(self, value: str):
-        self.__stream_processing_time = value or environment.get_variable(
-            "STREAM_PROCESSING_TIME"
-        )
+        self.__stream_processing_time = value or "0 seconds"
 
     @property
     def stream_output_mode(self) -> str:

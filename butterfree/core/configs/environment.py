@@ -10,7 +10,6 @@ specification = {
     "FEATURE_STORE_S3_BUCKET": "test",
     "FEATURE_STORE_HISTORICAL_DATABASE": "test",
     "KAFKA_CONSUMER_CONNECTION_STRING": "test_host:1234,test_host2:1234",
-    "STREAM_PROCESSING_TIME": "0 seconds",
     "STREAM_CHECKPOINT_PATH": None,
 }
 
