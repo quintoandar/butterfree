@@ -20,7 +20,11 @@ This document describes our guidelines for contributing to Butterfree and its mo
   * [Tests](#tests)
   * [GitFlow](#gitflow)
   * [Pull Requests](#pull-requests)
-
+    + [Creating a Pull Request](#creating-a-pull-request)
+      - [Good branch name](#good-branch-name)
+      - [Create small PRs](#create-small-PRs)
+      - [Add good description](#add-good-description)
+      - [Add labels](#add-labels)    
 
 ## Development Environment
 
