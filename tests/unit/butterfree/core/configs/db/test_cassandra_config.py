@@ -1,5 +1,7 @@
 import pytest
 
+from butterfree.core.configs.db import CassandraConfig
+
 
 class TestCassandraConfig:
     def test_mode(self, cassandra_config):
@@ -164,3 +166,12 @@ class TestCassandraConfig:
 
         # then
         assert cassandra_config.stream_checkpoint_path == value
+
+    def test_set_credentials_on_instantiation(self):
+        cassandra_config = CassandraConfig(  # noqa: S106
+            username="username", password="password", host="host", keyspace="keyspace"
+        )
+        assert cassandra_config.username == "username"
+        assert cassandra_config.password == "password"
+        assert cassandra_config.host == "host"
+        assert cassandra_config.keyspace == "keyspace"
