@@ -1,8 +1,6 @@
 ## Butterfree
 Made with :heart: by the **MLOps** team from [QuintoAndar](https://github.com/quintoandar/)
 
-![butterfree's evolution](https://i.imgur.com/wJzsBaK.gif)
-
 This library supports Python version 3.6+ and meant to provide tools for building ETL pipelines for Feature Stores using [Apache Spark](https://spark.apache.org/).
 
 The library is centered on the following concetps:
