@@ -16,9 +16,7 @@ from butterfree.transform.transformations.sql_expression_transform import (
     SQLExpressionTransform,
 )
 from butterfree.transform.transformations.stack_transform import StackTransform
-from butterfree.transform.transformations.transform_component import (
-    TransformComponent,
-)
+from butterfree.transform.transformations.transform_component import TransformComponent
 
 __all__ = [
     "AggregatedTransform",

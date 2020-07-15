@@ -47,9 +47,7 @@ class TestCassandraConfig:
 
     def test_keyspace_empty(self, cassandra_config, mocker):
         # given
-        mocker.patch(
-            "butterfree.configs.environment.get_variable", return_value=None
-        )
+        mocker.patch("butterfree.configs.environment.get_variable", return_value=None)
 
         with pytest.raises(ValueError, match="cannot be empty"):
             cassandra_config.keyspace = None
@@ -69,9 +67,7 @@ class TestCassandraConfig:
 
     def test_host_empty(self, cassandra_config, mocker):
         # given
-        mocker.patch(
-            "butterfree.configs.environment.get_variable", return_value=None
-        )
+        mocker.patch("butterfree.configs.environment.get_variable", return_value=None)
 
         with pytest.raises(ValueError, match="cannot be empty"):
             cassandra_config.host = None
@@ -91,9 +87,7 @@ class TestCassandraConfig:
 
     def test_username_empty(self, cassandra_config, mocker):
         # given
-        mocker.patch(
-            "butterfree.configs.environment.get_variable", return_value=None
-        )
+        mocker.patch("butterfree.configs.environment.get_variable", return_value=None)
 
         with pytest.raises(ValueError, match="cannot be empty"):
             cassandra_config.username = None
@@ -113,9 +107,7 @@ class TestCassandraConfig:
 
     def test_password_empty(self, cassandra_config, mocker):
         # given
-        mocker.patch(
-            "butterfree.configs.environment.get_variable", return_value=None
-        )
+        mocker.patch("butterfree.configs.environment.get_variable", return_value=None)
 
         with pytest.raises(ValueError, match="cannot be empty"):
             cassandra_config.password = None

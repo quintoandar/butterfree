@@ -2,8 +2,8 @@ import json
 
 from pytest import fixture
 
-from butterfree.constants.columns import TIMESTAMP_COLUMN
 from butterfree.constants import DataType
+from butterfree.constants.columns import TIMESTAMP_COLUMN
 
 
 @fixture

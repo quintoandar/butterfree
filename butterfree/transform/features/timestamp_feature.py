@@ -2,8 +2,8 @@
 from pyspark.sql import DataFrame
 from pyspark.sql.functions import from_unixtime, to_timestamp
 
-from butterfree.constants.columns import TIMESTAMP_COLUMN
 from butterfree.constants import DataType
+from butterfree.constants.columns import TIMESTAMP_COLUMN
 from butterfree.transform.features import Feature
 from butterfree.transform.transformations import TransformComponent
 
