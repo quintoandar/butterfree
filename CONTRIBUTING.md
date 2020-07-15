@@ -220,7 +220,7 @@ And a good practice in some repository is to follow the features/bugfixes branch
 
 #### Create small PRs
 
-Before you start working on a story/feature, make a mental/written note on how you want to break it down into several smaller pull requests, so it's possible to define a sufficient narrow scope for your changes.
+Before you start working on a story/feature, make a mental/written note on how you want to break it down into several smaller pull requests, so it's possible to define a sufficient narrow scope for your changes. Also do not forget to assign yourself regarding the PR.
 
 #### Add good description
 
