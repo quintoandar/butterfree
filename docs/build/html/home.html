@@ -93,6 +93,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#transform">Transform</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#load">Load</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#streaming">Streaming</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#setup-configuration">Setup Configuration</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="getstart.html">Getting Started</a></li>
@@ -101,6 +102,7 @@
 <li class="toctree-l1"><a class="reference internal" href="transform.html#aggregated-feature-sets">Aggregated Feature Sets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="load.html">Sink</a></li>
 <li class="toctree-l1"><a class="reference internal" href="stream.html">Streaming Feature Sets in Butterfree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Setup Configuration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">API Specification</a></li>
 </ul>
 
@@ -178,12 +180,13 @@
 <li><p><a class="reference external" href="#transform">Transform</a></p></li>
 <li><p><a class="reference external" href="#load">Load</a></p></li>
 <li><p><a class="reference external" href="#streaming">Streaming</a></p></li>
+<li><p><a class="reference external" href="#setup-configuration">Setup Configuration</a></p></li>
 </ul>
 </div>
 <div class="section" id="what-is-going-on-here">
 <h2>What is going on here<a class="headerlink" href="#what-is-going-on-here" title="Permalink to this headline">¶</a></h2>
 <p>Besides introducing Butterfree itself, it’s necessary to define some concepts that will be presented throughout this Docs.</p>
-<p>The feature store is where features for machine learning models and pipelines are stored. A feature is an individual property or characteristic of a data-sample, such as the height of a person, the area of a house or an aggregated feature as the average prices of houses seen by a user within the last day. A feature set can be thought of as a set of features. Finally, an entity is an unity representation of a specific business context.</p>
+<p>The feature store is where features for machine learning models and pipelines are stored. A feature is an individual property or characteristic of a data-sample, such as the height of a person, the area of a house or an aggregated feature as the average prices of houses seen by a user within the last day. A feature set can be thought of as a set of features. Finally, an entity is a unity representation of a specific business context.</p>
 <p>This repository holds all scripts that will extract data from necessary sources (S3 and Kafka, for instance), transform all of this raw data into feature sets and, finally, upload these results in a feature store.</p>
 <p>Scripts use Python and <a class="reference external" href="https://spark.apache.org/">Apache’s Spark</a>.</p>
 <p>It’s important to highlight that a feature store incurs some challenging concerns, such as:</p>
@@ -225,6 +228,10 @@
 <div class="section" id="streaming">
 <h2>Streaming<a class="headerlink" href="#streaming" title="Permalink to this headline">¶</a></h2>
 <p>We also support streaming pipelines in Butterfree. More information is available at the <a class="reference internal" href="stream.html"><span class="doc">Streaming Session</span></a>.</p>
+</div>
+<div class="section" id="setup-configuration">
+<h2>Setup Configuration<a class="headerlink" href="#setup-configuration" title="Permalink to this headline">¶</a></h2>
+<p>Some configurations are needed to run your ETL pipelines. Detailed information is provided at the <a class="reference internal" href="configuration.html"><span class="doc">Configuration Section</span></a></p>
 </div>
 </div>
 

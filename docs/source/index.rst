@@ -13,4 +13,5 @@ Navigation
    transform
    load
    stream
+   configuration
    modules
