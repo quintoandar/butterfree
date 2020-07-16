@@ -68,6 +68,8 @@ class OnlineFeatureStoreWriter(Writer):
         according to OnlineFeatureStoreWriter class arguments.
     """
 
+    __name__ = "Online Feature Store Writer"
+
     def __init__(self, db_config=None, debug_mode: bool = False, write_to_entity=False):
         self.db_config = db_config or CassandraConfig()
         self.debug_mode = debug_mode

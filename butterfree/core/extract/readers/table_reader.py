@@ -42,6 +42,8 @@ class TableReader(Reader):
 
     """
 
+    __name__ = "Table Reader"
+
     def __init__(self, id: str, table: str, database: str = None):
         super().__init__(id)
         if not isinstance(table, str):
