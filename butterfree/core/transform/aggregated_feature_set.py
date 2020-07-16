@@ -455,11 +455,11 @@ class AggregatedFeatureSet(FeatureSet):
                 self._build_feature_column_name(fc, pivot_value=pv, window=w)
                 for pv, fc, w in combination
             ]
-            type = (
-                len(pivot_values)
-                * len(windows)
-                * [fc.data_type.spark for fc in f.transformation.functions]
-            )
+            type = [
+                fc.data_type.spark
+                for fc in f.transformation.functions
+                for _ in range(len(pivot_values) * len(windows))
+            ]
 
             for n, dt in zip(name, type):
                 schema.append({"column_name": n, "type": dt, "primary_key": False})

@@ -101,6 +101,8 @@ class KafkaReader(Reader):
         "timestampType",
     ]
 
+    __name__ = "Kafka Reader"
+
     def __init__(
         self,
         id: str,

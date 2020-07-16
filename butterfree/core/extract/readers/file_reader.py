@@ -67,6 +67,8 @@ class FileReader(Reader):
 
     """
 
+    __name__ = "File Reader"
+
     def __init__(
         self,
         id: str,
