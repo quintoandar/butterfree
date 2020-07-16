@@ -1,6 +1,13 @@
 import pytest
 from pyspark.sql import functions
-from pyspark.sql.types import ArrayType, DoubleType, LongType, StringType, TimestampType
+from pyspark.sql.types import (
+    ArrayType,
+    DoubleType,
+    FloatType,
+    LongType,
+    StringType,
+    TimestampType,
+)
 
 from butterfree.core.clients import SparkClient
 from butterfree.core.constants.data_type import DataType
@@ -98,12 +105,12 @@ class TestAggregatedFeatureSet:
             },
             {
                 "column_name": "feature1__stddev_pop_over_1_week_rolling_windows",
-                "type": DoubleType(),
+                "type": FloatType(),
                 "primary_key": False,
             },
             {
                 "column_name": "feature1__stddev_pop_over_2_days_rolling_windows",
-                "type": DoubleType(),
+                "type": FloatType(),
                 "primary_key": False,
             },
             {
@@ -129,7 +136,7 @@ class TestAggregatedFeatureSet:
                     transformation=AggregatedTransform(
                         functions=[
                             Function(functions.avg, DataType.DOUBLE),
-                            Function(functions.stddev_pop, DataType.DOUBLE),
+                            Function(functions.stddev_pop, DataType.FLOAT),
                         ],
                     ),
                 ),

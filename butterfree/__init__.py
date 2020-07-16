@@ -18,6 +18,7 @@ from butterfree.core.load.writers import (
     OnlineFeatureStoreWriter,
 )
 from butterfree.core.pipelines.feature_set_pipeline import FeatureSetPipeline
+from butterfree.core.reports.metadata import Metadata
 from butterfree.core.transform import FeatureSet
 from butterfree.core.transform.aggregated_feature_set import AggregatedFeatureSet
 from butterfree.core.transform.features import Feature, KeyFeature, TimestampFeature
@@ -83,4 +84,5 @@ __all__ = [
     "assert_column_equality",
     "assert_dataframe_equality",
     "create_df_from_collection",
+    "Metadata",
 ]
