@@ -1,6 +1,6 @@
 import pytest
 
-from butterfree.core.configs import environment
+from butterfree.configs import environment
 
 
 def test_get_variable_success(monkeypatch):

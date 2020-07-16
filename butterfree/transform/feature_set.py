@@ -7,10 +7,10 @@ import pyspark.sql.functions as F
 from pyspark.sql import Window
 from pyspark.sql.dataframe import DataFrame
 
-from butterfree.core.clients import SparkClient
-from butterfree.core.constants.columns import TIMESTAMP_COLUMN
-from butterfree.core.transform.features import Feature, KeyFeature, TimestampFeature
-from butterfree.core.transform.transformations import AggregatedTransform
+from butterfree.clients import SparkClient
+from butterfree.constants.columns import TIMESTAMP_COLUMN
+from butterfree.transform.features import Feature, KeyFeature, TimestampFeature
+from butterfree.transform.transformations import AggregatedTransform
 
 
 class FeatureSet:

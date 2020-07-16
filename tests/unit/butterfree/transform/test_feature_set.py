@@ -3,25 +3,25 @@ from unittest.mock import Mock
 import pytest
 from pyspark.sql import functions as F
 from pyspark.sql.types import DoubleType, FloatType, LongType, TimestampType
-from tests.unit.butterfree.core.transform.conftest import (
+from tests.unit.butterfree.transform.conftest import (
     feature_add,
     feature_divide,
     key_id,
     timestamp_c,
 )
 
-from butterfree.core.clients import SparkClient
-from butterfree.core.constants.columns import TIMESTAMP_COLUMN
-from butterfree.core.constants.data_type import DataType
-from butterfree.core.transform import FeatureSet
-from butterfree.core.transform.features import Feature, KeyFeature, TimestampFeature
-from butterfree.core.transform.transformations import (
+from butterfree.clients import SparkClient
+from butterfree.constants import DataType
+from butterfree.constants.columns import TIMESTAMP_COLUMN
+from butterfree.testing.dataframe import assert_dataframe_equality
+from butterfree.transform import FeatureSet
+from butterfree.transform.features import Feature, KeyFeature, TimestampFeature
+from butterfree.transform.transformations import (
     AggregatedTransform,
     SparkFunctionTransform,
     SQLExpressionTransform,
 )
-from butterfree.core.transform.utils.function import Function
-from butterfree.testing.dataframe import assert_dataframe_equality
+from butterfree.transform.utils import Function
 
 
 class TestFeatureSet:

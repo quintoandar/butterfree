@@ -1,6 +1,6 @@
 import pytest
 
-from butterfree.core.configs.db import CassandraConfig
+from butterfree.configs.db import CassandraConfig
 
 
 class TestCassandraConfig:

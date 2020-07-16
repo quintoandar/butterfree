@@ -4,15 +4,16 @@ import json
 
 from mdutils import MdUtils
 
-from butterfree import FeatureSetPipeline, FileReader, KafkaReader, TableReader
-from butterfree.core.transform.aggregated_feature_set import AggregatedFeatureSet
+from butterfree.extract.readers import FileReader, KafkaReader, TableReader
+from butterfree.pipelines import FeatureSetPipeline
+from butterfree.transform.aggregated_feature_set import AggregatedFeatureSet
 
 
 class Metadata:
     """Generate metadata for feature set pipeline.
 
     Attributes:
-        feature_set: object processed with feature set pipeline.
+        pipeline: object processed with feature set pipeline.
         save: bool value with default is False.
             When this value is True, it will generate a file.
 

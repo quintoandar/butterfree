@@ -1,22 +1,19 @@
 from pyspark.sql import functions
 
-from butterfree import (
-    DataType,
-    Feature,
-    FeatureSet,
-    FeatureSetPipeline,
-    FileReader,
-    Function,
+from butterfree.constants import DataType
+from butterfree.extract import Source
+from butterfree.extract.readers import FileReader, TableReader
+from butterfree.load import Sink
+from butterfree.load.writers import (
     HistoricalFeatureStoreWriter,
-    KeyFeature,
-    Metadata,
     OnlineFeatureStoreWriter,
-    Sink,
-    Source,
-    SparkFunctionTransform,
-    TableReader,
-    TimestampFeature,
 )
+from butterfree.pipelines import FeatureSetPipeline
+from butterfree.reports import Metadata
+from butterfree.transform import FeatureSet
+from butterfree.transform.features import Feature, KeyFeature, TimestampFeature
+from butterfree.transform.transformations import SparkFunctionTransform
+from butterfree.transform.utils import Function
 
 
 class TestMetadata:
