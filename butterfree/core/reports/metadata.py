@@ -18,8 +18,8 @@ class Metadata:
 
     Example:
 
-        >>> feature_set_pipeline = FeatureSetPipeline()
-        >>> metadata = Metadata(feature_set_pipeline)
+        >>> pipeline = FeatureSetPipeline()
+        >>> metadata = Metadata(pipeline)
         >>> metadata.to_json()
 
     [
@@ -80,8 +80,8 @@ class Metadata:
     ]
     """
 
-    def __init__(self, feature_set: FeatureSetPipeline, save: bool = False):
-        self.feature_set = feature_set
+    def __init__(self, pipeline: FeatureSetPipeline, save: bool = False):
+        self.pipeline = pipeline
         self.save = save
         self._name = None
         self._desc_feature_set = None
@@ -90,11 +90,11 @@ class Metadata:
         self._features = []
 
     def _construct(self):
-        self._name = self.feature_set.feature_set.name
-        self._desc_feature_set = self.feature_set.feature_set.description
+        self._name = self.pipeline.feature_set.name
+        self._desc_feature_set = self.pipeline.feature_set.description
 
         source = []
-        for reader in self.feature_set.source.readers:
+        for reader in self.pipeline.source.readers:
             if isinstance(reader, TableReader):
                 source.append((reader.__name__, f"{reader.database}.{reader.table}"))
             if isinstance(reader, FileReader):
@@ -104,22 +104,22 @@ class Metadata:
 
         self._source = source
 
-        self._sink = [writer.__name__ for writer in self.feature_set.sink.writers]
+        self._sink = [writer.__name__ for writer in self.pipeline.sink.writers]
 
         desc_feature = [
-            feature.description for feature in self.feature_set.feature_set.keys
+            feature.description for feature in self.pipeline.feature_set.keys
         ]
-        desc_feature.append(self.feature_set.feature_set.timestamp.description)
+        desc_feature.append(self.pipeline.feature_set.timestamp.description)
 
-        for feature in self.feature_set.feature_set.features:
+        for feature in self.pipeline.feature_set.features:
             windows = feature.transformation._windows or (
-                self.feature_set.feature_set._windows
-                if isinstance(self.feature_set.feature_set, AggregatedFeatureSet)
+                self.pipeline.feature_set._windows
+                if isinstance(self.pipeline.feature_set, AggregatedFeatureSet)
                 else [None]
             )
             pivot_values = (
-                self.feature_set.feature_set._pivot_values
-                if isinstance(self.feature_set.feature_set, AggregatedFeatureSet)
+                self.pipeline.feature_set._pivot_values
+                if isinstance(self.pipeline.feature_set, AggregatedFeatureSet)
                 else [None]
             )
             desc_feature += [
@@ -128,7 +128,7 @@ class Metadata:
                 for _ in range(len(pivot_values) * len(windows))
             ] or [feature.description]
 
-        schema = self.feature_set.feature_set.get_schema()
+        schema = self.pipeline.feature_set.get_schema()
 
         self._features = [(column, desc) for column, desc in zip(schema, desc_feature)]
 
