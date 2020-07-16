@@ -378,6 +378,19 @@ class FeatureSet:
 
         return df.select([column for column in self.columns])
 
+    @staticmethod
+    def define_start_date(start_date: str = None):
+        """Get feature set schema.
+
+        Args:
+            start_date: start date regarding source dataframe.
+
+        Returns:
+            start date.
+
+        """
+        return start_date
+
     def construct(
         self,
         dataframe: DataFrame,
