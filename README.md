@@ -18,13 +18,13 @@ Butterfree depends on **Python 3.6+** and it is **Spark 3.0 ready** :heavy_check
 [Python Package Index](https://quintoandar.github.io/python-package-server/) hosts reference to a pip-installable module of this library, using it is as straightforward as including it on your project's requirements.
 
 ```bash
-pip install quintoandar-butterfree --extra-index-url https://quintoandar.github.io/python-package-server/
+pip install butterfree
 ```
 
-Or after listing `quintoandar-butterfree` in your `requirements.txt` file:
+Or after listing `butterfree` in your `requirements.txt` file:
 
 ```bash
-pip install -r requirements.txt --extra-index-url https://quintoandar.github.io/python-package-server/
+pip install -r requirements.txt
 ```
 
 You may also have access to our preview build (unstable) by installing from `staging` branch:
@@ -34,10 +34,10 @@ pip install git+https://github.com/quintoandar/butterfree.git@staging
 ```
 
 ## Documentation
-The official documentation is hosted on [Read the Docs](https://quintoandar-butterfree.readthedocs-hosted.com/en/latest/home.html)
+The official documentation is hosted on [Read the Docs](https://butterfree.readthedocs.io/en/latest/home.html)
 
 ## License
-TBD
+[Apache License 2.0](https://github.com/quintoandar/butterfree/blob/staging/LICENSE)
 
 ## Contributing
 All contributions are welcome! Feel free to open Pull Requests. Check the development and contributing **guidelines** described [here](CONTRIBUTING.md).
