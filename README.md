@@ -34,7 +34,7 @@ pip install git+https://github.com/quintoandar/butterfree.git@staging
 ```
 
 ## Documentation
-The official documentation is hosted on [Read the Docs](https://quintoandar-butterfree.readthedocs-hosted.com/en/latest/home.html)
+The official documentation is hosted on [Read the Docs](https://butterfree.readthedocs.io/en/latest/home.html)
 
 ## License
 TBD
