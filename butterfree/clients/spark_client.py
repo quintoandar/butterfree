@@ -1,9 +1,9 @@
 """SparkClient entity."""
 
-from typing import List, Optional
+from typing import Any, Dict, List, Optional, Union
 
-from pyspark.sql import DataFrame, SparkSession
-from pyspark.sql.streaming import StreamingQuery
+from pyspark.sql import DataFrame, DataFrameReader, SparkSession
+from pyspark.sql.streaming import DataStreamReader, StreamingQuery
 from pyspark.sql.types import StructType
 
 from butterfree.clients import AbstractClient
@@ -16,8 +16,8 @@ class SparkClient(AbstractClient):
 
     """
 
-    def __init__(self):
-        self._session = None
+    def __init__(self) -> None:
+        self._session: Optional[SparkSession] = None
 
     @property
     def conn(self) -> SparkSession:
@@ -34,8 +34,8 @@ class SparkClient(AbstractClient):
     def read(
         self,
         format: str,
-        options: dict,
-        schema: StructType = None,
+        options: Dict[str, Any],
+        schema: Optional[StructType] = None,
         stream: bool = False,
     ) -> DataFrame:
         """Use the SparkSession.read interface to load data into a dataframe.
@@ -58,7 +58,9 @@ class SparkClient(AbstractClient):
         if not isinstance(options, dict):
             raise ValueError("options needs to be a dict with the setup configurations")
 
-        df_reader = self.conn.readStream if stream else self.conn.read
+        df_reader: Union[
+            DataStreamReader, DataFrameReader
+        ] = self.conn.readStream if stream else self.conn.read
         df_reader = df_reader.schema(schema) if schema else df_reader
         return df_reader.format(format).options(**options).load()
 
@@ -92,7 +94,9 @@ class SparkClient(AbstractClient):
         return self.conn.sql(query)
 
     @staticmethod
-    def write_dataframe(dataframe: DataFrame, format_: str, mode: str, **options):
+    def write_dataframe(
+        dataframe: DataFrame, format_: str, mode: str, **options: Any
+    ) -> None:
         """Receive a spark DataFrame and write it.
 
         Args:
@@ -118,8 +122,8 @@ class SparkClient(AbstractClient):
         checkpoint_path: str,
         format_: str,
         mode: str,
-        **options,
-    ):
+        **options: Any,
+    ) -> StreamingQuery:
         """Starts streaming data writing job.
 
         Args:
@@ -173,8 +177,8 @@ class SparkClient(AbstractClient):
         format_: str = None,
         mode: str = None,
         partition_by: List[str] = None,
-        **options,
-    ):
+        **options: Any,
+    ) -> None:
         """Receive a spark DataFrame and write it as a table in metastore.
 
         Args:
@@ -218,8 +222,6 @@ class SparkClient(AbstractClient):
             name: name of the temporary view.
 
         """
-        return (
-            dataframe.createOrReplaceTempView(name)
-            if not dataframe.isStreaming
-            else dataframe.writeStream.format("memory").queryName(name).start()
-        )
+        if not dataframe.isStreaming:
+            return dataframe.createOrReplaceTempView(name)  # type: ignore
+        return dataframe.writeStream.format("memory").queryName(name).start()
