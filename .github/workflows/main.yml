@@ -2,7 +2,7 @@ name: "CI"
 on: [push]
 
 jobs:
-  build:
+  Tests:
     runs-on: ubuntu-latest
     container: rappdw/docker-java-python
 
@@ -12,11 +12,43 @@ jobs:
     - name: Install dependencies
       run: make drone-install
 
-    - name: Style Check
-      run: PYTHONPATH=./pip/deps make style-check
+#    - name: Style check
+#      run: PYTHONPATH=./pip/deps make style-check
+#
+#    - name: Quality check
+#      run: PYTHONPATH=./pip/deps make quality-check
+#
+#    - name: Tests
+#      run: PYTHONPATH=./pip/deps make tests
 
-    - name: Quality Check
-      run: PYTHONPATH=./pip/deps make quality-check
+    - name: Build package
+      if: ${{ contains(github.ref, "master") }}
+      run: make package
 
-    - name: Tests
-      run: PYTHONPATH=./pip/deps make tests
+    - name: Get version
+      if: ${{ contains(github.ref, "master") }}
+      run: |
+        - export VERSION=$(grep __version__ setup.py | head -1 | cut -d \" -f2 | cut -d \' -f2)
+
+    - name: Test Env
+      run: echo $VERSION
+
+    - name: Test Env2
+      if: ${{ env.VERSION == '0.10.3' }}
+      run: echo Success!
+
+#    - name: Create Release
+#      if: ${{ contains(github.ref, "master")}}
+#      id: create_release
+#      uses: actions/create-release@v1
+#      env:
+#        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#      with:
+#        tag_name: ${{ env.VERSION }}
+#        release_name: Release ${{ env.VERSION }}
+#
+#    - name: Publish release to pypi.org
+#      if: ${{ contains(github.ref, "master") }}
+#      run: |
+#        pip install twine==3.1.1
+#        twine upload -u $PYPI_USERNAME -p $PYPI_PASSWORD --verbose dist/*

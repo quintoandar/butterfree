@@ -110,42 +110,21 @@ clean:
 	@find ./ -name '*~' -exec rm -f {} \;
 
 .PHONY: version
-## dump version into .version file and show
+## dump package name into VERSION env variable and show
 version:
-	@grep __version__ setup.py | head -1 | cut -d \" -f2 | cut -d \' -f2 > .version
-	@cat .version
-
-.PHONY: commit-hash
-## dump latest commit hash into .commit_has file and show
-commit-hash:
-	@git rev-parse HEAD > .commit_hash
-	@cat .commit_hash
+	@export VERSION=$(grep __version__ setup.py | head -1 | cut -d \" -f2 | cut -d \' -f2)
+	@$(info VERSION is [${VERSION}])
 
 .PHONY: package-name
-## dump package name into .package_name file and show
+## dump package name into PACKAGE_NAME env variable and show
 package-name:
-	@grep __package_name__ setup.py | head -1 | cut -d \" -f2 | cut -d \' -f2 | sed 's/.*/&${build}/' > .package_name
-	@cat .package_name
-
-.PHONY: repository-url
-## dump package repository url into .repository_ur file and show
-repository-url:
-	@grep __repository_url__ setup.py | head -1 | cut -d \" -f2 | cut -d \' -f2 > .repository_url
-
-.PHONY: check-version
-## checks whether actual version, in .version, already exists or not
-check-version:
-	@bash ./check_version.sh
+	@PACKAGE_NAME=$(grep __package_name__ setup.py | head -1 | cut -d \" -f2 | cut -d \' -f2 | sed 's/.*/&${build}/')
+	@echo $PACKAGE_NAME
 
 .PHONY: package
 ## build quintoandar-butterfree package wheel
 package:
 	@PYTHONPATH=. python -m setup sdist bdist_wheel
-
-.PHONY: publish
-## publishes quintoandar-butterfree package wheel to quintoandar's private package server
-publish:
-	@bash ./publish.sh ${build}
 
 .PHONY: test-examples
 ## run all the notebooks examples for testing
