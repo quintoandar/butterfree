@@ -2,13 +2,14 @@ name: "CI"
 on: [push]
 
 jobs:
-  Tests:
-    runs-on: ubuntu-latest
+  Pipeline:
+    runs-on: ubuntu-16.04
     container: rappdw/docker-java-python
 
     steps:
     - uses: actions/checkout@v2
 
+    # Tests
     - name: Install dependencies
       run: make drone-install
 
@@ -21,10 +22,7 @@ jobs:
     - name: Tests
       run: PYTHONPATH=./pip/deps make tests
 
-  Publish:
-    needs: Tests
-    if: contains(github.ref, 'master')
-    steps:
+    # Publish
     - name: Build package
       run: make package
 
@@ -44,8 +42,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ env.version }}
-        release_name: Release ${{ env.version }}
+        tag_name: v${{ env.version }}
+        release_name: Release v${{ env.version }}
 
     - name: Publish release to pypi.org
       if: contains(github.ref, 'master')
