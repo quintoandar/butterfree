@@ -9,8 +9,8 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Install dependencies
-      run: make drone-install
+#    - name: Install dependencies
+#      run: make drone-install
 
 #    - name: Style check
 #      run: PYTHONPATH=./pip/deps make style-check
@@ -22,11 +22,11 @@ jobs:
 #      run: PYTHONPATH=./pip/deps make tests
 
     - name: Build package
-      if: ${{ contains(github.ref, 'master') }}
+#      if: ${{ contains(github.ref, 'master') }}
       run: make package
 
     - name: Get version
-      if: ${{ contains(github.ref, 'master') }}
+#      if: ${{ contains(github.ref, 'master') }}
       run: |
         - export VERSION=$(grep __version__ setup.py | head -1 | cut -d \" -f2 | cut -d \' -f2)
 
