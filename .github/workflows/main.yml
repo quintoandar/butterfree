@@ -27,17 +27,16 @@ jobs:
 
     - name: Get version
 #      if: ${{ contains(github.ref, 'master') }}
-      run: |
-        export VERSION=$(grep __version__ setup.py | head -1 | cut -d \" -f2 | cut -d \' -f2)
+      run: echo ::set-env name=version::$(grep __version__ setup.py | head -1 | cut -d \" -f2 | cut -d \' -f2)
 
-    - name: Test Env
-      run: echo $VERSION
+    - name: v${{ env.version }}
+      run: echo $version
 
     - name: Test Env2
-      if: ${{ env.VERSION == '0.10.3' }}
+      if: ${{ env.version == '0.10.3' }}
       run: echo Success!
 
-#    - name: Create Release
+#    - name: Create release
 #      if: ${{ contains(github.ref, "master")}}
 #      id: create_release
 #      uses: actions/create-release@v1
