@@ -14,7 +14,7 @@ setup(
     name=__package_name__,
     description="A tool for building feature stores.",
     long_description=long_description,
-    long_description_content_type='text/markdown',
+    long_description_content_type="text/markdown",
     keywords="feature store sets ETL",
     version=__version__,
     url=__repository_url__,
