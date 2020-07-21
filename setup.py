@@ -7,8 +7,15 @@ __repository_url__ = "https://github.com/quintoandar/butterfree"
 with open("requirements.txt") as f:
     requirements = f.read().splitlines()
 
+with open("README.md") as f:
+    long_description = f.read()
+
 setup(
     name=__package_name__,
+    description="A tool for building feature stores.",
+    long_description=long_description,
+    long_description_content_type='text/markdown',
+    keywords="feature store sets ETL",
     version=__version__,
     url=__repository_url__,
     packages=find_packages(
@@ -24,8 +31,6 @@ setup(
     ),
     license="Copyright",
     author="QuintoAndar",
-    description="This repository contains ETL scripts defining the feature sets",
-    keywords="feature store sets ETL",
     install_requires=requirements,
     extras_require={"h3": ["cmake==3.16.3", "h3==3.4.2"]},
 )

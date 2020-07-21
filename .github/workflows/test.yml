@@ -1,0 +1,22 @@
+name: "Test"
+on: [push]
+
+jobs:
+  Pipeline:
+    runs-on: ubuntu-16.04
+    container: rappdw/docker-java-python
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run: make drone-install
+
+    - name: Style check
+      run: PYTHONPATH=./pip/deps make style-check
+
+    - name: Quality check
+      run: PYTHONPATH=./pip/deps make quality-check
+
+    - name: Tests
+      run: PYTHONPATH=./pip/deps make tests
