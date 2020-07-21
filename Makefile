@@ -30,8 +30,8 @@ minimum-requirements:
 ## install all requirements
 requirements: requirements-test requirements-lint dev-requirements minimum-requirements
 
-.PHONY: drone-install
-drone-install:
+.PHONY: ci-install
+ci-install:
 	@pip install --upgrade pip
 	@pip install cmake
 	@python -m pip install -U -r requirements.test.txt -r requirements.lint.txt -r requirements.dev.txt -r requirements.txt -t ./pip/deps --cache-dir ./pip/cache

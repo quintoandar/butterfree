@@ -1,5 +1,5 @@
 name: "Test"
-on: [push]
+on: [push, pull_request]
 
 jobs:
   Pipeline:
@@ -10,7 +10,7 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Install dependencies
-      run: make drone-install
+      run: make ci-install
 
     - name: Style check
       run: PYTHONPATH=./pip/deps make style-check
