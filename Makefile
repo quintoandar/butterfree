@@ -122,7 +122,7 @@ package-name:
 	@echo $PACKAGE_NAME
 
 .PHONY: package
-## build quintoandar-butterfree package wheel
+## build butterfree package wheel
 package:
 	@PYTHONPATH=. python -m setup sdist bdist_wheel
 
