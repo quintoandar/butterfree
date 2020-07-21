@@ -3,3 +3,4 @@ h3==3.4.3
 pyarrow==0.15.1
 pandas==1.0.3
 jupyter==1.0.0
+twine==3.1.1
