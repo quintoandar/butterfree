@@ -1,0 +1,36 @@
+name: "Publish"
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  Pipeline:
+    runs-on: ubuntu-16.04
+    container: rappdw/docker-java-python
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run: make ci-install
+
+    - name: Build package
+      run: make package
+
+    - name: Get version
+      run: echo ::set-env name=version::$(grep __version__ setup.py | head -1 | cut -d \" -f2 | cut -d \' -f2)
+
+    - name: Create release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ env.version }}
+        release_name: Release ${{ env.version }}
+
+    - name: Publish release to pypi.org
+      env:
+        PYPI_USERNAME: ${{ secrets.PYPI_USERNAME }}
+        PYPI_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+      run:  PYTHONPATH=./pip/deps python -m twine upload -u $PYPI_USERNAME -p $PYPI_PASSWORD --verbose dist/*
