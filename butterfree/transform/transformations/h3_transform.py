@@ -15,7 +15,7 @@ try:
 except ModuleNotFoundError as e:
     e.msg = (
         "H3 not found. To be able to use this module,"
-        "you must install quintoandar-butterfree[h3]."
+        "you must install butterfree[h3]."
     )
     raise
 
