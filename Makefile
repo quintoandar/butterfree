@@ -135,6 +135,12 @@ test-docs:
 	cd ./docs; make coverage
 	cd ./docs; make html
 
+.PHONY: clean-docs
+## delete files to local test
+clean-docs:
+	cd ./docs; rm -rf source/butterfree.*
+	cd ./docs; make clean
+
 .PHONY: test-examples
 ## run all the notebooks examples for testing
 test-examples:
