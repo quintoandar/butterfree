@@ -126,6 +126,15 @@ package-name:
 package:
 	@PYTHONPATH=. python -m setup sdist bdist_wheel
 
+.PHONY: test-docs
+## generate docs to local test
+test-docs:
+	cd ./docs; rm -rf source/butterfree.*
+	cd ./docs; sphinx-apidoc -T -E -o source/ ../butterfree
+	cd ./docs; make clean
+	cd ./docs; make coverage
+	cd ./docs; make html
+
 .PHONY: test-examples
 ## run all the notebooks examples for testing
 test-examples:
