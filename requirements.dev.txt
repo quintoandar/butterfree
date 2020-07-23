@@ -8,4 +8,4 @@ Sphinx==3.1.1
 sphinx-rtd-theme==0.4.3
 recommonmark==0.6.0
 mypy==0.782
-pyspark-stubs==3.0.0.dev8
+pyspark-stubs==3.0.0
