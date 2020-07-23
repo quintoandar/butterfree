@@ -12,7 +12,8 @@ with open("README.md") as f:
 
 setup(
     name=__package_name__,
-    description="A tool for building feature stores.",
+    description="A tool for building feature stores - Transform your raw data "
+    "into beautiful features.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     keywords="feature store sets ETL",
