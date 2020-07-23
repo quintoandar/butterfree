@@ -34,4 +34,5 @@ setup(
     author="QuintoAndar",
     install_requires=requirements,
     extras_require={"h3": ["cmake==3.16.3", "h3==3.4.2"]},
+    python_requires=">=3.6, <4",
 )
