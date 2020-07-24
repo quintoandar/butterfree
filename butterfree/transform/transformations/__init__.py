@@ -21,7 +21,6 @@ from butterfree.transform.transformations.transform_component import TransformCo
 __all__ = [
     "AggregatedTransform",
     "CustomTransform",
-    "H3HashTransform",
     "SparkFunctionTransform",
     "SQLExpressionTransform",
     "StackTransform",
