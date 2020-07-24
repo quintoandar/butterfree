@@ -73,8 +73,9 @@ git fetch
 git pull origin staging
 git checkout -b release/0.4.0
 
-# finalize the changelog, dump the version into setup.py, then:
-git add CHANGELOG.md
+# finalize the changelog, dump the version into setup.py and update the documentation then:
+make update-docs
+git add .
 git commit -m "release 0.4.0"
 
 # rebase against master, which we're going to merge into
@@ -96,13 +97,17 @@ of Butterfree's python package to our private server.
 
 ### Update API Documentation
 
-If new information was added in the documentation in the release. You will need to update our hosted API Documentation. It's super simple, in the **documentation** branch  just bring the modifications from the master branch and run:
+If new information was added in the documentation in the release, maybe you will need to update our hosted Documentation. It's super simple, in the **docs** folder just apply the modifications and open a PR:
 
+If you want to test your changes locally, just run:
+ 
 ```bash
-make update-docs
+make docs
 ```
 
-No need to worry about modifying the `html files`,  everything is generated from [Sphinx](https://www.sphinx-doc.org/en/master/index.html) and hosted by [ReadtheDocs](https://readthedocs.org/). But your documentation changes will only be applied after a merge to documentation branch.
+And open `index.html` file. 
+
+No need to worry about modifying the `API Documentation`,  everything is generated from [Sphinx](https://www.sphinx-doc.org/en/master/index.html) and hosted by [ReadtheDocs](https://readthedocs.org/). But your documentation changes will only be applied after a merge to master branch.
 
 
 ## Hotfixes
