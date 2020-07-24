@@ -5,3 +5,4 @@ parameters-validation==1.1.5
 pyspark==3.0.0
 PyYAML==5.3
 cassandra-driver==3.22.0
+sphinxemoji==0.1.6
