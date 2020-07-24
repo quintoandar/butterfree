@@ -1,4 +1,6 @@
 ## Butterfree
+_A tool for building feature stores. Transform your raw data into beautiful features._
+
 Made with :heart: by the **MLOps** team from [QuintoAndar](https://github.com/quintoandar/)
 
 This library supports Python version 3.6+ and meant to provide tools for building ETL pipelines for Feature Stores using [Apache Spark](https://spark.apache.org/).

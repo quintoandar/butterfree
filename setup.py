@@ -12,7 +12,8 @@ with open("README.md") as f:
 
 setup(
     name=__package_name__,
-    description="A tool for building feature stores.",
+    description="A tool for building feature stores - Transform your raw data "
+    "into beautiful features.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     keywords="feature store sets ETL",
@@ -33,4 +34,5 @@ setup(
     author="QuintoAndar",
     install_requires=requirements,
     extras_require={"h3": ["cmake==3.16.3", "h3==3.4.2"]},
+    python_requires=">=3.6, <4",
 )
