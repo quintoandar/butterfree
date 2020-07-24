@@ -8,7 +8,6 @@ from butterfree.transform.transformations.aggregated_transform import (
     AggregatedTransform,
 )
 from butterfree.transform.transformations.custom_transform import CustomTransform
-from butterfree.transform.transformations.h3_transform import H3HashTransform
 from butterfree.transform.transformations.spark_function_transform import (
     SparkFunctionTransform,
 )
@@ -21,7 +20,6 @@ from butterfree.transform.transformations.transform_component import TransformCo
 __all__ = [
     "AggregatedTransform",
     "CustomTransform",
-    "H3HashTransform",
     "SparkFunctionTransform",
     "SQLExpressionTransform",
     "StackTransform",

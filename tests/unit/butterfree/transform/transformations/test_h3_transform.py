@@ -5,7 +5,7 @@ import pytest
 from butterfree.constants.data_type import DataType
 from butterfree.testing.dataframe import assert_dataframe_equality
 from butterfree.transform.features import Feature, KeyFeature
-from butterfree.transform.transformations import H3HashTransform
+from butterfree.transform.transformations.h3_transform import H3HashTransform
 
 
 class TestH3Transform:

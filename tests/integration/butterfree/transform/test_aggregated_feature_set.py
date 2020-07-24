@@ -6,7 +6,8 @@ from butterfree.constants.data_type import DataType
 from butterfree.testing.dataframe import assert_dataframe_equality
 from butterfree.transform.aggregated_feature_set import AggregatedFeatureSet
 from butterfree.transform.features import Feature, KeyFeature, TimestampFeature
-from butterfree.transform.transformations import AggregatedTransform, H3HashTransform
+from butterfree.transform.transformations import AggregatedTransform
+from butterfree.transform.transformations.h3_transform import H3HashTransform
 from butterfree.transform.utils.function import Function
 
 
