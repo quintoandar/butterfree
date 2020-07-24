@@ -73,8 +73,9 @@ git fetch
 git pull origin staging
 git checkout -b release/0.4.0
 
-# finalize the changelog, dump the version into setup.py, then:
-git add CHANGELOG.md
+# finalize the changelog, dump the version into setup.py and update the documentation then:
+make update-docs
+git add .
 git commit -m "release 0.4.0"
 
 # rebase against master, which we're going to merge into
@@ -106,7 +107,7 @@ make docs
 
 And open `index.html` file. 
 
-No need to worry about modifying the `API Documentation`,  everything is generated from [Sphinx](https://www.sphinx-doc.org/en/master/index.html) and hosted by [ReadtheDocs](https://readthedocs.org/). But your documentation changes will only be applied after a merge to documentation branch.
+No need to worry about modifying the `API Documentation`,  everything is generated from [Sphinx](https://www.sphinx-doc.org/en/master/index.html) and hosted by [ReadtheDocs](https://readthedocs.org/). But your documentation changes will only be applied after a merge to master branch.
 
 
 ## Hotfixes
