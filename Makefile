@@ -133,13 +133,10 @@ update-docs:
 	cd ./docs; sphinx-apidoc -T -E -o source/ ../butterfree
 	cd ./docs; make coverage
 
-.PHONY: test-docs
+.PHONY: docs
 ## generate docs to local test
-test-docs:
-	cd ./docs; rm -rf source/butterfree.*
-	cd ./docs; sphinx-apidoc -T -E -o source/ ../butterfree
+docs:
 	cd ./docs; make clean
-	cd ./docs; make coverage
 	cd ./docs; make html
 
 .PHONY: test-examples

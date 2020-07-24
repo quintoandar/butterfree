@@ -101,7 +101,7 @@ If new information was added in the documentation in the release, maybe you will
 If you want to test your changes locally, just run:
  
 ```bash
-make test-docs
+make docs
 ```
 
 And open `index.html` file. 

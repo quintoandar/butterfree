@@ -20,6 +20,7 @@ setup(
     url=__repository_url__,
     packages=find_packages(
         exclude=(
+            "docs",
             "tests",
             "tests.*",
             "pipenv",
