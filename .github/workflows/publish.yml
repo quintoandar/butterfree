@@ -15,9 +15,6 @@ jobs:
     - name: Install dependencies
       run: make ci-install
 
-    - name: Update documentation
-      run: make update-docs
-
     - name: Build package
       run: make package
 
