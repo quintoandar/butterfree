@@ -7,6 +7,7 @@ from mdutils import MdUtils
 from butterfree.extract.readers import FileReader, KafkaReader, TableReader
 from butterfree.pipelines import FeatureSetPipeline
 from butterfree.transform.aggregated_feature_set import AggregatedFeatureSet
+from butterfree.transform.transformations import SparkFunctionTransform
 
 
 class Metadata:
@@ -114,7 +115,9 @@ class Metadata:
 
         for feature in self.pipeline.feature_set.features:
             if feature.transformation:
-                windows = feature.transformation._windows or (
+                windows = (feature.transformation._windows
+                if isinstance(feature.transformation, SparkFunctionTransform)
+                else [None]) or (
                     self.pipeline.feature_set._windows
                     if isinstance(self.pipeline.feature_set, AggregatedFeatureSet)
                     else [None]
@@ -124,13 +127,14 @@ class Metadata:
                     if isinstance(self.pipeline.feature_set, AggregatedFeatureSet)
                     else [None]
                 )
-                desc_feature += [
+                desc_feature += ([
                     feature.description
                     for _ in feature.transformation.functions
                     for _ in range(len(pivot_values) * len(windows))
-                ] or [feature.description]
+                ] if isinstance(feature.transformation, SparkFunctionTransform) or isinstance(self.pipeline.feature_set, AggregatedFeatureSet) else [feature.description])
             else:
                 desc_feature += [feature.description]
+
 
         schema = self.pipeline.feature_set.get_schema()
 

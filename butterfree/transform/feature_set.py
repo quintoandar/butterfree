@@ -10,7 +10,7 @@ from pyspark.sql.dataframe import DataFrame
 from butterfree.clients import SparkClient
 from butterfree.constants.columns import TIMESTAMP_COLUMN
 from butterfree.transform.features import Feature, KeyFeature, TimestampFeature
-from butterfree.transform.transformations import AggregatedTransform
+from butterfree.transform.transformations import AggregatedTransform, SparkFunctionTransform
 
 
 class FeatureSet:
@@ -32,18 +32,17 @@ class FeatureSet:
         This an example regarding the feature set definition. All features
         and its transformations are defined.
 
-    >>> from butterfree.transform import FeatureSet
-    >>> from butterfree.transform.features import (
+    >>> from butterfree.core.transform import FeatureSet
+    >>> from butterfree.core.transform.features import (
     ...     Feature,
     ...     KeyFeature,
     ...     TimestampFeature,
     ...)
-    >>> from butterfree.transform.transformations import (
+    >>> from butterfree.core.transform.transformations import (
     ...     SparkFunctionTransform,
     ...     CustomTransform,
     ... )
-    >>> from butterfree.constants import DataType
-    >>> from butterfree.transform.utils import Function
+    >>> from butterfree.core.transform.utils.functions import Functions
     >>> import pyspark.sql.functions as F
 
     >>> def divide(df, fs, column1, column2):
@@ -61,8 +60,8 @@ class FeatureSet:
     ...            description="test",
     ...            transformation=SparkFunctionTransform(
     ...                 functions=[
-    ...                            Function(F.avg, DataType.DOUBLE),
-    ...                            Function(F.stddev_pop, DataType.DOUBLE)]
+    ...                            Functions(F.avg, DataType.DOUBLE),
+    ...                            Functions(F.stddev_pop, DataType.DOUBLE)]
     ...             ).with_window(
     ...                 partition_by="id",
     ...                 order_by=TIMESTAMP_COLUMN,
@@ -262,12 +261,12 @@ class FeatureSet:
         for f in self.features:
             name = self._get_features_columns(f)
             if f.transformation:
-                windows = f.transformation._windows or [None]
-                type = [
+                windows = (f.transformation._windows if isinstance(f.transformation, SparkFunctionTransform) else [None])
+                type = ([
                     fc.data_type.spark
                     for fc in f.transformation.functions
                     for _ in range(len(windows))
-                ] or [f.dtype.spark]
+                ] if isinstance(f.transformation, SparkFunctionTransform) else [f.dtype.spark])
             else:
                 type = [f.dtype.spark]
 
