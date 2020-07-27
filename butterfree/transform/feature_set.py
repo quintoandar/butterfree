@@ -10,7 +10,10 @@ from pyspark.sql.dataframe import DataFrame
 from butterfree.clients import SparkClient
 from butterfree.constants.columns import TIMESTAMP_COLUMN
 from butterfree.transform.features import Feature, KeyFeature, TimestampFeature
-from butterfree.transform.transformations import AggregatedTransform, SparkFunctionTransform
+from butterfree.transform.transformations import (
+    AggregatedTransform,
+    SparkFunctionTransform,
+)
 
 
 class FeatureSet:
@@ -260,13 +263,12 @@ class FeatureSet:
 
         for f in self.features:
             name = self._get_features_columns(f)
-            if f.transformation:
-                windows = (f.transformation._windows if isinstance(f.transformation, SparkFunctionTransform) else [None])
-                type = ([
+            if isinstance(f.transformation, SparkFunctionTransform):
+                type = [
                     fc.data_type.spark
                     for fc in f.transformation.functions
-                    for _ in range(len(windows))
-                ] if isinstance(f.transformation, SparkFunctionTransform) else [f.dtype.spark])
+                    for _ in range(len(f.transformation._windows or [None]))
+                ]
             else:
                 type = [f.dtype.spark]
 
