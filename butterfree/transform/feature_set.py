@@ -35,17 +35,18 @@ class FeatureSet:
         This an example regarding the feature set definition. All features
         and its transformations are defined.
 
-    >>> from butterfree.core.transform import FeatureSet
-    >>> from butterfree.core.transform.features import (
+    >>> from butterfree.transform import FeatureSet
+    >>> from butterfree.transform.features import (
     ...     Feature,
     ...     KeyFeature,
     ...     TimestampFeature,
     ...)
-    >>> from butterfree.core.transform.transformations import (
+    >>> from butterfree.transform.transformations import (
     ...     SparkFunctionTransform,
     ...     CustomTransform,
     ... )
-    >>> from butterfree.core.transform.utils.functions import Functions
+    >>> from butterfree.constants import DataType
+    >>> from butterfree.transform.utils import Function
     >>> import pyspark.sql.functions as F
 
     >>> def divide(df, fs, column1, column2):
@@ -63,8 +64,8 @@ class FeatureSet:
     ...            description="test",
     ...            transformation=SparkFunctionTransform(
     ...                 functions=[
-    ...                            Functions(F.avg, DataType.DOUBLE),
-    ...                            Functions(F.stddev_pop, DataType.DOUBLE)]
+    ...                            Function(F.avg, DataType.DOUBLE),
+    ...                            Function(F.stddev_pop, DataType.DOUBLE)]
     ...             ).with_window(
     ...                 partition_by="id",
     ...                 order_by=TIMESTAMP_COLUMN,
