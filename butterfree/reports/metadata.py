@@ -113,21 +113,24 @@ class Metadata:
         desc_feature.append(self.pipeline.feature_set.timestamp.description)
 
         for feature in self.pipeline.feature_set.features:
-            windows = feature.transformation._windows or (
-                self.pipeline.feature_set._windows
-                if isinstance(self.pipeline.feature_set, AggregatedFeatureSet)
-                else [None]
-            )
-            pivot_values = (
-                self.pipeline.feature_set._pivot_values
-                if isinstance(self.pipeline.feature_set, AggregatedFeatureSet)
-                else [None]
-            )
-            desc_feature += [
-                feature.description
-                for _ in feature.transformation.functions
-                for _ in range(len(pivot_values) * len(windows))
-            ] or [feature.description]
+            if feature.transformation:
+                windows = feature.transformation._windows or (
+                    self.pipeline.feature_set._windows
+                    if isinstance(self.pipeline.feature_set, AggregatedFeatureSet)
+                    else [None]
+                )
+                pivot_values = (
+                    self.pipeline.feature_set._pivot_values
+                    if isinstance(self.pipeline.feature_set, AggregatedFeatureSet)
+                    else [None]
+                )
+                desc_feature += [
+                    feature.description
+                    for _ in feature.transformation.functions
+                    for _ in range(len(pivot_values) * len(windows))
+                ] or [feature.description]
+            else:
+                desc_feature += [feature.description]
 
         schema = self.pipeline.feature_set.get_schema()
 
