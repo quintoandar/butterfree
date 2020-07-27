@@ -1,3 +1,5 @@
+from functools import partial
+
 import pytest
 from pyspark.sql import functions
 
@@ -96,3 +98,20 @@ class TestAggregatedTransform:
         # cast to string to compare the columns definitions because direct column
         # comparison was not working
         assert str(target_aggregations) == str(output_aggregations)
+
+    def test_anonymous_function(self):
+        with pytest.raises(
+            AttributeError,
+            match="Anonymous functions are not supported on AggregatedTransform.",
+        ):
+            Feature(
+                name="feature1",
+                description="unit test",
+                transformation=AggregatedTransform(
+                    functions=[
+                        Function(
+                            func=partial(functions.count), data_type=DataType.INTEGER
+                        )
+                    ]
+                ),
+            ).get_output_columns()

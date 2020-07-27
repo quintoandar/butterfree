@@ -83,11 +83,15 @@ class AggregatedTransform(TransformComponent):
         ]
 
     def _get_output_name(self, function):
-        base_name = (
-            "__".join([self._parent.name, function.__name__])
-            if hasattr(function, "__name__")
-            else self._parent_name
-        )
+        if not hasattr(function, "__name__"):
+            feature_name = self._parent.name
+            raise AttributeError(
+                f"""Anonymous functions are not supported on AggregatedTransform.
+                    Check feature {feature_name} transforms.
+                """
+            )
+
+        base_name = "__".join([self._parent.name, function.__name__])
         return base_name
 
     @property
