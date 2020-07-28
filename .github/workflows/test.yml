@@ -14,17 +14,22 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Install dependencies
-      run: make ci-install
+#    - name: Install dependencies
+#      run: make ci-install
+#
+#    - name: Style check
+#      run: PYTHONPATH=./pip/deps make style-check
+#
+#    - name: Quality check
+#      run: PYTHONPATH=./pip/deps make quality-check
+#
+#    - name: Tests
+#      run: PYTHONPATH=./pip/deps make tests
 
-    - name: Style check
-      run: PYTHONPATH=./pip/deps make style-check
-
-    - name: Quality check
-      run: PYTHONPATH=./pip/deps make quality-check
-
-    - name: Tests
-      run: PYTHONPATH=./pip/deps make tests
+    - name: Print ref
+      env:
+        GIT_REF: ${{ github.ref }}
+      run: echo &GIT_REF
 
     - name: Setup sonarqube
       if: github.ref == 'ref/head/rafaelleinio/sonar-check'
