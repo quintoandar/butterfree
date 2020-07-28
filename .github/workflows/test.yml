@@ -26,8 +26,15 @@ jobs:
 #    - name: Tests
 #      run: PYTHONPATH=./pip/deps make tests
 
-    - name: Setup sonarqube
-      uses: warchant/setup-sonar-scanner@v1
+  Sonar:
+    runs-on: ubuntu-16.04
+    container: newtmitch/sonar-scanner
+
+    steps:
+    - uses: actions/checkout@v2
+
+#    - name: Setup sonarqube
+#      uses: warchant/setup-sonar-scanner@v1
 
     - name: Run sonarqube
       env:
