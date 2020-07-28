@@ -26,17 +26,10 @@ jobs:
 #    - name: Tests
 #      run: PYTHONPATH=./pip/deps make tests
 
-    - name: Print ref
-      env:
-        GIT_REF: ${{ github.ref }}
-      run: echo $GIT_REF
-
     - name: Setup sonarqube
-      if: github.ref == 'ref/head/rafaelleinio/sonar-check'
       uses: warchant/setup-sonar-scanner@v1
 
     - name: Run sonarqube
-      if: github.ref == 'ref/head/rafaelleinio/sonar-check'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 #        SONAR_PASSWORD: ${{ secrets.SONAR_PASSWORD }}}
