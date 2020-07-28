@@ -41,16 +41,16 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 #        SONAR_PASSWORD: ${{ secrets.SONAR_PASSWORD }}}
         PR_NUMBER: ${{ github.event.number }}
-      run: sonar-scanner
-          -Dsonar.projectName=Butterfree \
-          -Dsonar.projectKey=butterfree \
-          -Dsonar.projectBaseDir=. \
-          -Dsonar.sources=./butterfree \
-          -Dsonar.sourceEncoding=UTF-8 \
-          -Dsonar.analysis.mode=preview \
-          -Dsonar.github.pullRequest=$PR_NUMBER \
-          -Dsonar.github.repository=quintoandar/butterfree \
-          -Dsonar.github.oauth=$GITHUB_TOKEN \
-          -Dsonar.host.url=https://sonar.quintoandar.com.br \
-          -Dsonar.login=user \
-          -Dsonar.password=$SONAR_PASSWORD
+      run: sonar-scanner \
+        -Dsonar.projectName=Butterfree \
+        -Dsonar.projectKey=butterfree \
+        -Dsonar.projectBaseDir=. \
+        -Dsonar.sources=./butterfree \
+        -Dsonar.sourceEncoding=UTF-8 \
+        -Dsonar.analysis.mode=preview \
+        -Dsonar.github.pullRequest=$PR_NUMBER \
+        -Dsonar.github.repository=quintoandar/butterfree \
+        -Dsonar.github.oauth=$GITHUB_TOKEN \
+        -Dsonar.host.url=https://sonar.quintoandar.com.br \
+        -Dsonar.login=user \
+        -Dsonar.password=$SONAR_PASSWORD
