@@ -43,7 +43,6 @@ jobs:
         PR_NUMBER: ${{ github.event.number }}
       run: sonar-scanner \
         -Dsonar.projectName=Butterfree \
-        -Dsonar.projectKey=butterfree \
         -Dsonar.projectBaseDir=. \
         -Dsonar.sources=./butterfree \
         -Dsonar.sourceEncoding=UTF-8 \
