@@ -29,7 +29,7 @@ jobs:
     - name: Print ref
       env:
         GIT_REF: ${{ github.ref }}
-      run: echo &GIT_REF
+      run: echo $GIT_REF
 
     - name: Setup sonarqube
       if: github.ref == 'ref/head/rafaelleinio/sonar-check'
