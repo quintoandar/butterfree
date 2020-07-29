@@ -7,6 +7,7 @@ from mdutils import MdUtils
 from butterfree.extract.readers import FileReader, KafkaReader, TableReader
 from butterfree.pipelines import FeatureSetPipeline
 from butterfree.transform.aggregated_feature_set import AggregatedFeatureSet
+from butterfree.transform.transformations import SparkFunctionTransform
 
 
 class Metadata:
@@ -114,21 +115,30 @@ class Metadata:
 
         for feature in self.pipeline.feature_set.features:
             if feature.transformation:
-                windows = feature.transformation._windows or (
-                    self.pipeline.feature_set._windows
-                    if isinstance(self.pipeline.feature_set, AggregatedFeatureSet)
-                    else [None]
+                windows = (
+                    feature.transformation._windows or [None]
+                    if isinstance(feature.transformation, SparkFunctionTransform)
+                    else (
+                        self.pipeline.feature_set._windows or [None]
+                        if isinstance(self.pipeline.feature_set, AggregatedFeatureSet)
+                        else [None]
+                    )
                 )
                 pivot_values = (
-                    self.pipeline.feature_set._pivot_values
+                    self.pipeline.feature_set._pivot_values or [None]
                     if isinstance(self.pipeline.feature_set, AggregatedFeatureSet)
                     else [None]
                 )
-                desc_feature += [
-                    feature.description
-                    for _ in feature.transformation.functions
-                    for _ in range(len(pivot_values) * len(windows))
-                ] or [feature.description]
+                desc_feature += (
+                    [
+                        feature.description
+                        for _ in feature.transformation.functions
+                        for _ in range(len(pivot_values) * len(windows))
+                    ]
+                    if isinstance(feature.transformation, SparkFunctionTransform)
+                    or isinstance(self.pipeline.feature_set, AggregatedFeatureSet)
+                    else [feature.description]
+                )
             else:
                 desc_feature += [feature.description]
 
