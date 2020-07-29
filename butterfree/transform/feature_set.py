@@ -380,7 +380,7 @@ class FeatureSet:
 
     @staticmethod
     def define_start_date(start_date: str = None):
-        """Get feature set schema.
+        """Get feature set start date.
 
         Args:
             start_date: start date regarding source dataframe.
