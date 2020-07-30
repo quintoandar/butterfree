@@ -1,13 +1,32 @@
 """CassandraClient entity."""
 from ssl import CERT_REQUIRED, PROTOCOL_TLSv1
-from typing import List
+from typing import Dict, List, Optional
 
 from cassandra.auth import PlainTextAuthProvider
-from cassandra.cluster import Cluster
+from cassandra.cluster import Cluster, ResponseFuture, Session
 from cassandra.policies import RoundRobinPolicy
 from cassandra.query import dict_factory
+from typing_extensions import TypedDict
 
 from butterfree.clients import AbstractClient
+
+
+class CassandraColumn(TypedDict):
+    """Type for cassandra columns.
+
+    It's just a type abstraction, we can use it or a normal dict
+
+    >>> def function(column: CassandraColumn) -> CassandraColumn:
+    ...     return column
+    >>> # The following two lines will pass in the type checking
+    >>> function({'column_name': 'test', 'type': 'integer', 'primary_key': False})
+    >>> function(CassandraColumn(column_name='test', type='integer', primary_key=False))
+
+    """
+
+    column_name: str
+    type: str
+    primary_key: bool
 
 
 class CassandraClient(AbstractClient):
@@ -23,18 +42,18 @@ class CassandraClient(AbstractClient):
     def __init__(
         self,
         cassandra_host: List[str],
-        cassandra_key_space,
-        cassandra_user=None,
-        cassandra_password=None,
-    ):
+        cassandra_key_space: str,
+        cassandra_user: Optional[str] = None,
+        cassandra_password: Optional[str] = None,
+    ) -> None:
         self.cassandra_host = cassandra_host
         self.cassandra_key_space = cassandra_key_space
         self.cassandra_user = cassandra_user
         self.cassandra_password = cassandra_password
-        self._session = None
+        self._session: Optional[Session] = None
 
     @property
-    def conn(self, *, ssl_path: str = None):
+    def conn(self, *, ssl_path: str = None) -> Session:  # type: ignore
         """Establishes a Cassandra connection."""
         auth_provider = (
             PlainTextAuthProvider(
@@ -63,9 +82,7 @@ class CassandraClient(AbstractClient):
         self._session.row_factory = dict_factory
         return self._session
 
-    def sql(
-        self, query: str,
-    ):
+    def sql(self, query: str) -> ResponseFuture:
         """Executes desired query.
 
         Attributes:
@@ -76,7 +93,7 @@ class CassandraClient(AbstractClient):
             raise RuntimeError("There's no session available for this query.")
         return self._session.execute(query)
 
-    def get_schema(self, table: str) -> list:
+    def get_schema(self, table: str) -> List[Dict[str, str]]:
         """Returns desired table schema.
 
         Attributes:
@@ -103,7 +120,9 @@ class CassandraClient(AbstractClient):
 
         return response
 
-    def _get_create_table_query(self, columns: dict, table: str):
+    def _get_create_table_query(
+        self, columns: List[CassandraColumn], table: str,
+    ) -> str:
         """Creates CQL statement to create a table."""
         parsed_columns = []
         primary_keys = []
@@ -114,19 +133,21 @@ class CassandraClient(AbstractClient):
                 primary_keys.append(col["column_name"])
             parsed_columns.append(col_str)
 
-        parsed_columns = ", ".join(parsed_columns)
+        joined_parsed_columns = ", ".join(parsed_columns)
 
         if len(primary_keys) > 0:
-            primary_keys = ", ".join(primary_keys)
-            columns_str = f"{parsed_columns}, PRIMARY KEY ({primary_keys})"
+            joined_primary_keys = ", ".join(primary_keys)
+            columns_str = (
+                f"{joined_parsed_columns}, PRIMARY KEY ({joined_primary_keys})"
+            )
         else:
-            columns_str = parsed_columns
+            columns_str = joined_parsed_columns
 
         query = f"CREATE TABLE {self.cassandra_key_space}.{table} " f"({columns_str}); "
 
         return query
 
-    def create_table(self, columns: dict, table: str,) -> None:
+    def create_table(self, columns: List[CassandraColumn], table: str) -> None:
         """Creates a table.
 
         Attributes:
