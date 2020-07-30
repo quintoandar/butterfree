@@ -3,6 +3,20 @@ All notable changes to this project will be documented in this file.
 
 Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each release or unreleased log for a better organization.
 
+## [1.0.1](https://github.com/quintoandar/butterfree/releases/tag/1.0.1)
+### Added
+* Adding the library motto to readme and python package ([#203](https://github.com/quintoandar/butterfree/pull/203))
+
+### Changed
+* [MLOP-418] Take Butterfree's docs to the master branch ([#201](https://github.com/quintoandar/butterfree/pull/201))
+* Update notebooks examples ([#205](https://github.com/quintoandar/butterfree/pull/205))
+* [MLOP-417] Remove Drone yml/Drone references ([#211](https://github.com/quintoandar/butterfree/pull/211))
+
+### Fixed
+* Fixing an attribute reference error and raising a more meaningful exception when an anonymous function is passed to an AggregatedTransform ([#206](https://github.com/quintoandar/butterfree/pull/206))
+* Fix schema and reports. ([#207](https://github.com/quintoandar/butterfree/pull/207))
+* Fixes type hints for `clients` module ([#198](https://github.com/quintoandar/butterfree/pull/207))
+
 ## [1.0.0](https://github.com/quintoandar/butterfree/releases/tag/1.0.0)
 ### Added
 * [MLOP-415] GitHub Actions CI ([#199](https://github.com/quintoandar/butterfree/pull/199))
