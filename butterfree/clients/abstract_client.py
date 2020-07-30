@@ -1,5 +1,6 @@
 """Abstract class for database clients."""
 from abc import ABC, abstractmethod
+from typing import Any
 
 
 class AbstractClient(ABC):
@@ -7,12 +8,12 @@ class AbstractClient(ABC):
 
     @property
     @abstractmethod
-    def conn(self):
+    def conn(self) -> Any:
         """Returns a connection object."""
         pass
 
     @abstractmethod
-    def sql(self, query: str):
+    def sql(self, query: str) -> Any:
         """Runs a query.
 
         Args:

@@ -1,17 +1,21 @@
+from typing import Any, Dict, Optional, Union
+from unittest.mock import Mock
+
 import pytest
-from pyspark.sql import DataFrame
+from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.streaming import StreamingQuery
+from pyspark.sql.types import StructType
 
 from butterfree.clients import SparkClient
 from butterfree.testing.dataframe import assert_dataframe_equality
 
 
-def create_temp_view(dataframe: DataFrame, name):
+def create_temp_view(dataframe: DataFrame, name: str) -> None:
     dataframe.createOrReplaceTempView(name)
 
 
 class TestSparkClient:
-    def test_conn(self):
+    def test_conn(self) -> None:
         # arrange
         spark_client = SparkClient()
 
@@ -29,7 +33,15 @@ class TestSparkClient:
             ("json", {"path": "path/to/file"}, True, None),
         ],
     )
-    def test_read(self, format, options, stream, schema, target_df, mocked_spark_read):
+    def test_read(
+        self,
+        format: str,
+        options: Dict[str, Any],
+        stream: bool,
+        schema: Optional[StructType],
+        target_df: DataFrame,
+        mocked_spark_read: Mock,
+    ) -> None:
         # arrange
         spark_client = SparkClient()
         mocked_spark_read.load.return_value = target_df
@@ -47,15 +59,17 @@ class TestSparkClient:
         "format, options",
         [(None, {"path": "path/to/file"}), ("csv", "not a valid options")],
     )
-    def test_read_invalid_params(self, format, options):
+    def test_read_invalid_params(
+        self, format: Optional[str], options: Union[Dict[str, Any], str]
+    ) -> None:
         # arrange
         spark_client = SparkClient()
 
         # act and assert
         with pytest.raises(ValueError):
-            spark_client.read(format, options)
+            spark_client.read(format, options)  # type: ignore
 
-    def test_sql(self, target_df):
+    def test_sql(self, target_df: DataFrame) -> None:
         # arrange
         spark_client = SparkClient()
         create_temp_view(target_df, "test")
@@ -71,8 +85,13 @@ class TestSparkClient:
         [(None, "table", "table"), ("database", "table", "database.table")],
     )
     def test_read_table(
-        self, target_df, mocked_spark_read, database, table, target_table_name
-    ):
+        self,
+        target_df: DataFrame,
+        mocked_spark_read: Mock,
+        database: Optional[str],
+        table: str,
+        target_table_name: str,
+    ) -> None:
         # arrange
         spark_client = SparkClient()
         mocked_spark_read.table.return_value = target_df
@@ -88,31 +107,39 @@ class TestSparkClient:
     @pytest.mark.parametrize(
         "database, table", [("database", None), ("database", 123)],
     )
-    def test_read_table_invalid_params(self, database, table):
+    def test_read_table_invalid_params(
+        self, database: str, table: Optional[int]
+    ) -> None:
         # arrange
         spark_client = SparkClient()
 
         # act and assert
         with pytest.raises(ValueError):
-            spark_client.read_table(table, database)
+            spark_client.read_table(table, database)  # type: ignore
 
     @pytest.mark.parametrize(
         "format, mode", [("parquet", "append"), ("csv", "overwrite")],
     )
-    def test_write_dataframe(self, format, mode, mocked_spark_write):
+    def test_write_dataframe(
+        self, format: str, mode: str, mocked_spark_write: Mock
+    ) -> None:
         SparkClient.write_dataframe(mocked_spark_write, format, mode)
         mocked_spark_write.save.assert_called_with(format=format, mode=mode)
 
     @pytest.mark.parametrize(
         "format, mode", [(None, "append"), ("parquet", 1)],
     )
-    def test_write_dataframe_invalid_params(self, target_df, format, mode):
+    def test_write_dataframe_invalid_params(
+        self, target_df: DataFrame, format: Optional[str], mode: Union[str, int]
+    ) -> None:
         # arrange
         spark_client = SparkClient()
 
         # act and assert
         with pytest.raises(ValueError):
-            spark_client.write_dataframe(dataframe=target_df, format_=format, mode=mode)
+            spark_client.write_dataframe(
+                dataframe=target_df, format_=format, mode=mode  # type: ignore
+            )
 
     @pytest.mark.parametrize(
         "format, mode, database, table_name, path",
@@ -122,8 +149,14 @@ class TestSparkClient:
         ],
     )
     def test_write_table(
-        self, format, mode, database, table_name, path, mocked_spark_write
-    ):
+        self,
+        format: str,
+        mode: str,
+        database: str,
+        table_name: str,
+        path: str,
+        mocked_spark_write: Mock,
+    ) -> None:
         # given
         name = "{}.{}".format(database, table_name)
 
@@ -150,15 +183,20 @@ class TestSparkClient:
             ("user", "temp", None),
         ],
     )
-    def test_write_table_with_invalid_params(self, database, table_name, path):
+    def test_write_table_with_invalid_params(
+        self, database: Optional[str], table_name: Optional[str], path: Optional[str]
+    ) -> None:
         df_writer = "not a spark df writer"
 
         with pytest.raises(ValueError):
             SparkClient.write_table(
-                dataframe=df_writer, database=database, table_name=table_name, path=path
+                dataframe=df_writer,  # type: ignore
+                database=database,  # type: ignore
+                table_name=table_name,  # type: ignore
+                path=path,  # type: ignore
             )
 
-    def test_write_stream(self, mocked_stream_df):
+    def test_write_stream(self, mocked_stream_df: Mock) -> None:
         # arrange
         spark_client = SparkClient()
 
@@ -186,7 +224,7 @@ class TestSparkClient:
         mocked_stream_df.foreachBatch.assert_called_once()
         mocked_stream_df.start.assert_called_once()
 
-    def test_write_stream_invalid_params(self, mocked_stream_df):
+    def test_write_stream_invalid_params(self, mocked_stream_df: Mock) -> None:
         # arrange
         spark_client = SparkClient()
         mocked_stream_df.isStreaming = False
@@ -202,7 +240,9 @@ class TestSparkClient:
                 mode="append",
             )
 
-    def test_create_temporary_view(self, target_df, spark_session):
+    def test_create_temporary_view(
+        self, target_df: DataFrame, spark_session: SparkSession
+    ) -> None:
         # arrange
         spark_client = SparkClient()
 
