@@ -1,4 +1,4 @@
-name: "Publish"
+name: "Hotfix"
 on:
   pull_request:
     branches:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    if: github.event.action == 'closed' && github.event.pull_request.merged == true && contains(github.event.pull_request.head.ref, 'release/')
+    if: github.event.action == 'closed' && github.event.pull_request.merged == true && contains(github.event.pull_request.head.ref, 'hotfix/')
 
     runs-on: ubuntu-16.04
     container: rappdw/docker-java-python
