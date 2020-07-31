@@ -10,12 +10,12 @@ A feature is based on the `master` branch and merged back into the `master` bran
 ### Working Locally
 
 ```
-# checkout develop, fetch the latest changes and pull them from remote into local
+# checkout master, fetch the latest changes and pull them from remote into local
 git checkout master
 git fetch
 git pull origin master
 
-# create a feature branch that is based off develop
+# create a feature branch that is based off master
 git checkout -b <username>/some-description
 
 # do your work
