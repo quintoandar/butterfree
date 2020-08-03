@@ -1,6 +1,15 @@
 ## Butterfree
 _A tool for building feature stores. Transform your raw data into beautiful features._
 
+
+[![Release](https://img.shields.io/github/v/release/quintoandar/butterfree)]((https://pypi.org/project/butterfree/))
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
+![Publish](https://github.com/quintoandar/butterfree/workflows/Publish/badge.svg)
+![Test](https://github.com/quintoandar/butterfree/workflows/Test/badge.svg)
+[![Documentation Status](https://readthedocs.org/projects/butterfree/badge/?version=latest)](https://butterfree.readthedocs.io/en/latest/?badge=latest)
+
+
 Made with :heart: by the **MLOps** team from [QuintoAndar](https://github.com/quintoandar/)
 
 This library supports Python version 3.7+ and meant to provide tools for building ETL pipelines for Feature Stores using [Apache Spark](https://spark.apache.org/).
