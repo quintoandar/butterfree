@@ -1,14 +1,13 @@
 name: "Publish"
 on:
-  pull_request:
-    branches:
-      - master
-    types: [closed]
+  push:
+    paths:
+      - 'setup.py'
 
 
 jobs:
-  build:
-    if: github.event.action == 'closed' && github.event.pull_request.merged == true && contains(github.event.pull_request.head.ref, 'release/')
+  Pipeline:
+    if: contains(github.ref, 'hotfix/') == false
 
     runs-on: ubuntu-16.04
     container: rappdw/docker-java-python

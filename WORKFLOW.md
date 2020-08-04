@@ -1,4 +1,4 @@
-# Butterfree's Git Flow
+# Butterfree's WorkFlow
 
 ## Features
 
@@ -60,27 +60,24 @@ git push --force-with-lease
 
 ## Releases
 
-A release takes the changes in `release` and applies them to `master`.
+The release will always occur when we change the version in the setup.py file.
 
 
-### Working locally
-
+### Working Locally
 
 ```
-# create a release branch from master
+# just change the version on 
 git checkout master
 git fetch
 git pull origin master
-git checkout -b release/<version>
 
 # finalize the changelog, dump the version into setup.py and update the documentation then:
 make update-docs
 git add .
 git commit -m "release <version>"
 
-# rebase against master, which we're going to merge into
+# push the new version
 git fetch
-git rebase origin/master
 git push --force-with-lease
 ```
 
@@ -88,8 +85,6 @@ If there are any issues, fixes should be committed (or merged in) to the release
 
 ### Github workflow
 
-- Open a Pull Request against `master`
-- When the PR is approved and the deploy has been verified, merge using `squash and merge`.
 - A tag will automatically be triggered in our CI/CD. This tag/release will use the version for its title and push a new version
 of Butterfree's python package to our private server.
 
@@ -112,9 +107,6 @@ No need to worry about modifying the `API Documentation`,  everything is generat
 
 A hotfix is a patch that needs to go directly into `master` without going through the regular release process.
 The most common use case is to patch a bug that's on production when `hotfix` contains code that isn't yet ready for release.
-
-Another use case is when a past release needs a patch. For example, we are currently on version 3.2 but find a critical 
-bug that is present since 2.5 and want to fix it. Then we would create a hotfix branch and release it as 2.5.1.
 
 ### Working locally
 

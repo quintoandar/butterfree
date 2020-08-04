@@ -195,7 +195,7 @@ make test-examples
 ```
 
 ## GitFlow
-Please **follow the guidelines** described [here](GITFLOW.md).
+Please **follow the guidelines** described [here](WORKFLOW.md).
 
 ## Pull Requests
 
