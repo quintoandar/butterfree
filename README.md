@@ -10,8 +10,8 @@ _A tool for building feature stores. Transform your raw data into beautiful feat
 |-----------|---------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------|--------------------------------------------|
 | **PyPi**  | [![PyPi Downloads](https://pepy.tech/badge/butterfree)](https://pypi.org/project/butterfree/)                      | [Link](https://pypi.org/project/butterfree/)        | `pip install butterfree `                  |
 
-### Deploy status
-| Develop                                                                     | Production                                                                        | Documentation                                                                                                                                           |
+### Build status
+| Develop                                                                     | Stable                                                                            | Documentation                                                                                                                                           |
 |-----------------------------------------------------------------------------|-----------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
 | ![Test](https://github.com/quintoandar/butterfree/workflows/Test/badge.svg) | ![Publish](https://github.com/quintoandar/butterfree/workflows/Publish/badge.svg) | [![Documentation Status](https://readthedocs.org/projects/butterfree/badge/?version=latest)](https://butterfree.readthedocs.io/en/latest/?badge=latest) |
 
