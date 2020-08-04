@@ -1,11 +1,11 @@
 cmake==3.13.3
 h3==3.4.3
 pyarrow==0.15.1
-pandas==1.0.3
 jupyter==1.0.0
 twine==3.1.1
 Sphinx==3.1.1
 sphinx-rtd-theme==0.4.3
+sphinxemoji==0.1.6
 recommonmark==0.6.0
 mypy==0.782
 pyspark-stubs==3.0.0

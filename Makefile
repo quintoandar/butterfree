@@ -1,8 +1,8 @@
 .PHONY: environment
 ## create virtual environment for butterfree
 environment:
-	@pyenv install -s 3.6.8
-	@pyenv virtualenv 3.6.8 butterfree
+	@pyenv install -s 3.7.7
+	@pyenv virtualenv 3.7.7 butterfree
 	@pyenv local butterfree
 	@PYTHONPATH=. python -m pip install --upgrade pip
 
