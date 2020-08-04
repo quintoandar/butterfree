@@ -1,13 +1,19 @@
 ## Butterfree
 _A tool for building feature stores. Transform your raw data into beautiful features._
 
-
 [![Release](https://img.shields.io/github/v/release/quintoandar/butterfree)]((https://pypi.org/project/butterfree/))
+![Python Version](https://img.shields.io/badge/python-3.7%20%7C%203.8-brightgreen.svg)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-![Publish](https://github.com/quintoandar/butterfree/workflows/Publish/badge.svg)
-![Test](https://github.com/quintoandar/butterfree/workflows/Test/badge.svg)
-[![Documentation Status](https://readthedocs.org/projects/butterfree/badge/?version=latest)](https://butterfree.readthedocs.io/en/latest/?badge=latest)
+| Source    | Downloads                                                                                                                       | Page                                                 | Installation Command                       |
+|-----------|---------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------|--------------------------------------------|
+| **PyPi**  | [![PyPi Downloads](https://pepy.tech/badge/butterfree)](https://pypi.org/project/butterfree/)                      | [Link](https://pypi.org/project/butterfree/)        | `pip install butterfree `                  |
+
+### Deploy status
+| Develop                                                                     | Production                                                                        | Documentation                                                                                                                                           |
+|-----------------------------------------------------------------------------|-----------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ![Test](https://github.com/quintoandar/butterfree/workflows/Test/badge.svg) | ![Publish](https://github.com/quintoandar/butterfree/workflows/Publish/badge.svg) | [![Documentation Status](https://readthedocs.org/projects/butterfree/badge/?version=latest)](https://butterfree.readthedocs.io/en/latest/?badge=latest) |
 
 
 Made with :heart: by the **MLOps** team from [QuintoAndar](https://github.com/quintoandar/)
