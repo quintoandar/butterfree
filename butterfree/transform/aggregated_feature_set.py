@@ -466,8 +466,7 @@ class AggregatedFeatureSet(FeatureSet):
 
         return schema
 
-    @staticmethod
-    def define_start_date(start_date: str = None):
+    def define_start_date(self, start_date: str = None):
         """Get feature set start date.
 
         Args:

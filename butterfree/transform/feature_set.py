@@ -378,8 +378,7 @@ class FeatureSet:
 
         return df.select([column for column in self.columns])
 
-    @staticmethod
-    def define_start_date(start_date: str = None):
+    def define_start_date(self, start_date: str = None):
         """Get feature set start date.
 
         Args:
