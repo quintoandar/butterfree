@@ -7,7 +7,7 @@ on:
 
 jobs:
   Pipeline:
-    if: contains(github.ref, 'hotfix/') == false
+    if: contains(github.ref, 'hotfix/') == false && github.ref == 'master'
 
     runs-on: ubuntu-16.04
     container: rappdw/docker-java-python
