@@ -71,7 +71,7 @@ git checkout master
 git fetch
 git pull origin master
 
-# finalize the changelog, dump the version into setup.py and update the documentation then:
+# finalize the changelog, bump the version into setup.py and update the documentation then:
 make update-docs
 git add .
 git commit -m "release <version>"
