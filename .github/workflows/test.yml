@@ -3,7 +3,7 @@ on:
   push:
     branches:
       - master
-      - staging
+      - hotfix/**
   pull_request:
 
 jobs:

@@ -1,11 +1,14 @@
 name: "Publish"
 on:
   push:
-    branches:
-      - master
+    paths:
+      - 'setup.py'
+
 
 jobs:
   Pipeline:
+    if: github.ref == 'master' || contains(github.ref, 'hotfix/')
+
     runs-on: ubuntu-16.04
     container: rappdw/docker-java-python
 
