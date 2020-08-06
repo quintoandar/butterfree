@@ -66,14 +66,15 @@ The release will always occur when we change the version in the setup.py file.
 ### Working Locally
 
 ```
-# just change the version on 
+# work in master branch
 git checkout master
 git fetch
 git pull origin master
 
 # finalize the changelog, bump the version into setup.py and update the documentation then:
 make update-docs
-git add .
+git add CHANGELOG.md
+git add setup.py
 git commit -m "release <version>"
 
 # push the new version
@@ -81,12 +82,10 @@ git fetch
 git push --force-with-lease
 ```
 
-If there are any issues, fixes should be committed (or merged in) to the release branch.
-
 ### Github workflow
 
-- A tag will automatically be triggered in our CI/CD. This tag/release will use the version for its title and push a new version
-of Butterfree's python package to our private server.
+- The creation of the release tag and the update of the PyPi version will be done 
+automatically from the Publish workflow, you can follow [here](https://github.com/quintoandar/butterfree/actions?query=workflow%3APublish).
 
 ### Update API Documentation
 
@@ -108,20 +107,6 @@ No need to worry about modifying the `API Documentation`,  everything is generat
 A hotfix is a patch that needs to go directly into `master` without going through the regular release process.
 The most common use case is to patch a bug that's on production when `hotfix` contains code that isn't yet ready for release.
 
-### Working locally
-
-```
-# create a hotfix branch based on master, because master is what will be deployed to production
-git checkout master
-git fetch
-git pull origin master
-git checkout -b hotfix/describe-the-problem
-
-git add patch.fix
-git commit -m "fix the problem"
-git push
-```
-
 Another use case is when a past release needs a patch. For example, we are currently on version 3.2 but find a critical 
 bug that is present since 2.5 and want to fix it. Then we would create a hotfix branch and release it as 2.5.1.
 
@@ -129,12 +114,14 @@ bug that is present since 2.5 and want to fix it. Then we would create a hotfix 
 
 ```
 # create a hotfix branch based on master, because master is what will be deployed to production
-git checkout master@2.5
+git checkout master@<version>
 git fetch
 git pull origin master
-git checkout -b hotfix/describe-the-problem
+git checkout -b hotfix/<version>
+git checkout -b describe-the-problem
 
 git add patch.fix
+git add setup.py
 git commit -m "fix the problem"
 git push
 ```
@@ -143,7 +130,7 @@ Don't forget to update the Changelog and the version in `setup.py`.
 
 ### Github workflow
 
-- Open a Pull Request against `master`
+- Open a Pull Request against `hotfix/<version>`
 - When the PR's approved and the code is tested, `squash and merge` to squash your commits into a single commit.
 - A tag will automatically be triggered in our CI/CD. This tag/release will use the version for its title and push a new version
 of Butterfree's python package to our private server.
