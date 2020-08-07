@@ -174,6 +174,7 @@ class FeatureSetPipeline:
 
     def run(
         self,
+        start_date: str = None,
         end_date: str = None,
         partition_by: List[str] = None,
         order_by: List[str] = None,
@@ -191,7 +192,11 @@ class FeatureSetPipeline:
         soon. Use only if strictly necessary.
 
         """
-        dataframe = self.source.construct(client=self.spark_client)
+        start_date = self.feature_set.define_start_date(start_date)
+
+        dataframe = self.source.construct(
+            client=self.spark_client, start_date=start_date, end_date=end_date
+        )
 
         if partition_by:
             order_by = order_by or partition_by
