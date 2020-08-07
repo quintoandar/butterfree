@@ -3,6 +3,16 @@ All notable changes to this project will be documented in this file.
 
 Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each release or unreleased log for a better organization.
 
+## [1.0.2](https://github.com/quintoandar/butterfree/releases/tag/1.0.2)
+### Added
+* [MLOP-427] Add status badges ([#219](https://github.com/quintoandar/butterfree/pull/219))
+
+### Changed
+* [MLOP-426] Change branching strategy on butterfree to use only master branch ([#216](https://github.com/quintoandar/butterfree/pull/216))
+
+### Fixed
+* [MLOP-440] Python 3.7 bump and Fixing Dependencies ([#220](https://github.com/quintoandar/butterfree/pull/220)) 
+
 ## [1.0.1](https://github.com/quintoandar/butterfree/releases/tag/1.0.1)
 ### Added
 * Adding the library motto to readme and python package ([#203](https://github.com/quintoandar/butterfree/pull/203))
@@ -15,7 +25,7 @@ Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each 
 ### Fixed
 * Fixing an attribute reference error and raising a more meaningful exception when an anonymous function is passed to an AggregatedTransform ([#206](https://github.com/quintoandar/butterfree/pull/206))
 * Fix schema and reports. ([#207](https://github.com/quintoandar/butterfree/pull/207))
-* Fixes type hints for `clients` module ([#198](https://github.com/quintoandar/butterfree/pull/207))
+* Fixes type hints for `clients` module ([#198](https://github.com/quintoandar/butterfree/pull/198))
 
 ## [1.0.0](https://github.com/quintoandar/butterfree/releases/tag/1.0.0)
 ### Added
