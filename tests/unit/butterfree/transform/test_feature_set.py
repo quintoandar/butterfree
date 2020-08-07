@@ -420,3 +420,40 @@ class TestFeatureSet:
                 keys=[key_id],
                 timestamp=timestamp_c,
             ).construct(dataframe, spark_client)
+
+    def test_define_start_date(self, key_id, timestamp_c, dataframe):
+        feature_set = FeatureSet(
+            name="feature_set",
+            entity="entity",
+            description="description",
+            features=[
+                Feature(
+                    name="feature1",
+                    description="test",
+                    transformation=SparkFunctionTransform(
+                        functions=[
+                            Function(F.avg, DataType.FLOAT),
+                            Function(F.stddev_pop, DataType.DOUBLE),
+                        ]
+                    ).with_window(
+                        partition_by="id",
+                        order_by=TIMESTAMP_COLUMN,
+                        mode="fixed_windows",
+                        window_definition=["2 minutes", "15 minutes"],
+                    ),
+                ),
+            ],
+            keys=[
+                KeyFeature(
+                    name="id",
+                    description="The user's Main ID or device ID",
+                    dtype=DataType.BIGINT,
+                )
+            ],
+            timestamp=TimestampFeature(),
+        )
+
+        start_date = feature_set.define_start_date("2020-08-04")
+
+        assert isinstance(start_date, str)
+        assert start_date == "2020-08-04"

@@ -466,6 +466,17 @@ class AggregatedFeatureSet(FeatureSet):
 
         return schema
 
+    def define_start_date(self, start_date: str = None):
+        """Get aggregated feature set start date.
+
+        Args:
+            start_date: start date regarding source dataframe.
+
+        Returns:
+            start date.
+        """
+        return start_date
+
     def construct(
         self,
         dataframe: DataFrame,
