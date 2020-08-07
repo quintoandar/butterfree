@@ -389,3 +389,42 @@ class TestAggregatedFeatureSet:
 
         # assert
         assert_dataframe_equality(target_df, output_df)
+
+    def test_define_start_date(self):
+        feature_set = AggregatedFeatureSet(
+            name="feature_set",
+            entity="entity",
+            description="description",
+            features=[
+                Feature(
+                    name="feature1",
+                    description="test",
+                    transformation=AggregatedTransform(
+                        functions=[
+                            Function(functions.avg, DataType.DOUBLE),
+                            Function(functions.stddev_pop, DataType.FLOAT),
+                        ],
+                    ),
+                ),
+                Feature(
+                    name="feature2",
+                    description="test",
+                    transformation=AggregatedTransform(
+                        functions=[Function(functions.count, DataType.ARRAY_STRING)]
+                    ),
+                ),
+            ],
+            keys=[
+                KeyFeature(
+                    name="id",
+                    description="The user's Main ID or device ID",
+                    dtype=DataType.BIGINT,
+                )
+            ],
+            timestamp=TimestampFeature(),
+        ).with_windows(definitions=["1 week", "2 days"])
+
+        start_date = feature_set.define_start_date("2020-08-04")
+
+        assert isinstance(start_date, str)
+        assert start_date == "2020-08-04"

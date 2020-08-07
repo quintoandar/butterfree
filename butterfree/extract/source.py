@@ -54,7 +54,9 @@ class Source:
         self.readers = readers
         self.query = query
 
-    def construct(self, client: SparkClient) -> DataFrame:
+    def construct(
+        self, client: SparkClient, start_date: str = None, end_date: str = None
+    ) -> DataFrame:
         """Construct an entry point dataframe for a feature set.
 
         This method will assemble multiple readers, by building each one and
