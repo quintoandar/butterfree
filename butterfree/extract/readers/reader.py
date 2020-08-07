@@ -1,5 +1,7 @@
 """Reader entity."""
 
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from functools import reduce
 from typing import Callable, List
@@ -7,6 +9,7 @@ from typing import Callable, List
 from pyspark.sql import DataFrame
 
 from butterfree.clients import SparkClient
+from butterfree.extract.readers.incremental_strategy import IncrementalStrategy
 
 
 class Reader(ABC):
@@ -19,9 +22,10 @@ class Reader(ABC):
 
     """
 
-    def __init__(self, id: str):
+    def __init__(self, id: str, incremental_strategy: IncrementalStrategy = None):
         self.id = id
         self.transformations = []
+        self.incremental_strategy = incremental_strategy
 
     def with_(self, transformer: Callable, *args, **kwargs):
         """Define a new transformation for the Reader.
@@ -46,14 +50,20 @@ class Reader(ABC):
         self.transformations.append(new_transformation)
         return self
 
-    def _apply_transformations(self, df: DataFrame) -> DataFrame:
-        return reduce(
-            lambda result_df, transformation: transformation["transformer"](
-                result_df, *transformation["args"], **transformation["kwargs"]
-            ),
-            self.transformations,
-            df,
-        )
+    def with_incremental_strategy(
+        self, incremental_strategy: IncrementalStrategy
+    ) -> Reader:
+        """Define the incremental strategy for the Reader.
+
+        Args:
+            incremental_strategy: definition of the incremental strategy.
+
+        Returns:
+            Reader with defined incremental strategy.
+
+        """
+        self.incremental_strategy = incremental_strategy
+        return self
 
     @abstractmethod
     def consume(self, client: SparkClient) -> DataFrame:
@@ -65,27 +75,69 @@ class Reader(ABC):
         Returns:
             Dataframe with all the data.
 
-        :return: Spark dataframe
         """
 
-    def build(self, client: SparkClient, columns: List[tuple] = None):
+    def build(
+        self,
+        client: SparkClient,
+        columns: List[tuple] = None,
+        start_date=None,
+        end_date=None,
+    ):
         """Register the data got from the reader in the Spark metastore.
 
         Create a temporary view in Spark metastore referencing the data
         extracted from the target origin after the application of all the
         defined pre-processing transformations.
 
+        The arguments start_date and end_date are going to be use only when there
+        is a defined `IncrementalStrategy` on the `Reader`.
+
         Args:
             client: client responsible for connecting to Spark session.
-            columns: list of tuples for renaming/filtering the dataset.
+            columns: list of tuples for selecting/renaming columns on the df.
+            start_date: lower bound to use in the filter expression.
+            end_date: upper bound to use in the filter expression.
 
         """
-        transformed_df = self._apply_transformations(self.consume(client))
+        column_selection_df = self._select_columns(columns, client)
+        transformed_df = self._apply_transformations(column_selection_df)
+        filtered_df = self._filter_with_incremental_strategy(
+            transformed_df, start_date, end_date
+        )
+        filtered_df.createOrReplaceTempView(self.id)
 
-        if columns:
-            select_expression = []
-            for old_expression, new_column_name in columns:
-                select_expression.append(f"{old_expression} as {new_column_name}")
-            transformed_df = transformed_df.selectExpr(*select_expression)
+    def _select_columns(self, columns: List[str], client: SparkClient) -> DataFrame:
+        df = self.consume(client)
+        return df.selectExpr(
+            *(
+                [
+                    f"{old_expression} as {new_column_name}"
+                    for old_expression, new_column_name in columns
+                ]
+                if columns
+                else df.columns
+            )
+        )
 
-        transformed_df.createOrReplaceTempView(self.id)
+    def _apply_transformations(self, df: DataFrame) -> DataFrame:
+        return reduce(
+            lambda result_df, transformation: transformation["transformer"](
+                result_df, *transformation["args"], **transformation["kwargs"]
+            ),
+            self.transformations,
+            df,
+        )
+
+    def _filter_with_incremental_strategy(
+        self, df: DataFrame, start_date: str, end_date: str
+    ) -> DataFrame:
+        return (
+            df.where(
+                self.incremental_strategy.get_expression(
+                    start_date=start_date, end_date=end_date
+                )
+            )
+            if self.incremental_strategy
+            else df
+        )
