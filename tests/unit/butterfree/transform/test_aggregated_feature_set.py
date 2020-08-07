@@ -427,4 +427,30 @@ class TestAggregatedFeatureSet:
         start_date = feature_set.define_start_date("2020-08-04")
 
         assert isinstance(start_date, str)
-        assert start_date == "2020-08-04"
+        assert start_date == "2020-07-27"
+
+    def test_feature_set_start_date(
+        self, timestamp_c, feature_set_with_distinct_dataframe,
+    ):
+
+        fs = AggregatedFeatureSet(
+            name="name",
+            entity="entity",
+            description="description",
+            features=[
+                Feature(
+                    name="feature",
+                    description="test",
+                    transformation=AggregatedTransform(
+                        functions=[Function(functions.sum, DataType.INTEGER)]
+                    ),
+                ),
+            ],
+            keys=[KeyFeature(name="h3", description="test", dtype=DataType.STRING)],
+            timestamp=timestamp_c,
+        ).with_windows(["10 days", "3 weeks", "90 days"])
+
+        # assert
+        start_date = fs.define_start_date("2016-04-14")
+
+        assert start_date == "2016-01-14"

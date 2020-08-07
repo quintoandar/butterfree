@@ -3,6 +3,7 @@ from pyspark import sql
 from pyspark.sql import functions
 
 from butterfree.constants.columns import TIMESTAMP_COLUMN
+from butterfree.constants.window_definitions import ALLOWED_WINDOWS
 
 
 class FrameBoundaries:
@@ -13,21 +14,6 @@ class FrameBoundaries:
         window_definition: time ranges to be used in the windows,
         it can be second(s), minute(s), hour(s), day(s), week(s) and year(s),
     """
-
-    __ALLOWED_WINDOWS = {
-        "second": 1,
-        "seconds": 1,
-        "minute": 60,
-        "minutes": 60,
-        "hour": 3600,
-        "hours": 3600,
-        "day": 86400,
-        "days": 86400,
-        "week": 604800,
-        "weeks": 604800,
-        "year": 29030400,
-        "years": 29030400,
-    }
 
     def __init__(self, mode=None, window_definition=None):
         self.mode = mode
@@ -48,7 +34,7 @@ class FrameBoundaries:
         if self.window_definition is None:
             return None
         u = self.window_definition.split()[1]
-        if u not in self.__ALLOWED_WINDOWS and self.mode != "row_windows":
+        if u not in ALLOWED_WINDOWS and self.mode != "row_windows":
             raise ValueError("Not allowed")
 
         return u
@@ -61,7 +47,7 @@ class FrameBoundaries:
             span = self.window_size - 1
             return w.rowsBetween(-span, 0)
         if self.mode == "fixed_windows":
-            span = self.__ALLOWED_WINDOWS[self.window_unit] * self.window_size
+            span = ALLOWED_WINDOWS[self.window_unit] * self.window_size
             return w.rangeBetween(-span, 0)
 
 
