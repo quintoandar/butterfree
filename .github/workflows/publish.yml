@@ -7,7 +7,7 @@ on:
 
 jobs:
   Pipeline:
-    if: github.ref == 'master' || contains(github.ref, 'hotfix/')
+    if: github.ref == 'refs/heads/master' || contains(github.ref, 'hotfix/')
 
     runs-on: ubuntu-16.04
     container: rappdw/docker-java-python
@@ -32,7 +32,12 @@ jobs:
         tag_name: ${{ env.version }}
         release_name: Release ${{ env.version }}
 
+    - name: Release already exist
+        if: ${{ failure() }}
+        run: echo Release already exist
+
     - name: Publish release to pypi.org
+      if: ${{ success() }}
       env:
         PYPI_USERNAME: ${{ secrets.PYPI_USERNAME }}
         PYPI_PASSWORD: ${{ secrets.PYPI_PASSWORD }}

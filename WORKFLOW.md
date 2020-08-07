@@ -66,10 +66,11 @@ The release will always occur when we change the version in the setup.py file.
 ### Working Locally
 
 ```
-# work in master branch
+# create a feature branch
 git checkout master
 git fetch
 git pull origin master
+git checkout -b release/<version>
 
 # finalize the changelog, bump the version into setup.py and update the documentation then:
 make update-docs
@@ -84,6 +85,8 @@ git push --force-with-lease
 
 ### Github workflow
 
+- Open a Pull Request against `master`.
+- When the PR's approved and the code is tested, `squash and merge` to squash your commits into a single commit.
 - The creation of the release tag and the update of the PyPi version will be done 
 automatically from the Publish workflow, you can follow [here](https://github.com/quintoandar/butterfree/actions?query=workflow%3APublish).
 
