@@ -392,3 +392,53 @@ class TestFeatureSetPipeline:
         test_pipeline.feature_set.construct.assert_called_once()
         test_pipeline.sink.flush.assert_called_once()
         test_pipeline.sink.validate.assert_called_once()
+
+    def test_run_agg_with_start_date(self, spark_session):
+        test_pipeline = FeatureSetPipeline(
+            spark_client=SparkClient(),
+            source=Mock(
+                spec=Source,
+                readers=[TableReader(id="source_a", database="db", table="table",)],
+                query="select * from source_a",
+            ),
+            feature_set=Mock(
+                spec=AggregatedFeatureSet,
+                name="feature_set",
+                entity="entity",
+                description="description",
+                keys=[
+                    KeyFeature(
+                        name="user_id",
+                        description="The user's Main ID or device ID",
+                        dtype=DataType.INTEGER,
+                    )
+                ],
+                timestamp=TimestampFeature(from_column="ts"),
+                features=[
+                    Feature(
+                        name="listing_page_viewed__rent_per_month",
+                        description="Average of something.",
+                        transformation=AggregatedTransform(
+                            functions=[
+                                Function(functions.avg, DataType.FLOAT),
+                                Function(functions.stddev_pop, DataType.FLOAT),
+                            ],
+                        ),
+                    ),
+                ],
+            ),
+            sink=Mock(
+                spec=Sink, writers=[HistoricalFeatureStoreWriter(db_config=None)],
+            ),
+        )
+
+        # feature_set need to return a real df for streaming validation
+        sample_df = spark_session.createDataFrame([{"a": "x", "b": "y", "c": "3"}])
+        test_pipeline.feature_set.construct.return_value = sample_df
+
+        test_pipeline.run(start_date="2020-08-04")
+
+        test_pipeline.source.construct.assert_called_once()
+        test_pipeline.feature_set.construct.assert_called_once()
+        test_pipeline.sink.flush.assert_called_once()
+        test_pipeline.sink.validate.assert_called_once()
