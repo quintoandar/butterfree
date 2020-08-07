@@ -33,8 +33,8 @@ jobs:
         release_name: Release ${{ env.version }}
 
     - name: Release already exist
-        if: ${{ failure() }}
-        run: echo Release already exist
+      if: ${{ failure() }}
+      run: echo Release already exist
 
     - name: Publish release to pypi.org
       if: ${{ success() }}
