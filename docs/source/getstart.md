@@ -1,6 +1,6 @@
 # Getting Started
 
-Butterfree depends on **Python 3.6+** and it is **Spark 3.0 ready**.
+Butterfree depends on **Python 3.7+** and it is **Spark 3.0 ready**.
 
 [Python Package Index](https://quintoandar.github.io/python-package-server/) hosts reference to a pip-installable module of this library, using it is as straightforward as including it on your project's requirements.
 
