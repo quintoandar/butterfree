@@ -427,7 +427,7 @@ class TestAggregatedFeatureSet:
         start_date = feature_set.define_start_date("2020-08-04")
 
         assert isinstance(start_date, str)
-        assert start_date == "2020-08-04"
+        assert start_date == "2020-07-27"
 
     def test_feature_set_start_date(
         self, timestamp_c, feature_set_with_distinct_dataframe,
