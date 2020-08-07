@@ -1,6 +1,6 @@
 """AggregatedFeatureSet entity."""
 import itertools
-from datetime import timedelta
+from datetime import datetime, timedelta
 from functools import reduce
 from typing import Dict, List
 
@@ -8,6 +8,7 @@ from pyspark import sql
 from pyspark.sql import DataFrame, functions
 
 from butterfree.clients import SparkClient
+from butterfree.constants.window_definitions import ALLOWED_WINDOWS
 from butterfree.dataframe_service import repartition_df
 from butterfree.transform import FeatureSet
 from butterfree.transform.features import Feature, KeyFeature, TimestampFeature
@@ -466,6 +467,15 @@ class AggregatedFeatureSet(FeatureSet):
 
         return schema
 
+    @staticmethod
+    def _get_biggest_window_in_days(definitions: List[str]):
+        windows_list = []
+        for window in definitions:
+            windows_list.append(
+                int(window.split()[0]) * ALLOWED_WINDOWS[window.split()[1]]
+            )
+        return max(windows_list) / (60 * 60 * 24)
+
     def define_start_date(self, start_date: str = None):
         """Get aggregated feature set start date.
 
@@ -475,6 +485,18 @@ class AggregatedFeatureSet(FeatureSet):
         Returns:
             start date.
         """
+        if self._windows:
+            window_definition = [
+                definition.frame_boundaries.window_definition
+                for definition in self._windows
+            ]
+            biggest_window = self._get_biggest_window_in_days(window_definition)
+
+            return (
+                datetime.strptime(start_date, "%Y-%m-%d")
+                - timedelta(days=int(biggest_window) + 1)
+            ).strftime("%Y-%m-%d")
+
         return start_date
 
     def construct(
