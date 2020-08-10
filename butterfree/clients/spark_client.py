@@ -223,5 +223,5 @@ class SparkClient(AbstractClient):
 
         """
         if not dataframe.isStreaming:
-            return dataframe.createOrReplaceTempView(name)  # type: ignore
+            return dataframe.createOrReplaceTempView(name)
         return dataframe.writeStream.format("memory").queryName(name).start()

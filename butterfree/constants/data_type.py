@@ -2,10 +2,9 @@
 
 from enum import Enum
 
+from pyspark.sql.types import ArrayType, BinaryType, BooleanType
+from pyspark.sql.types import DataType as PySparkDataType
 from pyspark.sql.types import (
-    ArrayType,
-    BinaryType,
-    BooleanType,
     DateType,
     DecimalType,
     DoubleType,
@@ -15,8 +14,10 @@ from pyspark.sql.types import (
     StringType,
     TimestampType,
 )
+from typing_extensions import final
 
 
+@final
 class DataType(Enum):
     """Holds constants for data types within Butterfree."""
 
@@ -34,6 +35,6 @@ class DataType(Enum):
     ARRAY_STRING = (ArrayType(StringType()), "frozen<list<text>>")
     ARRAY_FLOAT = (ArrayType(FloatType()), "frozen<list<float>>")
 
-    def __init__(self, spark, cassandra):
+    def __init__(self, spark: PySparkDataType, cassandra: str) -> None:
         self.spark = spark
         self.cassandra = cassandra
