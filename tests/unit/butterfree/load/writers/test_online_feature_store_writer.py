@@ -6,6 +6,7 @@ from pyspark.sql.streaming import StreamingQuery
 
 from butterfree.clients import SparkClient
 from butterfree.configs.db import CassandraConfig
+from butterfree.dataframe_service.incremental_strategy import IncrementalStrategy
 from butterfree.load.writers import OnlineFeatureStoreWriter
 from butterfree.testing.dataframe import assert_dataframe_equality
 
@@ -71,6 +72,41 @@ class TestOnlineFeatureStoreWriter:
         writer.write(feature_set, feature_set_dataframe, spark_client)
 
         assert sorted(latest_feature_set_dataframe.collect()) == sorted(
+            spark_client.write_dataframe.call_args[1]["dataframe"].collect()
+        )
+        assert (
+            writer.db_config.mode == spark_client.write_dataframe.call_args[1]["mode"]
+        )
+        assert (
+            writer.db_config.format_
+            == spark_client.write_dataframe.call_args[1]["format_"]
+        )
+        # assert if all additional options got from db_config
+        # are in the called args in write_dataframe
+        assert all(
+            item in spark_client.write_dataframe.call_args[1].items()
+            for item in writer.db_config.get_options(table=feature_set.name).items()
+        )
+
+    def test_write_with_incremental_strategy(
+        self,
+        feature_set_dataframe,
+        filtered_latest_feature_set_dataframe,
+        cassandra_config,
+        mocker,
+        feature_set,
+    ):
+        # with
+        spark_client = mocker.stub("spark_client")
+        spark_client.write_dataframe = mocker.stub("write_dataframe")
+        writer = OnlineFeatureStoreWriter(cassandra_config).with_incremental_strategy(
+            IncrementalStrategy(column="timestamp")
+        )
+
+        # when
+        writer.write(feature_set, feature_set_dataframe, spark_client)
+
+        assert sorted(filtered_latest_feature_set_dataframe.collect()) == sorted(
             spark_client.write_dataframe.call_args[1]["dataframe"].collect()
         )
         assert (

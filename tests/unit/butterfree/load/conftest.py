@@ -44,6 +44,37 @@ def feature_set_dataframe(spark_context, spark_session):
 
 
 @fixture
+def filtered_historical_feature_set_dataframe(spark_context, spark_session):
+    data = [
+        {
+            "feature": 100,
+            "id": 1,
+            TIMESTAMP_COLUMN: "2019-12-31",
+            columns.PARTITION_YEAR: 2019,
+            columns.PARTITION_MONTH: 12,
+            columns.PARTITION_DAY: 31,
+        },
+        {
+            "id": 2,
+            TIMESTAMP_COLUMN: "2019-12-31",
+            "feature": 200,
+            columns.PARTITION_YEAR: 2019,
+            columns.PARTITION_MONTH: 12,
+            columns.PARTITION_DAY: 31,
+        },
+        {
+            "id": 1,
+            TIMESTAMP_COLUMN: "2020-01-15",
+            "feature": 110,
+            columns.PARTITION_YEAR: 2020,
+            columns.PARTITION_MONTH: 1,
+            columns.PARTITION_DAY: 15,
+        },
+    ]
+    return spark_session.read.json(spark_context.parallelize(data, 1))
+
+
+@fixture
 def historical_feature_set_dataframe(spark_context, spark_session):
     data = [
         {
@@ -84,6 +115,15 @@ def historical_feature_set_dataframe(spark_context, spark_session):
 
 @fixture
 def latest_feature_set_dataframe(spark_context, spark_session):
+    data = [
+        {"id": 2, TIMESTAMP_COLUMN: "2019-12-31", "feature": 200},
+        {"id": 1, TIMESTAMP_COLUMN: "2020-02-01", "feature": 120},
+    ]
+    return spark_session.read.json(spark_context.parallelize(data, 1))
+
+
+@fixture
+def filtered_latest_feature_set_dataframe(spark_context, spark_session):
     data = [
         {"id": 2, TIMESTAMP_COLUMN: "2019-12-31", "feature": 200},
         {"id": 1, TIMESTAMP_COLUMN: "2020-02-01", "feature": 120},

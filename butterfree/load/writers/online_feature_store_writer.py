@@ -76,7 +76,7 @@ class OnlineFeatureStoreWriter(Writer):
         db_config=None,
         debug_mode: bool = False,
         write_to_entity=False,
-        incremental_strategy: IncrementalStrategy = None
+        incremental_strategy: IncrementalStrategy = None,
     ):
         self.db_config = db_config or CassandraConfig()
         self.debug_mode = debug_mode

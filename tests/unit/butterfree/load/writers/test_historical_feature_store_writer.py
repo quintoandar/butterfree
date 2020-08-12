@@ -5,6 +5,7 @@ import pytest
 from pyspark.sql.functions import spark_partition_id
 
 from butterfree.clients import SparkClient
+from butterfree.dataframe_service.incremental_strategy import IncrementalStrategy
 from butterfree.load.writers import HistoricalFeatureStoreWriter
 from butterfree.testing.dataframe import assert_dataframe_equality
 
@@ -32,6 +33,42 @@ class TestHistoricalFeatureStoreWriter:
 
         # then
         assert_dataframe_equality(historical_feature_set_dataframe, result_df)
+
+        assert (
+            writer.db_config.format_ == spark_client.write_table.call_args[1]["format_"]
+        )
+        assert writer.db_config.mode == spark_client.write_table.call_args[1]["mode"]
+        assert (
+            writer.PARTITION_BY == spark_client.write_table.call_args[1]["partition_by"]
+        )
+        assert feature_set.name == spark_client.write_table.call_args[1]["table_name"]
+
+    def test_write_with_incremental_strategy(
+        self,
+        feature_set_dataframe,
+        filtered_historical_feature_set_dataframe,
+        mocker,
+        feature_set,
+    ):
+        # given
+        spark_client = mocker.stub("spark_client")
+        spark_client.write_table = mocker.stub("write_table")
+        writer = HistoricalFeatureStoreWriter().with_incremental_strategy(
+            IncrementalStrategy(column="timestamp")
+        )
+
+        # when
+        writer.write(
+            feature_set=feature_set,
+            dataframe=feature_set_dataframe,
+            spark_client=spark_client,
+            start_date="2019-12-31",
+            end_date="2020-01-31",
+        )
+        result_df = spark_client.write_table.call_args[1]["dataframe"]
+
+        # then
+        assert_dataframe_equality(filtered_historical_feature_set_dataframe, result_df)
 
         assert (
             writer.db_config.format_ == spark_client.write_table.call_args[1]["format_"]
