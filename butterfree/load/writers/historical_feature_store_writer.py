@@ -11,6 +11,7 @@ from butterfree.configs.db import S3Config
 from butterfree.constants import columns
 from butterfree.constants.spark_constants import DEFAULT_NUM_PARTITIONS
 from butterfree.dataframe_service import repartition_df
+from butterfree.dataframe_service.incremental_strategy import IncrementalStrategy
 from butterfree.load.writers.writer import Writer
 from butterfree.transform import FeatureSet
 
@@ -94,6 +95,7 @@ class HistoricalFeatureStoreWriter(Writer):
         num_partitions=None,
         validation_threshold: float = DEFAULT_VALIDATION_THRESHOLD,
         debug_mode: bool = False,
+        incremental_strategy: IncrementalStrategy = None,
     ):
         self.db_config = db_config or S3Config()
         self.database = database or environment.get_variable(
@@ -102,9 +104,15 @@ class HistoricalFeatureStoreWriter(Writer):
         self.num_partitions = num_partitions or DEFAULT_NUM_PARTITIONS
         self.validation_threshold = validation_threshold
         self.debug_mode = debug_mode
+        self.incremental_strategy = incremental_strategy
 
     def write(
-        self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient,
+        self,
+        feature_set: FeatureSet,
+        dataframe: DataFrame,
+        spark_client: SparkClient,
+        start_date: str = None,
+        end_date: str = None,
     ):
         """Loads the data from a feature set into the Historical Feature Store.
 
@@ -112,12 +120,18 @@ class HistoricalFeatureStoreWriter(Writer):
             feature_set: object processed with feature_set informations.
             dataframe: spark dataframe containing data from a feature set.
             spark_client: client for spark connections with external services.
+            start_date: start date regarding the load layer.
+            end_date: end date related to the load layer.
 
         If the debug_mode is set to True, a temporary table with a name in the format:
         historical_feature_store__{feature_set.name} will be created instead of writing
         to the real historical feature store.
 
         """
+        if start_date or end_date:
+            dataframe = self.incremental_strategy.filter_with_incremental_strategy(
+                dataframe, start_date, end_date
+            )
         dataframe = self._create_partitions(dataframe)
 
         if self.debug_mode:

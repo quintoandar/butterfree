@@ -67,13 +67,17 @@ class Source:
 
         Args:
             client: client responsible for connecting to Spark session.
+            start_date: start date related to the extract layer.
+            end_date:  end date regarding the extract layer.
 
         Returns:
             DataFrame with the query result against all readers.
 
         """
         for reader in self.readers:
-            reader.build(client)  # create temporary views for each reader
+            reader.build(
+                client=client, start_date=start_date, end_date=end_date
+            )  # create temporary views for each reader
 
         dataframe = client.sql(self.query)
 

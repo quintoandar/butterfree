@@ -81,7 +81,12 @@ class Sink:
             )
 
     def flush(
-        self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient
+        self,
+        feature_set: FeatureSet,
+        dataframe: DataFrame,
+        spark_client: SparkClient,
+        start_date: str = None,
+        end_date: str = None,
     ) -> List[StreamingQuery]:
         """Trigger a write job in all the defined Writers.
 
@@ -89,6 +94,8 @@ class Sink:
             dataframe: spark dataframe containing data from a feature set.
             feature_set: object processed with feature set metadata.
             spark_client: client used to run a query.
+            start_date: start date related to the load layer.
+            end_date: end date related to the load layer.
 
         Returns:
             Streaming handlers for each defined writer, if writing streaming dfs.
@@ -98,7 +105,11 @@ class Sink:
 
         handlers = [
             writer.write(
-                feature_set=feature_set, dataframe=dataframe, spark_client=spark_client
+                feature_set=feature_set,
+                dataframe=dataframe,
+                spark_client=spark_client,
+                start_date=start_date,
+                end_date=end_date,
             )
             for writer in self.writers
         ]

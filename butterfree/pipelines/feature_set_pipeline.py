@@ -215,6 +215,8 @@ class FeatureSetPipeline:
             dataframe=dataframe,
             feature_set=self.feature_set,
             spark_client=self.spark_client,
+            start_date=start_date,
+            end_date=end_date,
         )
 
         if not dataframe.isStreaming:

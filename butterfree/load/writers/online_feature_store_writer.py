@@ -10,6 +10,7 @@ from pyspark.sql.streaming import StreamingQuery
 from butterfree.clients import SparkClient
 from butterfree.configs.db import CassandraConfig
 from butterfree.constants.columns import TIMESTAMP_COLUMN
+from butterfree.dataframe_service.incremental_strategy import IncrementalStrategy
 from butterfree.load.writers.writer import Writer
 from butterfree.transform import FeatureSet
 
@@ -70,10 +71,17 @@ class OnlineFeatureStoreWriter(Writer):
 
     __name__ = "Online Feature Store Writer"
 
-    def __init__(self, db_config=None, debug_mode: bool = False, write_to_entity=False):
+    def __init__(
+        self,
+        db_config=None,
+        debug_mode: bool = False,
+        write_to_entity=False,
+        incremental_strategy: IncrementalStrategy = None
+    ):
         self.db_config = db_config or CassandraConfig()
         self.debug_mode = debug_mode
         self.write_to_entity = write_to_entity
+        self.incremental_strategy = incremental_strategy
 
     @staticmethod
     def filter_latest(dataframe: DataFrame, id_columns: List[Any]) -> DataFrame:
@@ -144,7 +152,12 @@ class OnlineFeatureStoreWriter(Writer):
         )
 
     def write(
-        self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient,
+        self,
+        feature_set: FeatureSet,
+        dataframe: DataFrame,
+        spark_client: SparkClient,
+        start_date: str = None,
+        end_date: str = None,
     ) -> Optional[StreamingQuery]:
         """Loads the latest data from a feature set into the Feature Store.
 
@@ -152,16 +165,24 @@ class OnlineFeatureStoreWriter(Writer):
             feature_set: object processed with feature set metadata.
             dataframe: Spark dataframe containing data from a feature set.
             spark_client: client for Spark connections with external services.
+            start_date: start date regarding the load layer.
+            end_date: end date related to the load layer.
 
         Returns:
             Streaming handler if writing streaming df, None otherwise.
 
         If the debug_mode is set to True, a temporary table with a name in the format:
         `online_feature_store__my_feature_set` will be created instead of writing to
-        the real online feature store. If dataframe is streaming this temporary table
+        the real online feature s        dataframe = self.incremental_strategy.filter_with_incremental_strategy(
+            dataframe, start_date, end_date
+        )tore. If dataframe is streaming this temporary table
         will be updated in real time.
 
         """
+        if start_date or end_date:
+            dataframe = self.incremental_strategy.filter_with_incremental_strategy(
+                dataframe, start_date, end_date
+            )
         table_name = feature_set.entity if self.write_to_entity else feature_set.name
 
         if dataframe.isStreaming:
