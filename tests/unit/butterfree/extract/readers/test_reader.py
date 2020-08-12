@@ -1,7 +1,8 @@
 import pytest
 from pyspark.sql.functions import expr
 
-from butterfree.extract.readers import FileReader, IncrementalStrategy
+from butterfree.dataframe_service.incremental_strategy import IncrementalStrategy
+from butterfree.extract.readers import FileReader
 from butterfree.testing.dataframe import assert_dataframe_equality
 
 
