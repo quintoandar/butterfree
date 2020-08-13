@@ -1,4 +1,4 @@
-from butterfree.extract.readers import IncrementalStrategy
+from butterfree.dataframe_service import IncrementalStrategy
 
 
 class TestIncrementalStrategy:

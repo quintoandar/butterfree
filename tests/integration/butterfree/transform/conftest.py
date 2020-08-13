@@ -395,3 +395,46 @@ def rolling_windows_output_feature_set_dataframe_base_date(
     df = df.withColumn(TIMESTAMP_COLUMN, df.origin_ts.cast(DataType.TIMESTAMP.spark))
 
     return df
+
+
+@fixture
+def feature_set_dates_dataframe(spark_context, spark_session):
+    data = [
+        {"id": 1, "ts": "2016-04-11 11:31:11", "feature": 200},
+        {"id": 1, "ts": "2016-04-12 11:44:12", "feature": 300},
+        {"id": 1, "ts": "2016-04-13 11:46:24", "feature": 400},
+        {"id": 1, "ts": "2016-04-14 12:03:21", "feature": 500},
+    ]
+    df = spark_session.read.json(spark_context.parallelize(data, 1))
+    df = df.withColumn(TIMESTAMP_COLUMN, df.ts.cast(DataType.TIMESTAMP.spark))
+    df = df.withColumn("ts", df.ts.cast(DataType.TIMESTAMP.spark))
+
+    return df
+
+
+@fixture
+def rolling_windows_output_date_boundaries(spark_context, spark_session):
+    data = [
+        {
+            "id": 1,
+            "ts": "2016-04-11 00:00:00",
+            "feature__avg_over_1_day_rolling_windows": None,
+            "feature__avg_over_1_week_rolling_windows": None,
+            "feature__stddev_pop_over_1_day_rolling_windows": None,
+            "feature__stddev_pop_over_1_week_rolling_windows": None,
+        },
+        {
+            "id": 1,
+            "ts": "2016-04-12 00:00:00",
+            "feature__avg_over_1_day_rolling_windows": 200.0,
+            "feature__avg_over_1_week_rolling_windows": 200.0,
+            "feature__stddev_pop_over_1_day_rolling_windows": 0.0,
+            "feature__stddev_pop_over_1_week_rolling_windows": 0.0,
+        },
+    ]
+    df = spark_session.read.json(
+        spark_context.parallelize(data).map(lambda x: json.dumps(x))
+    )
+    df = df.withColumn(TIMESTAMP_COLUMN, df.ts.cast(DataType.TIMESTAMP.spark))
+
+    return df
