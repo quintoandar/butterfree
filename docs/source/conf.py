@@ -28,9 +28,9 @@ copyright = "2020, QuintoAndar"
 author = "QuintoAndar"
 
 # The short X.Y version
-version = "0.10.3"
+version = "1.0"
 # The full version, including alpha/beta/rc tags
-release = "0.10.3"
+release = "1.0.2"
 
 
 # -- General configuration ---------------------------------------------------
@@ -46,7 +46,6 @@ extensions = [
     "sphinx.ext.autodoc",
     "recommonmark",
     "sphinx_rtd_theme",
-    "sphinx.ext.githubpages",
     "sphinx.ext.napoleon",
     "sphinx.ext.coverage",
     "sphinxemoji.sphinxemoji",
