@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from pyspark.sql import DataFrame
+
 
 class IncrementalStrategy:
     """Define an incremental strategy to be used on data sources.
@@ -96,3 +98,25 @@ class IncrementalStrategy:
                 expression += f" and {self.column} <= date('{end_date}')"
             return expression
         return f"{self.column} <= date('{end_date}')"
+
+    def filter_with_incremental_strategy(
+        self, dataframe: DataFrame, start_date: str = None, end_date: str = None
+    ) -> DataFrame:
+        """Filters the dataframe according to the date boundaries.
+
+        Args:
+            dataframe: dataframe that will be filtered.
+            start_date: date lower bound to use in the filter.
+            end_date: date upper bound to use in the filter.
+
+        Returns:
+            Filtered dataframe based on defined time boundaries.
+
+        """
+        return (
+            dataframe.where(
+                self.get_expression(start_date=start_date, end_date=end_date)
+            )
+            if start_date or end_date
+            else dataframe
+        )
