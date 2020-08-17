@@ -227,7 +227,7 @@ class SparkClient(AbstractClient):
         return dataframe.writeStream.format("memory").queryName(name).start()
 
     def add_table_partitions(
-        self, partitions: List[dict], table, database=None
+        self, partitions: List[Dict[str, Any]], table: str, database: str = None
     ) -> None:
         """Add partitions to an existing table.
 
