@@ -252,3 +252,26 @@ class TestSparkClient:
 
         # assert
         assert_dataframe_equality(target_df, result_df)
+
+    def test_add_table_partitions(self, mock_spark_sql: Mock):
+        # arrange
+        target_command = (
+            f"ALTER TABLE `db`.`table` ADD IF NOT EXISTS "
+            f"PARTITION ( year = 2020, month = 8, day = 14 ) "
+            f"PARTITION ( year = 2020, month = 8, day = 15 ) "
+            f"PARTITION ( year = 2020, month = 8, day = 16 )"
+        )
+
+        spark_client = SparkClient()
+        spark_client._session = mock_spark_sql
+        partitions = [
+            {"year": 2020, "month": 8, "day": 14},
+            {"year": 2020, "month": 8, "day": 15},
+            {"year": 2020, "month": 8, "day": 16},
+        ]
+
+        # act
+        spark_client.add_table_partitions(partitions, "table", "db")
+
+        # assert
+        mock_spark_sql.assert_called_once_with(target_command)

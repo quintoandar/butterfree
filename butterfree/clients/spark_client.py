@@ -225,3 +225,41 @@ class SparkClient(AbstractClient):
         if not dataframe.isStreaming:
             return dataframe.createOrReplaceTempView(name)
         return dataframe.writeStream.format("memory").queryName(name).start()
+
+    def add_table_partitions(
+        self, partitions: List[dict], table, database=None
+    ) -> None:
+        """Add partitions to an existing table.
+
+        Args:
+            partitions: partitions to add to the table.
+                It's expected a list of partition dicts to add to the table.
+                Example: `[{"year": 2020, "month": 8, "day": 14}, ...]`
+            table: table to add the partitions.
+            database: name of the database where the table is saved.
+
+        """
+        for partition_dict in partitions:
+            if not all(
+                (isinstance(value, str) or isinstance(value, int))
+                for value in partition_dict
+            ):
+                raise ValueError("Partition values must be string or int.")
+        database_expr = f"`{database}`." or ""
+        key_values_expr = [
+            ", ".join(
+                [
+                    "{} = {}".format(k, v)
+                    if not isinstance(v, str)
+                    else "{} = '{}'".format(k, v)
+                    for k, v in partition.items()
+                ]
+            )
+            for partition in partitions
+        ]
+        partitions_expr = " ".join(f"PARTITION ( {expr} )" for expr in key_values_expr)
+        command = (
+            f"ALTER TABLE {database_expr}`{table}` ADD IF NOT EXISTS {partitions_expr}"
+        )
+
+        self.conn.sql(command)
