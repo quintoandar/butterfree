@@ -241,10 +241,17 @@ class SparkClient(AbstractClient):
         """
         for partition_dict in partitions:
             if not all(
-                (isinstance(value, str) or isinstance(value, int))
-                for value in partition_dict
+                (
+                    isinstance(key, str)
+                    and (isinstance(value, str) or isinstance(value, int))
+                )
+                for key, value in partition_dict.items()
             ):
-                raise ValueError("Partition values must be string or int.")
+                raise ValueError(
+                    "Partition keys must be column names "
+                    "and values must be string or int."
+                )
+
         database_expr = f"`{database}`." or ""
         key_values_expr = [
             ", ".join(

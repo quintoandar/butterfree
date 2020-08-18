@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Any, Dict, Optional, Union
 from unittest.mock import Mock
 
@@ -275,3 +276,20 @@ class TestSparkClient:
 
         # assert
         mock_spark_sql.assert_called_once_with(target_command)
+
+    @pytest.mark.parametrize(
+        "partition",
+        [
+            [{"float_partition": 2.72}],
+            [{123: 2020}],
+            [{"date": datetime(year=2020, month=8, day=18)}],
+        ],
+    )
+    def test_add_invalid_partitions(self, mock_spark_sql: Mock, partition):
+        # arrange
+        spark_client = SparkClient()
+        spark_client._session = mock_spark_sql
+
+        # act and assert
+        with pytest.raises(ValueError):
+            spark_client.add_table_partitions(partition, "table", "db")
