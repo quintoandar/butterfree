@@ -46,6 +46,13 @@ def mocked_stream_df() -> Mock:
     return mock
 
 
+@pytest.fixture()
+def mock_spark_sql() -> Mock:
+    mock = Mock()
+    mock.sql = mock
+    return mock
+
+
 @pytest.fixture
 def cassandra_client() -> CassandraClient:
     return CassandraClient(
