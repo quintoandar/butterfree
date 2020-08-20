@@ -1,3 +1,5 @@
+"""Hook abstract class entity."""
+
 from abc import ABC, abstractmethod
 
 from pyspark.sql import DataFrame
@@ -14,6 +16,6 @@ class Hook(ABC):
             dataframe: dataframe to use in the Hook.
 
         Returns:
-            dataframe result from the hook.
+            dataframe result from the Hook.
 
         """

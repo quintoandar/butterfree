@@ -1,3 +1,5 @@
+"""Spark table schema compatibility Hook definition."""
+
 from pyspark.sql import DataFrame
 
 from butterfree.clients import SparkClient
