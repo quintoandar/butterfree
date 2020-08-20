@@ -192,10 +192,10 @@ class FeatureSetPipeline:
         soon. Use only if strictly necessary.
 
         """
-        start_date = self.feature_set.define_start_date(start_date)
-
         dataframe = self.source.construct(
-            client=self.spark_client, start_date=start_date, end_date=end_date
+            client=self.spark_client,
+            start_date=self.feature_set.define_start_date(start_date),
+            end_date=end_date,
         )
 
         if partition_by:
@@ -207,6 +207,7 @@ class FeatureSetPipeline:
         dataframe = self.feature_set.construct(
             dataframe=dataframe,
             client=self.spark_client,
+            start_date=start_date,
             end_date=end_date,
             num_processors=num_processors,
         )

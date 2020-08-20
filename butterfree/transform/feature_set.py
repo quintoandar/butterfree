@@ -393,6 +393,7 @@ class FeatureSet:
         self,
         dataframe: DataFrame,
         client: SparkClient,
+        start_date: str = None,
         end_date: str = None,
         num_processors: int = None,
     ) -> DataFrame:
@@ -404,7 +405,8 @@ class FeatureSet:
         Args:
             dataframe: input dataframe to be transformed by the features.
             client: client responsible for connecting to Spark session.
-            end_date: user defined base date.
+            start_date: user defined start date.
+            end_date: user defined end date.
             num_processors: cluster total number of processors for repartitioning.
 
         Returns:

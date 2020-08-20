@@ -8,8 +8,9 @@ from pyspark import sql
 from pyspark.sql import DataFrame, functions
 
 from butterfree.clients import SparkClient
+from butterfree.constants.columns import TIMESTAMP_COLUMN
 from butterfree.constants.window_definitions import ALLOWED_WINDOWS
-from butterfree.dataframe_service import repartition_df
+from butterfree.dataframe_service import IncrementalStrategy, repartition_df
 from butterfree.transform import FeatureSet
 from butterfree.transform.features import Feature, KeyFeature, TimestampFeature
 from butterfree.transform.transformations import AggregatedTransform
@@ -203,6 +204,7 @@ class AggregatedFeatureSet(FeatureSet):
         self._pivot_values = []
         self._distinct_subset = []
         self._distinct_keep = None
+        self.incremental_strategy = IncrementalStrategy(column=TIMESTAMP_COLUMN)
         super(AggregatedFeatureSet, self).__init__(
             name, entity, description, keys, timestamp, features,
         )
@@ -503,6 +505,7 @@ class AggregatedFeatureSet(FeatureSet):
         self,
         dataframe: DataFrame,
         client: SparkClient,
+        start_date: str = None,
         end_date: str = None,
         num_processors: int = None,
     ) -> DataFrame:
@@ -515,6 +518,7 @@ class AggregatedFeatureSet(FeatureSet):
         Args:
             dataframe: input dataframe to be transformed by the features.
             client: client responsible for connecting to Spark session.
+            start_date: user defined min date for having aggregated data.
             end_date: user defined max date for having aggregated data (exclusive).
             num_processors: cluster total number of processors for repartitioning.
 
@@ -568,6 +572,10 @@ class AggregatedFeatureSet(FeatureSet):
             )
         else:
             output_df = self._aggregate(output_df, features=self.features)
+
+        output_df = self.incremental_strategy.filter_with_incremental_strategy(
+            dataframe=output_df, start_date=start_date, end_date=end_date
+        )
 
         output_df = output_df.select(*self.columns).replace(float("nan"), None)
         if not output_df.isStreaming:
