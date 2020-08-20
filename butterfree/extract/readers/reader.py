@@ -9,7 +9,7 @@ from typing import Callable, List
 from pyspark.sql import DataFrame
 
 from butterfree.clients import SparkClient
-from butterfree.extract.readers.incremental_strategy import IncrementalStrategy
+from butterfree.dataframe_service.incremental_strategy import IncrementalStrategy
 
 
 class Reader(ABC):
@@ -102,10 +102,11 @@ class Reader(ABC):
         """
         column_selection_df = self._select_columns(columns, client)
         transformed_df = self._apply_transformations(column_selection_df)
-        filtered_df = self._filter_with_incremental_strategy(
-            transformed_df, start_date, end_date
-        )
-        filtered_df.createOrReplaceTempView(self.id)
+        if self.incremental_strategy:
+            transformed_df = self.incremental_strategy.filter_with_incremental_strategy(
+                transformed_df, start_date, end_date
+            )
+        transformed_df.createOrReplaceTempView(self.id)
 
     def _select_columns(self, columns: List[str], client: SparkClient) -> DataFrame:
         df = self.consume(client)
@@ -127,17 +128,4 @@ class Reader(ABC):
             ),
             self.transformations,
             df,
-        )
-
-    def _filter_with_incremental_strategy(
-        self, df: DataFrame, start_date: str, end_date: str
-    ) -> DataFrame:
-        return (
-            df.where(
-                self.incremental_strategy.get_expression(
-                    start_date=start_date, end_date=end_date
-                )
-            )
-            if self.incremental_strategy
-            else df
         )
