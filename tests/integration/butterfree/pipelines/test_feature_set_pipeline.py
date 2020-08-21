@@ -138,8 +138,8 @@ class TestFeatureSetPipeline:
         fixed_windows_output_feature_set_date_dataframe,
     ):
         # arrange
-        table_reader_id = "a_source"
-        table_reader_table = "table"
+        table_reader_id = "b_source"
+        table_reader_table = "b_table"
         table_reader_db = environment.get_variable("FEATURE_STORE_HISTORICAL_DATABASE")
         create_temp_view(dataframe=mocked_date_df, name=table_reader_id)
         create_db_and_table(
@@ -226,8 +226,8 @@ class TestFeatureSetPipeline:
         fixed_windows_output_feature_set_date_dataframe,
     ):
         # arrange
-        table_reader_id = "a_source"
-        table_reader_table = "table"
+        table_reader_id = "b_source"
+        table_reader_table = "b_table"
         table_reader_db = environment.get_variable("FEATURE_STORE_HISTORICAL_DATABASE")
         create_temp_view(dataframe=mocked_date_df, name=table_reader_id)
         create_db_and_table(
