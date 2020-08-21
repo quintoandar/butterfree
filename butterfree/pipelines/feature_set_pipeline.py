@@ -1,4 +1,5 @@
 """FeatureSetPipeline entity."""
+from datetime import datetime, timedelta
 from typing import List
 
 from butterfree.clients import SparkClient
@@ -224,3 +225,36 @@ class FeatureSetPipeline:
                 feature_set=self.feature_set,
                 spark_client=self.spark_client,
             )
+
+    def run_for_date(
+        self,
+        execution_date: str = None,
+        partition_by: List[str] = None,
+        order_by: List[str] = None,
+        num_processors: int = None,
+    ):
+        """Runs the defined feature set pipeline for a specific date.
+
+        The pipeline consists in the following steps:
+        - Constructs the input dataframe from the data source.
+        - Construct the feature set dataframe using the defined Features.
+        - Load the data to the configured sink locations.
+
+        It's important to notice, however, that both parameters partition_by
+        and num_processors are WIP, we intend to enhance their functionality
+        soon. Use only if strictly necessary.
+
+        """
+        start_date = execution_date
+
+        end_date = (
+            datetime.strptime(execution_date, "%Y-%m-%d") + timedelta(days=1)
+        ).strftime("%Y-%m-%d")
+
+        self.run(
+            start_date=start_date,
+            end_date=end_date,
+            partition_by=partition_by,
+            order_by=order_by,
+            num_processors=num_processors,
+        )

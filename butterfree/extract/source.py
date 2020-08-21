@@ -73,7 +73,9 @@ class Source:
 
         """
         for reader in self.readers:
-            reader.build(client)  # create temporary views for each reader
+            reader.build(
+                client=client, start_date=start_date, end_date=end_date
+            )  # create temporary views for each reader
 
         dataframe = client.sql(self.query)
 
