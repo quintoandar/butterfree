@@ -74,3 +74,36 @@ def fixed_windows_output_feature_set_dataframe(spark_context, spark_session):
     df = df.withColumn(TIMESTAMP_COLUMN, df.timestamp.cast(DataType.TIMESTAMP.spark))
 
     return df
+
+
+@pytest.fixture()
+def mocked_date_df(spark_context, spark_session):
+    data = [
+        {"id": 1, "ts": "2016-04-11 11:31:11", "feature": 200},
+        {"id": 1, "ts": "2016-04-12 11:44:12", "feature": 300},
+        {"id": 1, "ts": "2016-04-13 11:46:24", "feature": 400},
+        {"id": 1, "ts": "2016-04-14 12:03:21", "feature": 500},
+    ]
+    df = spark_session.read.json(spark_context.parallelize(data, 1))
+    df = df.withColumn(TIMESTAMP_COLUMN, df.ts.cast(DataType.TIMESTAMP.spark))
+
+    return df
+
+
+@pytest.fixture()
+def fixed_windows_output_feature_set_date_dataframe(spark_context, spark_session):
+    data = [
+        {
+            "id": 1,
+            "timestamp": "2016-04-12 11:44:12",
+            "feature__avg_over_1_day_fixed_windows": 300,
+            "feature__stddev_pop_over_1_day_fixed_windows": 0,
+            "year": 2016,
+            "month": 4,
+            "day": 12,
+        },
+    ]
+    df = spark_session.read.json(spark_context.parallelize(data, 1))
+    df = df.withColumn(TIMESTAMP_COLUMN, df.timestamp.cast(DataType.TIMESTAMP.spark))
+
+    return df
