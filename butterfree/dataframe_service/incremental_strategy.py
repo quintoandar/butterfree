@@ -32,7 +32,7 @@ class IncrementalStrategy:
             `IncrementalStrategy` with the defined column expression.
 
         """
-        return IncrementalStrategy(column=f"date(from_unixtime({column_name}/ 1000.0))")
+        return IncrementalStrategy(column=f"from_unixtime({column_name}/ 1000.0)")
 
     def from_string(self, column_name: str, mask: str = None) -> IncrementalStrategy:
         """Create a column expression from ts column defined as a simple string.
@@ -65,9 +65,9 @@ class IncrementalStrategy:
 
         """
         return IncrementalStrategy(
-            column=f"date(concat(string({year_column}), "
+            column=f"concat(string({year_column}), "
             f"'-', string({month_column}), "
-            f"'-', string({day_column})))"
+            f"'-', string({day_column}))"
         )
 
     def get_expression(self, start_date: str = None, end_date: str = None) -> str:
@@ -93,11 +93,11 @@ class IncrementalStrategy:
         if not (start_date or end_date):
             raise ValueError("Both arguments start_date and end_date can't be None.")
         if start_date:
-            expression = f"{self.column} >= date('{start_date}')"
+            expression = f"date({self.column}) >= date('{start_date}')"
             if end_date:
-                expression += f" and {self.column} <= date('{end_date}')"
+                expression += f" and date({self.column}) <= date('{end_date}')"
             return expression
-        return f"{self.column} <= date('{end_date}')"
+        return f"date({self.column}) <= date('{end_date}')"
 
     def filter_with_incremental_strategy(
         self, dataframe: DataFrame, start_date: str = None, end_date: str = None
