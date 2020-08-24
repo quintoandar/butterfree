@@ -164,6 +164,9 @@ class TestFeatureSetPipeline:
         feature_set_pipeline.run_for_date(execution_date="2016-04-12")
 
         df = spark_session.sql("select * from historical_feature_store__feature_set")
+        target_df = fixed_windows_output_feature_set_date_dataframe.filter(
+            "timestamp < '2016-04-13'"
+        )
 
         # assert
-        assert_dataframe_equality(df, fixed_windows_output_feature_set_date_dataframe)
+        assert_dataframe_equality(df, target_df)

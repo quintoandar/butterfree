@@ -1,5 +1,4 @@
 """FeatureSetPipeline entity."""
-from datetime import datetime, timedelta
 from typing import List
 
 from butterfree.clients import SparkClient
@@ -245,15 +244,9 @@ class FeatureSetPipeline:
         soon. Use only if strictly necessary.
 
         """
-        start_date = execution_date
-
-        end_date = (
-            datetime.strptime(execution_date, "%Y-%m-%d") + timedelta(days=1)
-        ).strftime("%Y-%m-%d")
-
         self.run(
-            start_date=start_date,
-            end_date=end_date,
+            start_date=execution_date,
+            end_date=execution_date,
             partition_by=partition_by,
             order_by=order_by,
             num_processors=num_processors,
