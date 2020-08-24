@@ -7,7 +7,6 @@ from pyspark.sql import functions as F
 from butterfree.configs import environment
 from butterfree.constants import DataType
 from butterfree.constants.columns import TIMESTAMP_COLUMN
-from butterfree.dataframe_service.incremental_strategy import IncrementalStrategy
 from butterfree.extract import Source
 from butterfree.extract.readers import TableReader
 from butterfree.load import Sink
@@ -136,57 +135,14 @@ class TestFeatureSetPipeline:
         mocked_date_df,
         spark_session,
         fixed_windows_output_feature_set_date_dataframe,
+        feature_set_pipeline,
     ):
         # arrange
-        table_reader_id = "b_source"
         table_reader_table = "b_table"
         create_temp_view(dataframe=mocked_date_df, name=table_reader_table)
 
         # act
-        test_pipeline = FeatureSetPipeline(
-            source=Source(
-                readers=[
-                    TableReader(
-                        id=table_reader_id, table=table_reader_table,
-                    ).with_incremental_strategy(
-                        incremental_strategy=IncrementalStrategy(column="timestamp")
-                    ),
-                ],
-                query=f"select * from {table_reader_id} ",  # noqa
-            ),
-            feature_set=FeatureSet(
-                name="feature_set",
-                entity="entity",
-                description="description",
-                features=[
-                    Feature(
-                        name="feature",
-                        description="test",
-                        transformation=SparkFunctionTransform(
-                            functions=[
-                                Function(F.avg, DataType.FLOAT),
-                                Function(F.stddev_pop, DataType.FLOAT),
-                            ],
-                        ).with_window(
-                            partition_by="id",
-                            order_by=TIMESTAMP_COLUMN,
-                            mode="fixed_windows",
-                            window_definition=["1 day"],
-                        ),
-                    ),
-                ],
-                keys=[
-                    KeyFeature(
-                        name="id",
-                        description="The user's Main ID or device ID",
-                        dtype=DataType.INTEGER,
-                    )
-                ],
-                timestamp=TimestampFeature(),
-            ),
-            sink=Sink(writers=[HistoricalFeatureStoreWriter(debug_mode=True)]),
-        )
-        test_pipeline.run(start_date="2016-04-12", end_date="2016-04-13")
+        feature_set_pipeline.run(start_date="2016-04-12", end_date="2016-04-13")
 
         df = spark_session.sql("select * from historical_feature_store__feature_set")
 
@@ -198,57 +154,14 @@ class TestFeatureSetPipeline:
         mocked_date_df,
         spark_session,
         fixed_windows_output_feature_set_date_dataframe,
+        feature_set_pipeline,
     ):
         # arrange
-        table_reader_id = "b_source"
         table_reader_table = "b_table"
         create_temp_view(dataframe=mocked_date_df, name=table_reader_table)
 
         # act
-        test_pipeline = FeatureSetPipeline(
-            source=Source(
-                readers=[
-                    TableReader(
-                        id=table_reader_id, table=table_reader_table,
-                    ).with_incremental_strategy(
-                        incremental_strategy=IncrementalStrategy(column="timestamp")
-                    ),
-                ],
-                query=f"select * from {table_reader_id} ",  # noqa
-            ),
-            feature_set=FeatureSet(
-                name="feature_set",
-                entity="entity",
-                description="description",
-                features=[
-                    Feature(
-                        name="feature",
-                        description="test",
-                        transformation=SparkFunctionTransform(
-                            functions=[
-                                Function(F.avg, DataType.FLOAT),
-                                Function(F.stddev_pop, DataType.FLOAT),
-                            ],
-                        ).with_window(
-                            partition_by="id",
-                            order_by=TIMESTAMP_COLUMN,
-                            mode="fixed_windows",
-                            window_definition=["1 day"],
-                        ),
-                    ),
-                ],
-                keys=[
-                    KeyFeature(
-                        name="id",
-                        description="The user's Main ID or device ID",
-                        dtype=DataType.INTEGER,
-                    )
-                ],
-                timestamp=TimestampFeature(),
-            ),
-            sink=Sink(writers=[HistoricalFeatureStoreWriter(debug_mode=True)]),
-        )
-        test_pipeline.run_for_date(execution_date="2016-04-12")
+        feature_set_pipeline.run_for_date(execution_date="2016-04-12")
 
         df = spark_session.sql("select * from historical_feature_store__feature_set")
 

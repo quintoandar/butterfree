@@ -1,7 +1,18 @@
 import pytest
+from pyspark.sql import functions as F
 
 from butterfree.constants import DataType
 from butterfree.constants.columns import TIMESTAMP_COLUMN
+from butterfree.dataframe_service.incremental_strategy import IncrementalStrategy
+from butterfree.extract import Source
+from butterfree.extract.readers import TableReader
+from butterfree.load import Sink
+from butterfree.load.writers import HistoricalFeatureStoreWriter
+from butterfree.pipelines.feature_set_pipeline import FeatureSetPipeline
+from butterfree.transform import FeatureSet
+from butterfree.transform.features import Feature, KeyFeature, TimestampFeature
+from butterfree.transform.transformations import SparkFunctionTransform
+from butterfree.transform.utils import Function
 
 
 @pytest.fixture()
@@ -107,3 +118,50 @@ def fixed_windows_output_feature_set_date_dataframe(spark_context, spark_session
     df = df.withColumn(TIMESTAMP_COLUMN, df.timestamp.cast(DataType.TIMESTAMP.spark))
 
     return df
+
+
+@pytest.fixture()
+def feature_set_pipeline(spark_context, spark_session):
+    feature_set_pipeline = FeatureSetPipeline(
+        source=Source(
+            readers=[
+                TableReader(id="b_source", table="b_table",).with_incremental_strategy(
+                    incremental_strategy=IncrementalStrategy(column="timestamp")
+                ),
+            ],
+            query=f"select * from b_source ",  # noqa
+        ),
+        feature_set=FeatureSet(
+            name="feature_set",
+            entity="entity",
+            description="description",
+            features=[
+                Feature(
+                    name="feature",
+                    description="test",
+                    transformation=SparkFunctionTransform(
+                        functions=[
+                            Function(F.avg, DataType.FLOAT),
+                            Function(F.stddev_pop, DataType.FLOAT),
+                        ],
+                    ).with_window(
+                        partition_by="id",
+                        order_by=TIMESTAMP_COLUMN,
+                        mode="fixed_windows",
+                        window_definition=["1 day"],
+                    ),
+                ),
+            ],
+            keys=[
+                KeyFeature(
+                    name="id",
+                    description="The user's Main ID or device ID",
+                    dtype=DataType.INTEGER,
+                )
+            ],
+            timestamp=TimestampFeature(),
+        ),
+        sink=Sink(writers=[HistoricalFeatureStoreWriter(debug_mode=True)]),
+    )
+
+    return feature_set_pipeline
