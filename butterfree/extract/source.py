@@ -60,13 +60,18 @@ class Source:
         """Construct an entry point dataframe for a feature set.
 
         This method will assemble multiple readers, by building each one and
-        querying them using a Spark SQL.
+        querying them using a Spark SQL. It's important to highlight that in
+        order to filter a dataframe regarding date boundaries, it's important
+        to define a IncrementalStrategy, otherwise your data will not be filtered.
+        Besides, both start and end dates parameters are optional.
 
         After that, there's the caching of the dataframe, however since cache()
         in Spark is lazy, an action is triggered in order to force persistence.
 
         Args:
             client: client responsible for connecting to Spark session.
+            start_date: user defined start date for filtering.
+            end_date: user defined end date for filtering.
 
         Returns:
             DataFrame with the query result against all readers.
