@@ -129,3 +129,44 @@ class TestFeatureSetPipeline:
 
         # tear down
         shutil.rmtree("test_folder")
+
+    def test_feature_set_pipeline_with_dates(
+        self,
+        mocked_date_df,
+        spark_session,
+        fixed_windows_output_feature_set_date_dataframe,
+        feature_set_pipeline,
+    ):
+        # arrange
+        table_reader_table = "b_table"
+        create_temp_view(dataframe=mocked_date_df, name=table_reader_table)
+
+        # act
+        feature_set_pipeline.run(start_date="2016-04-12", end_date="2016-04-13")
+
+        df = spark_session.sql("select * from historical_feature_store__feature_set")
+
+        # assert
+        assert_dataframe_equality(df, fixed_windows_output_feature_set_date_dataframe)
+
+    def test_feature_set_pipeline_with_execution_date(
+        self,
+        mocked_date_df,
+        spark_session,
+        fixed_windows_output_feature_set_date_dataframe,
+        feature_set_pipeline,
+    ):
+        # arrange
+        table_reader_table = "b_table"
+        create_temp_view(dataframe=mocked_date_df, name=table_reader_table)
+
+        # act
+        feature_set_pipeline.run_for_date(execution_date="2016-04-12")
+
+        df = spark_session.sql("select * from historical_feature_store__feature_set")
+        target_df = fixed_windows_output_feature_set_date_dataframe.filter(
+            "timestamp < '2016-04-13'"
+        )
+
+        # assert
+        assert_dataframe_equality(df, target_df)

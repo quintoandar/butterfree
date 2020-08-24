@@ -18,7 +18,7 @@ class TestIncrementalStrategy:
         incremental_strategy = IncrementalStrategy().from_string(
             "dt", mask="dd/MM/yyyy"
         )
-        target_expression = "to_date(dt, 'dd/MM/yyyy') >= date('2020-01-01')"
+        target_expression = "date(to_date(dt, 'dd/MM/yyyy')) >= date('2020-01-01')"
 
         # act
         result_expression = incremental_strategy.get_expression(start_date="2020-01-01")
@@ -46,7 +46,7 @@ class TestIncrementalStrategy:
     def test_get_expression_with_just_end_date(self):
         # arrange
         incremental_strategy = IncrementalStrategy(column="dt")
-        target_expression = "dt <= date('2020-01-01')"
+        target_expression = "date(dt) <= date('2020-01-01')"
 
         # act
         result_expression = incremental_strategy.get_expression(end_date="2020-01-01")
@@ -57,7 +57,9 @@ class TestIncrementalStrategy:
     def test_get_expression_with_start_and_end_date(self):
         # arrange
         incremental_strategy = IncrementalStrategy(column="dt")
-        target_expression = "dt >= date('2019-12-30') and dt <= date('2020-01-01')"
+        target_expression = (
+            "date(dt) >= date('2019-12-30') and date(dt) <= date('2020-01-01')"
+        )
 
         # act
         result_expression = incremental_strategy.get_expression(
