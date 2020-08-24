@@ -13,7 +13,7 @@ class TestPartitioning:
 
         # act
         result_values = extract_partition_values(
-            test_partitioning_input_df, patition_columns=["year", "month", "day"]
+            test_partitioning_input_df, partition_columns=["year", "month", "day"]
         )
 
         # assert
