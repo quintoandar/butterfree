@@ -51,6 +51,24 @@ class TestHookableComponent:
             hookable_component.enable_post_hooks = enable_post_hooks
 
     @pytest.mark.parametrize(
+        "pre_hooks, post_hooks",
+        [
+            ([AddHook(1)], "not a list of hooks"),
+            ([AddHook(1)], [AddHook(1), 2, 3]),
+            ("not a list of hooks", [AddHook(1)]),
+            ([AddHook(1), 2, 3], [AddHook(1)]),
+        ],
+    )
+    def test_invalid_hooks(self, pre_hooks, post_hooks):
+        # arrange
+        hookable_component = HookableComponent()
+
+        # act and assert
+        with pytest.raises(ValueError):
+            hookable_component.pre_hooks = pre_hooks
+            hookable_component.post_hooks = post_hooks
+
+    @pytest.mark.parametrize(
         "pre_hook, enable_pre_hooks, post_hook, enable_post_hooks",
         [
             (AddHook(value=1), False, AddHook(value=1), True),
