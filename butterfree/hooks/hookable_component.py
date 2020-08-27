@@ -135,9 +135,9 @@ class HookableComponent:
             dataframe after passing for all defined pre-hooks.
 
         """
-        return reduce(
-            lambda result_df, hook: hook.run(result_df), self.pre_hooks, dataframe,
-        )
+        for hook in self.pre_hooks:
+            dataframe = hook.run(dataframe)
+        return dataframe
 
     def run_post_hooks(self, dataframe: DataFrame) -> DataFrame:
         """Run all defined post-hook steps from a given dataframe.
@@ -149,6 +149,6 @@ class HookableComponent:
             dataframe after passing for all defined post-hooks.
 
         """
-        return reduce(
-            lambda result_df, hook: hook.run(result_df), self.post_hooks, dataframe,
-        )
+        for hook in self.pre_hooks:
+            dataframe = hook.run(dataframe)
+        return dataframe

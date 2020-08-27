@@ -8,8 +8,8 @@ from butterfree.testing.dataframe import assert_dataframe_equality
 class TestComponent(HookableComponent):
     def construct(self, dataframe):
         pre_hook_df = self.run_pre_hooks(dataframe)
-        construc_df = pre_hook_df.withColumn("feature", expr("feature * feature"))
-        return self.run_post_hooks(construc_df)
+        construct_df = pre_hook_df.withColumn("feature", expr("feature * feature"))
+        return self.run_post_hooks(construct_df)
 
 
 class AddHook(Hook):
