@@ -52,7 +52,8 @@ class CassandraTableSchemaCompatibilityHook(Hook):
 
         if not all([column in table_schema for column in schema]):
             raise ValueError(
-                "There's a schema incompatibility between the defined dataframe and the Cassandra table.\n"
+                "There's a schema incompatibility "
+                "between the defined dataframe and the Cassandra table.\n"
                 f"Dataframe schema = {schema}"
                 f"Target table schema = {table_schema}"
             )
