@@ -47,5 +47,5 @@ class TestCassandraTableSchemaCompatibilityHook:
         hook = CassandraTableSchemaCompatibilityHook(cassandra_client, table)
 
         # act and assert
-        with pytest.raises(ValueError, match="The dataframe has a schema incompatible"):
+        with pytest.raises(ValueError, match="There's a schema incompatibility between"):
             hook.run(input_dataframe)

@@ -1,4 +1,4 @@
-"""Spark table schema compatibility Hook definition."""
+"""Cassandra table schema compatibility Hook definition."""
 
 from pyspark.sql import DataFrame
 
@@ -52,7 +52,7 @@ class CassandraTableSchemaCompatibilityHook(Hook):
 
         if not all([column in table_schema for column in schema]):
             raise ValueError(
-                "The dataframe has a schema incompatible with the defined table.\n"
+                "There's a schema incompatibility between the defined dataframe and the Cassandra table.\n"
                 f"Dataframe schema = {schema}"
                 f"Target table schema = {table_schema}"
             )
