@@ -97,7 +97,6 @@ class Sink(HookableComponent):
             Streaming handlers for each defined writer, if writing streaming dfs.
 
         """
-
         if self.pre_hooks:
             self.run_pre_hooks(dataframe)
 
