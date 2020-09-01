@@ -5,13 +5,14 @@ from pyspark.sql.dataframe import DataFrame
 from pyspark.sql.streaming import StreamingQuery
 
 from butterfree.clients import SparkClient
+from butterfree.hooks import HookableComponent
 from butterfree.load.writers.writer import Writer
 from butterfree.transform import FeatureSet
 from butterfree.validations import BasicValidation
 from butterfree.validations.validation import Validation
 
 
-class Sink:
+class Sink(HookableComponent):
     """Define the destinations for the feature set pipeline.
 
     A Sink is created from a set of writers. The main goal of the Sink is to
@@ -26,6 +27,8 @@ class Sink:
     """
 
     def __init__(self, writers: List[Writer], validation: Validation = None):
+        super().__init__()
+        self.enable_post_hooks = False
         self.writers = writers
         self.validation = validation
 
@@ -94,6 +97,10 @@ class Sink:
             Streaming handlers for each defined writer, if writing streaming dfs.
 
         """
+
+        if self.pre_hooks:
+            self.run_pre_hooks(dataframe)
+
         self.validation.input(dataframe).check()
 
         handlers = [
@@ -102,5 +109,8 @@ class Sink:
             )
             for writer in self.writers
         ]
+
+        if self.post_hooks:
+            self.run_post_hooks(dataframe)
 
         return [handler for handler in handlers if handler]

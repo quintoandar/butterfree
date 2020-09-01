@@ -526,6 +526,8 @@ class AggregatedFeatureSet(FeatureSet):
             Spark dataframe with all the feature columns.
 
         """
+        self._start_date = start_date
+
         if end_date is None and self._windows:
             raise ValueError(
                 "When using aggregate with windows, one must give end_date."
@@ -533,6 +535,9 @@ class AggregatedFeatureSet(FeatureSet):
 
         if not isinstance(dataframe, DataFrame):
             raise ValueError("source_df must be a dataframe")
+
+        if self.pre_hooks:
+            self.run_pre_hooks(dataframe)
 
         output_df = reduce(
             lambda df, feature: feature.transform(df),
@@ -574,12 +579,15 @@ class AggregatedFeatureSet(FeatureSet):
             output_df = self._aggregate(output_df, features=self.features)
 
         output_df = self.incremental_strategy.filter_with_incremental_strategy(
-            dataframe=output_df, start_date=start_date, end_date=end_date
+            dataframe=output_df, start_date=self._start_date, end_date=end_date
         )
 
         output_df = output_df.select(*self.columns).replace(float("nan"), None)
         if not output_df.isStreaming:
             output_df = self._filter_duplicated_rows(output_df)
             output_df.cache().count()
+
+        if self.post_hooks:
+            self.run_post_hooks(output_df)
 
         return output_df

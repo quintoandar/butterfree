@@ -9,6 +9,7 @@ from pyspark.sql.dataframe import DataFrame
 
 from butterfree.clients import SparkClient
 from butterfree.constants.columns import TIMESTAMP_COLUMN
+from butterfree.hooks import HookableComponent
 from butterfree.transform.features import Feature, KeyFeature, TimestampFeature
 from butterfree.transform.transformations import (
     AggregatedTransform,
@@ -16,7 +17,7 @@ from butterfree.transform.transformations import (
 )
 
 
-class FeatureSet:
+class FeatureSet(HookableComponent):
     """Holds metadata about the feature set and constructs the final dataframe.
 
     Attributes:
@@ -97,21 +98,16 @@ class FeatureSet:
     method can be found at filter_duplicated_rows docstring.
     """
 
-    def __init__(
-        self,
-        name: str,
-        entity: str,
-        description: str,
-        keys: List[KeyFeature],
-        timestamp: TimestampFeature,
-        features: List[Feature],
-    ) -> None:
+    def __init__(self, name: str, entity: str, description: str, keys: List[KeyFeature], timestamp: TimestampFeature,
+                 features: List[Feature]) -> None:
+        super().__init__()
         self.name = name
         self.entity = entity
         self.description = description
         self.keys = keys
         self.timestamp = timestamp
         self.features = features
+        self._start_date = None
 
     @property
     def name(self) -> str:
@@ -413,8 +409,13 @@ class FeatureSet:
             Spark dataframe with all the feature columns.
 
         """
+        self._start_date = start_date
+
         if not isinstance(dataframe, DataFrame):
             raise ValueError("source_df must be a dataframe")
+
+        if self.pre_hooks:
+            self.run_pre_hooks(dataframe)
 
         output_df = reduce(
             lambda df, feature: feature.transform(df),
@@ -425,5 +426,8 @@ class FeatureSet:
         if not output_df.isStreaming:
             output_df = self._filter_duplicated_rows(output_df)
             output_df.cache().count()
+
+        if self.post_hooks:
+            self.run_post_hooks(output_df)
 
         return output_df
