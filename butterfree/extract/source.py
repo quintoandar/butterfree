@@ -87,9 +87,6 @@ class Source(HookableComponent):
 
         dataframe = client.sql(self.query)
 
-        if not dataframe.isStreaming:
-            dataframe.cache().count()
-
         if self.pre_hooks:
             self.run_pre_hooks(dataframe)
 

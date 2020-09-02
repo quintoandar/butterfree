@@ -432,7 +432,6 @@ class FeatureSet(HookableComponent):
 
         if not output_df.isStreaming:
             output_df = self._filter_duplicated_rows(output_df)
-            output_df.cache().count()
 
         if self.post_hooks:
             self.run_post_hooks(output_df)
