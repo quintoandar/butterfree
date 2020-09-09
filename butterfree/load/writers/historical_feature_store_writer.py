@@ -127,14 +127,27 @@ class HistoricalFeatureStoreWriter(Writer):
             )
             return
 
-        s3_key = os.path.join("historical", feature_set.entity, feature_set.name)
+        partition_overwrite_mode = spark_client.conn.conf.get(
+            "spark.sql.sources.partitionOverwriteMode"
+        ).lower()
 
-        spark_client.write_table(
+        if partition_overwrite_mode != "dynamic":
+            raise RuntimeError(
+                "m=load_incremental_table, "
+                "spark.sql.sources.partitionOverwriteMode={}, "
+                "msg=partitionOverwriteMode "
+                "have to be configured to 'dynamic'".format(partition_overwrite_mode)
+            )
+
+        s3_key = os.path.join("historical", feature_set.entity, feature_set.name)
+        options = {"path": self.db_config.get_options(s3_key).get("path")}
+
+        spark_client.write_dataframe(
             dataframe=dataframe,
-            database=self.database,
-            table_name=feature_set.name,
-            partition_by=self.PARTITION_BY,
-            **self.db_config.get_options(s3_key),
+            format_=self.db_config.format_,
+            mode=self.db_config.mode,
+            **options,
+            partitionBy=self.PARTITION_BY,
         )
 
     def _assert_validation_count(self, table_name, written_count, dataframe_count):
