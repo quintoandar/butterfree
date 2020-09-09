@@ -216,31 +216,3 @@ class TestHistoricalFeatureStoreWriter:
         # act and assert
         with pytest.raises(AssertionError):
             writer._assert_validation_count("table", written_count, dataframe_count)
-
-    def test_write_in_incremental_mode(
-        self,
-        feature_set_dataframe,
-        historical_feature_set_dataframe,
-        feature_set_incremental,
-        mocker,
-        spark_session,
-    ):
-        # given
-        # spark_client = mocker.stub("spark_client")
-        # spark_client.conn = mocker.stub("conn")
-        # spark_client.conn.conf = mocker.stub("conf")
-        spark_client = SparkClient()
-        spark_client.write_dataframe = mocker.stub("write_dataframe")
-        writer = HistoricalFeatureStoreWriter()
-        feature_set_incremental._start_date = "2019-12-31"
-
-        # when
-        writer.write(
-            feature_set=feature_set_incremental,
-            dataframe=feature_set_dataframe,
-            spark_client=spark_client,
-        )
-        result_df = spark_client.write_dataframe.call_args[1]["dataframe"]
-
-        # then
-        assert_dataframe_equality(historical_feature_set_dataframe, result_df)
