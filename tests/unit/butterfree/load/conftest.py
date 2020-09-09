@@ -33,31 +33,6 @@ def feature_set():
 
 
 @fixture
-def feature_set_incremental():
-    key_features = [
-        KeyFeature(name="id", description="Description", dtype=DataType.INTEGER)
-    ]
-    ts_feature = TimestampFeature(from_column=TIMESTAMP_COLUMN)
-    features = [
-        Feature(
-            name="feature",
-            description="test",
-            transformation=AggregatedTransform(
-                functions=[Function(functions.sum, DataType.INTEGER)]
-            ),
-        ),
-    ]
-    return AggregatedFeatureSet(
-        "feature_set",
-        "entity",
-        "description",
-        keys=key_features,
-        timestamp=ts_feature,
-        features=features,
-    )
-
-
-@fixture
 def feature_set_dataframe(spark_context, spark_session):
     data = [
         {"id": 1, TIMESTAMP_COLUMN: "2019-12-31", "feature": 100},
