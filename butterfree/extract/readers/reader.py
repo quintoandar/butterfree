@@ -109,9 +109,9 @@ class Reader(ABC, HookableComponent):
                 transformed_df, start_date, end_date
             )
 
-        self.run_post_hooks(transformed_df)
+        post_hook_df = self.run_post_hooks(transformed_df)
 
-        transformed_df.createOrReplaceTempView(self.id)
+        post_hook_df.createOrReplaceTempView(self.id)
 
     def _select_columns(self, columns: List[str], client: SparkClient) -> DataFrame:
         df = self.consume(client)

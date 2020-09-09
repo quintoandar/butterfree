@@ -526,8 +526,6 @@ class AggregatedFeatureSet(FeatureSet):
             Spark dataframe with all the feature columns.
 
         """
-        self._start_date = start_date
-
         if end_date is None and self._windows:
             raise ValueError(
                 "When using aggregate with windows, one must give end_date."
@@ -536,12 +534,12 @@ class AggregatedFeatureSet(FeatureSet):
         if not isinstance(dataframe, DataFrame):
             raise ValueError("source_df must be a dataframe")
 
-        self.run_pre_hooks(dataframe)
+        pre_hook_df = self.run_pre_hooks(dataframe)
 
         output_df = reduce(
             lambda df, feature: feature.transform(df),
             self.keys + [self.timestamp],
-            dataframe,
+            pre_hook_df,
         )
 
         if self._windows:
@@ -586,6 +584,6 @@ class AggregatedFeatureSet(FeatureSet):
             output_df = self._filter_duplicated_rows(output_df)
             output_df.cache().count()
 
-        self.run_post_hooks(output_df)
+        post_hook_df = self.run_post_hooks(output_df)
 
-        return output_df
+        return post_hook_df
