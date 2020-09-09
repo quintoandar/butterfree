@@ -24,6 +24,7 @@ class Reader(ABC, HookableComponent):
     """
 
     def __init__(self, id: str, incremental_strategy: IncrementalStrategy = None):
+        super().__init__()
         self.id = id
         self.transformations = []
         self.incremental_strategy = incremental_strategy

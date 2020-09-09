@@ -17,6 +17,9 @@ class Writer(ABC, HookableComponent):
 
     """
 
+    def __init__(self):
+        super().__init__()
+
     @abstractmethod
     def write(
         self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient,

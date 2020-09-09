@@ -536,8 +536,7 @@ class AggregatedFeatureSet(FeatureSet):
         if not isinstance(dataframe, DataFrame):
             raise ValueError("source_df must be a dataframe")
 
-        if self.pre_hooks:
-            self.run_pre_hooks(dataframe)
+        self.run_pre_hooks(dataframe)
 
         output_df = reduce(
             lambda df, feature: feature.transform(df),
@@ -587,7 +586,6 @@ class AggregatedFeatureSet(FeatureSet):
             output_df = self._filter_duplicated_rows(output_df)
             output_df.cache().count()
 
-        if self.post_hooks:
-            self.run_post_hooks(output_df)
+        self.run_post_hooks(output_df)
 
         return output_df
