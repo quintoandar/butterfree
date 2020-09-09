@@ -5,10 +5,11 @@ from abc import ABC, abstractmethod
 from pyspark.sql.dataframe import DataFrame
 
 from butterfree.clients import SparkClient
+from butterfree.hooks import HookableComponent
 from butterfree.transform import FeatureSet
 
 
-class Writer(ABC):
+class Writer(ABC, HookableComponent):
     """Abstract base class for Writers.
 
     Args:

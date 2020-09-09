@@ -90,10 +90,6 @@ class Source(HookableComponent):
         if not dataframe.isStreaming:
             dataframe.cache().count()
 
-        if self.pre_hooks:
-            self.run_pre_hooks(dataframe)
-
-        if self.post_hooks:
-            self.run_post_hooks(dataframe)
+        self.run_post_hooks(dataframe)
 
         return dataframe
