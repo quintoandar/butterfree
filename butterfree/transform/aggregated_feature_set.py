@@ -576,7 +576,7 @@ class AggregatedFeatureSet(FeatureSet):
             output_df = self._aggregate(output_df, features=self.features)
 
         output_df = self.incremental_strategy.filter_with_incremental_strategy(
-            dataframe=output_df, start_date=self._start_date, end_date=end_date
+            dataframe=output_df, start_date=start_date, end_date=end_date
         )
 
         output_df = output_df.select(*self.columns).replace(float("nan"), None)
