@@ -9,6 +9,7 @@ from pyspark.sql.dataframe import DataFrame
 
 from butterfree.clients import SparkClient
 from butterfree.constants.columns import TIMESTAMP_COLUMN
+from butterfree.hooks import HookableComponent
 from butterfree.transform.features import Feature, KeyFeature, TimestampFeature
 from butterfree.transform.transformations import (
     AggregatedTransform,
@@ -16,7 +17,7 @@ from butterfree.transform.transformations import (
 )
 
 
-class FeatureSet:
+class FeatureSet(HookableComponent):
     """Holds metadata about the feature set and constructs the final dataframe.
 
     Attributes:
@@ -106,6 +107,7 @@ class FeatureSet:
         timestamp: TimestampFeature,
         features: List[Feature],
     ) -> None:
+        super().__init__()
         self.name = name
         self.entity = entity
         self.description = description
@@ -416,13 +418,17 @@ class FeatureSet:
         if not isinstance(dataframe, DataFrame):
             raise ValueError("source_df must be a dataframe")
 
+        pre_hook_df = self.run_pre_hooks(dataframe)
+
         output_df = reduce(
             lambda df, feature: feature.transform(df),
             self.keys + [self.timestamp] + self.features,
-            dataframe,
+            pre_hook_df,
         ).select(*self.columns)
 
         if not output_df.isStreaming:
             output_df = self._filter_duplicated_rows(output_df)
 
-        return output_df
+        post_hook_df = self.run_post_hooks(output_df)
+
+        return post_hook_df

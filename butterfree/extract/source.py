@@ -6,9 +6,10 @@ from pyspark.sql import DataFrame
 
 from butterfree.clients import SparkClient
 from butterfree.extract.readers.reader import Reader
+from butterfree.hooks import HookableComponent
 
 
-class Source:
+class Source(HookableComponent):
     """The definition of the the entry point data for the ETL pipeline.
 
     A FeatureSet (the next step in the pipeline) expects a single dataframe as
@@ -51,6 +52,8 @@ class Source:
     """
 
     def __init__(self, readers: List[Reader], query: str) -> None:
+        super().__init__()
+        self.enable_pre_hooks = False
         self.readers = readers
         self.query = query
 
@@ -84,4 +87,6 @@ class Source:
 
         dataframe = client.sql(self.query)
 
-        return dataframe
+        post_hook_df = self.run_post_hooks(dataframe)
+
+        return post_hook_df

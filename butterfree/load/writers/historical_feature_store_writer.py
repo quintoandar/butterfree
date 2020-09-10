@@ -128,6 +128,7 @@ class HistoricalFeatureStoreWriter(Writer):
             return
 
         s3_key = os.path.join("historical", feature_set.entity, feature_set.name)
+
         spark_client.write_table(
             dataframe=dataframe,
             database=self.database,
