@@ -10,9 +10,10 @@ from pyspark.sql import DataFrame
 
 from butterfree.clients import SparkClient
 from butterfree.dataframe_service.incremental_strategy import IncrementalStrategy
+from butterfree.hooks import HookableComponent
 
 
-class Reader(ABC):
+class Reader(ABC, HookableComponent):
     """Abstract base class for Readers.
 
     Attributes:
@@ -23,6 +24,7 @@ class Reader(ABC):
     """
 
     def __init__(self, id: str, incremental_strategy: IncrementalStrategy = None):
+        super().__init__()
         self.id = id
         self.transformations = []
         self.incremental_strategy = incremental_strategy
@@ -106,7 +108,10 @@ class Reader(ABC):
             transformed_df = self.incremental_strategy.filter_with_incremental_strategy(
                 transformed_df, start_date, end_date
             )
-        transformed_df.createOrReplaceTempView(self.id)
+
+        post_hook_df = self.run_post_hooks(transformed_df)
+
+        post_hook_df.createOrReplaceTempView(self.id)
 
     def _select_columns(self, columns: List[str], client: SparkClient) -> DataFrame:
         df = self.consume(client)
