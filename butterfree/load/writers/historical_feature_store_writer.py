@@ -177,11 +177,17 @@ class HistoricalFeatureStoreWriter(Writer):
 
         """
         table_name = (
-            f"{self.database}.{feature_set.name}"
+            f"{feature_set.name}"
             if not self.debug_mode
             else f"historical_feature_store__{feature_set.name}"
         )
-        written_count = spark_client.read_table(table_name).count()
+        written_count = (
+            spark_client.read(
+                self.db_config.format_, options=self.db_config.get_options(table_name)
+            ).count()
+            if not self.debug_mode
+            else spark_client.read_table(table_name).count()
+        )
         dataframe_count = dataframe.count()
         self._assert_validation_count(table_name, written_count, dataframe_count)
 

@@ -45,7 +45,7 @@ class TestHistoricalFeatureStoreWriter:
         )
         assert (
             writer.PARTITION_BY
-            == spark_client.write_dataframe.call_args[1]["partition_by"]
+            == spark_client.write_dataframe.call_args[1]["partitionBy"]
         )
 
     def test_write_invalid_partition_mode(
@@ -94,8 +94,8 @@ class TestHistoricalFeatureStoreWriter:
     def test_validate(self, feature_set_dataframe, mocker, feature_set):
         # given
         spark_client = mocker.stub("spark_client")
-        spark_client.read_table = mocker.stub("read_table")
-        spark_client.read_table.return_value = feature_set_dataframe
+        spark_client.read = mocker.stub("read")
+        spark_client.read.return_value = feature_set_dataframe
 
         writer = HistoricalFeatureStoreWriter()
 
@@ -103,15 +103,15 @@ class TestHistoricalFeatureStoreWriter:
         writer.validate(feature_set, feature_set_dataframe, spark_client)
 
         # then
-        spark_client.read_table.assert_called_once()
+        spark_client.read.assert_called_once()
 
     def test_validate_false(self, feature_set_dataframe, mocker, feature_set):
         # given
         spark_client = mocker.stub("spark_client")
-        spark_client.read_table = mocker.stub("read_table")
+        spark_client.read = mocker.stub("read")
 
         # limiting df to 1 row, now the counts should'n be the same
-        spark_client.read_table.return_value = feature_set_dataframe.limit(1)
+        spark_client.read.return_value = feature_set_dataframe.limit(1)
 
         writer = HistoricalFeatureStoreWriter()
 
