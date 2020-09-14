@@ -10,6 +10,7 @@ from pyspark.sql.streaming import StreamingQuery
 from butterfree.clients import SparkClient
 from butterfree.configs.db import CassandraConfig
 from butterfree.constants.columns import TIMESTAMP_COLUMN
+from butterfree.hooks.schema_compatibility import CassandraTableSchemaCompatibilityHook
 from butterfree.load.writers.writer import Writer
 from butterfree.transform import FeatureSet
 
@@ -71,9 +72,10 @@ class OnlineFeatureStoreWriter(Writer):
     __name__ = "Online Feature Store Writer"
 
     def __init__(self, db_config=None, debug_mode: bool = False, write_to_entity=False):
+        super().__init__(debug_mode)
         self.db_config = db_config or CassandraConfig()
-        self.debug_mode = debug_mode
         self.write_to_entity = write_to_entity
+        self.pre_hooks = [CassandraTableSchemaCompatibilityHook]
 
     @staticmethod
     def filter_latest(dataframe: DataFrame, id_columns: List[Any]) -> DataFrame:
@@ -165,12 +167,6 @@ class OnlineFeatureStoreWriter(Writer):
         table_name = feature_set.entity if self.write_to_entity else feature_set.name
 
         if dataframe.isStreaming:
-            if self.debug_mode:
-                return self._write_in_debug_mode(
-                    table_name=table_name,
-                    dataframe=dataframe,
-                    spark_client=spark_client,
-                )
             return self._write_stream(
                 feature_set=feature_set,
                 dataframe=dataframe,
@@ -181,11 +177,6 @@ class OnlineFeatureStoreWriter(Writer):
         latest_df = self.filter_latest(
             dataframe=dataframe, id_columns=feature_set.keys_columns
         )
-
-        if self.debug_mode:
-            return self._write_in_debug_mode(
-                table_name=table_name, dataframe=latest_df, spark_client=spark_client
-            )
 
         return spark_client.write_dataframe(
             dataframe=latest_df,
