@@ -10,7 +10,7 @@ from butterfree.configs import environment
 from butterfree.configs.db import S3Config
 from butterfree.constants import columns
 from butterfree.constants.spark_constants import DEFAULT_NUM_PARTITIONS
-from butterfree.dataframe_service import repartition_df, extract_partition_values
+from butterfree.dataframe_service import extract_partition_values, repartition_df
 from butterfree.hooks.schema_compatibility import SparkTableSchemaCompatibilityHook
 from butterfree.load.writers.writer import Writer
 from butterfree.transform import FeatureSet
@@ -95,8 +95,14 @@ class HistoricalFeatureStoreWriter(Writer):
 
     __name__ = "Historical Feature Store Writer"
 
-    def __init__(self, db_config=None, database=None, num_partitions=None,
-                 validation_threshold: float = DEFAULT_VALIDATION_THRESHOLD, debug_mode: bool = False):
+    def __init__(
+        self,
+        db_config=None,
+        database=None,
+        num_partitions=None,
+        validation_threshold: float = DEFAULT_VALIDATION_THRESHOLD,
+        debug_mode: bool = False,
+    ):
         super().__init__(debug_mode)
         self.db_config = db_config or S3Config()
         self.database = database or environment.get_variable(
@@ -120,7 +126,9 @@ class HistoricalFeatureStoreWriter(Writer):
         to the real historical feature store.
 
         """
-        self.add_pre_hook(SparkTableSchemaCompatibilityHook(spark_client, feature_set.name))
+        self.add_pre_hook(
+            SparkTableSchemaCompatibilityHook(spark_client, feature_set.name)
+        )
 
         dataframe = self._create_partitions(dataframe)
 
@@ -149,7 +157,9 @@ class HistoricalFeatureStoreWriter(Writer):
 
         partition_values = extract_partition_values(dataframe, self.PARTITION_BY)
 
-        spark_client.add_table_partitions(partition_values, feature_set.name, self.database)
+        spark_client.add_table_partitions(
+            partition_values, feature_set.name, self.database
+        )
 
     def _assert_validation_count(self, table_name, written_count, dataframe_count):
         lower_bound = (1 - self.validation_threshold) * written_count

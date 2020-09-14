@@ -3,10 +3,13 @@ from butterfree.load.writers import HistoricalFeatureStoreWriter
 
 
 class TestWriter:
-    def test_build(self, feature_set_dataframe,
+    def test_build(
+        self,
+        feature_set_dataframe,
         historical_feature_set_dataframe,
         mocker,
-        feature_set,):
+        feature_set,
+    ):
         # arrange
         spark_client = SparkClient()
         spark_client.conn.conf.set(

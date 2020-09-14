@@ -65,10 +65,9 @@ class Writer(ABC, HookableComponent):
         is a defined `IncrementalStrategy` on the `Reader`.
 
         Args:
-            client: client responsible for connecting to Spark session.
-            columns: list of tuples for selecting/renaming columns on the df.
-            start_date: lower bound to use in the filter expression.
-            end_date: upper bound to use in the filter expression.
+            feature_set: object processed with feature set metadata.
+            dataframe: Spark dataframe containing data from a feature set.
+            spark_client: client for Spark connections with external services.
 
         """
         pre_hook_df = self.run_pre_hooks(dataframe)
@@ -81,7 +80,5 @@ class Writer(ABC, HookableComponent):
             return
 
         self.write(
-            feature_set=feature_set,
-            dataframe=pre_hook_df,
-            spark_client=spark_client,
+            feature_set=feature_set, dataframe=pre_hook_df, spark_client=spark_client,
         )
