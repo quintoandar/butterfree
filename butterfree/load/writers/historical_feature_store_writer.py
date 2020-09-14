@@ -71,9 +71,16 @@ class HistoricalFeatureStoreWriter(Writer):
         Both methods (write and validate) will need the Spark Client, Feature Set
         and DataFrame, to write or to validate, according to the Writer's arguments.
 
-        P.S.: When writing, the HistoricalFeatureStoreWrite partitions the data to
+        P.S.(1): When writing, the HistoricalFeatureStoreWrite partitions the data to
         improve queries performance. The data is stored in partition folders in AWS S3
         based on time (per year, month and day).
+
+        P.S.(2): HistoricalFeatureStoreWrite use Dynamic Partition Inserts,
+        the behaviour of OVERWRITE keyword is controlled by
+        spark.sql.sources.partitionOverwriteMode configuration property.
+        The dynamic overwrite mode is enabled Spark will only delete the
+        partitions for which it has data to be written to.
+        All the other partitions remain intact.
 
     """
 
@@ -127,14 +134,27 @@ class HistoricalFeatureStoreWriter(Writer):
             )
             return
 
-        s3_key = os.path.join("historical", feature_set.entity, feature_set.name)
+        partition_overwrite_mode = spark_client.conn.conf.get(
+            "spark.sql.sources.partitionOverwriteMode"
+        ).lower()
 
-        spark_client.write_table(
+        if partition_overwrite_mode != "dynamic":
+            raise RuntimeError(
+                "m=load_incremental, "
+                "spark.sql.sources.partitionOverwriteMode={}, "
+                "msg=partitionOverwriteMode "
+                "have to be configured to 'dynamic'".format(partition_overwrite_mode)
+            )
+
+        s3_key = os.path.join("historical", feature_set.entity, feature_set.name)
+        options = {"path": self.db_config.get_options(s3_key).get("path")}
+
+        spark_client.write_dataframe(
             dataframe=dataframe,
-            database=self.database,
-            table_name=feature_set.name,
-            partition_by=self.PARTITION_BY,
-            **self.db_config.get_options(s3_key),
+            format_=self.db_config.format_,
+            mode=self.db_config.mode,
+            **options,
+            partitionBy=self.PARTITION_BY,
         )
 
     def _assert_validation_count(self, table_name, written_count, dataframe_count):
@@ -164,11 +184,17 @@ class HistoricalFeatureStoreWriter(Writer):
 
         """
         table_name = (
-            f"{self.database}.{feature_set.name}"
+            f"{feature_set.name}"
             if not self.debug_mode
             else f"historical_feature_store__{feature_set.name}"
         )
-        written_count = spark_client.read_table(table_name).count()
+        written_count = (
+            spark_client.read(
+                self.db_config.format_, options=self.db_config.get_options(table_name)
+            ).count()
+            if not self.debug_mode
+            else spark_client.read_table(table_name).count()
+        )
         dataframe_count = dataframe.count()
         self._assert_validation_count(table_name, written_count, dataframe_count)
 

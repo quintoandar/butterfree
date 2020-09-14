@@ -4,6 +4,7 @@ from unittest.mock import Mock
 from pyspark.sql import DataFrame
 from pyspark.sql import functions as F
 
+from butterfree.clients import SparkClient
 from butterfree.configs import environment
 from butterfree.constants import DataType
 from butterfree.constants.columns import TIMESTAMP_COLUMN
@@ -53,13 +54,17 @@ class TestFeatureSetPipeline:
             table_reader_db=table_reader_db,
             table_reader_table=table_reader_table,
         )
+
+        spark_client = SparkClient()
+        spark_client.conn.conf.set(
+            "spark.sql.sources.partitionOverwriteMode", "dynamic"
+        )
+
         dbconfig = Mock()
+        dbconfig.mode = "overwrite"
+        dbconfig.format_ = "parquet"
         dbconfig.get_options = Mock(
-            return_value={
-                "mode": "overwrite",
-                "format_": "parquet",
-                "path": "test_folder/historical/entity/feature_set",
-            }
+            return_value={"path": "test_folder/historical/entity/feature_set"}
         )
 
         # act
