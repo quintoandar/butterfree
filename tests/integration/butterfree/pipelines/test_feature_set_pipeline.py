@@ -10,14 +10,27 @@ from butterfree.constants import DataType
 from butterfree.constants.columns import TIMESTAMP_COLUMN
 from butterfree.extract import Source
 from butterfree.extract.readers import TableReader
+from butterfree.hooks import Hook
 from butterfree.load import Sink
 from butterfree.load.writers import HistoricalFeatureStoreWriter
 from butterfree.pipelines.feature_set_pipeline import FeatureSetPipeline
 from butterfree.testing.dataframe import assert_dataframe_equality
 from butterfree.transform import FeatureSet
 from butterfree.transform.features import Feature, KeyFeature, TimestampFeature
-from butterfree.transform.transformations import CustomTransform, SparkFunctionTransform
+from butterfree.transform.transformations import (
+    CustomTransform,
+    SparkFunctionTransform,
+    SQLExpressionTransform,
+)
 from butterfree.transform.utils import Function
+
+
+class AddHook(Hook):
+    def __init__(self, value):
+        self.value = value
+
+    def run(self, dataframe):
+        return dataframe.withColumn("feature", F.expr(f"feature + {self.value}"))
 
 
 def create_temp_view(dataframe: DataFrame, name):
@@ -215,3 +228,61 @@ class TestFeatureSetPipeline:
 
         # assert
         assert_dataframe_equality(df, target_df)
+
+    def test_pipeline_with_hooks(self, spark_session, mocked_df):
+        # arrange
+        hook1 = AddHook(value=1)
+
+        spark_session.sql(
+            "select 1 as id, timestamp('2020-01-01') as timestamp, 0 as feature"
+        ).createOrReplaceTempView("test")
+
+        test_pipeline = FeatureSetPipeline(
+            source=Source(
+                readers=[TableReader(id="reader", table="test",).add_post_hook(hook1)],
+                query="select * from reader",
+            ).add_post_hook(hook1),
+            feature_set=FeatureSet(
+                name="feature_set",
+                entity="entity",
+                description="description",
+                features=[
+                    Feature(
+                        name="feature",
+                        description="test",
+                        transformation=SQLExpressionTransform(expression="feature + 1"),
+                        dtype=DataType.INTEGER,
+                    ),
+                ],
+                keys=[
+                    KeyFeature(
+                        name="id",
+                        description="The user's Main ID or device ID",
+                        dtype=DataType.INTEGER,
+                    )
+                ],
+                timestamp=TimestampFeature(),
+            )
+            .add_pre_hook(hook1)
+            .add_post_hook(hook1),
+            sink=Sink(
+                writers=[
+                    HistoricalFeatureStoreWriter(
+                        debug_mode=True
+                    )  # .add_pre_hook(hook1)
+                ],
+            ).add_pre_hook(hook1),
+        )
+
+        target_df = spark_session.sql(
+            "select 1 as id, timestamp('2020-01-01') as timestamp, 6 as feature, 2020"
+            "as year, 1 as month, 1 as day"
+        )
+
+        # act
+        test_pipeline.run()
+        output_df = spark_session.table("historical_feature_store__feature_set")
+
+        # assert
+        output_df.show()
+        assert_dataframe_equality(output_df, target_df)
