@@ -1,9 +1,10 @@
 import pytest
 
 from butterfree.constants import DataType
+from butterfree.testing.dataframe import assert_dataframe_equality
 from butterfree.transform.features import Feature
 from butterfree.transform.transformations import SQLExpressionTransform
-from butterfree.testing.dataframe import assert_dataframe_equality
+
 
 class TestSQLExpressionTransform:
     def test_feature_transform(self, feature_set_dataframe):
