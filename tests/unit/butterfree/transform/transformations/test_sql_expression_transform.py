@@ -1,6 +1,7 @@
 import pytest
 
 from butterfree.constants import DataType
+from butterfree.testing.dataframe import assert_dataframe_equality
 from butterfree.transform.features import Feature
 from butterfree.transform.transformations import SQLExpressionTransform
 
@@ -69,3 +70,20 @@ class TestSQLExpressionTransform:
             )
 
             test_feature.transform(feature_set_dataframe).collect()
+
+    def test_overwriting_column(self, spark_session):
+        # arrange
+        input_df = spark_session.sql("select 0 as feature")
+        feature_with_same_name = Feature(
+            name="feature",
+            description="description",
+            dtype=DataType.INTEGER,
+            transformation=SQLExpressionTransform(expression="feature + 1"),
+        )
+        target_df = spark_session.sql("select 1 as feature")
+
+        # act
+        output_df = feature_with_same_name.transform(input_df)
+
+        # assert
+        assert_dataframe_equality(output_df, target_df)

@@ -4,6 +4,7 @@ from typing import List
 
 from parameters_validation import non_blank
 from pyspark.sql import DataFrame
+from pyspark.sql.functions import expr
 
 from butterfree.transform.transformations.transform_component import TransformComponent
 
@@ -72,9 +73,4 @@ class SQLExpressionTransform(TransformComponent):
             Transformed dataframe.
 
         """
-        try:
-            return dataframe.selectExpr(
-                f"*", f"{self.expression} as {self._parent.name}"
-            )
-        except Exception as e:
-            raise e
+        return dataframe.withColumn(self._parent.name, expr(self.expression))
