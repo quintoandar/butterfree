@@ -1,8 +1,10 @@
 """Writer entity."""
 
 from abc import ABC, abstractmethod
+from typing import Optional
 
 from pyspark.sql.dataframe import DataFrame
+from pyspark.sql.streaming import StreamingQuery
 
 from butterfree.clients import SparkClient
 from butterfree.hooks import HookableComponent
@@ -19,6 +21,7 @@ class Writer(ABC, HookableComponent):
 
     def __init__(self, debug_mode: bool = False):
         super().__init__()
+        self.enable_post_hooks = False
         self.debug_mode = debug_mode
 
     @abstractmethod
@@ -54,7 +57,7 @@ class Writer(ABC, HookableComponent):
 
     def build(
         self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient,
-    ):
+    ) -> Optional[StreamingQuery]:
         """Register the data got from the reader in the Spark metastore.
 
         Create a temporary view in Spark metastore referencing the data
@@ -73,12 +76,21 @@ class Writer(ABC, HookableComponent):
         pre_hook_df = self.run_pre_hooks(dataframe)
 
         if self.debug_mode:
-            spark_client.create_temporary_view(
-                dataframe=dataframe,
-                name=f"historical_feature_store__{feature_set.name}",
+            return self._write_in_debug_mode(
+                table_name=f"{feature_set.name}",
+                dataframe=pre_hook_df,
+                spark_client=spark_client,
             )
-            return
 
         self.write(
             feature_set=feature_set, dataframe=pre_hook_df, spark_client=spark_client,
+        )
+
+    @staticmethod
+    def _write_in_debug_mode(
+        table_name: str, dataframe: DataFrame, spark_client: SparkClient
+    ) -> Optional[StreamingQuery]:
+        """Creates a temporary table instead of writing to the real feature store."""
+        return spark_client.create_temporary_view(
+            dataframe=dataframe, name=f"{table_name}"
         )

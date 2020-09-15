@@ -11,7 +11,6 @@ from butterfree.configs.db import S3Config
 from butterfree.constants import columns
 from butterfree.constants.spark_constants import DEFAULT_NUM_PARTITIONS
 from butterfree.dataframe_service import extract_partition_values, repartition_df
-from butterfree.hooks.schema_compatibility import SparkTableSchemaCompatibilityHook
 from butterfree.load.writers.writer import Writer
 from butterfree.transform import FeatureSet
 
@@ -126,10 +125,9 @@ class HistoricalFeatureStoreWriter(Writer):
         to the real historical feature store.
 
         """
-        self.add_pre_hook(
-            SparkTableSchemaCompatibilityHook(spark_client, feature_set.name)
-        )
-
+        # self.add_pre_hook(
+        #     SparkTableSchemaCompatibilityHook(spark_client, feature_set.name)
+        # )
         dataframe = self._create_partitions(dataframe)
 
         partition_overwrite_mode = spark_client.conn.conf.get(

@@ -10,7 +10,6 @@ from pyspark.sql.streaming import StreamingQuery
 from butterfree.clients import SparkClient
 from butterfree.configs.db import CassandraConfig
 from butterfree.constants.columns import TIMESTAMP_COLUMN
-from butterfree.hooks.schema_compatibility import CassandraTableSchemaCompatibilityHook
 from butterfree.load.writers.writer import Writer
 from butterfree.transform import FeatureSet
 
@@ -75,7 +74,6 @@ class OnlineFeatureStoreWriter(Writer):
         super().__init__(debug_mode)
         self.db_config = db_config or CassandraConfig()
         self.write_to_entity = write_to_entity
-        self.pre_hooks = [CassandraTableSchemaCompatibilityHook]
 
     @staticmethod
     def filter_latest(dataframe: DataFrame, id_columns: List[Any]) -> DataFrame:
@@ -135,15 +133,6 @@ class OnlineFeatureStoreWriter(Writer):
             **self.db_config.get_options(table=table_name),
         )
         return streaming_handler
-
-    @staticmethod
-    def _write_in_debug_mode(
-        table_name: str, dataframe: DataFrame, spark_client: SparkClient
-    ) -> Optional[StreamingQuery]:
-        """Creates a temporary table instead of writing to the real feature store."""
-        return spark_client.create_temporary_view(
-            dataframe=dataframe, name=f"online_feature_store__{table_name}"
-        )
 
     def write(
         self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient,

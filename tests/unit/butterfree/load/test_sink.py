@@ -72,7 +72,7 @@ class TestSink:
         ]
 
         for w in writer:
-            w.write = mocker.stub("write")
+            w.build = mocker.stub("build")
 
         feature_set = mocker.stub("feature_set")
         feature_set.entity = "house"
@@ -88,7 +88,7 @@ class TestSink:
 
         # then
         for w in writer:
-            w.write.assert_called_once()
+            w.build.assert_called_once()
 
     def test_flush_with_invalid_df(self, not_feature_set_dataframe, mocker):
         # given
@@ -120,31 +120,15 @@ class TestSink:
         with pytest.raises(ValueError):
             Sink(writers=writer)
 
-    def test_flush_streaming_df(self, feature_set):
+    def test_flush_streaming_df(
+        self, feature_set, mocked_stream_df, online_feature_store_writer_stream
+    ):
         """Testing the return of the streaming handlers by the sink."""
         # arrange
         spark_client = SparkClient()
 
-        mocked_stream_df = Mock()
-        mocked_stream_df.isStreaming = True
-        mocked_stream_df.writeStream = mocked_stream_df
-        mocked_stream_df.trigger.return_value = mocked_stream_df
-        mocked_stream_df.outputMode.return_value = mocked_stream_df
-        mocked_stream_df.outputMode.return_value = mocked_stream_df
-        mocked_stream_df.option.return_value = mocked_stream_df
-        mocked_stream_df.foreachBatch.return_value = mocked_stream_df
-        mocked_stream_df.start.return_value = Mock(spec=StreamingQuery)
-
-        online_feature_store_writer = OnlineFeatureStoreWriter()
-        online_feature_store_writer_on_entity = OnlineFeatureStoreWriter(
-            write_to_entity=True
-        )
-
         sink = Sink(
-            writers=[
-                online_feature_store_writer,
-                online_feature_store_writer_on_entity,
-            ],
+            writers=[online_feature_store_writer_stream],
             validation=Mock(spec=BasicValidation),
         )
 
@@ -173,9 +157,13 @@ class TestSink:
         feature_set.name = "my_feature_set"
 
         online_feature_store_writer = OnlineFeatureStoreWriter()
+        online_feature_store_writer.run_pre_hooks = Mock()
+        online_feature_store_writer.run_pre_hooks.return_value = feature_set_dataframe
         online_feature_store_writer_on_entity = OnlineFeatureStoreWriter(
             write_to_entity=True
         )
+        online_feature_store_writer_on_entity.run_pre_hooks = Mock()
+        online_feature_store_writer_on_entity.run_pre_hooks.return_value = feature_set_dataframe
 
         sink = Sink(
             writers=[online_feature_store_writer, online_feature_store_writer_on_entity]
@@ -200,5 +188,5 @@ class TestSink:
             dataframe=ANY,
             format_=ANY,
             mode=ANY,
-            **online_feature_store_writer.db_config.get_options(table="my_feature_set"),
+            **online_feature_store_writer_on_entity.db_config.get_options(table="my_feature_set"),
         )

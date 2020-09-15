@@ -16,13 +16,16 @@ class TestHistoricalFeatureStoreWriter:
         historical_feature_set_dataframe,
         mocker,
         feature_set,
+        spark_session,
     ):
         # given
         spark_client = SparkClient()
         spark_client.write_dataframe = mocker.stub("write_dataframe")
+        spark_client.add_table_partitions = mocker.stub("add_table_partitions")
         spark_client.conn.conf.set(
             "spark.sql.sources.partitionOverwriteMode", "dynamic"
         )
+
         writer = HistoricalFeatureStoreWriter()
 
         # when
@@ -68,28 +71,6 @@ class TestHistoricalFeatureStoreWriter:
                 dataframe=feature_set_dataframe,
                 spark_client=spark_client,
             )
-
-    def test_write_in_debug_mode(
-        self,
-        feature_set_dataframe,
-        historical_feature_set_dataframe,
-        feature_set,
-        spark_session,
-    ):
-        # given
-        spark_client = SparkClient()
-        writer = HistoricalFeatureStoreWriter(debug_mode=True)
-
-        # when
-        writer.write(
-            feature_set=feature_set,
-            dataframe=feature_set_dataframe,
-            spark_client=spark_client,
-        )
-        result_df = spark_session.table(f"historical_feature_store__{feature_set.name}")
-
-        # then
-        assert_dataframe_equality(historical_feature_set_dataframe, result_df)
 
     def test_validate(self, feature_set_dataframe, mocker, feature_set):
         # given

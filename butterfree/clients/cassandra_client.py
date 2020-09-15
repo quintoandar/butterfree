@@ -42,12 +42,12 @@ class CassandraClient(AbstractClient):
     def __init__(
         self,
         cassandra_host: List[str],
-        cassandra_key_space: str,
+        cassandra_keyspace: str,
         cassandra_user: Optional[str] = None,
         cassandra_password: Optional[str] = None,
     ) -> None:
         self.cassandra_host = cassandra_host
-        self.cassandra_key_space = cassandra_key_space
+        self.cassandra_keyspace = cassandra_keyspace
         self.cassandra_user = cassandra_user
         self.cassandra_password = cassandra_password
         self._session: Optional[Session] = None
@@ -78,7 +78,7 @@ class CassandraClient(AbstractClient):
             ssl_options=ssl_opts,
             load_balancing_policy=RoundRobinPolicy(),
         )
-        self._session = cluster.connect(self.cassandra_key_space)
+        self._session = cluster.connect(self.cassandra_keyspace)
         self._session.row_factory = dict_factory
         return self._session
 
@@ -106,7 +106,7 @@ class CassandraClient(AbstractClient):
         """
         query = (
             f"SELECT column_name, type FROM system_schema.columns "  # noqa
-            f"WHERE keyspace_name = '{self.cassandra_key_space}' "  # noqa
+            f"WHERE keyspace_name = '{self.cassandra_keyspace}' "  # noqa
             f"  AND table_name = '{table}';"  # noqa
         )
 
@@ -115,7 +115,7 @@ class CassandraClient(AbstractClient):
         if not response:
             raise RuntimeError(
                 f"No columns found for table: {table}"
-                f"in key space: {self.cassandra_key_space}"
+                f"in key space: {self.cassandra_keyspace}"
             )
 
         return response
@@ -143,7 +143,7 @@ class CassandraClient(AbstractClient):
         else:
             columns_str = joined_parsed_columns
 
-        query = f"CREATE TABLE {self.cassandra_key_space}.{table} " f"({columns_str}); "
+        query = f"CREATE TABLE {self.cassandra_keyspace}.{table} " f"({columns_str}); "
 
         return query
 

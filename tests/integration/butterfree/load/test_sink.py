@@ -38,11 +38,15 @@ def test_sink(input_dataframe, feature_set):
     )
     online_writer = OnlineFeatureStoreWriter(db_config=online_config)
 
+    online_writer.run_pre_hooks = Mock()
+    online_writer.run_pre_hooks.return_value = target_latest_df
+
     writers = [historical_writer, online_writer]
     sink = Sink(writers)
 
     # act
     client.sql("CREATE DATABASE IF NOT EXISTS {}".format(historical_writer.database))
+    client.sql("CREATE TABLE {}.{} (id int, timestamp timestamp, feature float) PARTITIONED BY (year int, month int, day int)".format(historical_writer.database, feature_set.name))
     sink.flush(feature_set, feature_set_df, client)
 
     # get historical results

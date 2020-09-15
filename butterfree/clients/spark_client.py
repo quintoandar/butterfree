@@ -252,7 +252,7 @@ class SparkClient(AbstractClient):
                     "and values must be string or int."
                 )
 
-        database_expr = f"`{database}`." or ""
+        database_expr = f"`{database}`." if database else ""
         key_values_expr = [
             ", ".join(
                 [

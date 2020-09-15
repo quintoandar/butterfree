@@ -55,9 +55,7 @@ def mock_spark_sql() -> Mock:
 
 @pytest.fixture
 def cassandra_client() -> CassandraClient:
-    return CassandraClient(
-        cassandra_host=["mock"], cassandra_key_space="dummy_keyspace"
-    )
+    return CassandraClient(cassandra_host=["mock"], cassandra_keyspace="dummy_keyspace")
 
 
 @pytest.fixture

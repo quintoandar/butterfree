@@ -1,4 +1,8 @@
+from typing import Dict
+from unittest.mock import Mock
+
 from pyspark.sql import functions
+from pyspark.sql.streaming import StreamingQuery
 from pyspark.sql.types import StringType, StructField, StructType
 from pytest import fixture
 
@@ -6,6 +10,7 @@ from butterfree.configs.db import CassandraConfig
 from butterfree.constants import columns
 from butterfree.constants.columns import TIMESTAMP_COLUMN
 from butterfree.constants.data_type import DataType
+from butterfree.load.writers import OnlineFeatureStoreWriter
 from butterfree.transform import FeatureSet
 from butterfree.transform.aggregated_feature_set import AggregatedFeatureSet
 from butterfree.transform.features import Feature, KeyFeature, TimestampFeature
@@ -23,31 +28,6 @@ def feature_set():
         Feature(name="feature", description="Description", dtype=DataType.BIGINT,)
     ]
     return FeatureSet(
-        "feature_set",
-        "entity",
-        "description",
-        keys=key_features,
-        timestamp=ts_feature,
-        features=features,
-    )
-
-
-@fixture
-def feature_set_incremental():
-    key_features = [
-        KeyFeature(name="id", description="Description", dtype=DataType.INTEGER)
-    ]
-    ts_feature = TimestampFeature(from_column=TIMESTAMP_COLUMN)
-    features = [
-        Feature(
-            name="feature",
-            description="test",
-            transformation=AggregatedTransform(
-                functions=[Function(functions.sum, DataType.INTEGER)]
-            ),
-        ),
-    ]
-    return AggregatedFeatureSet(
         "feature_set",
         "entity",
         "description",
@@ -236,3 +216,29 @@ def expected_schema():
             "primary_key": False,
         },
     ]
+
+
+@fixture
+def mocked_stream_df():
+    mocked_stream_df = Mock()
+    mocked_stream_df.isStreaming = True
+    mocked_stream_df.writeStream = mocked_stream_df
+    mocked_stream_df.format.return_value = mocked_stream_df
+    mocked_stream_df.queryName.return_value = mocked_stream_df
+    mocked_stream_df.start.return_value = Mock(spec=StreamingQuery)
+
+    return mocked_stream_df
+
+
+@fixture
+def online_feature_store_writer_stream():
+    online_feature_store_writer = Mock(spec=OnlineFeatureStoreWriter)
+    online_feature_store_writer.write_to_entity = True
+    online_feature_store_writer.db_config = online_feature_store_writer
+    online_feature_store_writer.db_config.host = online_feature_store_writer
+    online_feature_store_writer.db_config.keyspace = online_feature_store_writer
+    online_feature_store_writer.db_config.username = online_feature_store_writer
+    online_feature_store_writer.db_config.password = online_feature_store_writer
+    online_feature_store_writer.build.return_value = Mock(spec=StreamingQuery)
+
+    return online_feature_store_writer
