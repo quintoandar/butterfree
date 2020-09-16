@@ -1,4 +1,3 @@
-from typing import Dict
 from unittest.mock import Mock
 
 from pyspark.sql import functions

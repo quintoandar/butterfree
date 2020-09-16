@@ -46,7 +46,12 @@ def test_sink(input_dataframe, feature_set):
 
     # act
     client.sql("CREATE DATABASE IF NOT EXISTS {}".format(historical_writer.database))
-    client.sql("CREATE TABLE {}.{} (id int, timestamp timestamp, feature float) PARTITIONED BY (year int, month int, day int)".format(historical_writer.database, feature_set.name))
+    client.sql(
+        "CREATE TABLE {}.{} (id int, timestamp timestamp, "
+        "feature float) PARTITIONED BY (year int, month int, day int)".format(
+            historical_writer.database, feature_set.name
+        )
+    )
     sink.flush(feature_set, feature_set_df, client)
 
     # get historical results

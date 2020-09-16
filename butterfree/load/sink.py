@@ -94,7 +94,7 @@ class Sink(HookableComponent):
     def flush(
         self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient
     ) -> List[StreamingQuery]:
-        """Trigger a write job in all the defined Writers.
+        """Trigger a build job in all the defined Writers.
 
         Args:
             dataframe: spark dataframe containing data from a feature set.

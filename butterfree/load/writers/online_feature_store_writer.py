@@ -147,11 +147,6 @@ class OnlineFeatureStoreWriter(Writer):
         Returns:
             Streaming handler if writing streaming df, None otherwise.
 
-        If the debug_mode is set to True, a temporary table with a name in the format:
-        `online_feature_store__my_feature_set` will be created instead of writing to
-        the real online feature store. If dataframe is streaming this temporary table
-        will be updated in real time.
-
         """
         table_name = feature_set.entity if self.write_to_entity else feature_set.name
 

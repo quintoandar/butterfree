@@ -60,6 +60,18 @@ class TestFeatureSetPipeline:
             "spark.sql.sources.partitionOverwriteMode", "dynamic"
         )
 
+        spark_client.sql(
+            "CREATE TABLE {}.{} (id int, timestamp timestamp, "
+            "feature1__avg_over_2_minutes_fixed_windows float, "
+            "feature1__avg_over_15_minutes_fixed_windows float, "
+            "feature1__stddev_pop_over_2_minutes_fixed_windows float, "
+            "feature1__stddev_pop_over_15_minutes_fixed_windows float, "
+            "divided_feature double) "
+            "PARTITIONED BY (year int, month int, day int)".format(
+                table_reader_db, "feature_set"
+            )
+        )
+
         dbconfig = Mock()
         dbconfig.mode = "overwrite"
         dbconfig.format_ = "parquet"
@@ -145,11 +157,18 @@ class TestFeatureSetPipeline:
         # arrange
         table_reader_table = "b_table"
         create_temp_view(dataframe=mocked_date_df, name=table_reader_table)
+        spark_session.sql("CREATE DATABASE IF NOT EXISTS {}".format("test"))
+        spark_session.sql(
+            "CREATE TABLE test.feature_fixed_window (id int, "
+            "timestamp timestamp, "
+            "feature__avg_over_1_day_fixed_windows float, "
+            "feature__stddev_pop_over_1_day_fixed_windows float)"
+        )
 
         # act
         feature_set_pipeline.run(start_date="2016-04-12", end_date="2016-04-13")
 
-        df = spark_session.sql("select * from historical_feature_store__feature_set")
+        df = spark_session.table(f"{feature_set_pipeline.feature_set.name}")
 
         # assert
         assert_dataframe_equality(df, fixed_windows_output_feature_set_date_dataframe)
@@ -168,7 +187,7 @@ class TestFeatureSetPipeline:
         # act
         feature_set_pipeline.run_for_date(execution_date="2016-04-12")
 
-        df = spark_session.sql("select * from historical_feature_store__feature_set")
+        df = spark_session.table(f"{feature_set_pipeline.feature_set.name}")
         target_df = fixed_windows_output_feature_set_date_dataframe.filter(
             "timestamp < '2016-04-13'"
         )

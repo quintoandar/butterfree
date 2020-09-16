@@ -119,15 +119,7 @@ class HistoricalFeatureStoreWriter(Writer):
             feature_set: object processed with feature_set informations.
             dataframe: spark dataframe containing data from a feature set.
             spark_client: client for spark connections with external services.
-
-        If the debug_mode is set to True, a temporary table with a name in the format:
-        historical_feature_store__{feature_set.name} will be created instead of writing
-        to the real historical feature store.
-
         """
-        # self.add_pre_hook(
-        #     SparkTableSchemaCompatibilityHook(spark_client, feature_set.name)
-        # )
         dataframe = self._create_partitions(dataframe)
 
         partition_overwrite_mode = spark_client.conn.conf.get(
@@ -185,11 +177,8 @@ class HistoricalFeatureStoreWriter(Writer):
                 feature set dataframe.
 
         """
-        table_name = (
-            f"{feature_set.name}"
-            if not self.debug_mode
-            else f"historical_feature_store__{feature_set.name}"
-        )
+        table_name = f"{feature_set.name}"
+
         written_count = (
             spark_client.read(
                 self.db_config.format_, options=self.db_config.get_options(table_name)

@@ -163,7 +163,9 @@ class TestSink:
             write_to_entity=True
         )
         online_feature_store_writer_on_entity.run_pre_hooks = Mock()
-        online_feature_store_writer_on_entity.run_pre_hooks.return_value = feature_set_dataframe
+        online_feature_store_writer_on_entity.run_pre_hooks.return_value = (
+            feature_set_dataframe
+        )
 
         sink = Sink(
             writers=[online_feature_store_writer, online_feature_store_writer_on_entity]
@@ -188,5 +190,7 @@ class TestSink:
             dataframe=ANY,
             format_=ANY,
             mode=ANY,
-            **online_feature_store_writer_on_entity.db_config.get_options(table="my_feature_set"),
+            **online_feature_store_writer_on_entity.db_config.get_options(
+                table="my_feature_set"
+            ),
         )

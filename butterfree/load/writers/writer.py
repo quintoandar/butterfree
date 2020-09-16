@@ -58,19 +58,17 @@ class Writer(ABC, HookableComponent):
     def build(
         self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient,
     ) -> Optional[StreamingQuery]:
-        """Register the data got from the reader in the Spark metastore.
-
-        Create a temporary view in Spark metastore referencing the data
-        extracted from the target origin after the application of all the
-        defined pre-processing transformations.
-
-        The arguments start_date and end_date are going to be use only when there
-        is a defined `IncrementalStrategy` on the `Reader`.
+        """Trigger the writer from a feature set into the Feature Store.
 
         Args:
             feature_set: object processed with feature set metadata.
             dataframe: Spark dataframe containing data from a feature set.
             spark_client: client for Spark connections with external services.
+
+        If the debug_mode is set to True, a temporary table with a name in the format:
+        {feature_set.name} will be created instead of writing
+        to the real historical or online feature store.
+        If dataframe is streaming this temporary table will be updated in real time.
 
         """
         pre_hook_df = self.run_pre_hooks(dataframe)
