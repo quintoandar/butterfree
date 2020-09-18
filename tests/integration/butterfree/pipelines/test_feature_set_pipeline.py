@@ -6,8 +6,10 @@ from pyspark.sql import functions as F
 
 from butterfree.clients import SparkClient
 from butterfree.configs import environment
+from butterfree.configs.db import S3Config
 from butterfree.constants import DataType
 from butterfree.constants.columns import TIMESTAMP_COLUMN
+from butterfree.dataframe_service.incremental_strategy import IncrementalStrategy
 from butterfree.extract import Source
 from butterfree.extract.readers import TableReader
 from butterfree.hooks import Hook
@@ -33,6 +35,14 @@ class AddHook(Hook):
         return dataframe.withColumn("feature", F.expr(f"feature + {self.value}"))
 
 
+class RunHook(Hook):
+    def __init__(self, id):
+        self.id = id
+
+    def run(self, dataframe):
+        return dataframe.withColumn("run_id", F.lit(self.id))
+
+
 def create_temp_view(dataframe: DataFrame, name):
     dataframe.createOrReplaceTempView(name)
 
@@ -50,6 +60,14 @@ def divide(df, fs, column1, column2):
     name = fs.get_output_columns()[0]
     df = df.withColumn(name, F.col(column1) / F.col(column2))
     return df
+
+
+def create_ymd(dataframe):
+    return (
+        dataframe.withColumn("year", F.year(F.col("timestamp")))
+        .withColumn("month", F.month(F.col("timestamp")))
+        .withColumn("day", F.dayofmonth(F.col("timestamp")))
+    )
 
 
 class TestFeatureSetPipeline:
@@ -275,9 +293,9 @@ class TestFeatureSetPipeline:
         )
 
         target_df = spark_session.sql(
-            "select 1 as id, timestamp('2020-01-01') as timestamp, 6 as feature, 2020"
+            "select 1 as id, timestamp('2020-01-01') as timestamp, 6 as feature, 2020 "
             "as year, 1 as month, 1 as day"
-        )
+        )  # temporary: after adding pre-hook to the writer change the value to 7
 
         # act
         test_pipeline.run()
@@ -286,3 +304,127 @@ class TestFeatureSetPipeline:
         # assert
         output_df.show()
         assert_dataframe_equality(output_df, target_df)
+
+    def test_pipeline_interval_run(
+        self, mocked_date_df, pipeline_interval_run_target_dfs, spark_session
+    ):
+        """Testing pipeline's idempotent interval run feature.
+
+        Source data:
+        +-------+---+-------------------+-------------------+
+        |feature| id|                 ts|          timestamp|
+        +-------+---+-------------------+-------------------+
+        |    200|  1|2016-04-11 11:31:11|2016-04-11 11:31:11|
+        |    300|  1|2016-04-12 11:44:12|2016-04-12 11:44:12|
+        |    400|  1|2016-04-13 11:46:24|2016-04-13 11:46:24|
+        |    500|  1|2016-04-14 12:03:21|2016-04-14 12:03:21|
+        +-------+---+-------------------+-------------------+
+
+        The test executes 3 runs for different time intervals. The input data has 4 data
+        points: 2016-04-11, 2016-04-12, 2016-04-13 and 2016-04-14. The following run
+        specifications are:
+
+        1)  Interval: from 2016-04-11 to 2016-04-13
+            Target table result:
+            +---+-------+---+-----+------+-------------------+----+
+            |day|feature| id|month|run_id|          timestamp|year|
+            +---+-------+---+-----+------+-------------------+----+
+            | 11|    200|  1|    4|     1|2016-04-11 11:31:11|2016|
+            | 12|    300|  1|    4|     1|2016-04-12 11:44:12|2016|
+            | 13|    400|  1|    4|     1|2016-04-13 11:46:24|2016|
+            +---+-------+---+-----+------+-------------------+----+
+
+        2)  Interval: only 2016-04-14.
+            Target table result:
+            +---+-------+---+-----+------+-------------------+----+
+            |day|feature| id|month|run_id|          timestamp|year|
+            +---+-------+---+-----+------+-------------------+----+
+            | 11|    200|  1|    4|     1|2016-04-11 11:31:11|2016|
+            | 12|    300|  1|    4|     1|2016-04-12 11:44:12|2016|
+            | 13|    400|  1|    4|     1|2016-04-13 11:46:24|2016|
+            | 14|    500|  1|    4|     2|2016-04-14 12:03:21|2016|
+            +---+-------+---+-----+------+-------------------+----+
+
+        3)  Interval: only 2016-04-11.
+            Target table result:
+            +---+-------+---+-----+------+-------------------+----+
+            |day|feature| id|month|run_id|          timestamp|year|
+            +---+-------+---+-----+------+-------------------+----+
+            | 11|    200|  1|    4|     3|2016-04-11 11:31:11|2016|
+            | 12|    300|  1|    4|     1|2016-04-12 11:44:12|2016|
+            | 13|    400|  1|    4|     1|2016-04-13 11:46:24|2016|
+            | 14|    500|  1|    4|     2|2016-04-14 12:03:21|2016|
+            +---+-------+---+-----+------+-------------------+----+
+
+        """
+        # arrange
+        create_temp_view(dataframe=mocked_date_df, name="input_data")
+
+        db = environment.get_variable("FEATURE_STORE_HISTORICAL_DATABASE")
+        path = "test_folder/historical/entity/feature_set"
+        spark_session.sql(f"create database if not exists {db}")
+        dbconfig = S3Config()
+        dbconfig.get_options = Mock(
+            return_value={"mode": "overwrite", "format_": "parquet", "path": path}
+        )
+
+        first_run_hook = RunHook(id=1)
+        second_run_hook = RunHook(id=2)
+        third_run_hook = RunHook(id=3)
+
+        (
+            first_run_target_df,
+            second_run_target_df,
+            third_run_target_df,
+        ) = pipeline_interval_run_target_dfs
+
+        test_pipeline = FeatureSetPipeline(
+            source=Source(
+                readers=[
+                    TableReader(id="id", table="input_data",).with_incremental_strategy(
+                        IncrementalStrategy("ts")
+                    ),
+                ],
+                query="select * from id ",
+            ),
+            feature_set=FeatureSet(
+                name="feature_set",
+                entity="entity",
+                description="",
+                keys=[KeyFeature(name="id", description="", dtype=DataType.INTEGER,)],
+                timestamp=TimestampFeature(from_column="ts"),
+                features=[
+                    Feature(name="feature", description="", dtype=DataType.INTEGER),
+                    Feature(name="run_id", description="", dtype=DataType.INTEGER),
+                ],
+            ),
+            sink=Sink(writers=[HistoricalFeatureStoreWriter(db_config=dbconfig)],),
+        )
+
+        spark_session.conf.set("spark.sql.sources.partitionOverwriteMode", "dynamic")
+
+        # act and assert
+        test_pipeline.sink.writers[0].validate = Mock()  # temporary
+
+        test_pipeline.feature_set.add_pre_hook(first_run_hook)
+        test_pipeline.run(end_date="2016-04-13")
+        first_run_output_df = spark_session.read.parquet(path)
+        # first_run_output_df = spark_session.table("test.feature_set")
+        assert_dataframe_equality(first_run_output_df, first_run_target_df)  # temporary
+
+        test_pipeline.feature_set.add_pre_hook(second_run_hook)
+        test_pipeline.run_for_date("2016-04-14")
+        second_run_output_df = spark_session.read.parquet(path)
+        # second_run_output_df = spark_session.table("test.feature_set")
+        assert_dataframe_equality(
+            second_run_output_df, second_run_target_df
+        )  # temporary
+
+        test_pipeline.feature_set.add_pre_hook(third_run_hook)
+        test_pipeline.run_for_date("2016-04-11")
+        third_run_output_df = spark_session.read.parquet(path)
+        # third_run_output_df = spark_session.table("test.feature_set")
+        assert_dataframe_equality(third_run_output_df, third_run_target_df)  # temporary
+
+        # tear down
+        shutil.rmtree("test_folder")
