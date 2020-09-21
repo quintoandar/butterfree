@@ -10,7 +10,9 @@ from butterfree.configs import environment
 from butterfree.configs.db import S3Config
 from butterfree.constants import columns
 from butterfree.constants.spark_constants import DEFAULT_NUM_PARTITIONS
-from butterfree.dataframe_service import extract_partition_values, repartition_df
+from butterfree.dataframe_service import repartition_df
+from butterfree.hooks import Hook
+from butterfree.hooks.schema_compatibility import SparkTableSchemaCompatibilityHook
 from butterfree.load.writers.writer import Writer
 from butterfree.transform import FeatureSet
 
@@ -101,16 +103,18 @@ class HistoricalFeatureStoreWriter(Writer):
         num_partitions=None,
         validation_threshold: float = DEFAULT_VALIDATION_THRESHOLD,
         debug_mode: bool = False,
+        check_schema: Hook = None,
     ):
         super().__init__(debug_mode)
         self.db_config = db_config or S3Config()
+        self.check_schema = check_schema
         self.database = database or environment.get_variable(
             "FEATURE_STORE_HISTORICAL_DATABASE"
         )
         self.num_partitions = num_partitions or DEFAULT_NUM_PARTITIONS
         self.validation_threshold = validation_threshold
 
-    def write(
+    def load(
         self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient,
     ):
         """Loads the data from a feature set into the Historical Feature Store.
@@ -120,35 +124,40 @@ class HistoricalFeatureStoreWriter(Writer):
             dataframe: spark dataframe containing data from a feature set.
             spark_client: client for spark connections with external services.
         """
+        if not self.check_schema:
+            self.check_schema = SparkTableSchemaCompatibilityHook(
+                spark_client, feature_set.name, self.database
+            )
+
+        self.add_pre_hook(self.check_schema)
+
         dataframe = self._create_partitions(dataframe)
 
-        partition_overwrite_mode = spark_client.conn.conf.get(
-            "spark.sql.sources.partitionOverwriteMode"
-        ).lower()
+        if not self.debug_mode:
+            partition_overwrite_mode = spark_client.conn.conf.get(
+                "spark.sql.sources.partitionOverwriteMode"
+            ).lower()
 
-        if partition_overwrite_mode != "dynamic":
-            raise RuntimeError(
-                "m=load_incremental, "
-                "spark.sql.sources.partitionOverwriteMode={}, "
-                "msg=partitionOverwriteMode "
-                "have to be configured to 'dynamic'".format(partition_overwrite_mode)
-            )
+            if partition_overwrite_mode != "dynamic":
+                raise RuntimeError(
+                    "m=load_incremental, "
+                    "spark.sql.sources.partitionOverwriteMode={}, "
+                    "msg=partitionOverwriteMode "
+                    "have to be configured to 'dynamic'".format(
+                        partition_overwrite_mode
+                    )
+                )
 
         s3_key = os.path.join("historical", feature_set.entity, feature_set.name)
         options = {"path": self.db_config.get_options(s3_key).get("path")}
 
-        spark_client.write_dataframe(
-            dataframe=dataframe,
-            format_=self.db_config.format_,
-            mode=self.db_config.mode,
-            **options,
-            partitionBy=self.PARTITION_BY,
-        )
-
-        partition_values = extract_partition_values(dataframe, self.PARTITION_BY)
-
-        spark_client.add_table_partitions(
-            partition_values, feature_set.name, self.database
+        return (
+            dataframe,
+            self.db_config,
+            options,
+            self.database,
+            feature_set.name,
+            self.PARTITION_BY,
         )
 
     def _assert_validation_count(self, table_name, written_count, dataframe_count):
@@ -177,7 +186,11 @@ class HistoricalFeatureStoreWriter(Writer):
                 feature set dataframe.
 
         """
-        table_name = f"{feature_set.name}"
+        table_name = (
+            f"{self.database}.{feature_set.name}"
+            if not self.debug_mode
+            else f"historical_feature_store__{feature_set.name}"
+        )
 
         written_count = (
             spark_client.read(

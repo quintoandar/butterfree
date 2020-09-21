@@ -1,5 +1,5 @@
 """Writer entity."""
-
+import os
 from abc import ABC, abstractmethod
 from typing import Optional
 
@@ -7,6 +7,7 @@ from pyspark.sql.dataframe import DataFrame
 from pyspark.sql.streaming import StreamingQuery
 
 from butterfree.clients import SparkClient
+from butterfree.dataframe_service import extract_partition_values
 from butterfree.hooks import HookableComponent
 from butterfree.transform import FeatureSet
 
@@ -19,13 +20,14 @@ class Writer(ABC, HookableComponent):
 
     """
 
-    def __init__(self, debug_mode: bool = False):
+    def __init__(self, debug_mode: bool = False, write_to_entity: bool = False):
         super().__init__()
         self.enable_post_hooks = False
         self.debug_mode = debug_mode
+        self.write_to_entity = write_to_entity
 
     @abstractmethod
-    def write(
+    def load(
         self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient,
     ):
         """Loads the data from a feature set into the Feature Store.
@@ -55,7 +57,7 @@ class Writer(ABC, HookableComponent):
 
         """
 
-    def build(
+    def write(
         self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient,
     ) -> Optional[StreamingQuery]:
         """Trigger the writer from a feature set into the Feature Store.
@@ -71,18 +73,46 @@ class Writer(ABC, HookableComponent):
         If dataframe is streaming this temporary table will be updated in real time.
 
         """
-        pre_hook_df = self.run_pre_hooks(dataframe)
+        load_df, db_config, options, database, table_name, partition_by = self.load(
+            feature_set=feature_set, dataframe=dataframe, spark_client=spark_client,
+        )
+
+        pre_hook_df = self.run_pre_hooks(load_df)
 
         if self.debug_mode:
             return self._write_in_debug_mode(
-                table_name=f"{feature_set.name}",
+                table_name=(
+                    f"historical_feature_store__{table_name}"
+                    if partition_by
+                    else f"online_feature_store__{table_name}"
+                ),
                 dataframe=pre_hook_df,
                 spark_client=spark_client,
             )
 
-        self.write(
-            feature_set=feature_set, dataframe=pre_hook_df, spark_client=spark_client,
+        if dataframe.isStreaming:
+            return self._write_stream(
+                feature_set=feature_set,
+                dataframe=pre_hook_df,
+                spark_client=spark_client,
+                table_name=table_name,
+                db_config=db_config,
+            )
+
+        spark_client.write_dataframe(
+            dataframe=pre_hook_df,
+            format_=db_config.format_,
+            mode=db_config.mode,
+            **options,
+            partitionBy=partition_by,
         )
+
+        if partition_by:
+            partition_values = extract_partition_values(pre_hook_df, partition_by)
+
+            spark_client.add_table_partitions(
+                partition_values, feature_set.name, database
+            )
 
     @staticmethod
     def _write_in_debug_mode(
@@ -92,3 +122,33 @@ class Writer(ABC, HookableComponent):
         return spark_client.create_temporary_view(
             dataframe=dataframe, name=f"{table_name}"
         )
+
+    def _write_stream(
+        self,
+        feature_set: FeatureSet,
+        dataframe: DataFrame,
+        spark_client: SparkClient,
+        table_name: str,
+        db_config,
+    ) -> StreamingQuery:
+        """Writes the dataframe in streaming mode."""
+        checkpoint_folder = (
+            f"{feature_set.name}__on_entity" if self.write_to_entity else table_name
+        )
+        checkpoint_path = (
+            os.path.join(
+                db_config.stream_checkpoint_path, feature_set.entity, checkpoint_folder,
+            )
+            if db_config.stream_checkpoint_path
+            else None
+        )
+        streaming_handler = spark_client.write_stream(
+            dataframe,
+            processing_time=db_config.stream_processing_time,
+            output_mode=db_config.stream_output_mode,
+            checkpoint_path=checkpoint_path,
+            format_=db_config.format_,
+            mode=db_config.mode,
+            **db_config.get_options(table=table_name),
+        )
+        return streaming_handler

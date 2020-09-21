@@ -109,12 +109,18 @@ def fixed_windows_output_feature_set_date_dataframe(spark_context, spark_session
             "timestamp": "2016-04-12 11:44:12",
             "feature__avg_over_1_day_fixed_windows": 300,
             "feature__stddev_pop_over_1_day_fixed_windows": 0,
+            "year": 2016,
+            "month": 4,
+            "day": 12,
         },
         {
             "id": 1,
             "timestamp": "2016-04-13 11:46:24",
             "feature__avg_over_1_day_fixed_windows": 400,
             "feature__stddev_pop_over_1_day_fixed_windows": 0,
+            "year": 2016,
+            "month": 4,
+            "day": 13,
         },
     ]
     df = spark_session.read.json(spark_context.parallelize(data, 1))

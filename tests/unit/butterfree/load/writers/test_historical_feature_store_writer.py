@@ -10,7 +10,7 @@ from butterfree.testing.dataframe import assert_dataframe_equality
 
 
 class TestHistoricalFeatureStoreWriter:
-    def test_write(
+    def test_load(
         self,
         feature_set_dataframe,
         historical_feature_set_dataframe,
@@ -20,8 +20,6 @@ class TestHistoricalFeatureStoreWriter:
     ):
         # given
         spark_client = SparkClient()
-        spark_client.write_dataframe = mocker.stub("write_dataframe")
-        spark_client.add_table_partitions = mocker.stub("add_table_partitions")
         spark_client.conn.conf.set(
             "spark.sql.sources.partitionOverwriteMode", "dynamic"
         )
@@ -29,27 +27,17 @@ class TestHistoricalFeatureStoreWriter:
         writer = HistoricalFeatureStoreWriter()
 
         # when
-        writer.write(
+        result_df, db_config, options, database, table_name, partition_by = writer.load(
             feature_set=feature_set,
             dataframe=feature_set_dataframe,
             spark_client=spark_client,
         )
-        result_df = spark_client.write_dataframe.call_args[1]["dataframe"]
 
         # then
         assert_dataframe_equality(historical_feature_set_dataframe, result_df)
 
-        assert (
-            writer.db_config.format_
-            == spark_client.write_dataframe.call_args[1]["format_"]
-        )
-        assert (
-            writer.db_config.mode == spark_client.write_dataframe.call_args[1]["mode"]
-        )
-        assert (
-            writer.PARTITION_BY
-            == spark_client.write_dataframe.call_args[1]["partitionBy"]
-        )
+        assert writer.db_config == db_config
+        assert writer.PARTITION_BY == partition_by
 
     def test_write_invalid_partition_mode(
         self,

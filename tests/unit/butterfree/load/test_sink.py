@@ -72,7 +72,7 @@ class TestSink:
         ]
 
         for w in writer:
-            w.build = mocker.stub("build")
+            w.write = mocker.stub("write")
 
         feature_set = mocker.stub("feature_set")
         feature_set.entity = "house"
@@ -88,7 +88,7 @@ class TestSink:
 
         # then
         for w in writer:
-            w.build.assert_called_once()
+            w.write.assert_called_once()
 
     def test_flush_with_invalid_df(self, not_feature_set_dataframe, mocker):
         # given
@@ -183,6 +183,7 @@ class TestSink:
             dataframe=ANY,
             format_=ANY,
             mode=ANY,
+            partitionBy=ANY,
             **online_feature_store_writer.db_config.get_options(table="my_entity"),
         )
 
@@ -190,6 +191,7 @@ class TestSink:
             dataframe=ANY,
             format_=ANY,
             mode=ANY,
+            partitionBy=ANY,
             **online_feature_store_writer_on_entity.db_config.get_options(
                 table="my_feature_set"
             ),

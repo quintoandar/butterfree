@@ -1,15 +1,14 @@
 """Holds the Online Feature Store writer class."""
-
-import os
-from typing import Any, List, Optional
+from typing import Any, List
 
 from pyspark.sql import DataFrame, Window
 from pyspark.sql.functions import col, row_number
-from pyspark.sql.streaming import StreamingQuery
 
-from butterfree.clients import SparkClient
+from butterfree.clients import CassandraClient, SparkClient
 from butterfree.configs.db import CassandraConfig
 from butterfree.constants.columns import TIMESTAMP_COLUMN
+from butterfree.hooks import Hook
+from butterfree.hooks.schema_compatibility import CassandraTableSchemaCompatibilityHook
 from butterfree.load.writers.writer import Writer
 from butterfree.transform import FeatureSet
 
@@ -70,10 +69,16 @@ class OnlineFeatureStoreWriter(Writer):
 
     __name__ = "Online Feature Store Writer"
 
-    def __init__(self, db_config=None, debug_mode: bool = False, write_to_entity=False):
-        super().__init__(debug_mode)
+    def __init__(
+        self,
+        db_config=None,
+        debug_mode: bool = False,
+        write_to_entity: bool = False,
+        check_schema: Hook = None,
+    ):
+        super().__init__(debug_mode, write_to_entity)
         self.db_config = db_config or CassandraConfig()
-        self.write_to_entity = write_to_entity
+        self.check_schema = check_schema
 
     @staticmethod
     def filter_latest(dataframe: DataFrame, id_columns: List[Any]) -> DataFrame:
@@ -103,40 +108,9 @@ class OnlineFeatureStoreWriter(Writer):
             .drop("rn")
         )
 
-    def _write_stream(
-        self,
-        feature_set: FeatureSet,
-        dataframe: DataFrame,
-        spark_client: SparkClient,
-        table_name: str,
-    ) -> StreamingQuery:
-        """Writes the dataframe in streaming mode."""
-        checkpoint_folder = (
-            f"{feature_set.name}__on_entity" if self.write_to_entity else table_name
-        )
-        checkpoint_path = (
-            os.path.join(
-                self.db_config.stream_checkpoint_path,
-                feature_set.entity,
-                checkpoint_folder,
-            )
-            if self.db_config.stream_checkpoint_path
-            else None
-        )
-        streaming_handler = spark_client.write_stream(
-            dataframe,
-            processing_time=self.db_config.stream_processing_time,
-            output_mode=self.db_config.stream_output_mode,
-            checkpoint_path=checkpoint_path,
-            format_=self.db_config.format_,
-            mode=self.db_config.mode,
-            **self.db_config.get_options(table=table_name),
-        )
-        return streaming_handler
-
-    def write(
+    def load(
         self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient,
-    ) -> Optional[StreamingQuery]:
+    ):
         """Loads the latest data from a feature set into the Feature Store.
 
         Args:
@@ -150,24 +124,31 @@ class OnlineFeatureStoreWriter(Writer):
         """
         table_name = feature_set.entity if self.write_to_entity else feature_set.name
 
-        if dataframe.isStreaming:
-            return self._write_stream(
-                feature_set=feature_set,
-                dataframe=dataframe,
-                spark_client=spark_client,
-                table_name=table_name,
+        cassandra_client = CassandraClient(
+            host=[self.db_config.host],
+            keyspace=self.db_config.keyspace,
+            user=self.db_config.username,
+            password=self.db_config.password,
+        )
+
+        if not self.check_schema:
+            self.check_schema = CassandraTableSchemaCompatibilityHook(
+                cassandra_client, table_name
             )
 
-        latest_df = self.filter_latest(
-            dataframe=dataframe, id_columns=feature_set.keys_columns
+        self.add_pre_hook(self.check_schema)
+
+        df = (
+            dataframe
+            if dataframe.isStreaming
+            else self.filter_latest(
+                dataframe=dataframe, id_columns=feature_set.keys_columns
+            )
         )
 
-        return spark_client.write_dataframe(
-            dataframe=latest_df,
-            format_=self.db_config.format_,
-            mode=self.db_config.mode,
-            **self.db_config.get_options(table=table_name),
-        )
+        options = self.db_config.get_options(table=table_name)
+
+        return (df, self.db_config, options, None, table_name, None)
 
     def validate(self, feature_set: FeatureSet, dataframe, spark_client: SparkClient):
         """Calculate dataframe rows to validate data into Feature Store.

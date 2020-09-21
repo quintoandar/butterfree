@@ -4,16 +4,8 @@ from typing import List
 from pyspark.sql.dataframe import DataFrame
 from pyspark.sql.streaming import StreamingQuery
 
-from butterfree.clients import CassandraClient, SparkClient
+from butterfree.clients import SparkClient
 from butterfree.hooks import HookableComponent
-from butterfree.hooks.schema_compatibility import (
-    CassandraTableSchemaCompatibilityHook,
-    SparkTableSchemaCompatibilityHook,
-)
-from butterfree.load.writers import (
-    HistoricalFeatureStoreWriter,
-    OnlineFeatureStoreWriter,
-)
 from butterfree.load.writers.writer import Writer
 from butterfree.transform import FeatureSet
 from butterfree.validations import BasicValidation
@@ -109,33 +101,8 @@ class Sink(HookableComponent):
 
         self.validation.input(pre_hook_df).check()
 
-        for writer in self.writers:
-            if isinstance(writer, HistoricalFeatureStoreWriter):
-                writer.add_pre_hook(
-                    SparkTableSchemaCompatibilityHook(
-                        spark_client, f"{feature_set.name}", f"{writer.database}"
-                    )
-                )
-            if isinstance(writer, OnlineFeatureStoreWriter):
-                table_name = (
-                    feature_set.entity if writer.write_to_entity else feature_set.name
-                )
-
-                cassandra_client = CassandraClient(
-                    cassandra_host=writer.db_config.host,
-                    cassandra_keyspace=writer.db_config.keyspace,
-                    cassandra_user=writer.db_config.username,
-                    cassandra_password=writer.db_config.password,
-                )
-
-                writer.add_pre_hook(
-                    CassandraTableSchemaCompatibilityHook(
-                        cassandra_client, f"{table_name}"
-                    )
-                )
-
         handlers = [
-            writer.build(
+            writer.write(
                 feature_set=feature_set,
                 dataframe=pre_hook_df,
                 spark_client=spark_client,

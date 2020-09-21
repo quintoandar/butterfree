@@ -162,13 +162,16 @@ class TestFeatureSetPipeline:
             "CREATE TABLE test.feature_fixed_window (id int, "
             "timestamp timestamp, "
             "feature__avg_over_1_day_fixed_windows float, "
-            "feature__stddev_pop_over_1_day_fixed_windows float)"
+            "feature__stddev_pop_over_1_day_fixed_windows float) "
+            "PARTITIONED BY (year int, month int, day int)"
         )
 
         # act
         feature_set_pipeline.run(start_date="2016-04-12", end_date="2016-04-13")
 
-        df = spark_session.table(f"{feature_set_pipeline.feature_set.name}")
+        df = spark_session.table(
+            f"historical_feature_store__{feature_set_pipeline.feature_set.name}"
+        )
 
         # assert
         assert_dataframe_equality(df, fixed_windows_output_feature_set_date_dataframe)
@@ -187,7 +190,9 @@ class TestFeatureSetPipeline:
         # act
         feature_set_pipeline.run_for_date(execution_date="2016-04-12")
 
-        df = spark_session.table(f"{feature_set_pipeline.feature_set.name}")
+        df = spark_session.table(
+            f"historical_feature_store__{feature_set_pipeline.feature_set.name}"
+        )
         target_df = fixed_windows_output_feature_set_date_dataframe.filter(
             "timestamp < '2016-04-13'"
         )
