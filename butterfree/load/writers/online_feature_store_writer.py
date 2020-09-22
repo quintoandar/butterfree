@@ -25,6 +25,8 @@ class OnlineFeatureStoreWriter(Writer):
             a table with the name equal to the entity name, defined on the pipeline.
             So, it WILL NOT write to a table with the name of the feature set, as it
             normally does.
+        check_schema: hook to check the schemas between the existing table
+            and the dataframe to be written.
 
     Example:
         Simple example regarding OnlineFeatureStoreWriter class instantiation.
@@ -33,7 +35,7 @@ class OnlineFeatureStoreWriter(Writer):
 
     >>> spark_client = SparkClient()
     >>> writer = OnlineFeatureStoreWriter()
-    >>> writer.write(feature_set=feature_set,
+    >>> writer.load(feature_set=feature_set,
        ...           dataframe=dataframe,
        ...           spark_client=spark_client)
 
@@ -46,7 +48,7 @@ class OnlineFeatureStoreWriter(Writer):
         ...                      keyspace="keyspace_name")
 
     >>> writer = OnlineFeatureStoreWriter(db_config=config)
-    >>> writer.write(feature_set=feature_set,
+    >>> writer.load(feature_set=feature_set,
        ...           dataframe=dataframe,
        ...           spark_client=spark_client)
 
@@ -111,7 +113,7 @@ class OnlineFeatureStoreWriter(Writer):
     def load(
         self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient,
     ):
-        """Loads the latest data from a feature set into the Feature Store.
+        """Prepare the dataframe before it is saved to the Online Feature Store.
 
         Args:
             feature_set: object processed with feature set metadata.
@@ -119,7 +121,12 @@ class OnlineFeatureStoreWriter(Writer):
             spark_client: client for Spark connections with external services.
 
         Returns:
-            Streaming handler if writing streaming df, None otherwise.
+            load_df: Dataframe ready to be saved.
+            db_config: Spark configuration for connect databases.
+            options(optional = None): All other string options.
+            database(optional = None): Database name where the dataframe will be saved.
+            table_name: Table name where the dataframe will be saved.
+            partition_by(optional = None): Partition column to use when writing.
 
         """
         table_name = feature_set.entity if self.write_to_entity else feature_set.name

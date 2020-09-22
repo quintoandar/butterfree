@@ -17,6 +17,12 @@ class Writer(ABC, HookableComponent):
 
     Args:
         spark_client: client for spark connections with external services.
+        debug_mode: "dry run" mode, write the result to a temporary view.
+        write_to_entity: option to write the data to the entity table.
+            With this option set to True, the writer will write the feature set to
+            a table with the name equal to the entity name, defined on the pipeline.
+            So, it WILL NOT write to a table with the name of the feature set, as it
+            normally does.
 
     """
 
@@ -30,7 +36,7 @@ class Writer(ABC, HookableComponent):
     def load(
         self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient,
     ):
-        """Loads the data from a feature set into the Feature Store.
+        """Prepare the dataframe before it is saved to the Feature Store.
 
         Feature Store could be Online or Historical.
 
@@ -38,6 +44,14 @@ class Writer(ABC, HookableComponent):
             feature_set: object processed with feature set metadata.
             dataframe: Spark dataframe containing data from a feature set.
             spark_client: client for Spark connections with external services.
+
+        Returns:
+            load_df: Dataframe ready to be saved.
+            db_config: Spark configuration for connect databases.
+            options(optional = None): All other string options.
+            database(optional = None): Database name where the dataframe will be saved.
+            table_name: Table name where the dataframe will be saved.
+            partition_by(optional = None): Partition column to use when writing.
 
         """
 
@@ -60,7 +74,9 @@ class Writer(ABC, HookableComponent):
     def write(
         self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient,
     ) -> Optional[StreamingQuery]:
-        """Trigger the writer from a feature set into the Feature Store.
+        """Loads the latest data from a feature set into the Feature Store.
+
+        Feature Store could be Online or Historical.
 
         Args:
             feature_set: object processed with feature set metadata.
@@ -71,6 +87,9 @@ class Writer(ABC, HookableComponent):
         {feature_set.name} will be created instead of writing
         to the real historical or online feature store.
         If dataframe is streaming this temporary table will be updated in real time.
+
+        Returns:
+            Streaming handler if writing streaming df, None otherwise.
 
         """
         load_df, db_config, options, database, table_name, partition_by = self.load(

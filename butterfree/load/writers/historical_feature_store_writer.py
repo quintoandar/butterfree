@@ -33,6 +33,8 @@ class HistoricalFeatureStoreWriter(Writer):
             return a count equal to 995000 an error will not be thrown.
             Use validation_threshold = 0 to not use tolerance in the validation.
         debug_mode: "dry run" mode, write the result to a temporary view.
+        check_schema: hook to check the schemas between the existing table
+            and the dataframe to be written.
 
     Example:
         Simple example regarding HistoricalFeatureStoreWriter class instantiation.
@@ -41,7 +43,7 @@ class HistoricalFeatureStoreWriter(Writer):
 
     >>> spark_client = SparkClient()
     >>> writer = HistoricalFeatureStoreWriter()
-    >>> writer.write(feature_set=feature_set,
+    >>> writer.load(feature_set=feature_set,
        ...           dataframe=dataframe,
        ...           spark_client=spark_client)
 
@@ -54,7 +56,7 @@ class HistoricalFeatureStoreWriter(Writer):
         ...               mode="overwrite",
         ...               format_="parquet")
     >>> writer = HistoricalFeatureStoreWriter(db_config=config)
-    >>> writer.write(feature_set=feature_set,
+    >>> writer.load(feature_set=feature_set,
        ...           dataframe=dataframe,
        ...           spark_client=spark_client)
 
@@ -117,12 +119,20 @@ class HistoricalFeatureStoreWriter(Writer):
     def load(
         self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient,
     ):
-        """Loads the data from a feature set into the Historical Feature Store.
+        """Prepare the dataframe before it is saved to the Historical Feature Store.
 
         Args:
             feature_set: object processed with feature_set informations.
             dataframe: spark dataframe containing data from a feature set.
             spark_client: client for spark connections with external services.
+
+        Returns:
+            load_df: Dataframe ready to be saved.
+            db_config: Spark configuration for connect databases.
+            options(optional = None): All other string options.
+            database(optional = None): Database name where the dataframe will be saved.
+            table_name: Table name where the dataframe will be saved.
+            partition_by(optional = None): Partition column to use when writing.
         """
         if not self.check_schema:
             self.check_schema = SparkTableSchemaCompatibilityHook(
