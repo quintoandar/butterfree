@@ -1,4 +1,6 @@
 """FeatureSetPipeline entity."""
+import os
+import time
 from typing import List
 
 from butterfree.clients import SparkClient
@@ -16,6 +18,8 @@ class FeatureSetPipeline:
         feature_set: feature set composed by features and context metadata.
         sink: sink used to write the output dataframe in the desired locations.
         spark_client: client used to access Spark connection.
+        timezone: timestamp feature transformations will assume this timezone 
+            when they don't have a tz suffix.
 
     Example:
         This an example regarding the feature set pipeline definition. All
@@ -122,11 +126,25 @@ class FeatureSetPipeline:
         feature_set: FeatureSet,
         sink: Sink,
         spark_client: SparkClient = None,
+        timezone: str = "UTC",
     ):
         self.source = source
         self.feature_set = feature_set
         self.sink = sink
         self.spark_client = spark_client
+        self.timezone = timezone
+
+    @property
+    def timezone(self) -> str:
+        return self._timezone
+
+    @timezone.setter
+    def timezone(self, value: str):
+        if value:
+            self.spark_client.conn.conf.set("spark.sql.session.timeZone", value)
+            os.environ["TZ"] = value
+            time.tzset()
+        self._timezone = value
 
     @property
     def source(self) -> Source:
