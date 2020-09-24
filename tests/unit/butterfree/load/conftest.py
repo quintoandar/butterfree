@@ -238,6 +238,6 @@ def online_feature_store_writer_stream():
     online_feature_store_writer.db_config.keyspace = online_feature_store_writer
     online_feature_store_writer.db_config.username = online_feature_store_writer
     online_feature_store_writer.db_config.password = online_feature_store_writer
-    online_feature_store_writer.write.return_value = Mock(spec=StreamingQuery)
+    online_feature_store_writer.load.return_value = Mock(spec=StreamingQuery)
 
     return online_feature_store_writer

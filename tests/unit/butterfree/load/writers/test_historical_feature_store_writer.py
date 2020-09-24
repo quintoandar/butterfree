@@ -1,5 +1,6 @@
 import datetime
 import random
+from unittest.mock import Mock
 
 import pytest
 from pyspark.sql.functions import spark_partition_id
@@ -14,30 +15,46 @@ class TestHistoricalFeatureStoreWriter:
         self,
         feature_set_dataframe,
         historical_feature_set_dataframe,
-        mocker,
         feature_set,
+        mocker,
         spark_session,
     ):
         # given
         spark_client = SparkClient()
+        spark_client.write_dataframe = mocker.stub("write_dataframe")
+        spark_client.add_table_partitions = mocker.stub("add_table_partitions")
         spark_client.conn.conf.set(
             "spark.sql.sources.partitionOverwriteMode", "dynamic"
         )
 
         writer = HistoricalFeatureStoreWriter()
 
+        writer.run_pre_hooks = Mock()
+        writer.run_pre_hooks.return_value = feature_set_dataframe
+
         # when
-        result_df, db_config, options, database, table_name, partition_by = writer.load(
+        writer.load(
             feature_set=feature_set,
             dataframe=feature_set_dataframe,
             spark_client=spark_client,
         )
 
+        result_df = spark_client.write_dataframe.call_args[1]["dataframe"]
+
         # then
         assert_dataframe_equality(historical_feature_set_dataframe, result_df)
 
-        assert writer.db_config == db_config
-        assert writer.PARTITION_BY == partition_by
+        assert (
+            writer.db_config.format_
+            == spark_client.write_dataframe.call_args[1]["format_"]
+        )
+        assert (
+            writer.db_config.mode == spark_client.write_dataframe.call_args[1]["mode"]
+        )
+        assert (
+            writer.PARTITION_BY
+            == spark_client.write_dataframe.call_args[1]["partitionBy"]
+        )
 
     def test_write_invalid_partition_mode(
         self,
@@ -50,15 +67,47 @@ class TestHistoricalFeatureStoreWriter:
         spark_client = SparkClient()
         spark_client.write_dataframe = mocker.stub("write_dataframe")
         spark_client.conn.conf.set("spark.sql.sources.partitionOverwriteMode", "static")
-        writer = HistoricalFeatureStoreWriter()
 
+        writer = HistoricalFeatureStoreWriter()
+        writer.run_pre_hooks = Mock()
+        writer.run_pre_hooks.return_value = feature_set_dataframe
         # when
         with pytest.raises(RuntimeError):
-            _ = writer.write(
+            _ = writer.load(
                 feature_set=feature_set,
                 dataframe=feature_set_dataframe,
                 spark_client=spark_client,
             )
+
+    def test_write_in_debug_mode(
+        self,
+        feature_set_dataframe,
+        feature_set,
+        spark_session,
+        historical_feature_set_dataframe,
+    ):
+        # given
+        spark_client = SparkClient()
+
+        writer = HistoricalFeatureStoreWriter(debug_mode=True)
+        spark_session.sql("CREATE DATABASE IF NOT EXISTS {}".format(writer.database))
+        spark_session.sql(
+            "CREATE TABLE {}.{} (id bigint, "
+            "timestamp string, "
+            "feature bigint) PARTITIONED BY (year int, month int, day int)".format(
+                writer.database, feature_set.name
+            )
+        )
+        # when
+        writer.load(
+            feature_set=feature_set,
+            dataframe=feature_set_dataframe,
+            spark_client=spark_client,
+        )
+        result_df = spark_session.table(f"historical_feature_store__{feature_set.name}")
+
+        # then
+        assert_dataframe_equality(historical_feature_set_dataframe, result_df)
 
     def test_validate(self, feature_set_dataframe, mocker, feature_set):
         # given

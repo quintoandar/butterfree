@@ -10,7 +10,7 @@ from butterfree.configs import environment
 from butterfree.configs.db import S3Config
 from butterfree.constants import columns
 from butterfree.constants.spark_constants import DEFAULT_NUM_PARTITIONS
-from butterfree.dataframe_service import repartition_df
+from butterfree.dataframe_service import extract_partition_values, repartition_df
 from butterfree.hooks import Hook
 from butterfree.hooks.schema_compatibility import SparkTableSchemaCompatibilityHook
 from butterfree.load.writers.writer import Writer
@@ -105,11 +105,11 @@ class HistoricalFeatureStoreWriter(Writer):
         num_partitions=None,
         validation_threshold: float = DEFAULT_VALIDATION_THRESHOLD,
         debug_mode: bool = False,
-        check_schema: Hook = None,
+        check_schema_hook: Hook = None,
     ):
         super().__init__(debug_mode)
         self.db_config = db_config or S3Config()
-        self.check_schema = check_schema
+        self.check_schema_hook = check_schema_hook
         self.database = database or environment.get_variable(
             "FEATURE_STORE_HISTORICAL_DATABASE"
         )
@@ -119,29 +119,19 @@ class HistoricalFeatureStoreWriter(Writer):
     def load(
         self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient,
     ):
-        """Prepare the dataframe before it is saved to the Historical Feature Store.
+        """Loads the latest data from a feature set into the Feature Store.
+
+        Feature Store could be Online or Historical.
 
         Args:
-            feature_set: object processed with feature_set informations.
-            dataframe: spark dataframe containing data from a feature set.
-            spark_client: client for spark connections with external services.
-
-        Returns:
-            load_df: Dataframe ready to be saved.
-            db_config: Spark configuration for connect databases.
-            options(optional = None): All other string options.
-            database(optional = None): Database name where the dataframe will be saved.
-            table_name: Table name where the dataframe will be saved.
-            partition_by(optional = None): Partition column to use when writing.
+            feature_set: object processed with feature set metadata.
+            dataframe: Spark dataframe containing data from a feature set.
+            spark_client: client for Spark connections with external services.
         """
-        if not self.check_schema:
-            self.check_schema = SparkTableSchemaCompatibilityHook(
-                spark_client, feature_set.name, self.database
-            )
-
-        self.add_pre_hook(self.check_schema)
-
         dataframe = self._create_partitions(dataframe)
+
+        self.check_schema(spark_client, feature_set.name, self.database)
+        self.run_pre_hooks(dataframe)
 
         if not self.debug_mode:
             partition_overwrite_mode = spark_client.conn.conf.get(
@@ -161,13 +151,19 @@ class HistoricalFeatureStoreWriter(Writer):
         s3_key = os.path.join("historical", feature_set.entity, feature_set.name)
         options = {"path": self.db_config.get_options(s3_key).get("path")}
 
-        return (
+        self.write(
+            spark_client,
             dataframe,
+            feature_set.name,
             self.db_config,
             options,
-            self.database,
-            feature_set.name,
             self.PARTITION_BY,
+        )
+
+        partition_values = extract_partition_values(dataframe, self.PARTITION_BY)
+
+        spark_client.add_table_partitions(
+            partition_values, feature_set.name, self.database
         )
 
     def _assert_validation_count(self, table_name, written_count, dataframe_count):
@@ -211,6 +207,21 @@ class HistoricalFeatureStoreWriter(Writer):
         )
         dataframe_count = dataframe.count()
         self._assert_validation_count(table_name, written_count, dataframe_count)
+
+    def check_schema(self, client, table_name, database=None):
+        """Instantiate the schema check hook and add it to the list of pre hooks.
+
+        Args:
+            client: client for Spark or Cassandra connections with external services.
+            table_name: table name where the dataframe will be saved.
+            database: database name where the dataframe will be saved.
+        """
+        if not self.check_schema_hook:
+            self.check_schema_hook = SparkTableSchemaCompatibilityHook(
+                client, table_name, database
+            )
+
+        self.add_pre_hook(self.check_schema_hook)
 
     def _create_partitions(self, dataframe):
         # create year partition column

@@ -72,7 +72,7 @@ class TestSink:
         ]
 
         for w in writer:
-            w.write = mocker.stub("write")
+            w.load = mocker.stub("load")
 
         feature_set = mocker.stub("feature_set")
         feature_set.entity = "house"
@@ -88,7 +88,7 @@ class TestSink:
 
         # then
         for w in writer:
-            w.write.assert_called_once()
+            w.load.assert_called_once()
 
     def test_flush_with_invalid_df(self, not_feature_set_dataframe, mocker):
         # given

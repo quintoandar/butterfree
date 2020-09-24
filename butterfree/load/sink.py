@@ -102,7 +102,7 @@ class Sink(HookableComponent):
         self.validation.input(pre_hook_df).check()
 
         handlers = [
-            writer.write(
+            writer.load(
                 feature_set=feature_set,
                 dataframe=pre_hook_df,
                 spark_client=spark_client,
