@@ -59,6 +59,20 @@ class HistoricalFeatureStoreWriter(Writer):
         For what settings you can use on S3Config and default settings,
         to read S3Config class.
 
+        We can write with interval mode, where HistoricalFeatureStoreWrite
+        will need to use Dynamic Partition Inserts,
+        the behaviour of OVERWRITE keyword is controlled by
+        spark.sql.sources.partitionOverwriteMode configuration property.
+        The dynamic overwrite mode is enabled Spark will only delete the
+        partitions for which it has data to be written to.
+        All the other partitions remain intact.
+
+    >>> spark_client = SparkClient()
+    >>> writer = HistoricalFeatureStoreWriter(interval_mode=True)
+    >>> writer.write(feature_set=feature_set,
+       ...           dataframe=dataframe,
+       ...           spark_client=spark_client)
+
         We can instantiate HistoricalFeatureStoreWriter class to validate the df
         to be written.
 
@@ -71,16 +85,9 @@ class HistoricalFeatureStoreWriter(Writer):
         Both methods (write and validate) will need the Spark Client, Feature Set
         and DataFrame, to write or to validate, according to the Writer's arguments.
 
-        P.S.(1): When writing, the HistoricalFeatureStoreWrite partitions the data to
+        P.S.: When writing, the HistoricalFeatureStoreWrite partitions the data to
         improve queries performance. The data is stored in partition folders in AWS S3
         based on time (per year, month and day).
-
-        P.S.(2): HistoricalFeatureStoreWrite use Dynamic Partition Inserts,
-        the behaviour of OVERWRITE keyword is controlled by
-        spark.sql.sources.partitionOverwriteMode configuration property.
-        The dynamic overwrite mode is enabled Spark will only delete the
-        partitions for which it has data to be written to.
-        All the other partitions remain intact.
 
     """
 
@@ -101,14 +108,15 @@ class HistoricalFeatureStoreWriter(Writer):
         num_partitions=None,
         validation_threshold: float = DEFAULT_VALIDATION_THRESHOLD,
         debug_mode: bool = False,
+        interval_mode: bool = False,
     ):
+        super().__init__(debug_mode, interval_mode)
         self.db_config = db_config or S3Config()
         self.database = database or environment.get_variable(
             "FEATURE_STORE_HISTORICAL_DATABASE"
         )
         self.num_partitions = num_partitions or DEFAULT_NUM_PARTITIONS
         self.validation_threshold = validation_threshold
-        self.debug_mode = debug_mode
 
     def write(
         self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient,
@@ -127,6 +135,21 @@ class HistoricalFeatureStoreWriter(Writer):
         """
         dataframe = self._create_partitions(dataframe)
 
+        if self.interval_mode:
+            if self.debug_mode:
+                spark_client.conn.conf.set(
+                    "spark.sql.sources.partitionOverwriteMode", "dynamic"
+                )
+
+                spark_client.create_temporary_view(
+                    dataframe=dataframe,
+                    name=f"historical_feature_store__{feature_set.name}",
+                )
+                return
+
+            self._incremental_mode(feature_set, dataframe, spark_client)
+            return
+
         if self.debug_mode:
             spark_client.create_temporary_view(
                 dataframe=dataframe,
@@ -134,16 +157,31 @@ class HistoricalFeatureStoreWriter(Writer):
             )
             return
 
+        s3_key = os.path.join("historical", feature_set.entity, feature_set.name)
+
+        spark_client.write_table(
+            dataframe=dataframe,
+            database=self.database,
+            table_name=feature_set.name,
+            partition_by=self.PARTITION_BY,
+            **self.db_config.get_options(s3_key),
+        )
+
+    def _incremental_mode(
+        self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient
+    ):
+
         partition_overwrite_mode = spark_client.conn.conf.get(
             "spark.sql.sources.partitionOverwriteMode"
         ).lower()
 
         if partition_overwrite_mode != "dynamic":
             raise RuntimeError(
-                "m=load_incremental, "
+                "m=load_incremental_table, "
                 "spark.sql.sources.partitionOverwriteMode={}, "
-                "msg=partitionOverwriteMode "
-                "have to be configured to 'dynamic'".format(partition_overwrite_mode)
+                "msg=partitionOverwriteMode have to be configured to 'dynamic'".format(
+                    partition_overwrite_mode
+                )
             )
 
         s3_key = os.path.join("historical", feature_set.entity, feature_set.name)
@@ -185,15 +223,23 @@ class HistoricalFeatureStoreWriter(Writer):
         """
         table_name = (
             f"{feature_set.name}"
-            if not self.debug_mode
-            else f"historical_feature_store__{feature_set.name}"
+            if self.interval_mode and not self.debug_mode
+            else (
+                f"{self.database}.{feature_set.name}"
+                if not self.debug_mode
+                else f"historical_feature_store__{feature_set.name}"
+            )
         )
         written_count = (
             spark_client.read(
-                self.db_config.format_, options=self.db_config.get_options(table_name)
+                self.db_config.format_, options=self.db_config.get_options(table_name),
             ).count()
-            if not self.debug_mode
-            else spark_client.read_table(table_name).count()
+            if self.interval_mode and not self.debug_mode
+            else (
+                spark_client.read_table(table_name).count()
+                if not self.debug_mode
+                else spark_client.read_table(table_name).count()
+            )
         )
         dataframe_count = dataframe.count()
         self._assert_validation_count(table_name, written_count, dataframe_count)

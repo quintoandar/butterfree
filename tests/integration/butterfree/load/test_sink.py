@@ -26,7 +26,9 @@ def test_sink(input_dataframe, feature_set):
     s3config.get_options = Mock(
         return_value={"path": "test_folder/historical/entity/feature_set"}
     )
-    historical_writer = HistoricalFeatureStoreWriter(db_config=s3config)
+    historical_writer = HistoricalFeatureStoreWriter(
+        db_config=s3config, interval_mode=True
+    )
 
     # setup online writer
     # TODO: Change for CassandraConfig when Cassandra for test is ready

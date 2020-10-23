@@ -17,8 +17,10 @@ class Writer(ABC, HookableComponent):
 
     """
 
-    def __init__(self):
+    def __init__(self, debug_mode: bool = False, interval_mode: bool = False):
         super().__init__()
+        self.debug_mode = debug_mode
+        self.interval_mode = interval_mode
 
     @abstractmethod
     def write(
