@@ -9,7 +9,7 @@ from butterfree.hooks.schema_compatibility import CassandraTableSchemaCompatibil
 class TestCassandraTableSchemaCompatibilityHook:
     def test_run_compatible_schema(self, spark_session):
         cassandra_client = CassandraClient(
-            cassandra_host=["mock"], cassandra_key_space="dummy_keyspace"
+            host=["mock"], keyspace="dummy_keyspace"
         )
 
         cassandra_client.sql = MagicMock(  # type: ignore
@@ -30,7 +30,7 @@ class TestCassandraTableSchemaCompatibilityHook:
 
     def test_run_incompatible_schema(self, spark_session):
         cassandra_client = CassandraClient(
-            cassandra_host=["mock"], cassandra_key_space="dummy_keyspace"
+            host=["mock"], keyspace="dummy_keyspace"
         )
 
         cassandra_client.sql = MagicMock(  # type: ignore

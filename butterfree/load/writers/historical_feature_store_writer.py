@@ -11,6 +11,8 @@ from butterfree.configs.db import S3Config
 from butterfree.constants import columns
 from butterfree.constants.spark_constants import DEFAULT_NUM_PARTITIONS
 from butterfree.dataframe_service import repartition_df
+from butterfree.hooks import Hook
+from butterfree.hooks.schema_compatibility import SparkTableSchemaCompatibilityHook
 from butterfree.load.writers.writer import Writer
 from butterfree.transform import FeatureSet
 
@@ -109,6 +111,7 @@ class HistoricalFeatureStoreWriter(Writer):
         validation_threshold: float = DEFAULT_VALIDATION_THRESHOLD,
         debug_mode: bool = False,
         interval_mode: bool = False,
+        check_schema_hook: Hook = None
     ):
         super().__init__(debug_mode, interval_mode)
         self.db_config = db_config or S3Config()
@@ -117,6 +120,8 @@ class HistoricalFeatureStoreWriter(Writer):
         )
         self.num_partitions = num_partitions or DEFAULT_NUM_PARTITIONS
         self.validation_threshold = validation_threshold
+        self.debug_mode = debug_mode
+        self.check_schema_hook = check_schema_hook
 
     def write(
         self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient,
@@ -133,7 +138,9 @@ class HistoricalFeatureStoreWriter(Writer):
         to the real historical feature store.
 
         """
-        dataframe = self._create_partitions(dataframe)
+        partition_df = self._create_partitions(dataframe)
+
+        dataframe = self.check_schema(spark_client, partition_df, feature_set.name, self.database)
 
         if self.interval_mode:
             if self.debug_mode:
@@ -254,3 +261,18 @@ class HistoricalFeatureStoreWriter(Writer):
             columns.PARTITION_DAY, dayofmonth(dataframe[columns.TIMESTAMP_COLUMN])
         )
         return repartition_df(dataframe, self.PARTITION_BY, self.num_partitions)
+
+    def check_schema(self, client, dataframe, table_name, database=None):
+        """Instantiate the schema check hook and add it to the list of pre hooks.
+        Args:
+            client: client for Spark or Cassandra connections with external services.
+            dataframe: Spark dataframe containing data from a feature set.
+            table_name: table name where the dataframe will be saved.
+            database: database name where the dataframe will be saved.
+        """
+        if not self.check_schema_hook:
+            self.check_schema_hook = SparkTableSchemaCompatibilityHook(
+                client, table_name, database
+            )
+
+        return  self.check_schema_hook.run(dataframe)

@@ -38,6 +38,16 @@ class Writer(ABC, HookableComponent):
         """
 
     @abstractmethod
+    def check_schema(self, client, dataframe: DataFrame, table_name, database=None):
+        """Instantiate the schema check hook and add it to the list of pre hooks.
+        Args:
+            client: client for Spark or Cassandra connections with external services.
+            dataframe: Spark dataframe containing data from a feature set.
+            table_name: table name where the dataframe will be saved.
+            database: database name where the dataframe will be saved.
+        """
+
+    @abstractmethod
     def validate(
         self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient
     ):
