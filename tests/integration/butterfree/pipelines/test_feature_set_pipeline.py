@@ -8,6 +8,7 @@ from butterfree.clients import SparkClient
 from butterfree.configs import environment
 from butterfree.constants import DataType
 from butterfree.constants.columns import TIMESTAMP_COLUMN
+from butterfree.dataframe_service import IncrementalStrategy
 from butterfree.extract import Source
 from butterfree.extract.readers import TableReader
 from butterfree.load import Sink
@@ -171,19 +172,70 @@ class TestFeatureSetPipeline:
         mocked_date_df,
         spark_session,
         fixed_windows_output_feature_set_date_dataframe,
-        feature_set_pipeline_date,
+        mocker,
     ):
         # arrange
         table_reader_table = "b_table"
         create_temp_view(dataframe=mocked_date_df, name=table_reader_table)
 
-        # act
-        feature_set_pipeline_date.run_for_date(execution_date="2016-04-12")
-
-        df = spark_session.sql("select * from historical_feature_store__feature_set")
         target_df = fixed_windows_output_feature_set_date_dataframe.filter(
             "timestamp < '2016-04-13'"
         )
+
+        historical_writer = HistoricalFeatureStoreWriter(debug_mode=True)
+
+        historical_writer.check_schema_hook = mocker.stub("check_schema_hook")
+        historical_writer.check_schema_hook.run = mocker.stub("run")
+        historical_writer.check_schema_hook.run.return_value = target_df
+
+        feature_set_pipeline = FeatureSetPipeline(
+            source=Source(
+                readers=[
+                    TableReader(
+                        id="b_source", table="b_table",
+                    ).with_incremental_strategy(
+                        incremental_strategy=IncrementalStrategy(column="timestamp")
+                    ),
+                ],
+                query=f"select * from b_source ",  # noqa
+            ),
+            feature_set=FeatureSet(
+                name="feature_set",
+                entity="entity",
+                description="description",
+                features=[
+                    Feature(
+                        name="feature",
+                        description="test",
+                        transformation=SparkFunctionTransform(
+                            functions=[
+                                Function(F.avg, DataType.FLOAT),
+                                Function(F.stddev_pop, DataType.FLOAT),
+                            ],
+                        ).with_window(
+                            partition_by="id",
+                            order_by=TIMESTAMP_COLUMN,
+                            mode="fixed_windows",
+                            window_definition=["1 day"],
+                        ),
+                    ),
+                ],
+                keys=[
+                    KeyFeature(
+                        name="id",
+                        description="The user's Main ID or device ID",
+                        dtype=DataType.INTEGER,
+                    )
+                ],
+                timestamp=TimestampFeature(),
+            ),
+            sink=Sink(writers=[historical_writer]),
+        )
+
+        # act
+        feature_set_pipeline.run_for_date(execution_date="2016-04-12")
+
+        df = spark_session.sql("select * from historical_feature_store__feature_set")
 
         # assert
         assert_dataframe_equality(df, target_df)
