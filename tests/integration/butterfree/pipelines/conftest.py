@@ -131,10 +131,7 @@ def fixed_windows_output_feature_set_date_dataframe(spark_context, spark_session
 
 @pytest.fixture()
 def feature_set_pipeline(
-    spark_context,
-    spark_session,
-    fixed_windows_output_feature_set_date_dataframe,
-    mocker,
+    spark_context, spark_session,
 ):
 
     feature_set_pipeline = FeatureSetPipeline(
