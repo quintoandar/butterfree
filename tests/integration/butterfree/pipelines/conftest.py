@@ -136,13 +136,6 @@ def feature_set_pipeline(
     fixed_windows_output_feature_set_date_dataframe,
     mocker,
 ):
-    historical_writer = HistoricalFeatureStoreWriter(debug_mode=True)
-
-    historical_writer.check_schema_hook = mocker.stub("check_schema_hook")
-    historical_writer.check_schema_hook.run = mocker.stub("run")
-    historical_writer.check_schema_hook.run.return_value = (
-        fixed_windows_output_feature_set_date_dataframe
-    )
 
     feature_set_pipeline = FeatureSetPipeline(
         source=Source(
@@ -183,7 +176,7 @@ def feature_set_pipeline(
             ],
             timestamp=TimestampFeature(),
         ),
-        sink=Sink(writers=[historical_writer]),
+        sink=Sink(writers=[HistoricalFeatureStoreWriter(debug_mode=True)]),
     )
 
     return feature_set_pipeline
