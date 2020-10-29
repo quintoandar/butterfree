@@ -56,9 +56,7 @@ class CassandraClient(AbstractClient):
     def conn(self, *, ssl_path: str = None) -> Session:  # type: ignore
         """Establishes a Cassandra connection."""
         auth_provider = (
-            PlainTextAuthProvider(
-                username=self.user, password=self.password
-            )
+            PlainTextAuthProvider(username=self.user, password=self.password)
             if self.user is not None
             else None
         )
@@ -114,8 +112,7 @@ class CassandraClient(AbstractClient):
 
         if not response:
             raise RuntimeError(
-                f"No columns found for table: {table}"
-                f"in key space: {self.keyspace}"
+                f"No columns found for table: {table}" f"in key space: {self.keyspace}"
             )
 
         return response

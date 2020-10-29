@@ -8,9 +8,7 @@ from butterfree.hooks.schema_compatibility import CassandraTableSchemaCompatibil
 
 class TestCassandraTableSchemaCompatibilityHook:
     def test_run_compatible_schema(self, spark_session):
-        cassandra_client = CassandraClient(
-            host=["mock"], keyspace="dummy_keyspace"
-        )
+        cassandra_client = CassandraClient(host=["mock"], keyspace="dummy_keyspace")
 
         cassandra_client.sql = MagicMock(  # type: ignore
             return_value=[
@@ -29,9 +27,7 @@ class TestCassandraTableSchemaCompatibilityHook:
         assert hook.run(input_dataframe) == input_dataframe
 
     def test_run_incompatible_schema(self, spark_session):
-        cassandra_client = CassandraClient(
-            host=["mock"], keyspace="dummy_keyspace"
-        )
+        cassandra_client = CassandraClient(host=["mock"], keyspace="dummy_keyspace")
 
         cassandra_client.sql = MagicMock(  # type: ignore
             return_value=[

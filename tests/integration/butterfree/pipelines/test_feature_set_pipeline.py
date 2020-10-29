@@ -41,7 +41,11 @@ def divide(df, fs, column1, column2):
 
 class TestFeatureSetPipeline:
     def test_feature_set_pipeline(
-        self, mocked_df, spark_session, fixed_windows_output_feature_set_dataframe
+        self,
+        mocked_df,
+        spark_session,
+        fixed_windows_output_feature_set_dataframe,
+        mocker,
     ):
         # arrange
         table_reader_id = "a_source"
@@ -65,6 +69,14 @@ class TestFeatureSetPipeline:
         dbconfig.format_ = "parquet"
         dbconfig.get_options = Mock(
             return_value={"path": "test_folder/historical/entity/feature_set"}
+        )
+
+        historical_writer = HistoricalFeatureStoreWriter(db_config=dbconfig, interval_mode=True)
+
+        historical_writer.check_schema_hook = mocker.stub("check_schema_hook")
+        historical_writer.check_schema_hook.run = mocker.stub("run")
+        historical_writer.check_schema_hook.run.return_value = (
+            fixed_windows_output_feature_set_dataframe
         )
 
         # act
@@ -117,11 +129,7 @@ class TestFeatureSetPipeline:
                 ],
                 timestamp=TimestampFeature(),
             ),
-            sink=Sink(
-                writers=[
-                    HistoricalFeatureStoreWriter(db_config=dbconfig, interval_mode=True)
-                ],
-            ),
+            sink=Sink(writers=[historical_writer],),
         )
         test_pipeline.run()
 
@@ -163,14 +171,14 @@ class TestFeatureSetPipeline:
         mocked_date_df,
         spark_session,
         fixed_windows_output_feature_set_date_dataframe,
-        feature_set_pipeline,
+        feature_set_pipeline_date,
     ):
         # arrange
         table_reader_table = "b_table"
         create_temp_view(dataframe=mocked_date_df, name=table_reader_table)
 
         # act
-        feature_set_pipeline.run_for_date(execution_date="2016-04-12")
+        feature_set_pipeline_date.run_for_date(execution_date="2016-04-12")
 
         df = spark_session.sql("select * from historical_feature_store__feature_set")
         target_df = fixed_windows_output_feature_set_date_dataframe.filter(

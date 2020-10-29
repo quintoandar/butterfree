@@ -56,6 +56,11 @@ class TestHistoricalFeatureStoreWriter:
         )
         writer = HistoricalFeatureStoreWriter(interval_mode=True)
 
+        schema_dataframe = writer._create_partitions(feature_set_dataframe)
+        writer.check_schema_hook = mocker.stub("check_schema_hook")
+        writer.check_schema_hook.run = mocker.stub("run")
+        writer.check_schema_hook.run.return_value = schema_dataframe
+
         # when
         writer.write(
             feature_set=feature_set,
@@ -90,7 +95,13 @@ class TestHistoricalFeatureStoreWriter:
         spark_client = SparkClient()
         spark_client.write_dataframe = mocker.stub("write_dataframe")
         spark_client.conn.conf.set("spark.sql.sources.partitionOverwriteMode", "static")
+
         writer = HistoricalFeatureStoreWriter(interval_mode=True)
+
+        schema_dataframe = writer._create_partitions(feature_set_dataframe)
+        writer.check_schema_hook = mocker.stub("check_schema_hook")
+        writer.check_schema_hook.run = mocker.stub("run")
+        writer.check_schema_hook.run.return_value = schema_dataframe
 
         # when
         with pytest.raises(RuntimeError):
@@ -106,10 +117,16 @@ class TestHistoricalFeatureStoreWriter:
         historical_feature_set_dataframe,
         feature_set,
         spark_session,
+        mocker,
     ):
         # given
         spark_client = SparkClient()
         writer = HistoricalFeatureStoreWriter(debug_mode=True)
+
+        schema_dataframe = writer._create_partitions(feature_set_dataframe)
+        writer.check_schema_hook = mocker.stub("check_schema_hook")
+        writer.check_schema_hook.run = mocker.stub("run")
+        writer.check_schema_hook.run.return_value = schema_dataframe
 
         # when
         writer.write(

@@ -7,7 +7,7 @@ from pyspark.sql import DataFrame, Window
 from pyspark.sql.functions import col, row_number
 from pyspark.sql.streaming import StreamingQuery
 
-from butterfree.clients import SparkClient, CassandraClient
+from butterfree.clients import CassandraClient, SparkClient
 from butterfree.configs.db import CassandraConfig
 from butterfree.constants.columns import TIMESTAMP_COLUMN
 from butterfree.hooks import Hook
@@ -251,7 +251,8 @@ class OnlineFeatureStoreWriter(Writer):
         return db_schema
 
     def check_schema(self, client, dataframe, table_name, database=None):
-        """Instantiate the schema check hook and add it to the list of pre hooks.
+        """Instantiate the schema check hook to check schema between dataframe and database.
+
         Args:
             client: client for Spark or Cassandra connections with external services.
             dataframe: Spark dataframe containing data from a feature set.
@@ -263,4 +264,4 @@ class OnlineFeatureStoreWriter(Writer):
                 client, table_name
             )
 
-        return  self.check_schema_hook.run(dataframe)
+        return self.check_schema_hook.run(dataframe)

@@ -67,6 +67,10 @@ class TestOnlineFeatureStoreWriter:
         spark_client.write_dataframe = mocker.stub("write_dataframe")
         writer = OnlineFeatureStoreWriter(cassandra_config)
 
+        writer.check_schema_hook = mocker.stub("check_schema_hook")
+        writer.check_schema_hook.run = mocker.stub("run")
+        writer.check_schema_hook.run.return_value = feature_set_dataframe
+
         # when
         writer.write(feature_set, feature_set_dataframe, spark_client)
 
@@ -93,10 +97,15 @@ class TestOnlineFeatureStoreWriter:
         latest_feature_set_dataframe,
         feature_set,
         spark_session,
+        mocker,
     ):
         # given
         spark_client = SparkClient()
         writer = OnlineFeatureStoreWriter(debug_mode=True)
+
+        writer.check_schema_hook = mocker.stub("check_schema_hook")
+        writer.check_schema_hook.run = mocker.stub("run")
+        writer.check_schema_hook.run.return_value = feature_set_dataframe
 
         # when
         writer.write(
@@ -109,9 +118,7 @@ class TestOnlineFeatureStoreWriter:
         # then
         assert_dataframe_equality(latest_feature_set_dataframe, result_df)
 
-    def test_write_in_debug_and_stream_mode(
-        self, feature_set, spark_session,
-    ):
+    def test_write_in_debug_and_stream_mode(self, feature_set, spark_session, mocker):
         # arrange
         spark_client = SparkClient()
 
@@ -123,6 +130,10 @@ class TestOnlineFeatureStoreWriter:
         mocked_stream_df.start.return_value = Mock(spec=StreamingQuery)
 
         writer = OnlineFeatureStoreWriter(debug_mode=True)
+
+        writer.check_schema_hook = mocker.stub("check_schema_hook")
+        writer.check_schema_hook.run = mocker.stub("run")
+        writer.check_schema_hook.run.return_value = mocked_stream_df
 
         # act
         handler = writer.write(
@@ -139,7 +150,7 @@ class TestOnlineFeatureStoreWriter:
         assert isinstance(handler, StreamingQuery)
 
     @pytest.mark.parametrize("has_checkpoint", [True, False])
-    def test_write_stream(self, feature_set, has_checkpoint, monkeypatch):
+    def test_write_stream(self, feature_set, has_checkpoint, monkeypatch, mocker):
         # arrange
         spark_client = SparkClient()
         spark_client.write_stream = Mock()
@@ -161,6 +172,10 @@ class TestOnlineFeatureStoreWriter:
 
         writer = OnlineFeatureStoreWriter(cassandra_config)
         writer.filter_latest = Mock()
+
+        writer.check_schema_hook = mocker.stub("check_schema_hook")
+        writer.check_schema_hook.run = mocker.stub("run")
+        writer.check_schema_hook.run.return_value = dataframe
 
         # act
         stream_handler = writer.write(feature_set, dataframe, spark_client)
@@ -185,7 +200,7 @@ class TestOnlineFeatureStoreWriter:
 
         assert schema == expected_schema
 
-    def test_write_stream_on_entity(self, feature_set, monkeypatch):
+    def test_write_stream_on_entity(self, feature_set, monkeypatch, mocker):
         """Test write method with stream dataframe and write_to_entity enabled.
 
         The main purpose of this test is assert the correct setup of stream checkpoint
@@ -207,6 +222,10 @@ class TestOnlineFeatureStoreWriter:
         target_checkpoint_path = "test/my_entity/my_feature_set__on_entity"
 
         writer = OnlineFeatureStoreWriter(write_to_entity=True)
+
+        writer.check_schema_hook = mocker.stub("check_schema_hook")
+        writer.check_schema_hook.run = mocker.stub("run")
+        writer.check_schema_hook.run.return_value = dataframe
 
         # act
         stream_handler = writer.write(feature_set, dataframe, spark_client)

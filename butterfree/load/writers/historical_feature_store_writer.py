@@ -140,7 +140,9 @@ class HistoricalFeatureStoreWriter(Writer):
         """
         partition_df = self._create_partitions(dataframe)
 
-        dataframe = self.check_schema(spark_client, partition_df, feature_set.name, self.database)
+        dataframe = self.check_schema(
+            spark_client, partition_df, feature_set.name, self.database
+        )
 
         if self.interval_mode:
             if self.debug_mode:
@@ -263,7 +265,8 @@ class HistoricalFeatureStoreWriter(Writer):
         return repartition_df(dataframe, self.PARTITION_BY, self.num_partitions)
 
     def check_schema(self, client, dataframe, table_name, database=None):
-        """Instantiate the schema check hook and add it to the list of pre hooks.
+        """Instantiate the schema check hook to check schema between dataframe and database.
+
         Args:
             client: client for Spark or Cassandra connections with external services.
             dataframe: Spark dataframe containing data from a feature set.
@@ -275,4 +278,4 @@ class HistoricalFeatureStoreWriter(Writer):
                 client, table_name, database
             )
 
-        return  self.check_schema_hook.run(dataframe)
+        return self.check_schema_hook.run(dataframe)
