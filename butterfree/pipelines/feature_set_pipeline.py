@@ -174,11 +174,11 @@ class FeatureSetPipeline:
 
     def run(
         self,
-        start_date: str = None,
         end_date: str = None,
         partition_by: List[str] = None,
         order_by: List[str] = None,
         num_processors: int = None,
+        start_date: str = None,
     ):
         """Runs the defined feature set pipeline.
 
