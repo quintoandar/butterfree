@@ -117,7 +117,11 @@ class TestFeatureSetPipeline:
                 ],
                 timestamp=TimestampFeature(),
             ),
-            sink=Sink(writers=[HistoricalFeatureStoreWriter(db_config=dbconfig)],),
+            sink=Sink(
+                writers=[
+                    HistoricalFeatureStoreWriter(db_config=dbconfig, interval_mode=True)
+                ],
+            ),
         )
         test_pipeline.run()
 

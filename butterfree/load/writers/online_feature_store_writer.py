@@ -70,9 +70,15 @@ class OnlineFeatureStoreWriter(Writer):
 
     __name__ = "Online Feature Store Writer"
 
-    def __init__(self, db_config=None, debug_mode: bool = False, write_to_entity=False):
+    def __init__(
+        self,
+        db_config=None,
+        debug_mode: bool = False,
+        write_to_entity=False,
+        interval_mode: bool = False,
+    ):
+        super().__init__(debug_mode, interval_mode)
         self.db_config = db_config or CassandraConfig()
-        self.debug_mode = debug_mode
         self.write_to_entity = write_to_entity
 
     @staticmethod
