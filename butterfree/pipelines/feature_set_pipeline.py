@@ -45,7 +45,8 @@ class FeatureSetPipeline:
 
         >>> def divide(df, fs, column1, column2):
         ...     name = fs.get_output_columns()[0]
-        ...     df = df.withColumn(name, functions.col(column1) / functions.col(column2))
+        ...     df = df.withColumn(name,
+        ...            functions.col(column1) / functions.col(column2))
         ...     return df
 
         >>> pipeline = FeatureSetPipeline(
