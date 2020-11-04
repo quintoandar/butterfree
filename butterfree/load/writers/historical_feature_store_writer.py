@@ -111,7 +111,7 @@ class HistoricalFeatureStoreWriter(Writer):
         validation_threshold: float = DEFAULT_VALIDATION_THRESHOLD,
         debug_mode: bool = False,
         interval_mode: bool = False,
-        check_schema_hook: Hook = None
+        check_schema_hook: Hook = None,
     ):
         super().__init__(debug_mode, interval_mode)
         self.db_config = db_config or S3Config()

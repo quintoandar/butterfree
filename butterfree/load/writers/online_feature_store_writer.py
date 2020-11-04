@@ -83,7 +83,7 @@ class OnlineFeatureStoreWriter(Writer):
         debug_mode: bool = False,
         write_to_entity=False,
         interval_mode: bool = False,
-        check_schema_hook: Hook = None
+        check_schema_hook: Hook = None,
     ):
         super().__init__(debug_mode, interval_mode)
         self.db_config = db_config or CassandraConfig()

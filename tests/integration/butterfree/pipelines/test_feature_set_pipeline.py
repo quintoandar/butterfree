@@ -71,7 +71,9 @@ class TestFeatureSetPipeline:
             return_value={"path": "test_folder/historical/entity/feature_set"}
         )
 
-        historical_writer = HistoricalFeatureStoreWriter(db_config=dbconfig, interval_mode=True)
+        historical_writer = HistoricalFeatureStoreWriter(
+            db_config=dbconfig, interval_mode=True
+        )
 
         historical_writer.check_schema_hook = mocker.stub("check_schema_hook")
         historical_writer.check_schema_hook.run = mocker.stub("run")
