@@ -9,6 +9,7 @@ from pyspark.sql.dataframe import DataFrame
 
 from butterfree.clients import SparkClient
 from butterfree.constants.columns import TIMESTAMP_COLUMN
+from butterfree.dataframe_service import IncrementalStrategy
 from butterfree.hooks import HookableComponent
 from butterfree.transform.features import Feature, KeyFeature, TimestampFeature
 from butterfree.transform.transformations import (
@@ -114,6 +115,7 @@ class FeatureSet(HookableComponent):
         self.keys = keys
         self.timestamp = timestamp
         self.features = features
+        self.incremental_strategy = IncrementalStrategy(column=TIMESTAMP_COLUMN)
 
     @property
     def name(self) -> str:
@@ -380,6 +382,13 @@ class FeatureSet(HookableComponent):
 
         return df.select([column for column in self.columns])
 
+    def filter_dataframe_by_date(
+        self, df, start_date: str = None, end_date: str = None
+    ):
+        return self.incremental_strategy.filter_with_incremental_strategy(
+            dataframe=df, start_date=start_date, end_date=end_date
+        )
+
     def define_start_date(self, start_date: str = None):
         """Get feature set start date.
 
@@ -428,6 +437,8 @@ class FeatureSet(HookableComponent):
 
         if not output_df.isStreaming:
             output_df = self._filter_duplicated_rows(output_df)
+
+        output_df = self.filter_dataframe_by_date(output_df, start_date, end_date)
 
         post_hook_df = self.run_post_hooks(output_df)
 
