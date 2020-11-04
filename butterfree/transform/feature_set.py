@@ -385,6 +385,16 @@ class FeatureSet(HookableComponent):
     def filter_dataframe_by_date(
         self, df, start_date: str = None, end_date: str = None
     ):
+        """Filter, based on a time period, a given dataframe.
+
+        Args:
+            df: dataframe.
+            start_date: start date regarding a given dataframe.
+            end_date: end data regarding a given dataframe.
+
+        Returns:
+            Filtered dataframe.
+        """
         return self.incremental_strategy.filter_with_incremental_strategy(
             dataframe=df, start_date=start_date, end_date=end_date
         )
