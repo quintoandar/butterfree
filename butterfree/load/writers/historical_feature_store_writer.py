@@ -241,7 +241,8 @@ class HistoricalFeatureStoreWriter(Writer):
         )
         written_count = (
             spark_client.read(
-                self.db_config.format_, options=self.db_config.get_options(table_name),
+                self.db_config.format_,
+                path=self.db_config.get_path_with_partitions(table_name, dataframe),
             ).count()
             if self.interval_mode and not self.debug_mode
             else spark_client.read_table(table_name).count()

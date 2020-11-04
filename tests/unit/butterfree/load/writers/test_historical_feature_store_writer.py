@@ -178,47 +178,53 @@ class TestHistoricalFeatureStoreWriter:
             == "dynamic"
         )
 
-    def test_validate(self, feature_set_dataframe, mocker, feature_set):
+    def test_validate(self, historical_feature_set_dataframe, mocker, feature_set):
         # given
         spark_client = mocker.stub("spark_client")
         spark_client.read_table = mocker.stub("read_table")
-        spark_client.read_table.return_value = feature_set_dataframe
+        spark_client.read_table.return_value = historical_feature_set_dataframe
 
         writer = HistoricalFeatureStoreWriter()
 
         # when
-        writer.validate(feature_set, feature_set_dataframe, spark_client)
+        writer.validate(feature_set, historical_feature_set_dataframe, spark_client)
 
         # then
         spark_client.read_table.assert_called_once()
 
-    def test_validate_interval_mode(self, feature_set_dataframe, mocker, feature_set):
+    def test_validate_interval_mode(
+        self, historical_feature_set_dataframe, mocker, feature_set
+    ):
         # given
         spark_client = mocker.stub("spark_client")
         spark_client.read = mocker.stub("read")
-        spark_client.read.return_value = feature_set_dataframe
+        spark_client.read.return_value = historical_feature_set_dataframe
 
         writer = HistoricalFeatureStoreWriter(interval_mode=True)
 
         # when
-        writer.validate(feature_set, feature_set_dataframe, spark_client)
+        writer.validate(feature_set, historical_feature_set_dataframe, spark_client)
 
         # then
         spark_client.read.assert_called_once()
 
-    def test_validate_false(self, feature_set_dataframe, mocker, feature_set):
+    def test_validate_false(
+        self, historical_feature_set_dataframe, mocker, feature_set
+    ):
         # given
         spark_client = mocker.stub("spark_client")
         spark_client.read = mocker.stub("read")
 
         # limiting df to 1 row, now the counts should'n be the same
-        spark_client.read.return_value = feature_set_dataframe.limit(1)
+        spark_client.read.return_value = historical_feature_set_dataframe.limit(1)
 
         writer = HistoricalFeatureStoreWriter(interval_mode=True)
 
         # when
         with pytest.raises(AssertionError):
-            _ = writer.validate(feature_set, feature_set_dataframe, spark_client)
+            _ = writer.validate(
+                feature_set, historical_feature_set_dataframe, spark_client
+            )
 
     def test__create_partitions(self, spark_session, spark_context):
         # arrange

@@ -3,6 +3,8 @@
 import os
 from typing import Dict, List
 
+from pyspark.sql import DataFrame
+
 from butterfree.configs import environment
 from butterfree.configs.db import AbstractWriteConfig
 
@@ -11,11 +13,9 @@ class S3Config(AbstractWriteConfig):
     """Configuration for Spark metastore database stored on AWS S3.
 
     Attributes:
-        database: database name.
+        bucket: AWS S3 bucket name.
         mode: writing mode used be writers.
         format_: expected stored file format.
-        path: database root location.
-        partition_by: partition column to use when writing.
 
     """
 
@@ -71,6 +71,30 @@ class S3Config(AbstractWriteConfig):
             "format_": self.format_,
             "path": os.path.join(f"s3a://{self.bucket}/", key),
         }
+
+    def get_path_with_partitions(self, key: str, dataframe: DataFrame) -> List:
+        """Get options for AWS S3 from partitioned parquet file.
+
+        Options will be a dictionary with the write and read configuration for
+        Spark to AWS S3.
+
+        Args:
+            key: path to save data into AWS S3 bucket.
+            dataframe: spark dataframe containing data from a feature set.
+
+        Returns:
+            A list of string for file-system backed data sources.
+        """
+        path_list = []
+        for row in dataframe.collect():
+            path = (
+                f"s3a://{self.bucket}/{key}/year={row['year']}/"
+                f"month={row['month']}/day={row['day']}"
+            )
+            if path not in path_list:
+                path_list.append(path)
+
+        return path_list
 
     def translate(self, schema) -> List[Dict]:
         """Translate feature set spark schema to the corresponding database."""
