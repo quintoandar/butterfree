@@ -69,6 +69,7 @@ class OnlineFeatureStoreWriter(Writer):
         There's an important aspect to be highlighted here: if you're using
         the incremental mode, we do not check if your data is the newest before
         writing to the online feature store.
+
         This behavior is known and will be fixed soon.
     """
 
