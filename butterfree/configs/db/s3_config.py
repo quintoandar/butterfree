@@ -7,6 +7,7 @@ from pyspark.sql import DataFrame
 
 from butterfree.configs import environment
 from butterfree.configs.db import AbstractWriteConfig
+from butterfree.dataframe_service import extract_partition_values
 
 
 class S3Config(AbstractWriteConfig):
@@ -86,13 +87,14 @@ class S3Config(AbstractWriteConfig):
             A list of string for file-system backed data sources.
         """
         path_list = []
-        for row in dataframe.collect():
-            path = (
+        dataframe_values = extract_partition_values(
+            dataframe, partition_columns=["year", "month", "day"]
+        )
+        for row in dataframe_values:
+            path_list.append(
                 f"s3a://{self.bucket}/{key}/year={row['year']}/"
                 f"month={row['month']}/day={row['day']}"
             )
-            if path not in path_list:
-                path_list.append(path)
 
         return path_list
 
