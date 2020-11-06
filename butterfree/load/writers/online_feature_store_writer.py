@@ -66,6 +66,11 @@ class OnlineFeatureStoreWriter(Writer):
         Both methods (writer and validate) will need the Spark Client,
         Feature Set and DataFrame, to write or to validate,
         according to OnlineFeatureStoreWriter class arguments.
+        There's an important aspect to be highlighted here: if you're using
+        the incremental mode, we do not check if your data is the newest before
+        writing to the online feature store.
+
+        This behavior is known and will be fixed soon.
     """
 
     __name__ = "Online Feature Store Writer"
