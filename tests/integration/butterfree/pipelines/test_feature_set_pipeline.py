@@ -407,7 +407,7 @@ class TestFeatureSetPipeline:
         test_pipeline.sink.writers[0].validate = Mock()  # temporary
 
         test_pipeline.feature_set.add_pre_hook(first_run_hook)
-        test_pipeline.run(end_date="2016-04-13")
+        test_pipeline.run(end_date="2016-04-13", start_date="2016-04-11")
         first_run_output_df = spark_session.read.parquet(path)
         # first_run_output_df = spark_session.table("test.feature_set")
         assert_dataframe_equality(first_run_output_df, first_run_target_df)  # temporary
