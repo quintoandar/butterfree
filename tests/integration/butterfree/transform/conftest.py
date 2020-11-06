@@ -413,6 +413,18 @@ def feature_set_dates_dataframe(spark_context, spark_session):
 
 
 @fixture
+def feature_set_dates_output_dataframe(spark_context, spark_session):
+    data = [
+        {"id": 1, "timestamp": "2016-04-11 11:31:11", "feature": 200},
+        {"id": 1, "timestamp": "2016-04-12 11:44:12", "feature": 300},
+    ]
+    df = spark_session.read.json(spark_context.parallelize(data, 1))
+    df = df.withColumn("timestamp", df.timestamp.cast(DataType.TIMESTAMP.spark))
+
+    return df
+
+
+@fixture
 def rolling_windows_output_date_boundaries(spark_context, spark_session):
     data = [
         {

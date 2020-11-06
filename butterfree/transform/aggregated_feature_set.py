@@ -8,9 +8,8 @@ from pyspark import sql
 from pyspark.sql import DataFrame, functions
 
 from butterfree.clients import SparkClient
-from butterfree.constants.columns import TIMESTAMP_COLUMN
 from butterfree.constants.window_definitions import ALLOWED_WINDOWS
-from butterfree.dataframe_service import IncrementalStrategy, repartition_df
+from butterfree.dataframe_service import repartition_df
 from butterfree.transform import FeatureSet
 from butterfree.transform.features import Feature, KeyFeature, TimestampFeature
 from butterfree.transform.transformations import AggregatedTransform
@@ -204,7 +203,6 @@ class AggregatedFeatureSet(FeatureSet):
         self._pivot_values = []
         self._distinct_subset = []
         self._distinct_keep = None
-        self.incremental_strategy = IncrementalStrategy(column=TIMESTAMP_COLUMN)
         super(AggregatedFeatureSet, self).__init__(
             name, entity, description, keys, timestamp, features,
         )
