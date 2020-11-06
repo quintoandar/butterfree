@@ -7,9 +7,11 @@ from pyspark.sql import DataFrame, Window
 from pyspark.sql.functions import col, row_number
 from pyspark.sql.streaming import StreamingQuery
 
-from butterfree.clients import SparkClient
+from butterfree.clients import CassandraClient, SparkClient
 from butterfree.configs.db import CassandraConfig
 from butterfree.constants.columns import TIMESTAMP_COLUMN
+from butterfree.hooks import Hook
+from butterfree.hooks.schema_compatibility import CassandraTableSchemaCompatibilityHook
 from butterfree.load.writers.writer import Writer
 from butterfree.transform import FeatureSet
 
@@ -81,10 +83,12 @@ class OnlineFeatureStoreWriter(Writer):
         debug_mode: bool = False,
         write_to_entity=False,
         interval_mode: bool = False,
+        check_schema_hook: Hook = None,
     ):
         super().__init__(debug_mode, interval_mode)
         self.db_config = db_config or CassandraConfig()
         self.write_to_entity = write_to_entity
+        self.check_schema_hook = check_schema_hook
 
     @staticmethod
     def filter_latest(dataframe: DataFrame, id_columns: List[Any]) -> DataFrame:
@@ -175,6 +179,15 @@ class OnlineFeatureStoreWriter(Writer):
         """
         table_name = feature_set.entity if self.write_to_entity else feature_set.name
 
+        cassandra_client = CassandraClient(
+            host=[self.db_config.host],
+            keyspace=self.db_config.keyspace,
+            user=self.db_config.username,
+            password=self.db_config.password,
+        )
+
+        dataframe = self.check_schema(cassandra_client, dataframe, table_name)
+
         if dataframe.isStreaming:
             if self.debug_mode:
                 return self._write_in_debug_mode(
@@ -236,3 +249,19 @@ class OnlineFeatureStoreWriter(Writer):
         """
         db_schema = self.db_config.translate(feature_set.get_schema())
         return db_schema
+
+    def check_schema(self, client, dataframe, table_name, database=None):
+        """Instantiate the schema check hook to check schema between dataframe and database.
+
+        Args:
+            client: client for Spark or Cassandra connections with external services.
+            dataframe: Spark dataframe containing data from a feature set.
+            table_name: table name where the dataframe will be saved.
+            database: database name where the dataframe will be saved.
+        """
+        if not self.check_schema_hook:
+            self.check_schema_hook = CassandraTableSchemaCompatibilityHook(
+                client, table_name
+            )
+
+        return self.check_schema_hook.run(dataframe)

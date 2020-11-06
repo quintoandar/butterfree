@@ -15,9 +15,7 @@ def sanitize_string(query: str) -> str:
 class TestCassandraClient:
     def test_conn(self, cassandra_client: CassandraClient) -> None:
         # arrange
-        cassandra_client = CassandraClient(
-            cassandra_host=["mock"], cassandra_key_space="dummy_keyspace"
-        )
+        cassandra_client = CassandraClient(host=["mock"], keyspace="dummy_keyspace")
 
         # act
         start_conn = cassandra_client._session
