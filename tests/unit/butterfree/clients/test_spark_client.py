@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Dict, Optional, Union
+from typing import Any, Optional, Union
 from unittest.mock import Mock
 
 import pytest
@@ -27,19 +27,20 @@ class TestSparkClient:
         assert start_conn is None
 
     @pytest.mark.parametrize(
-        "format, options, stream, schema",
+        "format, path, stream, schema, options",
         [
-            ("parquet", {"path": "path/to/file"}, False, None),
-            ("csv", {"path": "path/to/file", "header": True}, False, None),
-            ("json", {"path": "path/to/file"}, True, None),
+            ("parquet", ["path/to/file"], False, None, {}),
+            ("csv", "path/to/file", False, None, {"header": True}),
+            ("json", "path/to/file", True, None, {}),
         ],
     )
     def test_read(
         self,
         format: str,
-        options: Dict[str, Any],
         stream: bool,
         schema: Optional[StructType],
+        path: Any,
+        options: Any,
         target_df: DataFrame,
         mocked_spark_read: Mock,
     ) -> None:
@@ -49,26 +50,25 @@ class TestSparkClient:
         spark_client._session = mocked_spark_read
 
         # act
-        result_df = spark_client.read(format, options, schema, stream)
+        result_df = spark_client.read(
+            format=format, schema=schema, stream=stream, path=path, **options
+        )
 
         # assert
         mocked_spark_read.format.assert_called_once_with(format)
-        mocked_spark_read.options.assert_called_once_with(**options)
+        mocked_spark_read.load.assert_called_once_with(path, **options)
         assert target_df.collect() == result_df.collect()
 
     @pytest.mark.parametrize(
-        "format, options",
-        [(None, {"path": "path/to/file"}), ("csv", "not a valid options")],
+        "format, path", [(None, "path/to/file"), ("csv", 123)],
     )
-    def test_read_invalid_params(
-        self, format: Optional[str], options: Union[Dict[str, Any], str]
-    ) -> None:
+    def test_read_invalid_params(self, format: Optional[str], path: Any) -> None:
         # arrange
         spark_client = SparkClient()
 
         # act and assert
         with pytest.raises(ValueError):
-            spark_client.read(format, options)  # type: ignore
+            spark_client.read(format=format, path=path)  # type: ignore
 
     def test_sql(self, target_df: DataFrame) -> None:
         # arrange

@@ -70,6 +70,11 @@ class TestFeatureSetPipeline:
         dbconfig.get_options = Mock(
             return_value={"path": "test_folder/historical/entity/feature_set"}
         )
+        dbconfig.get_path_with_partitions = Mock(
+            return_value=[
+                "test_folder/historical/entity/feature_set/year=2016/month=4/day=11"
+            ]
+        )
 
         historical_writer = HistoricalFeatureStoreWriter(
             db_config=dbconfig, interval_mode=True

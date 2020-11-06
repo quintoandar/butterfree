@@ -89,7 +89,7 @@ class TestAggregatedFeatureSet:
         output_df = fs.construct(dataframe, spark_client, end_date="2016-05-01")
         assert_dataframe_equality(output_df, rolling_windows_agg_dataframe)
 
-    def test_get_schema(self):
+    def test_get_schema(self, agg_feature_set):
         expected_schema = [
             {"column_name": "id", "type": LongType(), "primary_key": True},
             {"column_name": "timestamp", "type": TimestampType(), "primary_key": False},
@@ -125,40 +125,7 @@ class TestAggregatedFeatureSet:
             },
         ]
 
-        feature_set = AggregatedFeatureSet(
-            name="feature_set",
-            entity="entity",
-            description="description",
-            features=[
-                Feature(
-                    name="feature1",
-                    description="test",
-                    transformation=AggregatedTransform(
-                        functions=[
-                            Function(functions.avg, DataType.DOUBLE),
-                            Function(functions.stddev_pop, DataType.FLOAT),
-                        ],
-                    ),
-                ),
-                Feature(
-                    name="feature2",
-                    description="test",
-                    transformation=AggregatedTransform(
-                        functions=[Function(functions.count, DataType.ARRAY_STRING)]
-                    ),
-                ),
-            ],
-            keys=[
-                KeyFeature(
-                    name="id",
-                    description="The user's Main ID or device ID",
-                    dtype=DataType.BIGINT,
-                )
-            ],
-            timestamp=TimestampFeature(),
-        ).with_windows(definitions=["1 week", "2 days"])
-
-        schema = feature_set.get_schema()
+        schema = agg_feature_set.get_schema()
 
         assert schema == expected_schema
 
@@ -390,41 +357,9 @@ class TestAggregatedFeatureSet:
         # assert
         assert_dataframe_equality(target_df, output_df)
 
-    def test_define_start_date(self):
-        feature_set = AggregatedFeatureSet(
-            name="feature_set",
-            entity="entity",
-            description="description",
-            features=[
-                Feature(
-                    name="feature1",
-                    description="test",
-                    transformation=AggregatedTransform(
-                        functions=[
-                            Function(functions.avg, DataType.DOUBLE),
-                            Function(functions.stddev_pop, DataType.FLOAT),
-                        ],
-                    ),
-                ),
-                Feature(
-                    name="feature2",
-                    description="test",
-                    transformation=AggregatedTransform(
-                        functions=[Function(functions.count, DataType.ARRAY_STRING)]
-                    ),
-                ),
-            ],
-            keys=[
-                KeyFeature(
-                    name="id",
-                    description="The user's Main ID or device ID",
-                    dtype=DataType.BIGINT,
-                )
-            ],
-            timestamp=TimestampFeature(),
-        ).with_windows(definitions=["1 week", "2 days"])
+    def test_define_start_date(self, agg_feature_set):
 
-        start_date = feature_set.define_start_date("2020-08-04")
+        start_date = agg_feature_set.define_start_date("2020-08-04")
 
         assert isinstance(start_date, str)
         assert start_date == "2020-07-27"

@@ -34,9 +34,10 @@ class SparkClient(AbstractClient):
     def read(
         self,
         format: str,
-        options: Dict[str, Any],
+        path: Any = None,
         schema: Optional[StructType] = None,
         stream: bool = False,
+        **options: Any,
     ) -> DataFrame:
         """Use the SparkSession.read interface to load data into a dataframe.
 
@@ -45,9 +46,10 @@ class SparkClient(AbstractClient):
 
         Args:
             format: string with the format to be used by the DataframeReader.
-            options: options to setup the DataframeReader.
             stream:  flag to indicate if data must be read in stream mode.
             schema: an optional pyspark.sql.types.StructType for the input schema.
+            path: optional string or a list of string for file-system.
+            options: options to setup the DataframeReader.
 
         Returns:
             Dataframe
@@ -55,14 +57,14 @@ class SparkClient(AbstractClient):
         """
         if not isinstance(format, str):
             raise ValueError("format needs to be a string with the desired read format")
-        if not isinstance(options, dict):
-            raise ValueError("options needs to be a dict with the setup configurations")
+        if not isinstance(path, (str, list)):
+            raise ValueError("path needs to be a string or a list of string")
 
         df_reader: Union[
             DataStreamReader, DataFrameReader
         ] = self.conn.readStream if stream else self.conn.read
         df_reader = df_reader.schema(schema) if schema else df_reader
-        return df_reader.format(format).options(**options).load()
+        return df_reader.format(format).load(path, **options)
 
     def read_table(self, table: str, database: str = None) -> DataFrame:
         """Use the SparkSession.read interface to read a metastore table.

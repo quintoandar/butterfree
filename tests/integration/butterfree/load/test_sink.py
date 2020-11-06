@@ -26,6 +26,9 @@ def test_sink(input_dataframe, feature_set, mocker):
     s3config.get_options = Mock(
         return_value={"path": "test_folder/historical/entity/feature_set"}
     )
+    s3config.get_path_with_partitions = Mock(
+        return_value="test_folder/historical/entity/feature_set"
+    )
 
     historical_writer = HistoricalFeatureStoreWriter(
         db_config=s3config, interval_mode=True
@@ -59,12 +62,13 @@ def test_sink(input_dataframe, feature_set, mocker):
 
     # get historical results
     historical_result_df = client.read(
-        s3config.format_, options=s3config.get_options(feature_set.name)
+        s3config.format_,
+        path=s3config.get_path_with_partitions(feature_set.name, feature_set_df),
     )
 
     # get online results
     online_result_df = client.read(
-        online_config.format_, options=online_config.get_options(feature_set.name)
+        online_config.format_, **online_config.get_options(feature_set.name)
     )
 
     # assert
