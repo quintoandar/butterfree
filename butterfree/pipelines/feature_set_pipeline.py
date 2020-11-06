@@ -34,17 +34,19 @@ class FeatureSetPipeline:
         ...     KeyFeature,
         ...     TimestampFeature,
         ...)
+        >>> from butterfree.transform.utils import Function
         >>> from butterfree.transform.transformations import (
         ...     SparkFunctionTransform,
         ...     CustomTransform,
         ... )
         >>> from butterfree.load import Sink
         >>> from butterfree.load.writers import HistoricalFeatureStoreWriter
-        >>> import pyspark.sql.functions as F
+        >>> from pyspark.sql import functions
 
         >>> def divide(df, fs, column1, column2):
         ...     name = fs.get_output_columns()[0]
-        ...     df = df.withColumn(name, F.col(column1) / F.col(column2))
+        ...     df = df.withColumn(name,
+        ...            functions.col(column1) / functions.col(column2))
         ...     return df
 
         >>> pipeline = FeatureSetPipeline(
@@ -67,7 +69,8 @@ class FeatureSetPipeline:
         ...                name="feature1",
         ...                description="test",
         ...            transformation=SparkFunctionTransform(
-        ...                 functions=[F.avg, F.stddev_pop]
+        ...                 functions=[Function(functions.avg, DataType.DOUBLE),
+        ...                         Function(functions.stddev_pop, DataType.DOUBLE)],
         ...             ).with_window(
         ...                 partition_by="id",
         ...                 order_by=TIMESTAMP_COLUMN,
@@ -113,6 +116,19 @@ class FeatureSetPipeline:
         This last method (run) will execute the pipeline flow, it'll read from
         the defined sources, compute all the transformations and save the data
         to the specified locations.
+
+        We can run the pipeline over a range of dates by passing an end-date
+        and a start-date, where it will only bring data within this date range.
+
+        >>> pipeline.run(end_date="2020-08-04", start_date="2020-07-04")
+
+        Or run up to a date, where it will only bring data up to the specific date.
+
+        >>> pipeline.run(end_date="2020-08-04")
+
+        Or just a specific date, where you will only bring data for that day.
+
+        >>> pipeline.run_for_date(execution_date="2020-08-04")
 
     """
 
@@ -174,11 +190,11 @@ class FeatureSetPipeline:
 
     def run(
         self,
-        start_date: str = None,
         end_date: str = None,
         partition_by: List[str] = None,
         order_by: List[str] = None,
         num_processors: int = None,
+        start_date: str = None,
     ):
         """Runs the defined feature set pipeline.
 
