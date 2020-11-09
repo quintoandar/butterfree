@@ -40,7 +40,10 @@ class RunHook(Hook):
         self.id = id
 
     def run(self, dataframe):
-        return dataframe.withColumn("run_id", F.lit(self.id))
+        return dataframe.withColumn(
+            "run_id",
+            F.when(F.lit(self.id).isNotNull(), F.lit(self.id)).otherwise(F.lit(None)),
+        )
 
 
 def create_temp_view(dataframe: DataFrame, name):
@@ -101,15 +104,8 @@ class TestFeatureSetPipeline:
         dbconfig.get_options = Mock(
             return_value={"path": "test_folder/historical/entity/feature_set"}
         )
-        dbconfig.get_path_with_partitions = Mock(
-            return_value=[
-                "test_folder/historical/entity/feature_set/year=2016/month=4/day=11"
-            ]
-        )
 
-        historical_writer = HistoricalFeatureStoreWriter(
-            db_config=dbconfig, interval_mode=True
-        )
+        historical_writer = HistoricalFeatureStoreWriter(db_config=dbconfig)
 
         historical_writer.check_schema_hook = mocker.stub("check_schema_hook")
         historical_writer.check_schema_hook.run = mocker.stub("run")
@@ -247,13 +243,24 @@ class TestFeatureSetPipeline:
         # assert
         assert_dataframe_equality(df, target_df)
 
-    def test_pipeline_with_hooks(self, spark_session, mocked_df):
+    def test_pipeline_with_hooks(self, spark_session, mocker):
         # arrange
         hook1 = AddHook(value=1)
 
         spark_session.sql(
             "select 1 as id, timestamp('2020-01-01') as timestamp, 0 as feature"
         ).createOrReplaceTempView("test")
+
+        target_df = spark_session.sql(
+            "select 1 as id, timestamp('2020-01-01') as timestamp, 6 as feature, 2020 "
+            "as year, 1 as month, 1 as day"
+        )
+
+        historical_writer = HistoricalFeatureStoreWriter(debug_mode=True)
+
+        historical_writer.check_schema_hook = mocker.stub("check_schema_hook")
+        historical_writer.check_schema_hook.run = mocker.stub("run")
+        historical_writer.check_schema_hook.run.return_value = target_df
 
         test_pipeline = FeatureSetPipeline(
             source=Source(
@@ -283,19 +290,8 @@ class TestFeatureSetPipeline:
             )
             .add_pre_hook(hook1)
             .add_post_hook(hook1),
-            sink=Sink(
-                writers=[
-                    HistoricalFeatureStoreWriter(
-                        debug_mode=True
-                    )  # .add_pre_hook(hook1)
-                ],
-            ).add_pre_hook(hook1),
+            sink=Sink(writers=[historical_writer],).add_pre_hook(hook1),
         )
-
-        target_df = spark_session.sql(
-            "select 1 as id, timestamp('2020-01-01') as timestamp, 6 as feature, 2020 "
-            "as year, 1 as month, 1 as day"
-        )  # temporary: after adding pre-hook to the writer change the value to 7
 
         # act
         test_pipeline.run()
@@ -306,7 +302,7 @@ class TestFeatureSetPipeline:
         assert_dataframe_equality(output_df, target_df)
 
     def test_pipeline_interval_run(
-        self, mocked_date_df, pipeline_interval_run_target_dfs, spark_session
+        self, mocked_date_df, pipeline_interval_run_target_dfs, spark_session, mocker
     ):
         """Testing pipeline's idempotent interval run feature.
 
@@ -362,10 +358,22 @@ class TestFeatureSetPipeline:
 
         db = environment.get_variable("FEATURE_STORE_HISTORICAL_DATABASE")
         path = "test_folder/historical/entity/feature_set"
+
+        spark_session.conf.set("spark.sql.sources.partitionOverwriteMode", "dynamic")
         spark_session.sql(f"create database if not exists {db}")
+        spark_session.sql(
+            f"create table if not exists {db}.feature_set "
+            f"(id int, timestamp timestamp, feature int, "
+            f"run_id int, year int, month int, day int);"
+        )
+
         dbconfig = S3Config()
         dbconfig.get_options = Mock(
             return_value={"mode": "overwrite", "format_": "parquet", "path": path}
+        )
+
+        historical_writer = HistoricalFeatureStoreWriter(
+            db_config=dbconfig, interval_mode=True
         )
 
         first_run_hook = RunHook(id=1)
@@ -398,20 +406,28 @@ class TestFeatureSetPipeline:
                     Feature(name="run_id", description="", dtype=DataType.INTEGER),
                 ],
             ),
-            sink=Sink(writers=[HistoricalFeatureStoreWriter(db_config=dbconfig)],),
+            sink=Sink([historical_writer],),
         )
 
-        spark_session.conf.set("spark.sql.sources.partitionOverwriteMode", "dynamic")
-
         # act and assert
-        test_pipeline.sink.writers[0].validate = Mock()  # temporary
-
+        dbconfig.get_path_with_partitions = Mock(
+            return_value=[
+                "test_folder/historical/entity/feature_set/year=2016/month=4/day=11",
+                "test_folder/historical/entity/feature_set/year=2016/month=4/day=12",
+                "test_folder/historical/entity/feature_set/year=2016/month=4/day=13",
+            ]
+        )
         test_pipeline.feature_set.add_pre_hook(first_run_hook)
         test_pipeline.run(end_date="2016-04-13", start_date="2016-04-11")
         first_run_output_df = spark_session.read.parquet(path)
         # first_run_output_df = spark_session.table("test.feature_set")
         assert_dataframe_equality(first_run_output_df, first_run_target_df)  # temporary
 
+        dbconfig.get_path_with_partitions = Mock(
+            return_value=[
+                "test_folder/historical/entity/feature_set/year=2016/month=4/day=14",
+            ]
+        )
         test_pipeline.feature_set.add_pre_hook(second_run_hook)
         test_pipeline.run_for_date("2016-04-14")
         second_run_output_df = spark_session.read.parquet(path)
@@ -420,6 +436,11 @@ class TestFeatureSetPipeline:
             second_run_output_df, second_run_target_df
         )  # temporary
 
+        dbconfig.get_path_with_partitions = Mock(
+            return_value=[
+                "test_folder/historical/entity/feature_set/year=2016/month=4/day=11",
+            ]
+        )
         test_pipeline.feature_set.add_pre_hook(third_run_hook)
         test_pipeline.run_for_date("2016-04-11")
         third_run_output_df = spark_session.read.parquet(path)
