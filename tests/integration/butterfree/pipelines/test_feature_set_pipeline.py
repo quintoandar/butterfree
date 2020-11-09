@@ -362,7 +362,7 @@ class TestFeatureSetPipeline:
         spark_session.conf.set("spark.sql.sources.partitionOverwriteMode", "dynamic")
         spark_session.sql(f"create database if not exists {db}")
         spark_session.sql(
-            f"create table if not exists {db}.feature_set "
+            f"create table if not exists {db}.feature_set_interval "
             f"(id int, timestamp timestamp, feature int, "
             f"run_id int, year int, month int, day int);"
         )
@@ -396,7 +396,7 @@ class TestFeatureSetPipeline:
                 query="select * from id ",
             ),
             feature_set=FeatureSet(
-                name="feature_set",
+                name="feature_set_interval",
                 entity="entity",
                 description="",
                 keys=[KeyFeature(name="id", description="", dtype=DataType.INTEGER,)],
