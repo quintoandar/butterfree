@@ -25,7 +25,7 @@ The library is centered on the following concetps:
 - **Declarative Feature Engineering**: care about **what** you want to compute and **not how** to code it.
 - **Feature Store Modeling**: the library easily provides everything you need to process and load data to your Feature Store.
 
-To understand the main concepts of Feature Store modeling and library main features you can check [Butterfree's Wiki](https://github.com/quintoandar/butterfree/wiki).
+To understand the main concepts of Feature Store modeling and library main features you can check [Butterfree's Documentation](https://butterfree.readthedocs.io/en/latest/home.html), which is hosted by Read the Docs.
 
 To learn how to use Butterfree in practice, see [Butterfree's notebook examples](https://github.com/quintoandar/butterfree/tree/master/examples)  
 
@@ -49,9 +49,6 @@ You may also have access to our preview build (unstable) by installing from `sta
 ```bash
 pip install git+https://github.com/quintoandar/butterfree.git@staging
 ```
-
-## Documentation
-The official documentation is hosted on [Read the Docs](https://butterfree.readthedocs.io/en/latest/home.html)
 
 ## License
 [Apache License 2.0](https://github.com/quintoandar/butterfree/blob/staging/LICENSE)
