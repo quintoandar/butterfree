@@ -503,9 +503,9 @@ class AggregatedFeatureSet(FeatureSet):
         self,
         dataframe: DataFrame,
         client: SparkClient,
-        start_date: str = None,
         end_date: str = None,
         num_processors: int = None,
+        start_date: str = None,
     ) -> DataFrame:
         """Use all the features to build the feature set dataframe.
 
