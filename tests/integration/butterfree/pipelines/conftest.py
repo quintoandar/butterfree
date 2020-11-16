@@ -1,4 +1,5 @@
 import pytest
+from pyspark.sql import DataFrame
 from pyspark.sql import functions as F
 
 from butterfree.constants import DataType
@@ -180,138 +181,98 @@ def feature_set_pipeline(
 
 
 @pytest.fixture()
-def first_run_target_df(spark_session, spark_context):
+def pipeline_interval_run_target_dfs(
+    spark_session, spark_context
+) -> (DataFrame, DataFrame, DataFrame):
+    first_data = [
+        {
+            "id": 1,
+            "timestamp": "2016-04-11 11:31:11",
+            "feature": 200,
+            "run_id": 1,
+            "year": 2016,
+            "month": 4,
+            "day": 11,
+        },
+        {
+            "id": 1,
+            "timestamp": "2016-04-12 11:44:12",
+            "feature": 300,
+            "run_id": 1,
+            "year": 2016,
+            "month": 4,
+            "day": 12,
+        },
+        {
+            "id": 1,
+            "timestamp": "2016-04-13 11:46:24",
+            "feature": 400,
+            "run_id": 1,
+            "year": 2016,
+            "month": 4,
+            "day": 13,
+        },
+    ]
+
+    second_data = first_data + [
+        {
+            "id": 1,
+            "timestamp": "2016-04-14 12:03:21",
+            "feature": 500,
+            "run_id": 2,
+            "year": 2016,
+            "month": 4,
+            "day": 14,
+        },
+    ]
+
+    third_data = [
+        {
+            "id": 1,
+            "timestamp": "2016-04-11 11:31:11",
+            "feature": 200,
+            "run_id": 3,
+            "year": 2016,
+            "month": 4,
+            "day": 11,
+        },
+        {
+            "id": 1,
+            "timestamp": "2016-04-12 11:44:12",
+            "feature": 300,
+            "run_id": 1,
+            "year": 2016,
+            "month": 4,
+            "day": 12,
+        },
+        {
+            "id": 1,
+            "timestamp": "2016-04-13 11:46:24",
+            "feature": 400,
+            "run_id": 1,
+            "year": 2016,
+            "month": 4,
+            "day": 13,
+        },
+        {
+            "id": 1,
+            "timestamp": "2016-04-14 12:03:21",
+            "feature": 500,
+            "run_id": 2,
+            "year": 2016,
+            "month": 4,
+            "day": 14,
+        },
+    ]
+
     first_run_df = spark_session.read.json(
-        spark_context.parallelize(
-            [
-                {
-                    "id": 1,
-                    "timestamp": "2016-04-11 11:31:11",
-                    "feature": 200,
-                    "run_id": 1,
-                    "year": 2016,
-                    "month": 4,
-                    "day": 11,
-                },
-                {
-                    "id": 1,
-                    "timestamp": "2016-04-12 11:44:12",
-                    "feature": 300,
-                    "run_id": 1,
-                    "year": 2016,
-                    "month": 4,
-                    "day": 12,
-                },
-                {
-                    "id": 1,
-                    "timestamp": "2016-04-13 11:46:24",
-                    "feature": 400,
-                    "run_id": 1,
-                    "year": 2016,
-                    "month": 4,
-                    "day": 13,
-                },
-            ],
-            1,
-        )
+        spark_context.parallelize(first_data, 1)
     ).withColumn("timestamp", F.col("timestamp").cast(DataType.TIMESTAMP.spark))
-
-    return first_run_df
-
-
-@pytest.fixture()
-def second_run_target_df(spark_session, spark_context):
     second_run_df = spark_session.read.json(
-        spark_context.parallelize(
-            [
-                {
-                    "id": 1,
-                    "timestamp": "2016-04-11 11:31:11",
-                    "feature": 200,
-                    "run_id": 1,
-                    "year": 2016,
-                    "month": 4,
-                    "day": 11,
-                },
-                {
-                    "id": 1,
-                    "timestamp": "2016-04-12 11:44:12",
-                    "feature": 300,
-                    "run_id": 1,
-                    "year": 2016,
-                    "month": 4,
-                    "day": 12,
-                },
-                {
-                    "id": 1,
-                    "timestamp": "2016-04-13 11:46:24",
-                    "feature": 400,
-                    "run_id": 1,
-                    "year": 2016,
-                    "month": 4,
-                    "day": 13,
-                },
-                {
-                    "id": 1,
-                    "timestamp": "2016-04-14 12:03:21",
-                    "feature": 500,
-                    "run_id": 2,
-                    "year": 2016,
-                    "month": 4,
-                    "day": 14,
-                },
-            ],
-            1,
-        )
+        spark_context.parallelize(second_data, 1)
     ).withColumn("timestamp", F.col("timestamp").cast(DataType.TIMESTAMP.spark))
-
-    return second_run_df
-
-
-@pytest.fixture()
-def third_run_target_df(spark_session, spark_context):
     third_run_df = spark_session.read.json(
-        spark_context.parallelize(
-            [
-                {
-                    "id": 1,
-                    "timestamp": "2016-04-11 11:31:11",
-                    "feature": 200,
-                    "run_id": 3,
-                    "year": 2016,
-                    "month": 4,
-                    "day": 11,
-                },
-                {
-                    "id": 1,
-                    "timestamp": "2016-04-12 11:44:12",
-                    "feature": 300,
-                    "run_id": 1,
-                    "year": 2016,
-                    "month": 4,
-                    "day": 12,
-                },
-                {
-                    "id": 1,
-                    "timestamp": "2016-04-13 11:46:24",
-                    "feature": 400,
-                    "run_id": 1,
-                    "year": 2016,
-                    "month": 4,
-                    "day": 13,
-                },
-                {
-                    "id": 1,
-                    "timestamp": "2016-04-14 12:03:21",
-                    "feature": 500,
-                    "run_id": 2,
-                    "year": 2016,
-                    "month": 4,
-                    "day": 14,
-                },
-            ],
-            1,
-        )
+        spark_context.parallelize(third_data, 1)
     ).withColumn("timestamp", F.col("timestamp").cast(DataType.TIMESTAMP.spark))
 
-    return third_run_df
+    return first_run_df, second_run_df, third_run_df
