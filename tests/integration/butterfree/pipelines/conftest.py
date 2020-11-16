@@ -1,5 +1,4 @@
 import pytest
-from pyspark.sql import DataFrame
 from pyspark.sql import functions as F
 
 from butterfree.constants import DataType
@@ -181,9 +180,7 @@ def feature_set_pipeline(
 
 
 @pytest.fixture()
-def pipeline_interval_run_target_dfs(
-    spark_session, spark_context
-) -> (DataFrame, DataFrame, DataFrame):
+def first_run_target_df(spark_session, spark_context):
     first_run_df = spark_session.read.json(
         spark_context.parallelize(
             [
@@ -219,6 +216,11 @@ def pipeline_interval_run_target_dfs(
         )
     ).withColumn("timestamp", F.col("timestamp").cast(DataType.TIMESTAMP.spark))
 
+    return first_run_df
+
+
+@pytest.fixture()
+def second_run_target_df(spark_session, spark_context):
     second_run_df = spark_session.read.json(
         spark_context.parallelize(
             [
@@ -263,6 +265,11 @@ def pipeline_interval_run_target_dfs(
         )
     ).withColumn("timestamp", F.col("timestamp").cast(DataType.TIMESTAMP.spark))
 
+    return second_run_df
+
+
+@pytest.fixture()
+def third_run_target_df(spark_session, spark_context):
     third_run_df = spark_session.read.json(
         spark_context.parallelize(
             [
@@ -307,4 +314,4 @@ def pipeline_interval_run_target_dfs(
         )
     ).withColumn("timestamp", F.col("timestamp").cast(DataType.TIMESTAMP.spark))
 
-    return first_run_df, second_run_df, third_run_df
+    return third_run_df
