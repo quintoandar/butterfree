@@ -148,6 +148,6 @@ class HookableComponent:
             dataframe after passing for all defined post-hooks.
 
         """
-        for hook in self.pre_hooks:
+        for hook in self.post_hooks:
             dataframe = hook.run(dataframe)
         return dataframe
