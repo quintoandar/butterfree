@@ -430,9 +430,7 @@ class TestFeatureSetPipeline:
         test_pipeline.feature_set.add_pre_hook(second_run_hook)
         test_pipeline.run_for_date("2016-04-14")
         second_run_output_df = spark_session.read.parquet(path)
-        assert_dataframe_equality(
-            second_run_output_df, second_run_target_df
-        )
+        assert_dataframe_equality(second_run_output_df, second_run_target_df)
 
         dbconfig.get_path_with_partitions = Mock(
             return_value=[
