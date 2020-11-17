@@ -420,8 +420,7 @@ class TestFeatureSetPipeline:
         test_pipeline.feature_set.add_pre_hook(first_run_hook)
         test_pipeline.run(end_date="2016-04-13", start_date="2016-04-11")
         first_run_output_df = spark_session.read.parquet(path)
-        # first_run_output_df = spark_session.table("test.feature_set")
-        assert_dataframe_equality(first_run_output_df, first_run_target_df)  # temporary
+        assert_dataframe_equality(first_run_output_df, first_run_target_df)
 
         dbconfig.get_path_with_partitions = Mock(
             return_value=[
@@ -431,10 +430,9 @@ class TestFeatureSetPipeline:
         test_pipeline.feature_set.add_pre_hook(second_run_hook)
         test_pipeline.run_for_date("2016-04-14")
         second_run_output_df = spark_session.read.parquet(path)
-        # second_run_output_df = spark_session.table("test.feature_set")
         assert_dataframe_equality(
             second_run_output_df, second_run_target_df
-        )  # temporary
+        )
 
         dbconfig.get_path_with_partitions = Mock(
             return_value=[
@@ -444,8 +442,7 @@ class TestFeatureSetPipeline:
         test_pipeline.feature_set.add_pre_hook(third_run_hook)
         test_pipeline.run_for_date("2016-04-11")
         third_run_output_df = spark_session.read.parquet(path)
-        # third_run_output_df = spark_session.table("test.feature_set")
-        assert_dataframe_equality(third_run_output_df, third_run_target_df)  # temporary
+        assert_dataframe_equality(third_run_output_df, third_run_target_df)
 
         # tear down
         shutil.rmtree("test_folder")
