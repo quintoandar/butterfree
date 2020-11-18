@@ -1,4 +1,4 @@
-"""Holds configurations to read and write with Spark to Cassandra DB."""
+"""Holds configurations to read and write with Spark to Kafka."""
 from typing import Dict, List
 
 from butterfree.configs import environment
@@ -51,15 +51,6 @@ class KafkaConfig(AbstractWriteConfig):
         self.__kafka_connection_string = input_value
 
     @property
-    def format_(self) -> str:
-        """Write format for Spark."""
-        return self.__format
-
-    @format_.setter
-    def format_(self, value: str):
-        self.__format = value or "kafka"
-
-    @property
     def mode(self) -> str:
         """Write mode for Spark."""
         return self.__mode
@@ -69,13 +60,13 @@ class KafkaConfig(AbstractWriteConfig):
         self.__mode = value or "append"
 
     @property
-    def stream_processing_time(self) -> str:
-        """Processing time interval for streaming jobs."""
-        return self.__stream_processing_time
+    def format_(self) -> str:
+        """Write format for Spark."""
+        return self.__format
 
-    @stream_processing_time.setter
-    def stream_processing_time(self, value: str):
-        self.__stream_processing_time = value or "0 seconds"
+    @format_.setter
+    def format_(self, value: str):
+        self.__format = value or "kafka"
 
     @property
     def stream_output_mode(self) -> str:
@@ -96,6 +87,15 @@ class KafkaConfig(AbstractWriteConfig):
         self.__stream_checkpoint_path = value or environment.get_variable(
             "STREAM_CHECKPOINT_PATH"
         )
+
+    @property
+    def stream_processing_time(self) -> str:
+        """Processing time interval for streaming jobs."""
+        return self.__stream_processing_time
+
+    @stream_processing_time.setter
+    def stream_processing_time(self, value: str):
+        self.__stream_processing_time = value or "0 seconds"
 
     def get_options(self, table: str) -> dict:
         """Get options for connecting to Kafka.
