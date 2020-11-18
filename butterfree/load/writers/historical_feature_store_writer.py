@@ -95,6 +95,7 @@ class HistoricalFeatureStoreWriter(Writer):
         validation_threshold: float = DEFAULT_VALIDATION_THRESHOLD,
         debug_mode: bool = False,
     ):
+        super().__init__()
         self.db_config = db_config or S3Config()
         self.database = database or environment.get_variable(
             "FEATURE_STORE_HISTORICAL_DATABASE"
@@ -119,6 +120,8 @@ class HistoricalFeatureStoreWriter(Writer):
 
         """
         dataframe = self._create_partitions(dataframe)
+
+        dataframe = self._apply_transformations(dataframe)
 
         if self.debug_mode:
             spark_client.create_temporary_view(
