@@ -5,7 +5,7 @@ from pyspark.sql import DataFrame
 from pyspark.sql.streaming import StreamingQuery
 
 from butterfree.clients import SparkClient
-from butterfree.configs.db import CassandraConfig, KafkaConfig
+from butterfree.configs.db import CassandraConfig
 from butterfree.load.processing import json_transform
 from butterfree.load.writers import OnlineFeatureStoreWriter
 from butterfree.testing.dataframe import assert_dataframe_equality

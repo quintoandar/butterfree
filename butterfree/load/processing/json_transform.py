@@ -12,7 +12,6 @@ def json_transform(dataframe: DataFrame):
     Returns:
         Converted dataframe.
     """
-
     return dataframe.select(
         to_json(struct([dataframe[column] for column in dataframe.columns])).alias(
             "value"

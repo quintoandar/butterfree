@@ -116,4 +116,16 @@ class KafkaConfig(AbstractWriteConfig):
         }
 
     def translate(self, schema) -> List[Dict]:
+        """Get feature set schema to be translated.
+
+        The output will be a list of dictionaries regarding cassandra
+        database schema.
+
+        Args:
+            schema: feature set schema in spark.
+
+        Returns:
+            Kafka schema.
+
+        """
         pass

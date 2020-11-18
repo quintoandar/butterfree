@@ -22,7 +22,7 @@ class Writer(ABC):
         self.transformations = []
 
     def with_(self, transformer: Callable, *args, **kwargs):
-        """Define a new transformation for the Reader.
+        """Define a new transformation for the Writer.
 
         All the transformations are used when the method consume is called.
 
