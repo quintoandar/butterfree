@@ -211,3 +211,27 @@ def expected_schema():
             "primary_key": False,
         },
     ]
+
+
+@fixture
+def historical_feature_set_dataframe_json(spark_context, spark_session):
+    data = [
+        '{"value":"{\\"feature\\":120,\\"id\\":1,\\"timestamp\\":\\"2020-02-01\\",\\"year\\":2020,'
+        '\\"month\\":2,\\"day\\":1}"}',
+        '{"value":"{\\"feature\\":110,\\"id\\":1,\\"timestamp\\":\\"2020-01-15\\",\\"year\\":2020,'
+        '\\"month\\":1,\\"day\\":15}"}',
+        '{"value":"{\\"feature\\":100,\\"id\\":1,\\"timestamp\\":\\"2019-12-31\\",\\"year\\":2019,'
+        '\\"month\\":12,\\"day\\":31}"}',
+        '{"value":"{\\"feature\\":200,\\"id\\":2,\\"timestamp\\":\\"2019-12-31\\",\\"year\\":2019,'
+        '\\"month\\":12,\\"day\\":31}"}',
+    ]
+    return spark_session.read.json(spark_context.parallelize(data, 1))
+
+
+@fixture
+def online_feature_set_dataframe_json(spark_context, spark_session):
+    data = [
+        '{"value":"{\\"feature\\":120,\\"id\\":1,\\"timestamp\\":\\"2020-02-01\\"}"}',
+        '{"value":"{\\"feature\\":200,\\"id\\":2,\\"timestamp\\":\\"2019-12-31\\"}"}',
+    ]
+    return spark_session.read.json(spark_context.parallelize(data, 1))

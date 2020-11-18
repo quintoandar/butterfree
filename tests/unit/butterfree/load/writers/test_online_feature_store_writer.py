@@ -5,7 +5,8 @@ from pyspark.sql import DataFrame
 from pyspark.sql.streaming import StreamingQuery
 
 from butterfree.clients import SparkClient
-from butterfree.configs.db import CassandraConfig
+from butterfree.configs.db import CassandraConfig, KafkaConfig
+from butterfree.load.processing import json_transform
 from butterfree.load.writers import OnlineFeatureStoreWriter
 from butterfree.testing.dataframe import assert_dataframe_equality
 
@@ -221,4 +222,37 @@ class TestOnlineFeatureStoreWriter:
             format_=writer.db_config.format_,
             mode=writer.db_config.mode,
             **writer.db_config.get_options(table="my_entity"),
+        )
+
+    def test_write_with_transform(
+        self,
+        feature_set_dataframe,
+        online_feature_set_dataframe_json,
+        cassandra_config,
+        mocker,
+        feature_set,
+    ):
+        # with
+        spark_client = mocker.stub("spark_client")
+        spark_client.write_dataframe = mocker.stub("write_dataframe")
+        writer = OnlineFeatureStoreWriter(cassandra_config).with_(json_transform)
+
+        # when
+        writer.write(feature_set, feature_set_dataframe, spark_client)
+
+        assert sorted(online_feature_set_dataframe_json.collect()) == sorted(
+            spark_client.write_dataframe.call_args[1]["dataframe"].collect()
+        )
+        assert (
+            writer.db_config.mode == spark_client.write_dataframe.call_args[1]["mode"]
+        )
+        assert (
+            writer.db_config.format_
+            == spark_client.write_dataframe.call_args[1]["format_"]
+        )
+        # assert if all additional options got from db_config
+        # are in the called args in write_dataframe
+        assert all(
+            item in spark_client.write_dataframe.call_args[1].items()
+            for item in writer.db_config.get_options(table=feature_set.name).items()
         )

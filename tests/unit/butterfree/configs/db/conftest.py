@@ -1,6 +1,6 @@
 from pytest import fixture
 
-from butterfree.configs.db import CassandraConfig, S3Config
+from butterfree.configs.db import CassandraConfig, KafkaConfig, S3Config
 
 
 @fixture
@@ -11,6 +11,13 @@ def cassandra_config(monkeypatch):
     monkeypatch.setenv("CASSANDRA_USERNAME", "test")
 
     return CassandraConfig()
+
+
+@fixture
+def kafka_config(monkeypatch):
+    monkeypatch.setenv("KAFKA_CONNECTION_STRING", "test")
+
+    return KafkaConfig()
 
 
 @fixture
