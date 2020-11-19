@@ -485,7 +485,7 @@ class AggregatedFeatureSet(FeatureSet):
         Returns:
             start date.
         """
-        if self._windows:
+        if self._windows and start_date:
             window_definition = [
                 definition.frame_boundaries.window_definition
                 for definition in self._windows

@@ -128,11 +128,6 @@ class TestHistoricalFeatureStoreWriter:
         spark_client = SparkClient()
         writer = HistoricalFeatureStoreWriter(debug_mode=True)
 
-        schema_dataframe = writer._create_partitions(feature_set_dataframe)
-        writer.check_schema_hook = mocker.stub("check_schema_hook")
-        writer.check_schema_hook.run = mocker.stub("run")
-        writer.check_schema_hook.run.return_value = schema_dataframe
-
         # when
         writer.write(
             feature_set=feature_set,
@@ -155,11 +150,6 @@ class TestHistoricalFeatureStoreWriter:
         # given
         spark_client = SparkClient()
         writer = HistoricalFeatureStoreWriter(debug_mode=True, interval_mode=True)
-
-        schema_dataframe = writer._create_partitions(feature_set_dataframe)
-        writer.check_schema_hook = mocker.stub("check_schema_hook")
-        writer.check_schema_hook.run = mocker.stub("run")
-        writer.check_schema_hook.run.return_value = schema_dataframe
 
         # when
         writer.write(
