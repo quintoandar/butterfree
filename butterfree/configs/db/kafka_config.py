@@ -45,7 +45,9 @@ class KafkaConfig(AbstractWriteConfig):
 
     @kafka_connection_string.setter
     def kafka_connection_string(self, value: str):
-        input_value = value or environment.get_variable("KAFKA_CONSUMER_CONNECTION_STRING")
+        input_value = value or environment.get_variable(
+            "KAFKA_CONSUMER_CONNECTION_STRING"
+        )
         if input_value is None:
             raise ValueError("Config 'kafka connection string' cannot be empty.")
         self.__kafka_connection_string = input_value
