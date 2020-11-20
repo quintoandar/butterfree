@@ -5,6 +5,7 @@ import pytest
 from pyspark.sql.functions import spark_partition_id
 
 from butterfree.clients import SparkClient
+from butterfree.load.processing import json_transform
 from butterfree.load.writers import HistoricalFeatureStoreWriter
 from butterfree.testing.dataframe import assert_dataframe_equality
 
@@ -189,3 +190,35 @@ class TestHistoricalFeatureStoreWriter:
         # act and assert
         with pytest.raises(AssertionError):
             writer._assert_validation_count("table", written_count, dataframe_count)
+
+    def test_write_with_transform(
+        self,
+        feature_set_dataframe,
+        historical_feature_set_dataframe_json,
+        mocker,
+        feature_set,
+    ):
+        # given
+        spark_client = mocker.stub("spark_client")
+        spark_client.write_table = mocker.stub("write_table")
+        writer = HistoricalFeatureStoreWriter().with_(json_transform)
+
+        # when
+        writer.write(
+            feature_set=feature_set,
+            dataframe=feature_set_dataframe,
+            spark_client=spark_client,
+        )
+        result_df = spark_client.write_table.call_args[1]["dataframe"]
+
+        # then
+        assert_dataframe_equality(historical_feature_set_dataframe_json, result_df)
+
+        assert (
+            writer.db_config.format_ == spark_client.write_table.call_args[1]["format_"]
+        )
+        assert writer.db_config.mode == spark_client.write_table.call_args[1]["mode"]
+        assert (
+            writer.PARTITION_BY == spark_client.write_table.call_args[1]["partition_by"]
+        )
+        assert feature_set.name == spark_client.write_table.call_args[1]["table_name"]

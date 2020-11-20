@@ -71,6 +71,7 @@ class OnlineFeatureStoreWriter(Writer):
     __name__ = "Online Feature Store Writer"
 
     def __init__(self, db_config=None, debug_mode: bool = False, write_to_entity=False):
+        super().__init__()
         self.db_config = db_config or CassandraConfig()
         self.debug_mode = debug_mode
         self.write_to_entity = write_to_entity
@@ -165,6 +166,7 @@ class OnlineFeatureStoreWriter(Writer):
         table_name = feature_set.entity if self.write_to_entity else feature_set.name
 
         if dataframe.isStreaming:
+            dataframe = self._apply_transformations(dataframe)
             if self.debug_mode:
                 return self._write_in_debug_mode(
                     table_name=table_name,
@@ -181,6 +183,8 @@ class OnlineFeatureStoreWriter(Writer):
         latest_df = self.filter_latest(
             dataframe=dataframe, id_columns=feature_set.keys_columns
         )
+
+        latest_df = self._apply_transformations(latest_df)
 
         if self.debug_mode:
             return self._write_in_debug_mode(

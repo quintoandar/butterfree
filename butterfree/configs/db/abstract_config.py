@@ -1,13 +1,14 @@
 """Abstract classes for database configurations with spark."""
 
-from abc import ABC, abstractmethod, abstractproperty
+from abc import ABC, abstractmethod
 from typing import Dict, List
 
 
 class AbstractWriteConfig(ABC):
     """Abstract class for database write configurations with spark."""
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def mode(self) -> str:
         """Config option "mode" for spark write.
 
@@ -18,7 +19,8 @@ class AbstractWriteConfig(ABC):
 
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def format_(self) -> str:
         """Config option "format" for spark write.
 
