@@ -163,7 +163,7 @@ class TestFeatureSetPipeline:
                 ],
                 timestamp=TimestampFeature(),
             ),
-            sink=Sink(writers=[historical_writer],),
+            sink=Sink(writers=[historical_writer]),
         )
         test_pipeline.run()
 
@@ -195,12 +195,6 @@ class TestFeatureSetPipeline:
 
         historical_writer = HistoricalFeatureStoreWriter(debug_mode=True)
 
-        historical_writer.check_schema_hook = mocker.stub("check_schema_hook")
-        historical_writer.check_schema_hook.run = mocker.stub("run")
-        historical_writer.check_schema_hook.run.return_value = (
-            fixed_windows_output_feature_set_date_dataframe
-        )
-
         feature_set_pipeline.sink.writers = [historical_writer]
 
         # act
@@ -229,10 +223,6 @@ class TestFeatureSetPipeline:
 
         historical_writer = HistoricalFeatureStoreWriter(debug_mode=True)
 
-        historical_writer.check_schema_hook = mocker.stub("check_schema_hook")
-        historical_writer.check_schema_hook.run = mocker.stub("run")
-        historical_writer.check_schema_hook.run.return_value = target_df
-
         feature_set_pipeline.sink.writers = [historical_writer]
 
         # act
@@ -257,10 +247,6 @@ class TestFeatureSetPipeline:
         )
 
         historical_writer = HistoricalFeatureStoreWriter(debug_mode=True)
-
-        historical_writer.check_schema_hook = mocker.stub("check_schema_hook")
-        historical_writer.check_schema_hook.run = mocker.stub("run")
-        historical_writer.check_schema_hook.run.return_value = target_df
 
         test_pipeline = FeatureSetPipeline(
             source=Source(

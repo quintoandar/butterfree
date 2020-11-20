@@ -140,16 +140,15 @@ class HistoricalFeatureStoreWriter(Writer):
         """
         partition_df = self._create_partitions(dataframe)
 
-        dataframe = self.check_schema(
-            spark_client, partition_df, feature_set.name, self.database
-        )
+        if self.debug_mode:
+            dataframe = partition_df
+        else:
+            dataframe = self.check_schema(
+                spark_client, partition_df, feature_set.name, self.database
+            )
 
         if self.interval_mode:
             if self.debug_mode:
-                spark_client.conn.conf.set(
-                    "spark.sql.sources.partitionOverwriteMode", "dynamic"
-                )
-
                 spark_client.create_temporary_view(
                     dataframe=dataframe,
                     name=f"historical_feature_store__{feature_set.name}",

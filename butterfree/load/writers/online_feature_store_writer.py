@@ -179,14 +179,15 @@ class OnlineFeatureStoreWriter(Writer):
         """
         table_name = feature_set.entity if self.write_to_entity else feature_set.name
 
-        cassandra_client = CassandraClient(
-            host=[self.db_config.host],
-            keyspace=self.db_config.keyspace,
-            user=self.db_config.username,
-            password=self.db_config.password,
-        )
+        if not self.debug_mode:
+            cassandra_client = CassandraClient(
+                host=[self.db_config.host],
+                keyspace=self.db_config.keyspace,
+                user=self.db_config.username,
+                password=self.db_config.password,
+            )
 
-        dataframe = self.check_schema(cassandra_client, dataframe, table_name)
+            dataframe = self.check_schema(cassandra_client, dataframe, table_name)
 
         if dataframe.isStreaming:
             if self.debug_mode:
