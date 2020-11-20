@@ -145,7 +145,6 @@ class TestHistoricalFeatureStoreWriter:
         historical_feature_set_dataframe,
         feature_set,
         spark_session,
-        mocker,
     ):
         # given
         spark_client = SparkClient()
@@ -161,12 +160,6 @@ class TestHistoricalFeatureStoreWriter:
 
         # then
         assert_dataframe_equality(historical_feature_set_dataframe, result_df)
-        assert (
-            spark_client.conn.conf.get(
-                "spark.sql.sources.partitionOverwriteMode"
-            ).lower()
-            == "dynamic"
-        )
 
     def test_validate(self, historical_feature_set_dataframe, mocker, feature_set):
         # given

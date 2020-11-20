@@ -149,10 +149,6 @@ class HistoricalFeatureStoreWriter(Writer):
 
         if self.interval_mode:
             if self.debug_mode:
-                spark_client.conn.conf.set(
-                    "spark.sql.sources.partitionOverwriteMode", "dynamic"
-                )
-
                 spark_client.create_temporary_view(
                     dataframe=dataframe,
                     name=f"historical_feature_store__{feature_set.name}",
