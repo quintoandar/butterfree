@@ -11,7 +11,6 @@ specification = {
     "FEATURE_STORE_HISTORICAL_DATABASE": "test",
     "KAFKA_CONSUMER_CONNECTION_STRING": "test_host:1234,test_host2:1234",
     "STREAM_CHECKPOINT_PATH": None,
-    "KAFKA_CONNECTION_STRING": "test",
 }
 
 

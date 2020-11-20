@@ -42,7 +42,7 @@ class TestKafkaConfig:
 
     def test_kafka_connection_string(self, kafka_config):
         # expecting
-        default = "test"
+        default = "test_host:1234,test_host2:1234"
         assert kafka_config.kafka_connection_string == default
 
     def test_kafka_connection_string_empty(self, kafka_config, mocker):

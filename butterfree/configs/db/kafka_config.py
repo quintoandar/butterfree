@@ -9,7 +9,7 @@ class KafkaConfig(AbstractWriteConfig):
     """Configuration for Spark to connect to Kafka.
 
     Attributes:
-        kafka_connection_string: kafka topic name.
+        kafka_connection_string: string with hosts and ports to connect.
         mode: write mode for Spark.
         format_: write format for Spark.
         stream_processing_time: processing time interval for streaming jobs.
@@ -45,7 +45,7 @@ class KafkaConfig(AbstractWriteConfig):
 
     @kafka_connection_string.setter
     def kafka_connection_string(self, value: str):
-        input_value = value or environment.get_variable("KAFKA_CONNECTION_STRING")
+        input_value = value or environment.get_variable("KAFKA_CONSUMER_CONNECTION_STRING")
         if input_value is None:
             raise ValueError("Config 'kafka connection string' cannot be empty.")
         self.__kafka_connection_string = input_value
@@ -97,21 +97,21 @@ class KafkaConfig(AbstractWriteConfig):
     def stream_processing_time(self, value: str):
         self.__stream_processing_time = value or "0 seconds"
 
-    def get_options(self, table: str) -> dict:
+    def get_options(self, topic: str) -> dict:
         """Get options for connecting to Kafka.
 
         Options will be a dictionary with the write and read configuration for
         spark to kafka.
 
         Args:
-            table: table name (topic) into Kafka.
+            topic: topic related to Kafka.
 
         Returns:
             Configuration to connect to Kafka.
 
         """
         return {
-            "topic": table,
+            "topic": topic,
             "kafka.bootstrap.servers": self.kafka_connection_string,
         }
 
