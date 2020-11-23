@@ -7,6 +7,7 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
+   butterfree.load.processing
    butterfree.load.writers
 
 Submodules
