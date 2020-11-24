@@ -17,12 +17,6 @@ Submodules
    :show-inheritance:
 
 
-.. automodule:: butterfree.configs.db.kafka_config
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-
 .. automodule:: butterfree.configs.db.s3_config
    :members:
    :undoc-members:

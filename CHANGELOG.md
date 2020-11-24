@@ -3,20 +3,6 @@ All notable changes to this project will be documented in this file.
 
 Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each release or unreleased log for a better organization.
 
-## [1.1.0](https://github.com/quintoandar/butterfree/releases/tag/1.1.0)
-### Added
-* [MLOP-563] Enable Butterfree to write to Kafka ([#258](https://github.com/quintoandar/butterfree/pull/258))
-
-### Changed
-* Update README ([#257](https://github.com/quintoandar/butterfree/pull/257))
-
-### Fixed
-* [FIX] Downgrade Python Version in Pyenv ([#227](https://github.com/quintoandar/butterfree/pull/227))
-* [FIX] Fix docs ([#229](https://github.com/quintoandar/butterfree/pull/229)) 
-* [FIX] Fix Docs - Add more dependencies ([#230](https://github.com/quintoandar/butterfree/pull/230))
-* Fix broken notebook URL ([#236](https://github.com/quintoandar/butterfree/pull/236)) 
-* Issue #77 Fix ([#245](https://github.com/quintoandar/butterfree/pull/245))
-
 ## [1.0.2](https://github.com/quintoandar/butterfree/releases/tag/1.0.2)
 ### Added
 * [MLOP-427] Add status badges ([#219](https://github.com/quintoandar/butterfree/pull/219))
