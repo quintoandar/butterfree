@@ -10,7 +10,7 @@ Configurations:
 
 #### Setup by instantiation:
 ```python
-from butterfree.core.extract.readers import KafkaReader
+from butterfree.extract.readers import KafkaReader
 
 kafka_reader = KafkaReader(
     id="reader_id",
@@ -26,7 +26,7 @@ Setup the following environment variable in the Spark Cluster/Locally:
 
 After setting this variables you can instantiate `KafkaReader` easier:
 ```python
-from butterfree.core.extract.readers import KafkaReader
+from butterfree.extract.readers import KafkaReader
 
 kafka_reader = KafkaReader(
     id="reader_id",
@@ -36,7 +36,9 @@ kafka_reader = KafkaReader(
 
 ```
 
-### Online Feature Store (Cassandra Configuration)
+### Online Feature Store
+
+#### Cassandra Configuration
 
 Configurations:
  - Cassandra Username: username to connect to CassandraDB.
@@ -51,8 +53,8 @@ Configurations:
 
 #### Setup by instantiation:
 ```python
-from butterfree.core.configs.db import CassandraConfig
-from butterfree.core.load.writers import OnlineFeatureStoreWriter
+from butterfree.configs.db import CassandraConfig
+from butterfree.load.writers import OnlineFeatureStoreWriter
 
 db_config  = CassandraConfig(
     username="username", 
@@ -70,14 +72,46 @@ Setup the following environment variables in the Spark Cluster/Locally:
 
 After setting this variables you can instantiate `CassandraConfig` and `OnlineFeatureStoreWriter` easier:
 ```Python
-from butterfree.core.configs.db import CassandraConfig
-from butterfree.core.load.writers import OnlineFeatureStoreWriter
+from butterfree.configs.db import CassandraConfig
+from butterfree.load.writers import OnlineFeatureStoreWriter
 
 db_config  = CassandraConfig()
 writer = OnlineFeatureStoreWriter(db_config=db_config)
 
 # or just
 writer = OnlineFeatureStoreWriter()
+```
+
+#### Kafka Configuration
+
+Configurations:
+ - Kafka connection string: string with hosts and ports to connect.
+
+ - Stream Checkpoint Path: path on S3 to save the checkpoint for the streaming query. Only need when performing streaming writes.
+
+#### Setup by instantiation:
+```python
+from butterfree.configs.db import KafkaConfig
+from butterfree.load.writers import OnlineFeatureStoreWriter
+
+db_config  = KafkaConfig(
+    kafka_connection_string="kafka_connection_string", 
+    stream_checkpoint_path="path"
+)
+writer = OnlineFeatureStoreWriter(db_config=db_config)
+```
+
+#### Setup by environment variables:
+Setup the following environment variables in the Spark Cluster/Locally:
+`KAFKA_CONSUMER_CONNECTION_STRING`, `STREAM_CHECKPOINT_PATH`
+
+After setting this variables you can instantiate `KafkaConfig` and `OnlineFeatureStoreWriter` easier:
+```Python
+from butterfree.configs.db import KafkaConfig
+from butterfree.load.writers import OnlineFeatureStoreWriter
+
+kafka_config  = KafkaConfig()
+writer = OnlineFeatureStoreWriter(db_config=kafka_config)
 ```
 
 ### Historical Feature Store (Spark Metastore and S3)
@@ -88,8 +122,8 @@ Configurations:
 
 #### Setup by instantiation:
 ```python
-from butterfree.core.configs.db import S3Config
-from butterfree.core.load.writers import HistoricalFeatureStoreWriter
+from butterfree.configs.db import S3Config
+from butterfree.load.writers import HistoricalFeatureStoreWriter
 
 db_config  = S3Config(bucket="bucket")
 writer = HistoricalFeatureStoreWriter(
@@ -104,8 +138,8 @@ Setup the following environment variables in the Spark Cluster/Locally:
 
 After setting this variables you can instantiate `S3Config` and `HistoricalFeatureStoreWriter` easier:
 ```Python
-from butterfree.core.configs.db import S3Config
-from butterfree.core.load.writers import HistoricalFeatureStoreWriter
+from butterfree.configs.db import S3Config
+from butterfree.load.writers import HistoricalFeatureStoreWriter
 
 db_config  = S3Config()
 writer = HistoricalFeatureStoreWriter(db_config=db_config)
