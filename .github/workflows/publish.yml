@@ -22,7 +22,7 @@ jobs:
       run: make package
 
     - name: Get version
-      run: echo ::set-env name=version::$(grep __version__ setup.py | head -1 | cut -d \" -f2 | cut -d \' -f2)
+      run: echo "version=$(grep __version__ setup.py | head -1 | cut -d \" -f2 | cut -d \' -f2)" >> $GITHUB_ENV
 
     - name: Create release
       uses: actions/create-release@v1
