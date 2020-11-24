@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each release or unreleased log for a better organization.
 
+## [1.1.1](https://github.com/quintoandar/butterfree/releases/tag/1.1.1)
+
+### Fixed
+* Fix Butterfree's workflow ([#262](https://github.com/quintoandar/butterfree/pull/262)) 
+
 ## [1.1.0](https://github.com/quintoandar/butterfree/releases/tag/1.1.0)
 ### Added
 * [MLOP-563] Enable Butterfree to write to Kafka ([#258](https://github.com/quintoandar/butterfree/pull/258))
