@@ -9,6 +9,7 @@ class KafkaConfig(AbstractWriteConfig):
     """Configuration for Spark to connect to Kafka.
 
     Attributes:
+        kafka_topic: string with kafka topic name.
         kafka_connection_string: string with hosts and ports to connect.
         mode: write mode for Spark.
         format_: write format for Spark.
@@ -24,6 +25,7 @@ class KafkaConfig(AbstractWriteConfig):
 
     def __init__(
         self,
+        kafka_topic: str = None,
         kafka_connection_string: str = None,
         mode: str = None,
         format_: str = None,
@@ -31,6 +33,7 @@ class KafkaConfig(AbstractWriteConfig):
         stream_output_mode: str = None,
         stream_checkpoint_path: str = None,
     ):
+        self.kafka_topic = kafka_topic
         self.kafka_connection_string = kafka_connection_string
         self.mode = mode
         self.format_ = format_
@@ -39,8 +42,17 @@ class KafkaConfig(AbstractWriteConfig):
         self.stream_checkpoint_path = stream_checkpoint_path
 
     @property
+    def kafka_topic(self) -> str:
+        """Kafka topic name."""
+        return self.__kafka_topic
+
+    @kafka_topic.setter
+    def kafka_topic(self, value: str):
+        self.__kafka_topic = value
+
+    @property
     def kafka_connection_string(self) -> str:
-        """Username used in connection to Cassandra DB."""
+        """Kafka connection string with hosts and ports to connect."""
         return self.__kafka_connection_string
 
     @kafka_connection_string.setter
@@ -113,7 +125,7 @@ class KafkaConfig(AbstractWriteConfig):
 
         """
         return {
-            "topic": topic,
+            "topic": self.kafka_topic or topic,
             "kafka.bootstrap.servers": self.kafka_connection_string,
         }
 
