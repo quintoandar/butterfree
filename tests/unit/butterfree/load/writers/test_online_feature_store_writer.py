@@ -273,18 +273,6 @@ class TestOnlineFeatureStoreWriter:
         # when
         writer.write(feature_set, feature_set_dataframe, spark_client)
 
-        assert sorted(online_feature_set_dataframe_json.collect()) == sorted(
-            spark_client.write_dataframe.call_args[1]["dataframe"].collect()
-        )
-        assert (
-            writer.db_config.mode == spark_client.write_dataframe.call_args[1]["mode"]
-        )
-        assert (
-            writer.db_config.format_
-            == spark_client.write_dataframe.call_args[1]["format_"]
-        )
-        # assert if all additional options got from db_config
-        # are in the called args in write_dataframe
         assert all(
             item in spark_client.write_dataframe.call_args[1].items()
             for item in writer.db_config.get_options(topic=feature_set.name).items()
@@ -300,25 +288,17 @@ class TestOnlineFeatureStoreWriter:
         # with
         spark_client = mocker.stub("spark_client")
         spark_client.write_dataframe = mocker.stub("write_dataframe")
-        kafka_config = KafkaConfig(kafka_topic="custom_topic")
-        writer = OnlineFeatureStoreWriter(kafka_config).with_(json_transform)
+        custom_kafka_config = KafkaConfig(kafka_topic="custom_topic")
+        custom_writer = OnlineFeatureStoreWriter(custom_kafka_config).with_(
+            json_transform
+        )
 
         # when
-        writer.write(feature_set, feature_set_dataframe, spark_client)
+        custom_writer.write(feature_set, feature_set_dataframe, spark_client)
 
-        assert sorted(online_feature_set_dataframe_json.collect()) == sorted(
-            spark_client.write_dataframe.call_args[1]["dataframe"].collect()
-        )
-        assert (
-            writer.db_config.mode == spark_client.write_dataframe.call_args[1]["mode"]
-        )
-        assert (
-            writer.db_config.format_
-            == spark_client.write_dataframe.call_args[1]["format_"]
-        )
-        # assert if all additional options got from db_config
-        # are in the called args in write_dataframe
         assert all(
             item in spark_client.write_dataframe.call_args[1].items()
-            for item in writer.db_config.get_options(topic="custom_topic").items()
+            for item in custom_writer.db_config.get_options(
+                topic="custom_topic"
+            ).items()
         )
