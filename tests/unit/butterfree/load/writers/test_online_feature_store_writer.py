@@ -5,7 +5,7 @@ from pyspark.sql import DataFrame
 from pyspark.sql.streaming import StreamingQuery
 
 from butterfree.clients import SparkClient
-from butterfree.configs.db import CassandraConfig
+from butterfree.configs.db import CassandraConfig, KafkaConfig
 from butterfree.load.processing import json_transform
 from butterfree.load.writers import OnlineFeatureStoreWriter
 from butterfree.testing.dataframe import assert_dataframe_equality
@@ -255,4 +255,50 @@ class TestOnlineFeatureStoreWriter:
         assert all(
             item in spark_client.write_dataframe.call_args[1].items()
             for item in writer.db_config.get_options(table=feature_set.name).items()
+        )
+
+    def test_write_with_kafka_config(
+        self,
+        feature_set_dataframe,
+        online_feature_set_dataframe_json,
+        mocker,
+        feature_set,
+    ):
+        # with
+        spark_client = mocker.stub("spark_client")
+        spark_client.write_dataframe = mocker.stub("write_dataframe")
+        kafka_config = KafkaConfig()
+        writer = OnlineFeatureStoreWriter(kafka_config).with_(json_transform)
+
+        # when
+        writer.write(feature_set, feature_set_dataframe, spark_client)
+
+        assert all(
+            item in spark_client.write_dataframe.call_args[1].items()
+            for item in writer.db_config.get_options(topic=feature_set.name).items()
+        )
+
+    def test_write_with_custom_kafka_config(
+        self,
+        feature_set_dataframe,
+        online_feature_set_dataframe_json,
+        mocker,
+        feature_set,
+    ):
+        # with
+        spark_client = mocker.stub("spark_client")
+        spark_client.write_dataframe = mocker.stub("write_dataframe")
+        custom_kafka_config = KafkaConfig(kafka_topic="custom_topic")
+        custom_writer = OnlineFeatureStoreWriter(custom_kafka_config).with_(
+            json_transform
+        )
+
+        # when
+        custom_writer.write(feature_set, feature_set_dataframe, spark_client)
+
+        assert all(
+            item in spark_client.write_dataframe.call_args[1].items()
+            for item in custom_writer.db_config.get_options(
+                topic="custom_topic"
+            ).items()
         )

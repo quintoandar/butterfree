@@ -131,7 +131,7 @@ class OnlineFeatureStoreWriter(Writer):
             checkpoint_path=checkpoint_path,
             format_=self.db_config.format_,
             mode=self.db_config.mode,
-            **self.db_config.get_options(table=table_name),
+            **self.db_config.get_options(table_name),
         )
         return streaming_handler
 
@@ -195,7 +195,7 @@ class OnlineFeatureStoreWriter(Writer):
             dataframe=latest_df,
             format_=self.db_config.format_,
             mode=self.db_config.mode,
-            **self.db_config.get_options(table=table_name),
+            **self.db_config.get_options(table_name),
         )
 
     def validate(self, feature_set: FeatureSet, dataframe, spark_client: SparkClient):

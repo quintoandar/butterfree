@@ -100,5 +100,8 @@ class TestKafkaConfig:
         assert kafka_config.stream_checkpoint_path == value
 
     def test_set_credentials_on_instantiation(self):
-        kafka_config = KafkaConfig(kafka_connection_string="topic")  # noqa: S106
-        assert kafka_config.kafka_connection_string == "topic"
+        kafka_config = KafkaConfig(  # noqa: S106
+            kafka_topic="kafka_topic", kafka_connection_string="test_host:1234"
+        )
+        assert kafka_config.kafka_topic == "kafka_topic"
+        assert kafka_config.kafka_connection_string == "test_host:1234"
