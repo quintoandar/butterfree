@@ -85,6 +85,8 @@ writer = OnlineFeatureStoreWriter()
 #### Kafka Configuration
 
 Configurations:
+- Kafka topic: Kafka topic name.
+
  - Kafka connection string: string with hosts and ports to connect.
 
  - Stream Checkpoint Path: path on S3 to save the checkpoint for the streaming query. Only need when performing streaming writes.
@@ -94,11 +96,23 @@ Configurations:
 from butterfree.configs.db import KafkaConfig
 from butterfree.load.writers import OnlineFeatureStoreWriter
 
-db_config  = KafkaConfig(
+custom_kafka_config  = KafkaConfig(
+    kafka_topic="custom_topic",
     kafka_connection_string="kafka_connection_string", 
     stream_checkpoint_path="path"
 )
-writer = OnlineFeatureStoreWriter(db_config=db_config)
+writer = OnlineFeatureStoreWriter(db_config=custom_kafka_config)
+```
+or 
+```python
+from butterfree.configs.db import KafkaConfig
+from butterfree.load.writers import OnlineFeatureStoreWriter
+
+kafka_config  = KafkaConfig(
+    kafka_connection_string="kafka_connection_string", 
+    stream_checkpoint_path="path"
+)
+writer = OnlineFeatureStoreWriter(db_config=kafka_config)
 ```
 
 #### Setup by environment variables:
