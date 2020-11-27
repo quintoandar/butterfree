@@ -7,7 +7,7 @@ from pyspark.sql.functions import dayofmonth, month, year
 
 from butterfree.clients import SparkClient
 from butterfree.configs import environment
-from butterfree.configs.db import S3Config
+from butterfree.configs.db import MetastoreConfig
 from butterfree.constants import columns
 from butterfree.constants.spark_constants import DEFAULT_NUM_PARTITIONS
 from butterfree.dataframe_service import repartition_df
@@ -48,7 +48,7 @@ class HistoricalFeatureStoreWriter(Writer):
         and provide them to HistoricalFeatureStoreWriter.
 
     >>> spark_client = SparkClient()
-    >>> config = S3Config(bucket="my_s3_bucket_name",
+    >>> config = MetastoreConfig(path="my_s3_bucket_name",
         ...               mode="overwrite",
         ...               format_="parquet")
     >>> writer = HistoricalFeatureStoreWriter(db_config=config)
@@ -96,7 +96,7 @@ class HistoricalFeatureStoreWriter(Writer):
         debug_mode: bool = False,
     ):
         super().__init__()
-        self.db_config = db_config or S3Config()
+        self.db_config = db_config or MetastoreConfig()
         self.database = database or environment.get_variable(
             "FEATURE_STORE_HISTORICAL_DATABASE"
         )

@@ -7,33 +7,39 @@ from butterfree.configs import environment
 from butterfree.configs.db import AbstractWriteConfig
 
 
-class S3Config(AbstractWriteConfig):
-    """Configuration for Spark metastore database stored on AWS S3.
+class MetastoreConfig(AbstractWriteConfig):
+    """Configuration for Spark metastore database stored.
+
+    By default the configuration is for AWS S3.
 
     Attributes:
-        database: database name.
+        path: database root location.
         mode: writing mode used be writers.
         format_: expected stored file format.
-        path: database root location.
-        partition_by: partition column to use when writing.
+        file_system: file schema uri, like: s3a, file.
 
     """
 
     def __init__(
-        self, bucket: str = None, mode: str = None, format_: str = None,
+        self,
+        path: str = None,
+        mode: str = None,
+        format_: str = None,
+        file_system: str = None,
     ):
-        self.bucket = bucket
+        self.path = path
         self.mode = mode
         self.format_ = format_
+        self.file_system = file_system
 
     @property
-    def bucket(self) -> str:
+    def path(self) -> str:
         """Bucket name."""
-        return self.__bucket
+        return self.__path
 
-    @bucket.setter
-    def bucket(self, value: str):
-        self.__bucket = value or environment.get_variable("FEATURE_STORE_S3_BUCKET")
+    @path.setter
+    def path(self, value: str):
+        self.__path = value or environment.get_variable("FEATURE_STORE_S3_BUCKET")
 
     @property
     def format_(self) -> str:
@@ -53,23 +59,32 @@ class S3Config(AbstractWriteConfig):
     def mode(self, value):
         self.__mode = value or "overwrite"
 
+    @property
+    def file_system(self) -> str:
+        """Writing mode used be writers."""
+        return self.__file_system
+
+    @file_system.setter
+    def file_system(self, value):
+        self.__file_system = value or "s3a"
+
     def get_options(self, key: str) -> dict:
-        """Get options for AWS S3.
+        """Get options for Metastore.
 
         Options will be a dictionary with the write and read configuration for
-        Spark to AWS S3.
+        Spark Metastore.
 
         Args:
-            key: path to save data into AWS S3 bucket.
+            key: path to save data into Metastore.
 
         Returns:
-            Options configuration for AWS S3.
+            Options configuration for Metastore.
 
         """
         return {
             "mode": self.mode,
             "format_": self.format_,
-            "path": os.path.join(f"s3a://{self.bucket}/", key),
+            "path": os.path.join(f"{self.file_system}://{self.path}/", key),
         }
 
     def translate(self, schema) -> List[Dict]:
