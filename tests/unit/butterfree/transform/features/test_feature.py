@@ -1,9 +1,12 @@
 from unittest.mock import Mock
 
+import pytest
+
 from butterfree.constants import DataType
 from butterfree.constants.columns import TIMESTAMP_COLUMN
 from butterfree.testing.dataframe import assert_column_equality
 from butterfree.transform.features import Feature
+from butterfree.transform.transformations import SQLExpressionTransform
 
 
 class TestFeature:
@@ -100,6 +103,33 @@ class TestFeature:
         df = test_feature.transform(feature_set_dataframe)
 
         assert dict(df.dtypes).get("feature") == "timestamp"
+
+    def test_feature_transform_without_dtype(self, feature_set_dataframe):
+        with pytest.raises(
+            ValueError,
+            match="dtype can't be None, except if the transformation is "
+            "AggregatedTransform or SparkFunctionTransform",
+        ):
+            Feature(
+                name="feature",
+                description="unit test",
+                transformation=SQLExpressionTransform(expression="feature1/feature2"),
+            ).transform(feature_set_dataframe)
+
+    def test_feature_transform_with_wrong_from_column(self, feature_set_dataframe):
+        with pytest.raises(
+            ValueError,
+            match="from_column need to be None. "
+            "If not, the column name feature "
+            "in the dataframe will be overwritten with another column.",
+        ):
+            Feature(
+                name="feature",
+                description="unit test",
+                dtype=DataType.DOUBLE,
+                from_column="feature",
+                transformation=SQLExpressionTransform(expression="feature1/feature2"),
+            ).transform(feature_set_dataframe)
 
     def test_feature_transform_with_transformation_no_from_column(
         self, feature_set_dataframe

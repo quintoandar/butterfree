@@ -49,9 +49,10 @@ class H3HashTransform(TransformComponent):
         latitude and longitude columns.
 
         >>> from butterfree.transform.features import Feature
-        >>> from butterfree.transform.transformations import (
+        >>> from butterfree.transform.transformations.h3_transform import (
         ... H3HashTransform
         ...)
+        >>> from butterfree.constants import DataType
         >>> from pyspark import SparkContext
         >>> from pyspark.sql import session
         >>> sc = SparkContext.getOrCreate()
@@ -64,12 +65,13 @@ class H3HashTransform(TransformComponent):
         >>> feature = Feature(
         ...    name="feature",
         ...    description="h3 hash transform usage example",
+        ...    dtype=DataType.STRING,
         ...    transformation=H3HashTransform(
         ...        h3_resolutions=[6, 7, 8, 9, 10, 11, 12],
         ...        lat_column="lat",
         ...        lng_column="lng",
         ...    )
-        ...)
+        ... )
         >>> feature.transform(df).show()
         +-------+---+---------+----------+-------------------+-------------------+
         |feature| id|      lat|       lng|lat_lng__h3_hash__6|lat_lng__h3_hash__7|

@@ -25,6 +25,7 @@ class SQLExpressionTransform(TransformComponent):
 
         >>> from butterfree.transform.features import Feature
         >>> from butterfree.transform.transformations import SQLExpressionTransform
+        >>> from butterfree.constants import DataType
         >>> from pyspark import SparkContext
         >>> from pyspark.sql import session
         >>> import pyspark.sql.functions as F
@@ -38,6 +39,7 @@ class SQLExpressionTransform(TransformComponent):
         >>> feature = Feature(
         ...    name="feature",
         ...    description="SQL expression transform usage example",
+        ...    dtype=DataType.DOUBLE,
         ...    transformation=SQLExpressionTransform(expression="feature1/feature2"),
         ...)
         >>> feature.transform(df).orderBy("timestamp").show()
