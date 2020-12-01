@@ -119,9 +119,8 @@ class TestFeature:
     def test_feature_transform_with_wrong_from_column(self, feature_set_dataframe):
         with pytest.raises(
             ValueError,
-            match="from_column need to be None. "
-            "If not, the column name feature "
-            "in the dataframe will be overwritten with another column.",
+            match="from_column parameter doesn't need to be declared, "
+                  "the column name feature would be overwritten with another name.",
         ):
             Feature(
                 name="feature",

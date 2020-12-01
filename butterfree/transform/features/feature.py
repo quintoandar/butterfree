@@ -90,9 +90,9 @@ class Feature:
             or isinstance(self.transformation, StackTransform)
         ) and value is not None:
             raise ValueError(
-                f"from_column need to be None. "
-                f"If not, the column name {value} "
-                f"in the dataframe will be overwritten with another column."
+                f"from_column parameter doesn't need to be declared, "
+                f"the column name {value} would be overwritten with "
+                f"another name."
             )
 
         if value is not None and not isinstance(value, str):
