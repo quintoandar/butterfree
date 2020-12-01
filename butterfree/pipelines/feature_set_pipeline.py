@@ -25,7 +25,7 @@ class FeatureSetPipeline:
 
         >>> from butterfree.pipelines import FeatureSetPipeline
         >>> from butterfree.constants.columns import TIMESTAMP_COLUMN
-        >>> from butterfree.configs.db import S3Config
+        >>> from butterfree.configs.db import MetastoreConfig
         >>> from butterfree.extract import Source
         >>> from butterfree.extract.readers import TableReader
         >>> from butterfree.transform import FeatureSet
@@ -96,8 +96,7 @@ class FeatureSetPipeline:
         ...    sink=Sink(
         ...         writers=[
         ...            HistoricalFeatureStoreWriter(
-        ...                db_config=S3Config(
-        ...                    database="db",
+        ...                db_config=MetastoreConfig(
         ...                    format_="parquet",
         ...                    path=os.path.join(
         ...                        os.path.dirname(os.path.abspath(__file__))

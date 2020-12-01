@@ -1,6 +1,6 @@
 from pytest import fixture
 
-from butterfree.configs.db import CassandraConfig, KafkaConfig, S3Config
+from butterfree.configs.db import CassandraConfig, KafkaConfig, MetastoreConfig
 
 
 @fixture
@@ -21,7 +21,7 @@ def kafka_config(monkeypatch):
 
 
 @fixture
-def s3_config(monkeypatch):
+def metastore_config(monkeypatch):
     monkeypatch.setenv("FEATURE_STORE_S3_BUCKET", "test")
 
-    return S3Config()
+    return MetastoreConfig()
