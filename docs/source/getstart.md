@@ -14,12 +14,6 @@ Or after listing `butterfree` in your `requirements.txt` file:
 pip install -r requirements.txt
 ```
 
-You may also have access to our preview build (unstable) by installing from `staging` branch:
-
-```bash
-pip install git+https://github.com/quintoandar/butterfree.git@staging
-```
-
 ## Discovering Butterfree
 
 Welcome to **Discovering Butterfree** tutorial series! Click on the following links to open the tutorials:

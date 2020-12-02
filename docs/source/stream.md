@@ -10,7 +10,7 @@ Streaming feature sets are the ones that have at least one streaming source of d
 
 Using readers in streaming mode will make use of Spark's `readStream` API instead of the normal `read`. That means it will produce a stream dataframe (`df.isStreaming == True`) instead of a normal Spark's dataframe.
 
-The currently supported readers in stream mode are `FileReader` and `KafkaReader`. For more information about the specifications read their docstrings, [here](https://github.com/quintoandar/butterfree/blob/staging/butterfree/core/extract/readers/file_reader.py#L10) and [here](https://github.com/quintoandar/butterfree/blob/staging/butterfree/core/extract/readers/kafka_reader.py#L14) respectively. 
+The currently supported readers in stream mode are `FileReader` and `KafkaReader`. For more information about the specifications read their docstrings, [here](https://github.com/quintoandar/butterfree/blob/master/butterfree/extract/readers/file_reader.py#L10) and [here](https://github.com/quintoandar/butterfree/blob/master/butterfree/extract/readers/kafka_reader.py#L12) respectively. 
 
 ## Online Feature Store Writer
 `OnlineFeatureStoreWriter` is currently the only writer that supports streaming dataframes. It will write, in real time, and upserts to Cassandra. It uses `df.writeStream` and `foreachBatch` Spark functionality to do that. You can read more about `forachBatch` [here](https://spark.apache.org/docs/latest/structured-streaming-programming-guide.html#using-foreach-and-foreachbatch).
