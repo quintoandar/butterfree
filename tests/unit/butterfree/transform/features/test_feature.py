@@ -120,7 +120,7 @@ class TestFeature:
         with pytest.raises(
             ValueError,
             match="from_column parameter doesn't need to be declared, "
-                  "the column name feature would be overwritten with another name.",
+            "the column name feature would be overwritten with another name.",
         ):
             Feature(
                 name="feature",
