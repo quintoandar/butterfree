@@ -3,7 +3,7 @@ Sphinx==3.1.1
 sphinx-rtd-theme==0.4.3
 sphinxemoji==0.1.6
 typing-extensions==3.7.4.2
-cmake=3.18.4.post1
+cmake==3.18.4.post1
 h3==3.4.3
 pyarrow==0.15.1
 
