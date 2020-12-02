@@ -98,7 +98,7 @@ class SparkFunctionTransform(TransformComponent):
         base_name = (
             "__".join([self._parent.name, function.__name__])
             if hasattr(function, "__name__")
-            else self._parent_name
+            else self._parent.name
         )
 
         if self._windows:
