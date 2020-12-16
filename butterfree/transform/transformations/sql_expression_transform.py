@@ -55,7 +55,7 @@ class SQLExpressionTransform(TransformComponent):
     """
 
     def __init__(
-        self, expression: non_blank(str),
+        self, expression: non_blank[str],
     ):
         super().__init__()
         self.expression = expression

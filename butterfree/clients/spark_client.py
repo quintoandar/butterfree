@@ -214,7 +214,7 @@ class SparkClient(AbstractClient):
 
     def create_temporary_view(
         self, dataframe: DataFrame, name: str
-    ) -> Optional[StreamingQuery]:
+    ) -> Any:
         """Create a temporary view from a given dataframe.
 
         Args:

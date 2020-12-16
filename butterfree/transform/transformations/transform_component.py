@@ -1,7 +1,7 @@
 """Transform Abstract Class."""
 
 from abc import ABC, abstractmethod
-from typing import List
+from typing import List, Any
 
 from pyspark.sql import DataFrame
 
@@ -17,12 +17,12 @@ class TransformComponent(ABC):
         self._parent = None
 
     @property
-    def parent(self) -> "TransformComponent":
+    def parent(self) -> Any:
         """Parent transform component."""
         return self._parent
 
     @parent.setter
-    def parent(self, parent):
+    def parent(self, parent: "TransformComponent") -> None:
         self._parent = parent
 
     @property

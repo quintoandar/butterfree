@@ -1,5 +1,6 @@
 """Abstract Validation class."""
 from abc import ABC, abstractmethod
+from typing import Any
 
 from pyspark.sql.dataframe import DataFrame
 
@@ -12,10 +13,10 @@ class Validation(ABC):
 
     """
 
-    def __init__(self, dataframe: DataFrame = None):
+    def __init__(self, dataframe: DataFrame):
         self.dataframe = dataframe
 
-    def input(self, dataframe: DataFrame):
+    def input(self, dataframe: DataFrame) -> Any:
         """Input a dataframe to check.
 
         Args:

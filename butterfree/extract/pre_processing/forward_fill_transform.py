@@ -8,11 +8,11 @@ from pyspark.sql import DataFrame, Window, functions
 
 def forward_fill(
     dataframe: DataFrame,
-    partition_by: non_blank(Union[str, List[str]]),
-    order_by: non_blank(Union[str, List[str]]),
-    fill_column: non_blank(str),
-    filled_column: non_blank(str) = None,
-):
+    partition_by: non_blank[Union[str, List[str]]],
+    order_by: non_blank[Union[str, List[str]]],
+    fill_column: non_blank[str],
+    filled_column: non_blank[str] = None,
+) -> DataFrame:
     """Applies a forward fill to a single column.
 
     Filling null values with the last known non-null value, leaving leading nulls alone.

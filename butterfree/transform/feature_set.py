@@ -1,7 +1,7 @@
 """FeatureSet entity."""
 import itertools
 from functools import reduce
-from typing import Dict, List
+from typing import Dict, List, Any
 
 import pyspark.sql.functions as F
 from pyspark.sql import Window
@@ -151,7 +151,7 @@ class FeatureSet:
         self.__description = value
 
     @staticmethod
-    def _get_features_columns(*features) -> List[str]:
+    def _get_features_columns(*features: Feature) -> List[str]:
         return list(itertools.chain(*[k.get_output_columns() for k in features]))
 
     @property
@@ -178,7 +178,7 @@ class FeatureSet:
         return self.__timestamp
 
     @timestamp.setter
-    def timestamp(self, value: TimestampFeature):
+    def timestamp(self, value: TimestampFeature) -> None:
         if not isinstance(value, TimestampFeature):
             raise ValueError("timestamp needs to be a TimestampFeature object.")
 
@@ -194,7 +194,7 @@ class FeatureSet:
         return self.__features
 
     @features.setter
-    def features(self, value: List[Feature]):
+    def features(self, value: List[Feature]) -> None:
         if not isinstance(value, list) or not all(
             isinstance(item, Feature) for item in value
         ):
@@ -240,7 +240,7 @@ class FeatureSet:
         """
         return self.keys_columns + [self.timestamp_column] + self.features_columns
 
-    def get_schema(self) -> List[Dict]:
+    def get_schema(self) -> List[Dict[str, Any]]:
         """Get feature set schema.
 
         Args:
@@ -279,7 +279,7 @@ class FeatureSet:
         return schema
 
     @staticmethod
-    def _has_aggregated_transform(features):
+    def _has_aggregated_transform(features: List[Feature]) -> bool:
         """Aggregated Transform mode check.
 
         Checks if there's a rolling window mode within the scope of the
@@ -296,7 +296,7 @@ class FeatureSet:
             ]
         )
 
-    def _filter_duplicated_rows(self, df):
+    def _filter_duplicated_rows(self, df: DataFrame) -> DataFrame:
         """Filter dataframe duplicated rows.
 
         Attributes:

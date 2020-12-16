@@ -2,7 +2,7 @@
 
 from abc import ABC, abstractmethod
 from functools import reduce
-from typing import Callable
+from typing import Callable, Any
 
 from pyspark.sql.dataframe import DataFrame
 
@@ -21,7 +21,7 @@ class Writer(ABC):
     def __init__(self):
         self.transformations = []
 
-    def with_(self, transformer: Callable, *args, **kwargs):
+    def with_(self, transformer: Callable[..., DataFrame], *args, **kwargs) -> "Writer":
         """Define a new transformation for the Writer.
 
         All the transformations are used when the method consume is called.
@@ -46,7 +46,7 @@ class Writer(ABC):
 
     def _apply_transformations(self, df: DataFrame) -> DataFrame:
         return reduce(
-            lambda result_df, transformation: transformation["transformer"](
+            lambda result_df, transformation: transformation["transformer"]( #type: ignore
                 result_df, *transformation["args"], **transformation["kwargs"]
             ),
             self.transformations,
@@ -56,7 +56,7 @@ class Writer(ABC):
     @abstractmethod
     def write(
         self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient,
-    ):
+    ) -> Any:
         """Loads the data from a feature set into the Feature Store.
 
         Feature Store could be Online or Historical.
@@ -71,7 +71,7 @@ class Writer(ABC):
     @abstractmethod
     def validate(
         self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient
-    ):
+    ) -> Any:
         """Calculate dataframe rows to validate data into Feature Store.
 
         Args:

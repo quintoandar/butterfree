@@ -9,14 +9,14 @@ from butterfree.extract.pre_processing import forward_fill
 
 def pivot(
     dataframe: DataFrame,
-    group_by_columns: non_blank(List[str]),
-    pivot_column: non_blank(str),
-    agg_column: non_blank(str),
-    aggregation: non_null(Callable),
-    mock_value: non_null(object) = None,
-    mock_type: non_null(object) = None,
-    with_forward_fill: non_null(bool) = False,
-):
+    group_by_columns: non_blank[List[str]],
+    pivot_column: non_blank[str],
+    agg_column: non_blank[str],
+    aggregation: non_null[Callable],
+    mock_value: non_null[object] = None,
+    mock_type: non_null[object] = None,
+    with_forward_fill: non_null[bool] = False,
+) -> DataFrame:
     """Defines a pivot transformation.
 
     Attributes:
@@ -123,6 +123,7 @@ def pivot(
         with all mock values replaced by null.
     """
     agg_column_type = None
+
     if mock_value is not None:
         if mock_type is None:
             raise AttributeError(
@@ -156,7 +157,7 @@ def pivot(
             pivoted = pivoted.withColumn(
                 c,
                 functions.when(functions.col(c) != mock_value, functions.col(c)).cast(
-                    agg_column_type
+                    agg_column_type #type: ignore
                 ),
             )
     return pivoted

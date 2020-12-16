@@ -1,13 +1,14 @@
 """Holds the Historical Feature Store writer class."""
 
 import os
+from typing import Callable, Any, Union
 
 from pyspark.sql.dataframe import DataFrame
 from pyspark.sql.functions import dayofmonth, month, year
 
 from butterfree.clients import SparkClient
 from butterfree.configs import environment
-from butterfree.configs.db import MetastoreConfig
+from butterfree.configs.db import MetastoreConfig, AbstractWriteConfig
 from butterfree.constants import columns
 from butterfree.constants.spark_constants import DEFAULT_NUM_PARTITIONS
 from butterfree.dataframe_service import repartition_df
@@ -89,9 +90,9 @@ class HistoricalFeatureStoreWriter(Writer):
 
     def __init__(
         self,
-        db_config=None,
-        database=None,
-        num_partitions=None,
+        db_config: Union[AbstractWriteConfig, MetastoreConfig] = None,
+        database: str = None,
+        num_partitions: int = None,
         validation_threshold: float = DEFAULT_VALIDATION_THRESHOLD,
         debug_mode: bool = False,
     ):
@@ -106,7 +107,7 @@ class HistoricalFeatureStoreWriter(Writer):
 
     def write(
         self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient,
-    ):
+    ) -> None:
         """Loads the data from a feature set into the Historical Feature Store.
 
         Args:
@@ -139,7 +140,7 @@ class HistoricalFeatureStoreWriter(Writer):
             **self.db_config.get_options(s3_key),
         )
 
-    def _assert_validation_count(self, table_name, written_count, dataframe_count):
+    def _assert_validation_count(self, table_name: str, written_count: int, dataframe_count: int) -> None:
         lower_bound = (1 - self.validation_threshold) * written_count
         upper_bound = (1 + self.validation_threshold) * written_count
         validation = lower_bound <= dataframe_count <= upper_bound
@@ -152,7 +153,7 @@ class HistoricalFeatureStoreWriter(Writer):
 
     def validate(
         self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient
-    ):
+    ) -> None:
         """Calculate dataframe rows to validate data into Feature Store.
 
         Args:
@@ -174,7 +175,7 @@ class HistoricalFeatureStoreWriter(Writer):
         dataframe_count = dataframe.count()
         self._assert_validation_count(table_name, written_count, dataframe_count)
 
-    def _create_partitions(self, dataframe):
+    def _create_partitions(self, dataframe: DataFrame) -> DataFrame:
         # create year partition column
         dataframe = dataframe.withColumn(
             columns.PARTITION_YEAR, year(dataframe[columns.TIMESTAMP_COLUMN])

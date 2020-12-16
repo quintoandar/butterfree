@@ -3,7 +3,7 @@
 from datetime import datetime
 from typing import Union
 
-from pyspark.sql import functions
+from pyspark.sql import functions, DataFrame
 
 from butterfree.clients import SparkClient
 from butterfree.constants import DataType
@@ -15,7 +15,7 @@ def get_date_range(
     start_date: Union[str, datetime],
     end_date: Union[str, datetime],
     step: int = None,
-):
+) -> DataFrame:
     """Create a date range dataframe.
 
     The dataframe returning from this method will containing a single column
@@ -45,6 +45,6 @@ def get_date_range(
         ]
     )
     start_date, end_date = date_df.first()
-    return client.conn.range(start_date, end_date + day_in_seconds, step).select(
+    return client.conn.range(int(start_date), int(end_date) + day_in_seconds, step).select(
         functions.col("id").cast(DataType.TIMESTAMP.spark).alias(TIMESTAMP_COLUMN)
     )

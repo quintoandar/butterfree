@@ -1,4 +1,5 @@
 """FileReader entity."""
+from typing import Any, Dict
 
 from pyspark.sql import DataFrame
 from pyspark.sql.types import StructType
@@ -75,7 +76,7 @@ class FileReader(Reader):
         path: str,
         format: str,
         schema: StructType = None,
-        format_options: dict = None,
+        format_options: Dict[Any, Any] = None,
         stream: bool = False,
     ):
         super().__init__(id)

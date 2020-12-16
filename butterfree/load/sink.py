@@ -35,24 +35,24 @@ class Sink:
         return self._writers
 
     @writers.setter
-    def writers(self, value: List[Writer]):
+    def writers(self, value: List[Writer]) -> None:
         if not value or not all(isinstance(writer, Writer) for writer in value):
             raise ValueError("Writers needs to be a list of Writer instances.")
         else:
             self._writers = value
 
     @property
-    def validation(self):
+    def validation(self) -> Validation:
         """Validation to check the data before starting to write."""
         return self._validation
 
     @validation.setter
-    def validation(self, value: Validation):
+    def validation(self, value: Validation) -> None:
         self._validation = value or BasicValidation()
 
     def validate(
         self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient
-    ):
+    ) -> None:
         """Trigger a validation job in all the defined Writers.
 
         Args:

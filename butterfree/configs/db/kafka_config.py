@@ -1,5 +1,5 @@
 """Holds configurations to read and write with Spark to Kafka."""
-from typing import Dict, List
+from typing import Dict, List, Optional, Any
 
 from butterfree.configs import environment
 from butterfree.configs.db import AbstractWriteConfig
@@ -42,21 +42,21 @@ class KafkaConfig(AbstractWriteConfig):
         self.stream_checkpoint_path = stream_checkpoint_path
 
     @property
-    def kafka_topic(self) -> str:
+    def kafka_topic(self) -> Optional[str]:
         """Kafka topic name."""
         return self.__kafka_topic
 
     @kafka_topic.setter
-    def kafka_topic(self, value: str):
+    def kafka_topic(self, value: str) -> None:
         self.__kafka_topic = value
 
     @property
-    def kafka_connection_string(self) -> str:
+    def kafka_connection_string(self) -> Optional[str]:
         """Kafka connection string with hosts and ports to connect."""
         return self.__kafka_connection_string
 
     @kafka_connection_string.setter
-    def kafka_connection_string(self, value: str):
+    def kafka_connection_string(self, value: str) -> None:
         input_value = value or environment.get_variable(
             "KAFKA_CONSUMER_CONNECTION_STRING"
         )
@@ -65,53 +65,53 @@ class KafkaConfig(AbstractWriteConfig):
         self.__kafka_connection_string = input_value
 
     @property
-    def mode(self) -> str:
+    def mode(self) -> Optional[str]:
         """Write mode for Spark."""
         return self.__mode
 
     @mode.setter
-    def mode(self, value):
+    def mode(self, value:str) -> None:
         self.__mode = value or "append"
 
     @property
-    def format_(self) -> str:
+    def format_(self) -> Optional[str]:
         """Write format for Spark."""
         return self.__format
 
     @format_.setter
-    def format_(self, value: str):
+    def format_(self, value: str) -> None:
         self.__format = value or "kafka"
 
     @property
-    def stream_output_mode(self) -> str:
+    def stream_output_mode(self) -> Optional[str]:
         """Specify the mode from writing streaming data."""
         return self.__stream_output_mode
 
     @stream_output_mode.setter
-    def stream_output_mode(self, value: str):
+    def stream_output_mode(self, value: str) -> None:
         self.__stream_output_mode = value or "update"
 
     @property
-    def stream_checkpoint_path(self) -> str:
+    def stream_checkpoint_path(self) -> Optional[str]:
         """Path on S3 to save checkpoints for the stream job."""
         return self.__stream_checkpoint_path
 
     @stream_checkpoint_path.setter
-    def stream_checkpoint_path(self, value: str):
+    def stream_checkpoint_path(self, value: str) -> None:
         self.__stream_checkpoint_path = value or environment.get_variable(
             "STREAM_CHECKPOINT_PATH"
         )
 
     @property
-    def stream_processing_time(self) -> str:
+    def stream_processing_time(self) -> Optional[str]:
         """Processing time interval for streaming jobs."""
         return self.__stream_processing_time
 
     @stream_processing_time.setter
-    def stream_processing_time(self, value: str):
+    def stream_processing_time(self, value: str) -> None:
         self.__stream_processing_time = value or "0 seconds"
 
-    def get_options(self, topic: str) -> dict:
+    def get_options(self, topic: str) -> Dict[Optional[str], Optional[str]]:
         """Get options for connecting to Kafka.
 
         Options will be a dictionary with the write and read configuration for
@@ -129,7 +129,7 @@ class KafkaConfig(AbstractWriteConfig):
             "kafka.bootstrap.servers": self.kafka_connection_string,
         }
 
-    def translate(self, schema) -> List[Dict]:
+    def translate(self, schema: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Get feature set schema to be translated.
 
         The output will be a list of dictionaries regarding cassandra

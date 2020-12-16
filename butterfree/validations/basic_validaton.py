@@ -14,10 +14,10 @@ class BasicValidation(Validation):
 
     """
 
-    def __init__(self, dataframe: DataFrame = None):
+    def __init__(self, dataframe: DataFrame):
         super().__init__(dataframe)
 
-    def check(self):
+    def check(self) -> None:
         """Check basic validation properties about the dataframe.
 
         Raises:
@@ -28,7 +28,7 @@ class BasicValidation(Validation):
         self.validate_column_ts()
         self.validate_df_is_empty()
 
-    def validate_column_ts(self):
+    def validate_column_ts(self) -> None:
         """Check dataframe's ts column.
 
         Raises:
@@ -38,7 +38,7 @@ class BasicValidation(Validation):
         if TIMESTAMP_COLUMN not in self.dataframe.columns:
             raise ValueError(f"DataFrame must have a '{TIMESTAMP_COLUMN}' column.")
 
-    def validate_df_is_empty(self):
+    def validate_df_is_empty(self) -> None:
         """Check dataframe emptiness.
 
         Raises:
@@ -48,7 +48,7 @@ class BasicValidation(Validation):
         if (not self.dataframe.isStreaming) and self.dataframe.rdd.isEmpty():
             raise ValueError("DataFrame can't be empty.")
 
-    def validate_df_is_spark_df(self):
+    def validate_df_is_spark_df(self) -> None:
         """Check type of dataframe object.
 
         Raises:

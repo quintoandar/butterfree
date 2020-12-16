@@ -2,7 +2,7 @@
 
 from abc import ABC, abstractmethod
 from functools import reduce
-from typing import Callable, List
+from typing import Callable, List, Any, Tuple, Dict, Optional
 
 from pyspark.sql import DataFrame
 
@@ -21,9 +21,9 @@ class Reader(ABC):
 
     def __init__(self, id: str):
         self.id = id
-        self.transformations = []
+        self.transformations: List[Dict[str, Any]] = []
 
-    def with_(self, transformer: Callable, *args, **kwargs):
+    def with_(self, transformer: Callable[..., DataFrame], *args: Any, **kwargs: Any) -> Any:
         """Define a new transformation for the Reader.
 
         All the transformations are used when the method consume is called.
@@ -48,7 +48,7 @@ class Reader(ABC):
 
     def _apply_transformations(self, df: DataFrame) -> DataFrame:
         return reduce(
-            lambda result_df, transformation: transformation["transformer"](
+            lambda result_df, transformation: transformation["transformer"](   #type: ignore
                 result_df, *transformation["args"], **transformation["kwargs"]
             ),
             self.transformations,
@@ -68,7 +68,7 @@ class Reader(ABC):
         :return: Spark dataframe
         """
 
-    def build(self, client: SparkClient, columns: List[tuple] = None):
+    def build(self, client: SparkClient, columns: List[Any] = None) -> None:
         """Register the data got from the reader in the Spark metastore.
 
         Create a temporary view in Spark metastore referencing the data

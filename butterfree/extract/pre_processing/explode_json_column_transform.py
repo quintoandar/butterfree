@@ -72,7 +72,7 @@ def explode_json_column(
                 field.name,
                 from_json(
                     get_json_object(df[column], "$.{}".format(field.name)),
-                    schema=field.dataType,
+                    schema=field.dataType.typeName(),
                 ),
             )
         else:  # non-collection data types

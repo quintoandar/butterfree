@@ -120,7 +120,7 @@ class FeatureSetPipeline:
         source: Source,
         feature_set: FeatureSet,
         sink: Sink,
-        spark_client: SparkClient = None,
+        spark_client: SparkClient,
     ):
         self.source = source
         self.feature_set = feature_set
@@ -133,7 +133,7 @@ class FeatureSetPipeline:
         return self._source
 
     @source.setter
-    def source(self, source: Source):
+    def source(self, source: Source) -> None:
         if not isinstance(source, Source):
             raise ValueError("source must be a Source instance")
         self._source = source
@@ -144,29 +144,29 @@ class FeatureSetPipeline:
         return self._feature_set
 
     @feature_set.setter
-    def feature_set(self, feature_set: FeatureSet):
+    def feature_set(self, feature_set: FeatureSet) -> None:
         if not isinstance(feature_set, FeatureSet):
             raise ValueError("feature_set must be a FeatureSet instance")
         self._feature_set = feature_set
 
     @property
-    def sink(self):
+    def sink(self) -> Sink:
         """Sink used to write the output dataframe in the desired locations."""
         return self._sink
 
     @sink.setter
-    def sink(self, sink: Sink):
+    def sink(self, sink: Sink) -> None:
         if not isinstance(sink, Sink):
             raise ValueError("sink must be a Sink instance")
         self._sink = sink
 
     @property
-    def spark_client(self):
+    def spark_client(self) -> SparkClient:
         """Client used to access Spark connection."""
         return self._spark_client
 
     @spark_client.setter
-    def spark_client(self, spark_client: SparkClient):
+    def spark_client(self, spark_client: SparkClient) -> None:
         self._spark_client = spark_client or SparkClient()
         if not isinstance(self._spark_client, SparkClient):
             raise ValueError("spark_client must be a SparkClient instance")
@@ -177,7 +177,7 @@ class FeatureSetPipeline:
         partition_by: List[str] = None,
         order_by: List[str] = None,
         num_processors: int = None,
-    ):
+    ) -> None:
         """Runs the defined feature set pipeline.
 
         The pipeline consists in the following steps:

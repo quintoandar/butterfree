@@ -40,11 +40,11 @@ class Feature:
 
     def __init__(
         self,
-        name: non_blank(str),
-        description: non_blank(str),
-        dtype: non_blank(DataType) = None,
-        from_column: non_blank(str) = None,
-        transformation: non_null(TransformComponent) = None,
+        name: non_blank[str],
+        description: non_blank[str],
+        dtype: non_blank[DataType] = None,
+        from_column: non_blank[str] = None,
+        transformation: non_null[TransformComponent] = None,
     ) -> None:
         self.name = name
         self.description = description
