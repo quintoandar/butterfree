@@ -1,6 +1,6 @@
 """Methods to assert properties regarding Apache Spark Dataframes."""
 from json import dumps
-from typing import List, Any, Dict
+from typing import Any, Dict, List
 
 from pyspark import SparkContext
 from pyspark.sql import Column, DataFrame, SparkSession
@@ -25,10 +25,10 @@ def assert_dataframe_equality(output_df: DataFrame, target_df: DataFrame) -> Non
     select_cols = [col(c) for c in output_df.schema.fieldNames()]
 
     output_data = sorted(output_df.select(*select_cols).collect())
-    output_data = [row.asDict(recursive=True) for row in output_data] #type: ignore
+    output_data = [row.asDict(recursive=True) for row in output_data]  # type: ignore
 
     target_data = sorted(target_df.select(*select_cols).collect())
-    target_data = [row.asDict(recursive=True) for row in target_data] #type: ignore
+    target_data = [row.asDict(recursive=True) for row in target_data]  # type: ignore
 
     if not output_data == target_data:
         raise AssertionError(

@@ -1,7 +1,7 @@
 """Write feature set metadata."""
 
 import json
-from typing import List, Optional, Tuple, Dict, Any, Union
+from typing import Any, Dict, List, Optional, Tuple
 
 from mdutils import MdUtils
 
@@ -149,7 +149,7 @@ class Metadata:
 
         return self
 
-    def to_json(self) -> List[Any]:
+    def to_json(self) -> Any:
         """Generate json file."""
         params = self._construct()
 

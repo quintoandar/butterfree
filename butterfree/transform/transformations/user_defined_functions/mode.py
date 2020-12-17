@@ -1,12 +1,10 @@
 """Method to compute mode aggregation."""
-from typing import Union
-
 import pandas as pd
 from pyspark.sql.functions import pandas_udf
-from pyspark.sql.types import StringType, StructType
+from pyspark.sql.types import StringType
 
 
-@pandas_udf(Union[StructType, str], StringType)
+@pandas_udf(StringType())  # type: ignore
 def mode(column: pd.Series) -> str:
     """Computes a mode aggregation.
 

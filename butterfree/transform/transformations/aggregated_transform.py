@@ -2,7 +2,6 @@
 from collections import namedtuple
 from typing import List, Tuple
 
-from parameters_validation import non_blank
 from pyspark.sql import DataFrame
 from pyspark.sql.functions import col, expr, when
 
@@ -57,9 +56,7 @@ class AggregatedTransform(TransformComponent):
         NotImplementedError: ...
     """
 
-    def __init__(
-        self, functions: non_blank[List[Function]], filter_expression: str = None
-    ):
+    def __init__(self, functions: List[Function], filter_expression: str = None):
         super(AggregatedTransform, self).__init__()
         self.functions = functions
         self.filter_expression = filter_expression

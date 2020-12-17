@@ -119,7 +119,7 @@ class SparkClient(AbstractClient):
         dataframe: DataFrame,
         processing_time: str,
         output_mode: str,
-        checkpoint_path: str,
+        checkpoint_path: Optional[str],
         format_: str,
         mode: str,
         **options: Any,
@@ -171,7 +171,7 @@ class SparkClient(AbstractClient):
     @staticmethod
     def write_table(
         dataframe: DataFrame,
-        database: str,
+        database: Optional[str],
         table_name: str,
         path: str,
         format_: str = None,
@@ -212,9 +212,7 @@ class SparkClient(AbstractClient):
             **options,
         )
 
-    def create_temporary_view(
-        self, dataframe: DataFrame, name: str
-    ) -> Any:
+    def create_temporary_view(self, dataframe: DataFrame, name: str) -> Any:
         """Create a temporary view from a given dataframe.
 
         Args:

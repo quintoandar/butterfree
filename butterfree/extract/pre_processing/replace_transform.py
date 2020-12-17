@@ -6,7 +6,9 @@ from pyspark.sql.dataframe import DataFrame
 from pyspark.sql.functions import coalesce, col, create_map, lit
 
 
-def replace(dataframe: DataFrame, column: str, replace_dict: Dict[str, str]) -> DataFrame:
+def replace(
+    dataframe: DataFrame, column: str, replace_dict: Dict[str, str]
+) -> DataFrame:
     """Replace values of a string column in the dataframe using a dict.
 
     Example:
@@ -57,5 +59,7 @@ def replace(dataframe: DataFrame, column: str, replace_dict: Dict[str, str]) -> 
             "all keys and values as string values"
         )
 
-    mapping = create_map([lit(value) for value in chain(*replace_dict.items())]) #type: ignore
+    mapping = create_map(
+        [lit(value) for value in chain(*replace_dict.items())]  # type: ignore
+    )
     return dataframe.withColumn(column, coalesce(mapping[col(column)], col(column)))

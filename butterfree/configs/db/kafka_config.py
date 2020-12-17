@@ -1,5 +1,5 @@
 """Holds configurations to read and write with Spark to Kafka."""
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional
 
 from butterfree.configs import environment
 from butterfree.configs.db import AbstractWriteConfig
@@ -70,7 +70,7 @@ class KafkaConfig(AbstractWriteConfig):
         return self.__mode
 
     @mode.setter
-    def mode(self, value:str) -> None:
+    def mode(self, value: str) -> None:
         self.__mode = value or "append"
 
     @property

@@ -1,7 +1,7 @@
 """Abstract classes for database configurations with spark."""
 
 from abc import ABC, abstractmethod
-from typing import List, Any, Dict, Optional
+from typing import Any, Dict, List
 
 
 class AbstractWriteConfig(ABC):

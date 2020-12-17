@@ -1,7 +1,7 @@
 """FeatureSet entity."""
 import itertools
 from functools import reduce
-from typing import Dict, List, Any
+from typing import Any, Dict, List
 
 import pyspark.sql.functions as F
 from pyspark.sql import Window
@@ -262,7 +262,7 @@ class FeatureSet:
                     }
                 )
 
-        for f in self.features:
+        for f in self.features:  # type: ignore
             name = self._get_features_columns(f)
             if isinstance(f.transformation, SparkFunctionTransform):
                 type = [
@@ -356,11 +356,11 @@ class FeatureSet:
             +---+----------+--------+--------+--------+
 
         """
-        window_key_columns = Window.partitionBy(self.keys_columns).orderBy(
-            TIMESTAMP_COLUMN
-        )
+        window_key_columns = Window.partitionBy(
+            self.keys_columns  # type: ignore
+        ).orderBy(TIMESTAMP_COLUMN)
         window_all_columns = Window.partitionBy(
-            self.keys_columns + self.features_columns
+            self.keys_columns + self.features_columns  # type: ignore
         ).orderBy(TIMESTAMP_COLUMN)
 
         df = (

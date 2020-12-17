@@ -1,8 +1,7 @@
 """Spark Function Transform entity."""
-from typing import List, Any, Optional
+from typing import Any, List
 
-from parameters_validation import non_blank
-from pyspark.sql import WindowSpec, DataFrame
+from pyspark.sql import DataFrame
 
 from butterfree.transform.transformations.transform_component import TransformComponent
 from butterfree.transform.utils import Window
@@ -79,13 +78,13 @@ class SparkFunctionTransform(TransformComponent):
 
     """
 
-    def __init__(self, functions: non_blank[List[Function]]):
+    def __init__(self, functions: List[Function]):
         super().__init__()
         self.functions = functions
         self._windows: List[Any] = []
 
     def with_window(
-        self, partition_by: str, order_by: str = None, mode: str = None, window_definition: str = None
+        self, partition_by: str, order_by: str, window_definition: str, mode: str = None
     ) -> "SparkFunctionTransform":
         """Create a list with windows defined."""
         if mode is not None:
@@ -95,14 +94,14 @@ class SparkFunctionTransform(TransformComponent):
             ]
         return self
 
-    def _get_output_name(self, function: object, window: Window = None) -> Optional[str]:
+    def _get_output_name(self, function: object, window: Window = None) -> str:
         base_name = (
             "__".join([self._parent.name, function.__name__])
             if hasattr(function, "__name__")
             else self._parent.name
         )
 
-        if self._windows:
+        if self._windows and window is not None:
             return "_".join([base_name, window.get_name()])
 
         return base_name

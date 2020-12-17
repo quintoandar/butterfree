@@ -1,5 +1,5 @@
 """KafkaSource entity."""
-from typing import Dict, Any
+from typing import Any, Dict
 
 from pyspark.sql.dataframe import DataFrame, StructType
 from pyspark.sql.functions import col, struct

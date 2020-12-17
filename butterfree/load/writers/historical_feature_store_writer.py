@@ -1,14 +1,14 @@
 """Holds the Historical Feature Store writer class."""
 
 import os
-from typing import Callable, Any, Union
+from typing import Union
 
 from pyspark.sql.dataframe import DataFrame
 from pyspark.sql.functions import dayofmonth, month, year
 
 from butterfree.clients import SparkClient
 from butterfree.configs import environment
-from butterfree.configs.db import MetastoreConfig, AbstractWriteConfig
+from butterfree.configs.db import AbstractWriteConfig, MetastoreConfig
 from butterfree.constants import columns
 from butterfree.constants.spark_constants import DEFAULT_NUM_PARTITIONS
 from butterfree.dataframe_service import repartition_df
@@ -96,7 +96,7 @@ class HistoricalFeatureStoreWriter(Writer):
         validation_threshold: float = DEFAULT_VALIDATION_THRESHOLD,
         debug_mode: bool = False,
     ):
-        super().__init__()
+        super(HistoricalFeatureStoreWriter, self).__init__()
         self.db_config = db_config or MetastoreConfig()
         self.database = database or environment.get_variable(
             "FEATURE_STORE_HISTORICAL_DATABASE"
@@ -140,7 +140,9 @@ class HistoricalFeatureStoreWriter(Writer):
             **self.db_config.get_options(s3_key),
         )
 
-    def _assert_validation_count(self, table_name: str, written_count: int, dataframe_count: int) -> None:
+    def _assert_validation_count(
+        self, table_name: str, written_count: int, dataframe_count: int
+    ) -> None:
         lower_bound = (1 - self.validation_threshold) * written_count
         upper_bound = (1 + self.validation_threshold) * written_count
         validation = lower_bound <= dataframe_count <= upper_bound

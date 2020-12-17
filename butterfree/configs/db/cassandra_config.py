@@ -1,5 +1,5 @@
 """Holds configurations to read and write with Spark to Cassandra DB."""
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional
 
 from butterfree.configs import environment
 from butterfree.configs.db import AbstractWriteConfig

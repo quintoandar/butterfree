@@ -1,5 +1,5 @@
 """Holds the Sink class."""
-from typing import List
+from typing import List, Optional
 
 from pyspark.sql.dataframe import DataFrame
 from pyspark.sql.streaming import StreamingQuery
@@ -25,7 +25,7 @@ class Sink:
 
     """
 
-    def __init__(self, writers: List[Writer], validation: Validation = None):
+    def __init__(self, writers: List[Writer], validation: Optional[Validation] = None):
         self.writers = writers
         self.validation = validation
 
@@ -42,13 +42,13 @@ class Sink:
             self._writers = value
 
     @property
-    def validation(self) -> Validation:
+    def validation(self) -> Optional[Validation]:
         """Validation to check the data before starting to write."""
         return self._validation
 
     @validation.setter
     def validation(self, value: Validation) -> None:
-        self._validation = value or BasicValidation()
+        self._validation = value or BasicValidation()  # type: ignore
 
     def validate(
         self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient
@@ -94,7 +94,8 @@ class Sink:
             Streaming handlers for each defined writer, if writing streaming dfs.
 
         """
-        self.validation.input(dataframe).check()
+        if self.validation is not None:
+            self.validation.input(dataframe).check()
 
         handlers = [
             writer.write(

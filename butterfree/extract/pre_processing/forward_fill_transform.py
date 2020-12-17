@@ -2,16 +2,15 @@
 import sys
 from typing import List, Union
 
-from parameters_validation import non_blank
 from pyspark.sql import DataFrame, Window, functions
 
 
 def forward_fill(
     dataframe: DataFrame,
-    partition_by: non_blank[Union[str, List[str]]],
-    order_by: non_blank[Union[str, List[str]]],
-    fill_column: non_blank[str],
-    filled_column: non_blank[str] = None,
+    partition_by: Union[str, List[str]],
+    order_by: Union[str, List[str]],
+    fill_column: str,
+    filled_column: str = None,
 ) -> DataFrame:
     """Applies a forward fill to a single column.
 
@@ -94,7 +93,9 @@ def forward_fill(
         +-----------+-------------------+--------+-----------+
     """
     window = (
-        Window.partitionBy(partition_by).orderBy(order_by).rowsBetween(-sys.maxsize, 0)
+        Window.partitionBy(partition_by)  # type: ignore
+        .orderBy(order_by)  # type: ignore
+        .rowsBetween(-sys.maxsize, 0)
     )
 
     return dataframe.withColumn(

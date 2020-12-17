@@ -1,5 +1,5 @@
 """Module where there are repartition methods."""
-from typing import List, Optional
+from typing import List
 
 from pyspark.sql.dataframe import DataFrame
 
@@ -9,7 +9,9 @@ from butterfree.constants.spark_constants import (
 )
 
 
-def _num_partitions_definition(num_processors: int = None, num_partitions: int = None) -> int:
+def _num_partitions_definition(
+    num_processors: int = None, num_partitions: int = None
+) -> int:
     num_partitions = (
         num_processors * PARTITION_PROCESSOR_RATIO
         if num_processors

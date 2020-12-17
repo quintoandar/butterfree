@@ -2,7 +2,7 @@
 
 from abc import ABC, abstractmethod
 from functools import reduce
-from typing import Callable, List, Any, Tuple, Dict, Optional
+from typing import Any, Callable, Dict, List
 
 from pyspark.sql import DataFrame
 
@@ -23,7 +23,9 @@ class Reader(ABC):
         self.id = id
         self.transformations: List[Dict[str, Any]] = []
 
-    def with_(self, transformer: Callable[..., DataFrame], *args: Any, **kwargs: Any) -> Any:
+    def with_(
+        self, transformer: Callable[..., DataFrame], *args: Any, **kwargs: Any
+    ) -> Any:
         """Define a new transformation for the Reader.
 
         All the transformations are used when the method consume is called.
@@ -46,9 +48,9 @@ class Reader(ABC):
         self.transformations.append(new_transformation)
         return self
 
-    def _apply_transformations(self, df: DataFrame) -> DataFrame:
+    def _apply_transformations(self, df: DataFrame) -> Any:
         return reduce(
-            lambda result_df, transformation: transformation["transformer"](   #type: ignore
+            lambda result_df, transformation: transformation["transformer"](
                 result_df, *transformation["args"], **transformation["kwargs"]
             ),
             self.transformations,

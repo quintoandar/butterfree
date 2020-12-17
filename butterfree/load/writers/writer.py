@@ -2,7 +2,7 @@
 
 from abc import ABC, abstractmethod
 from functools import reduce
-from typing import Callable, Any
+from typing import Any, Callable, Dict, List
 
 from pyspark.sql.dataframe import DataFrame
 
@@ -18,10 +18,12 @@ class Writer(ABC):
 
     """
 
-    def __init__(self):
-        self.transformations = []
+    def __init__(self) -> None:
+        self.transformations: List[Dict[str, Any]] = []
 
-    def with_(self, transformer: Callable[..., DataFrame], *args, **kwargs) -> "Writer":
+    def with_(
+        self, transformer: Callable[..., DataFrame], *args: Any, **kwargs: Any
+    ) -> "Writer":
         """Define a new transformation for the Writer.
 
         All the transformations are used when the method consume is called.
@@ -46,7 +48,7 @@ class Writer(ABC):
 
     def _apply_transformations(self, df: DataFrame) -> DataFrame:
         return reduce(
-            lambda result_df, transformation: transformation["transformer"]( #type: ignore
+            lambda result_df, transformation: transformation["transformer"](
                 result_df, *transformation["args"], **transformation["kwargs"]
             ),
             self.transformations,

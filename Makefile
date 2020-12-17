@@ -87,7 +87,7 @@ type-check:
 	@echo "mypy"
 	@echo "===="
 	@echo ""
-	@python -m mypy butterfree/reports
+	@python -m mypy butterfree
 
 .PHONY: checks
 ## run all code checks
