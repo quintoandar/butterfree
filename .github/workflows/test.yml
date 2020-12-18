@@ -9,7 +9,7 @@ on:
 jobs:
   Pipeline:
     runs-on: ubuntu-16.04
-    container: rafaelleinio/docker-java-python
+    container: quintoandar/python-3-7-java
 
     steps:
     - uses: actions/checkout@v2
