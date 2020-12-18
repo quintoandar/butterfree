@@ -75,4 +75,7 @@ class Source:
 
         dataframe = client.sql(self.query)
 
+        if not dataframe.isStreaming:
+            dataframe.cache().count()
+
         return dataframe
