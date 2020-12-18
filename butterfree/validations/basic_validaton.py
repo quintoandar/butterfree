@@ -14,7 +14,7 @@ class BasicValidation(Validation):
 
     """
 
-    def __init__(self, dataframe: DataFrame):
+    def __init__(self, dataframe: DataFrame = None):
         super().__init__(dataframe)
 
     def check(self) -> None:
@@ -35,6 +35,8 @@ class BasicValidation(Validation):
             ValueError: if dataframe don't have a column named ts.
 
         """
+        if not self.dataframe:
+            raise ValueError("DataFrame can't be None.")
         if TIMESTAMP_COLUMN not in self.dataframe.columns:
             raise ValueError(f"DataFrame must have a '{TIMESTAMP_COLUMN}' column.")
 
@@ -45,6 +47,8 @@ class BasicValidation(Validation):
             ValueError: if dataframe is empty and is not streaming.
 
         """
+        if not self.dataframe:
+            raise ValueError("DataFrame can't be None.")
         if (not self.dataframe.isStreaming) and self.dataframe.rdd.isEmpty():
             raise ValueError("DataFrame can't be empty.")
 
@@ -55,6 +59,8 @@ class BasicValidation(Validation):
             ValueError: if dataframe is not instance of pyspark.sql.DataFrame.
 
         """
+        if not self.dataframe:
+            raise ValueError("DataFrame can't be None.")
         if not isinstance(self.dataframe, DataFrame):
             raise ValueError(
                 "dataframe needs to be a instance of pyspark.sql.DataFrame"

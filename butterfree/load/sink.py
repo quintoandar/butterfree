@@ -48,7 +48,7 @@ class Sink:
 
     @validation.setter
     def validation(self, value: Validation) -> None:
-        self._validation = value or BasicValidation()  # type: ignore
+        self._validation = value or BasicValidation()
 
     def validate(
         self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient

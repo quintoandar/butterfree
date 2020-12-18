@@ -27,14 +27,14 @@ class Function:
     @property
     def func(self) -> Callable:
         """Function to be used in the transformation."""
-        return self._func  # type: ignore
+        return self._func
 
     @func.setter
     def func(self, value: Callable) -> None:
         """Definitions to be used in the transformation."""
         if not value:
             raise ValueError("Function must not be empty.")
-        if callable(value):
+        if not callable(value):
             raise TypeError("Function must be callable.")
 
         self._func = value

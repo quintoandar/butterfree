@@ -31,15 +31,13 @@ class FrameBoundaries:
         "years": 29030400,
     }
 
-    def __init__(self, window_definition: str, mode: Optional[str]):
+    def __init__(self, mode: Optional[str], window_definition: str):
         self.mode = mode
         self.window_definition = window_definition
 
     @property
     def window_size(self) -> int:
         """Returns window size."""
-        if self.window_definition is None:
-            raise ValueError(f"{self.window_definition} can't be None.")
         if int(self.window_definition.split()[0]) <= 0:
             raise KeyError(f"{self.window_definition} have negative element.")
         return int(self.window_definition.split()[0])
@@ -47,8 +45,6 @@ class FrameBoundaries:
     @property
     def window_unit(self) -> str:
         """Returns window unit."""
-        if self.window_definition is None:
-            raise ValueError(f"{self.window_definition} can't be None.")
         unit = self.window_definition.split()[1]
         if unit not in self.__ALLOWED_WINDOWS and self.mode != "row_windows":
             raise ValueError("Not allowed")
@@ -84,14 +80,14 @@ class Window:
 
     def __init__(
         self,
-        partition_by: Union[Column, str, List[str], None],
-        order_by: Union[Column, str, None],
         window_definition: str,
+        partition_by: Optional[Union[Column, str, List[str]]] = None,
+        order_by: Optional[Union[Column, str]] = None,
         mode: str = None,
     ):
         self.partition_by = partition_by
         self.order_by = order_by or TIMESTAMP_COLUMN
-        self.frame_boundaries = FrameBoundaries(window_definition, mode)
+        self.frame_boundaries = FrameBoundaries(mode, window_definition)
 
     def get_name(self) -> str:
         """Return window suffix name based on passed criteria."""

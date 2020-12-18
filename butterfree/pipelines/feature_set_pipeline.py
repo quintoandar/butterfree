@@ -120,12 +120,12 @@ class FeatureSetPipeline:
         source: Source,
         feature_set: FeatureSet,
         sink: Sink,
-        spark_client: SparkClient,
+        spark_client: SparkClient = None,
     ):
         self.source = source
         self.feature_set = feature_set
         self.sink = sink
-        self.spark_client = spark_client
+        self.spark_client = spark_client or SparkClient()
 
     @property
     def source(self) -> Source:
@@ -167,9 +167,11 @@ class FeatureSetPipeline:
 
     @spark_client.setter
     def spark_client(self, spark_client: SparkClient) -> None:
-        self._spark_client = spark_client or SparkClient()
-        if not isinstance(self._spark_client, SparkClient):
+
+        if not isinstance(spark_client, SparkClient):
             raise ValueError("spark_client must be a SparkClient instance")
+
+        self._spark_client = spark_client
 
     def run(
         self,
