@@ -14,7 +14,7 @@ class CassandraConfig(AbstractWriteConfig):
     Attributes:
         username: username to use in connection.
         password: password to use in connection.
-        host: host to use in connection.
+        host: comma-separated host to use in connection.
         keyspace:  Cassandra DB keyspace to write data.
         mode: write mode for Spark.
         format_: write format for Spark.
@@ -143,6 +143,16 @@ class CassandraConfig(AbstractWriteConfig):
     def stream_checkpoint_path(self, value: str):
         self.__stream_checkpoint_path = value or environment.get_variable(
             "STREAM_CHECKPOINT_PATH"
+        )
+
+    def get_foreach_writer(self, table: str):
+        from butterfree.load.writers.foreach import ForEachCassandraWriter
+        return ForEachCassandraWriter(
+            host=self.host.split(","),
+            username=self.username,
+            password=self.password,
+            keyspace=self.keyspace,
+            table=table,
         )
 
     def get_options(self, table: str) -> dict:

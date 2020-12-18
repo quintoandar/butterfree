@@ -123,13 +123,22 @@ class KafkaReader(Reader):
         self.connection_string = connection_string or environment.get_variable(
             "KAFKA_CONSUMER_CONNECTION_STRING"
         )
-        self.options = dict(
-            {
-                "kafka.bootstrap.servers": self.connection_string,
-                "subscribe": self.topic,
-            },
-            **topic_options if topic_options else {},
-        )
+        self.options = {
+            "kafka.bootstrap.servers": self.connection_string,
+            "subscribe": self.topic,
+            # default was 512
+            # (ref: https://spark.apache.org/docs/latest/structured-streaming-kafka-integration.html)
+            "kafkaConsumer.pollTimeoutMs": 600000,
+            # default is 300000, but it was recently
+            # changed and we are not sure about the kafka consumer version
+            "kafka.max.poll.interval.ms": 600000,
+            # needs to be greater than max.poll.interval.ms
+            "kafka.request.timeout.ms": 610000,
+            # default is 500 and is advised to lower the
+            # number due to poll request timeout
+            "kafka.max.poll.records": 50,
+        }
+        self.options.update(topic_options if topic_options is not None else dict())
         self.stream = stream
 
     def _struct_df(self, df: DataFrame) -> DataFrame:

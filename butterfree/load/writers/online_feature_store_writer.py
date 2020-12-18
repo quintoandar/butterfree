@@ -113,7 +113,9 @@ class OnlineFeatureStoreWriter(Writer):
     ) -> StreamingQuery:
         """Writes the dataframe in streaming mode."""
         checkpoint_folder = (
-            f"{feature_set.name}__on_entity" if self.write_to_entity else table_name
+            f"{feature_set.name}__on_{table_name}"
+            if self.write_to_entity
+            else table_name
         )
         checkpoint_path = (
             os.path.join(
@@ -124,14 +126,13 @@ class OnlineFeatureStoreWriter(Writer):
             if self.db_config.stream_checkpoint_path
             else None
         )
-        streaming_handler = spark_client.write_stream(
+
+        streaming_handler = spark_client.foreach(
             dataframe,
             processing_time=self.db_config.stream_processing_time,
             output_mode=self.db_config.stream_output_mode,
             checkpoint_path=checkpoint_path,
-            format_=self.db_config.format_,
-            mode=self.db_config.mode,
-            **self.db_config.get_options(table_name),
+            foreach_writer=self.db_config.get_foreach_writer(table_name),
         )
         return streaming_handler
 
