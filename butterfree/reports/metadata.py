@@ -1,6 +1,7 @@
 """Write feature set metadata."""
 
 import json
+from typing import Any, Dict, List, Optional, Tuple
 
 from mdutils import MdUtils
 
@@ -85,13 +86,13 @@ class Metadata:
     def __init__(self, pipeline: FeatureSetPipeline, save: bool = False):
         self.pipeline = pipeline
         self.save = save
-        self._name = None
-        self._desc_feature_set = None
-        self._source = []
-        self._sink = []
-        self._features = []
+        self._name: Optional[str] = None
+        self._desc_feature_set: Optional[str] = None
+        self._source: List[Tuple[str, str]] = []
+        self._sink: List[str] = []
+        self._features: List[Tuple[Dict[str, Any], Any]] = []
 
-    def _construct(self):
+    def _construct(self) -> "Metadata":
         self._name = self.pipeline.feature_set.name
         self._desc_feature_set = self.pipeline.feature_set.description
 
@@ -148,7 +149,7 @@ class Metadata:
 
         return self
 
-    def to_json(self):
+    def to_json(self) -> Any:
         """Generate json file."""
         params = self._construct()
 
@@ -175,7 +176,7 @@ class Metadata:
         else:
             return lines
 
-    def to_markdown(self):
+    def to_markdown(self) -> Any:
         """Generate markdown file."""
         params = self._construct()
 

@@ -1,14 +1,14 @@
 """Holds the Online Feature Store writer class."""
 
 import os
-from typing import Any, List, Optional
+from typing import Any, Dict, List, Union
 
 from pyspark.sql import DataFrame, Window
 from pyspark.sql.functions import col, row_number
 from pyspark.sql.streaming import StreamingQuery
 
 from butterfree.clients import SparkClient
-from butterfree.configs.db import CassandraConfig
+from butterfree.configs.db import AbstractWriteConfig, CassandraConfig
 from butterfree.constants.columns import TIMESTAMP_COLUMN
 from butterfree.load.writers.writer import Writer
 from butterfree.transform import FeatureSet
@@ -70,8 +70,13 @@ class OnlineFeatureStoreWriter(Writer):
 
     __name__ = "Online Feature Store Writer"
 
-    def __init__(self, db_config=None, debug_mode: bool = False, write_to_entity=False):
-        super().__init__()
+    def __init__(
+        self,
+        db_config: Union[AbstractWriteConfig, CassandraConfig] = None,
+        debug_mode: bool = False,
+        write_to_entity: bool = False,
+    ):
+        super(OnlineFeatureStoreWriter, self).__init__()
         self.db_config = db_config or CassandraConfig()
         self.debug_mode = debug_mode
         self.write_to_entity = write_to_entity
@@ -138,7 +143,7 @@ class OnlineFeatureStoreWriter(Writer):
     @staticmethod
     def _write_in_debug_mode(
         table_name: str, dataframe: DataFrame, spark_client: SparkClient
-    ) -> Optional[StreamingQuery]:
+    ) -> Union[StreamingQuery, None]:
         """Creates a temporary table instead of writing to the real feature store."""
         return spark_client.create_temporary_view(
             dataframe=dataframe, name=f"online_feature_store__{table_name}"
@@ -146,7 +151,7 @@ class OnlineFeatureStoreWriter(Writer):
 
     def write(
         self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient,
-    ) -> Optional[StreamingQuery]:
+    ) -> Union[StreamingQuery, None]:
         """Loads the latest data from a feature set into the Feature Store.
 
         Args:
@@ -198,7 +203,9 @@ class OnlineFeatureStoreWriter(Writer):
             **self.db_config.get_options(table_name),
         )
 
-    def validate(self, feature_set: FeatureSet, dataframe, spark_client: SparkClient):
+    def validate(
+        self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient
+    ) -> None:
         """Calculate dataframe rows to validate data into Feature Store.
 
         Args:
@@ -217,7 +224,7 @@ class OnlineFeatureStoreWriter(Writer):
         # TODO how to run data validations when a database has concurrent writes.
         pass
 
-    def get_db_schema(self, feature_set: FeatureSet):
+    def get_db_schema(self, feature_set: FeatureSet) -> List[Dict[Any, Any]]:
         """Get desired database schema.
 
         Args:

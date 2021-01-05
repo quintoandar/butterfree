@@ -1,7 +1,7 @@
 """Spark Function Transform entity."""
-from typing import List
+from typing import Any, List
 
-from parameters_validation import non_blank
+from pyspark.sql import DataFrame
 
 from butterfree.transform.transformations.transform_component import TransformComponent
 from butterfree.transform.utils import Window
@@ -78,30 +78,39 @@ class SparkFunctionTransform(TransformComponent):
 
     """
 
-    def __init__(self, functions: non_blank(List[Function])):
+    def __init__(self, functions: List[Function]):
         super().__init__()
         self.functions = functions
-        self._windows = []
+        self._windows: List[Any] = []
 
     def with_window(
-        self, partition_by, order_by=None, mode=None, window_definition=None
-    ):
+        self,
+        partition_by: str,
+        window_definition: List[str],
+        order_by: str = None,
+        mode: str = None,
+    ) -> "SparkFunctionTransform":
         """Create a list with windows defined."""
         if mode is not None:
             self._windows = [
-                Window(partition_by, order_by, mode, definition)
+                Window(
+                    partition_by=partition_by,
+                    order_by=order_by,
+                    mode=mode,
+                    window_definition=definition,
+                )
                 for definition in window_definition
             ]
         return self
 
-    def _get_output_name(self, function, window=None):
+    def _get_output_name(self, function: object, window: Window = None) -> str:
         base_name = (
             "__".join([self._parent.name, function.__name__])
             if hasattr(function, "__name__")
             else self._parent.name
         )
 
-        if self._windows:
+        if self._windows and window is not None:
             return "_".join([base_name, window.get_name()])
 
         return base_name
@@ -119,7 +128,7 @@ class SparkFunctionTransform(TransformComponent):
 
         return output_columns
 
-    def transform(self, dataframe):
+    def transform(self, dataframe: DataFrame) -> DataFrame:
         """Performs a transformation to the feature pipeline.
 
         Args:

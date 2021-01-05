@@ -4,7 +4,7 @@ from pyspark.sql.functions import pandas_udf
 from pyspark.sql.types import StringType
 
 
-@pandas_udf(StringType())
+@pandas_udf(StringType())  # type: ignore
 def mode(column: pd.Series) -> str:
     """Computes a mode aggregation.
 

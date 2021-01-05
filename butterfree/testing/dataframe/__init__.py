@@ -1,13 +1,14 @@
 """Methods to assert properties regarding Apache Spark Dataframes."""
 from json import dumps
-from typing import List
+from typing import Any, Dict, List
 
 from pyspark import SparkContext
 from pyspark.sql import Column, DataFrame, SparkSession
 from pyspark.sql.functions import col
+from pyspark.sql.types import StructType
 
 
-def assert_dataframe_equality(output_df: DataFrame, target_df: DataFrame):
+def assert_dataframe_equality(output_df: DataFrame, target_df: DataFrame) -> None:
     """Dataframe comparison method."""
     if not (
         output_df.count() == target_df.count()
@@ -24,10 +25,10 @@ def assert_dataframe_equality(output_df: DataFrame, target_df: DataFrame):
     select_cols = [col(c) for c in output_df.schema.fieldNames()]
 
     output_data = sorted(output_df.select(*select_cols).collect())
-    output_data = [row.asDict(recursive=True) for row in output_data]
+    output_data = [row.asDict(recursive=True) for row in output_data]  # type: ignore
 
     target_data = sorted(target_df.select(*select_cols).collect())
-    target_data = [row.asDict(recursive=True) for row in target_data]
+    target_data = [row.asDict(recursive=True) for row in target_data]  # type: ignore
 
     if not output_data == target_data:
         raise AssertionError(
@@ -42,7 +43,7 @@ def assert_column_equality(
     target_df: DataFrame,
     output_column: Column,
     target_column: Column,
-):
+) -> None:
     """Columns comparison method."""
     if not (
         output_df.select(output_column).count()
@@ -68,11 +69,11 @@ def assert_column_equality(
 
 
 def create_df_from_collection(
-    data: List[dict],
+    data: List[Dict[Any, Any]],
     spark_context: SparkContext,
     spark_session: SparkSession,
-    schema=None,
-):
+    schema: StructType = None,
+) -> DataFrame:
     """Creates a dataframe from a list of dicts."""
     return spark_session.read.json(
         spark_context.parallelize(data, 1).map(lambda x: dumps(x)), schema=schema

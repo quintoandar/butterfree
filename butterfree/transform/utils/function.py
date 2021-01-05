@@ -2,8 +2,6 @@
 
 from typing import Callable
 
-from parameters_validation import non_blank
-
 from butterfree.constants import DataType
 
 
@@ -22,7 +20,7 @@ class Function:
         data_type: data type for the output columns.
     """
 
-    def __init__(self, func: non_blank(callable), data_type: non_blank(DataType)):
+    def __init__(self, func: Callable, data_type: DataType):
         self.func = func
         self.data_type = data_type
 
@@ -32,11 +30,11 @@ class Function:
         return self._func
 
     @func.setter
-    def func(self, value: Callable):
+    def func(self, value: Callable) -> None:
         """Definitions to be used in the transformation."""
         if not value:
             raise ValueError("Function must not be empty.")
-        if not isinstance(value, Callable):
+        if not callable(value):
             raise TypeError("Function must be callable.")
 
         self._func = value
@@ -47,7 +45,7 @@ class Function:
         return self._data_type
 
     @data_type.setter
-    def data_type(self, value: DataType):
+    def data_type(self, value: DataType) -> None:
         """Definitions to be used in the transformation."""
         if not value:
             raise ValueError("DataType must not be empty.")

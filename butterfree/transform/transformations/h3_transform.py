@@ -1,8 +1,7 @@
 """H3 Transform entity."""
 
-from typing import List
+from typing import Any, List, Optional
 
-from parameters_validation import non_blank
 from pyspark.sql import DataFrame
 from pyspark.sql.functions import lit, udf
 from pyspark.sql.types import StringType
@@ -21,7 +20,7 @@ except ModuleNotFoundError as e:
 
 
 @udf(StringType())
-def define_h3(lat, lng, resolution):
+def define_h3(lat: float, lng: float, resolution: int) -> Any:
     """UDF for h3 hash retrieval.
 
     Attributes:
@@ -85,16 +84,13 @@ class H3HashTransform(TransformComponent):
     """
 
     def __init__(
-        self,
-        h3_resolutions: non_blank(List[int]),
-        lat_column: non_blank(str),
-        lng_column: non_blank(str),
+        self, h3_resolutions: List[int], lat_column: str, lng_column: str,
     ):
         super().__init__()
         self.h3_resolutions = h3_resolutions
         self.lat_column = lat_column
         self.lng_column = lng_column
-        self.stack_transform = None
+        self.stack_transform: Optional[StackTransform] = None
 
     @property
     def output_columns(self) -> List[str]:
@@ -128,7 +124,7 @@ class H3HashTransform(TransformComponent):
             return self.stack_transform.transform(dataframe)
         return dataframe
 
-    def with_stack(self):
+    def with_stack(self) -> "H3HashTransform":
         """Add a final Stack step to the transformation.
 
         A new column will be created stacking all the the resolution columns

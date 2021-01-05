@@ -2,7 +2,6 @@
 
 from typing import List
 
-from parameters_validation import non_blank
 from pyspark.sql import DataFrame
 from pyspark.sql.functions import expr
 
@@ -55,7 +54,7 @@ class SQLExpressionTransform(TransformComponent):
     """
 
     def __init__(
-        self, expression: non_blank(str),
+        self, expression: str,
     ):
         super().__init__()
         self.expression = expression

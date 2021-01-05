@@ -1,6 +1,6 @@
 """CustomTransform entity."""
 
-from typing import Callable, List
+from typing import Any, Callable, List
 
 from pyspark.sql import DataFrame
 
@@ -57,18 +57,18 @@ class CustomTransform(TransformComponent):
 
     """
 
-    def __init__(self, transformer: Callable, **kwargs):
+    def __init__(self, transformer: Callable[..., Any], **kwargs: Any):
         super().__init__()
         self.transformer = transformer
         self.transformer__kwargs = kwargs
 
     @property
-    def transformer(self) -> Callable:
+    def transformer(self) -> Callable[..., Any]:
         """Function to use for transforming the dataframe."""
         return self._transformer
 
     @transformer.setter
-    def transformer(self, method: Callable):
+    def transformer(self, method: Callable[..., Any]) -> None:
         if not method:
             raise ValueError("A method must be provided to CustomTransform")
         self._transformer = method

@@ -1,5 +1,6 @@
 """Holds functions for managing the running environment."""
 import os
+from typing import Optional
 
 specification = {
     "ENVIRONMENT": "dev",
@@ -30,7 +31,7 @@ class UnspecifiedVariableError(RuntimeError):
         )
 
 
-def get_variable(variable_name: str, default_value: str = None) -> str:
+def get_variable(variable_name: str, default_value: str = None) -> Optional[str]:
     """Gets an environment variable.
 
     The variable comes from it's explicitly declared value in the running

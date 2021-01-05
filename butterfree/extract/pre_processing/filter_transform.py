@@ -2,7 +2,7 @@
 from pyspark.sql.dataframe import DataFrame
 
 
-def filter(dataframe: DataFrame, condition):
+def filter(dataframe: DataFrame, condition: str) -> DataFrame:
     """Filters DataFrame's rows using the given condition and value.
 
     Args:

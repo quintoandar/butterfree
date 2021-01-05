@@ -9,7 +9,9 @@ from butterfree.constants.spark_constants import (
 )
 
 
-def _num_partitions_definition(num_processors, num_partitions):
+def _num_partitions_definition(
+    num_processors: int = None, num_partitions: int = None
+) -> int:
     num_partitions = (
         num_processors * PARTITION_PROCESSOR_RATIO
         if num_processors
@@ -24,7 +26,7 @@ def repartition_df(
     partition_by: List[str],
     num_partitions: int = None,
     num_processors: int = None,
-):
+) -> DataFrame:
     """Partition the DataFrame.
 
     Args:
@@ -47,7 +49,7 @@ def repartition_sort_df(
     order_by: List[str],
     num_processors: int = None,
     num_partitions: int = None,
-):
+) -> DataFrame:
     """Partition and Sort the DataFrame.
 
     Args:

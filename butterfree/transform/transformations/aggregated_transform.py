@@ -1,8 +1,7 @@
 """Aggregated Transform entity."""
 from collections import namedtuple
-from typing import List
+from typing import List, Tuple
 
-from parameters_validation import non_blank
 from pyspark.sql import DataFrame
 from pyspark.sql.functions import col, expr, when
 
@@ -57,15 +56,13 @@ class AggregatedTransform(TransformComponent):
         NotImplementedError: ...
     """
 
-    def __init__(
-        self, functions: non_blank(List[Function]), filter_expression: str = None
-    ):
+    def __init__(self, functions: List[Function], filter_expression: str = None):
         super(AggregatedTransform, self).__init__()
         self.functions = functions
         self.filter_expression = filter_expression
 
     @property
-    def aggregations(self) -> List[tuple]:
+    def aggregations(self) -> List[Tuple]:
         """Aggregated spark columns."""
         column_name = self._parent.from_column or self._parent.name
 
@@ -82,7 +79,7 @@ class AggregatedTransform(TransformComponent):
             Function(f.func(expression), f.data_type.spark,) for f in self.functions
         ]
 
-    def _get_output_name(self, function):
+    def _get_output_name(self, function: object) -> str:
         if not hasattr(function, "__name__"):
             feature_name = self._parent.name
             raise AttributeError(

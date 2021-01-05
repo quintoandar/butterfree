@@ -1,11 +1,13 @@
 """Method to compute most frequent set aggregation."""
+from typing import Any
+
 import pandas as pd
 from pyspark.sql.functions import pandas_udf
 from pyspark.sql.types import ArrayType, StringType
 
 
-@pandas_udf(ArrayType(StringType()))
-def most_frequent_set(column: pd.Series) -> list:
+@pandas_udf(ArrayType(StringType()))  # type: ignore
+def most_frequent_set(column: pd.Series) -> Any:
     """Computes the most frequent set aggregation.
 
     Attributes:

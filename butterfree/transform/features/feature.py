@@ -1,8 +1,7 @@
 """Feature entity."""
 import warnings
-from typing import List
+from typing import Any, List
 
-from parameters_validation import non_blank, non_null
 from pyspark.sql import DataFrame
 from pyspark.sql.functions import col
 
@@ -40,11 +39,11 @@ class Feature:
 
     def __init__(
         self,
-        name: non_blank(str),
-        description: non_blank(str),
-        dtype: non_blank(DataType) = None,
-        from_column: non_blank(str) = None,
-        transformation: non_null(TransformComponent) = None,
+        name: str,
+        description: str,
+        dtype: DataType = None,
+        from_column: str = None,
+        transformation: TransformComponent = None,
     ) -> None:
         self.name = name
         self.description = description
@@ -53,9 +52,9 @@ class Feature:
         self.from_column = from_column
 
     @property
-    def dtype(self) -> DataType:
+    def dtype(self) -> Any:
         """Attribute dtype getter."""
-        return self.__dtype
+        return self.__dtype  # type: ignore
 
     @dtype.setter
     def dtype(self, value: DataType) -> None:
@@ -77,9 +76,9 @@ class Feature:
         self.__dtype = value
 
     @property
-    def from_column(self) -> str:
+    def from_column(self) -> Any:
         """Attribute from_column getter."""
-        return self.__from_column
+        return self.__from_column  # type: ignore
 
     @from_column.setter
     def from_column(self, value: str) -> None:
@@ -101,7 +100,7 @@ class Feature:
         self.__from_column = value
 
     @property
-    def transformation(self) -> TransformComponent:
+    def transformation(self) -> Any:
         """Attribute transformation getter."""
         return self.__transformation
 

@@ -2,7 +2,7 @@
 import itertools
 from datetime import timedelta
 from functools import reduce
-from typing import Dict, List
+from typing import Any, Dict, List, Optional, Union
 
 from pyspark import sql
 from pyspark.sql import DataFrame, functions
@@ -197,11 +197,11 @@ class AggregatedFeatureSet(FeatureSet):
         timestamp: TimestampFeature,
         features: List[Feature],
     ):
-        self._windows = []
-        self._pivot_column = None
-        self._pivot_values = []
-        self._distinct_subset = []
-        self._distinct_keep = None
+        self._windows: List[Any] = []
+        self._pivot_column: Optional[str] = None
+        self._pivot_values: Optional[List[Union[bool, float, int, str]]] = []
+        self._distinct_subset: List[Any] = []
+        self._distinct_keep: Optional[str] = None
         super(AggregatedFeatureSet, self).__init__(
             name, entity, description, keys, timestamp, features,
         )
@@ -212,7 +212,7 @@ class AggregatedFeatureSet(FeatureSet):
         return self.__features
 
     @features.setter
-    def features(self, value: List[Feature]):
+    def features(self, value: List[Feature]) -> None:
         if not isinstance(value, list) or not all(
             isinstance(item, Feature) for item in value
         ):
@@ -231,7 +231,7 @@ class AggregatedFeatureSet(FeatureSet):
         self.__features = value
 
     @staticmethod
-    def _has_aggregated_transform_only(features):
+    def _has_aggregated_transform_only(features: List[Feature]) -> bool:
         """Aggregated Transform check.
 
         Checks if all transformations are AggregatedTransform within the scope of the
@@ -249,7 +249,11 @@ class AggregatedFeatureSet(FeatureSet):
         )
 
     @staticmethod
-    def _build_feature_column_name(feature_column, pivot_value=None, window=None):
+    def _build_feature_column_name(
+        feature_column: str,
+        pivot_value: Union[float, str] = None,
+        window: Window = None,
+    ) -> str:
         base_name = feature_column
         if pivot_value is not None:
             base_name = f"{pivot_value}_{base_name}"
@@ -273,7 +277,7 @@ class AggregatedFeatureSet(FeatureSet):
         ]
         return feature_columns
 
-    def with_distinct(self, subset: List, keep: str = "last"):
+    def with_distinct(self, subset: List, keep: str = "last") -> "AggregatedFeatureSet":
         """Add a distinct configuration for your aggregated feature set.
 
         Args:
@@ -296,7 +300,7 @@ class AggregatedFeatureSet(FeatureSet):
 
         return self
 
-    def with_windows(self, definitions: List[str]):
+    def with_windows(self, definitions: List[str]) -> "AggregatedFeatureSet":
         """Create a list with windows defined."""
         self._windows = [
             Window(
@@ -309,7 +313,9 @@ class AggregatedFeatureSet(FeatureSet):
         ]
         return self
 
-    def with_pivot(self, column: str, values: List[str]):
+    def with_pivot(
+        self, column: str, values: Optional[List[Union[bool, float, int, str]]]
+    ) -> "AggregatedFeatureSet":
         """Add a pivot configuration for your aggregated feature set.
 
         This means we will group the input data, pivot over the column parameter and
@@ -328,7 +334,9 @@ class AggregatedFeatureSet(FeatureSet):
         self._pivot_values = values
         return self
 
-    def _get_base_dataframe(self, client, dataframe, end_date):
+    def _get_base_dataframe(
+        self, client: SparkClient, dataframe: DataFrame, end_date: str
+    ) -> DataFrame:
         start_date = dataframe.agg(functions.min(self.timestamp_column)).take(1)[0][0]
         end_date = end_date or dataframe.agg(functions.max(self.timestamp_column)).take(
             1
@@ -341,13 +349,25 @@ class AggregatedFeatureSet(FeatureSet):
         return unique_keys.crossJoin(date_df)
 
     @staticmethod
-    def _dataframe_join(left, right, on, how, num_processors=None):
+    def _dataframe_join(
+        left: DataFrame,
+        right: DataFrame,
+        on: List[str],
+        how: str,
+        num_processors: int = None,
+    ) -> DataFrame:
         # make both tables co-partitioned to improve join performance
         left = repartition_df(left, partition_by=on, num_processors=num_processors)
         right = repartition_df(right, partition_by=on, num_processors=num_processors)
         return left.join(right, on=on, how=how)
 
-    def _aggregate(self, dataframe, features, window=None, num_processors=None):
+    def _aggregate(
+        self,
+        dataframe: DataFrame,
+        features: List[Feature],
+        window: Optional[Window] = None,
+        num_processors: int = None,
+    ) -> DataFrame:
         aggregations = [
             c.function for f in features for c in f.transformation.aggregations
         ]
@@ -389,7 +409,9 @@ class AggregatedFeatureSet(FeatureSet):
         aggregated = grouped_data.agg(*aggregations)
         return self._with_renamed_columns(aggregated, features, window)
 
-    def _with_renamed_columns(self, aggregated, features, window):
+    def _with_renamed_columns(
+        self, aggregated: DataFrame, features: List[Feature], window: Optional[Window]
+    ) -> DataFrame:
         old_columns = [
             c
             for c in aggregated.columns
@@ -427,7 +449,7 @@ class AggregatedFeatureSet(FeatureSet):
         select += [kc for kc in self.keys_columns]
         return aggregated.selectExpr(*select)
 
-    def get_schema(self) -> List[Dict]:
+    def get_schema(self) -> List[Dict[str, Any]]:
         """Get feature set schema.
 
         Returns:
@@ -447,7 +469,7 @@ class AggregatedFeatureSet(FeatureSet):
         pivot_values = self._pivot_values or [None]
         windows = self._windows or [None]
 
-        for f in self.features:
+        for f in self.features:  # type: ignore
             combination = itertools.product(
                 pivot_values, self._get_features_columns(f), windows
             )
@@ -503,7 +525,7 @@ class AggregatedFeatureSet(FeatureSet):
             dataframe,
         )
 
-        if self._windows:
+        if self._windows and end_date is not None:
             # prepare our left table, a cartesian product between distinct keys
             # and dates in range for this feature set
             base_df = self._get_base_dataframe(
@@ -536,7 +558,9 @@ class AggregatedFeatureSet(FeatureSet):
         else:
             output_df = self._aggregate(output_df, features=self.features)
 
-        output_df = output_df.select(*self.columns).replace(float("nan"), None)
+        output_df = output_df.select(*self.columns).replace(  # type: ignore
+            float("nan"), None
+        )
         if not output_df.isStreaming:
             output_df = self._filter_duplicated_rows(output_df)
             output_df.cache().count()
