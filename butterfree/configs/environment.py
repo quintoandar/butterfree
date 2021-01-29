@@ -35,8 +35,8 @@ def get_variable(variable_name: str, default_value: str = None) -> Optional[str]
     """Gets an environment variable.
 
     The variable comes from it's explicitly declared value in the running
-    environment or from the default value declared in the environment.yaml
-    specification or from the default_value.
+    environment or from the default value declared in specification or from the
+    default_value.
 
     Args:
         variable_name: environment variable name.
