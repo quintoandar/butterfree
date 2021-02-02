@@ -1,6 +1,6 @@
 """AggregatedFeatureSet entity."""
 import itertools
-from datetime import timedelta, datetime
+from datetime import datetime, timedelta
 from functools import reduce
 from typing import Any, Dict, List, Optional, Union
 

@@ -1,4 +1,3 @@
-
 """Hook abstract class entity."""
 
 from abc import ABC, abstractmethod

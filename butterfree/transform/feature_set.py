@@ -99,8 +99,15 @@ class FeatureSet(HookableComponent):
     method can be found at filter_duplicated_rows docstring.
     """
 
-    def __init__(self, name: str, entity: str, description: str, keys: List[KeyFeature], timestamp: TimestampFeature,
-                 features: List[Feature]) -> None:
+    def __init__(
+        self,
+        name: str,
+        entity: str,
+        description: str,
+        keys: List[KeyFeature],
+        timestamp: TimestampFeature,
+        features: List[Feature],
+    ) -> None:
         super().__init__()
         self.name = name
         self.entity = entity

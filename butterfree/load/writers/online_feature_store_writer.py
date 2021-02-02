@@ -7,7 +7,7 @@ from pyspark.sql import DataFrame, Window
 from pyspark.sql.functions import col, row_number
 from pyspark.sql.streaming import StreamingQuery
 
-from butterfree.clients import SparkClient, CassandraClient
+from butterfree.clients import CassandraClient, SparkClient
 from butterfree.configs.db import AbstractWriteConfig, CassandraConfig
 from butterfree.constants.columns import TIMESTAMP_COLUMN
 from butterfree.hooks import Hook
@@ -189,7 +189,6 @@ class OnlineFeatureStoreWriter(Writer):
             )
 
             dataframe = self.check_schema(cassandra_client, dataframe, table_name)
-
 
         if dataframe.isStreaming:
             dataframe = self._apply_transformations(dataframe)

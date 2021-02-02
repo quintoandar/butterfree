@@ -1,11 +1,19 @@
 import json
 from unittest.mock import Mock
 
+from pyspark.sql import functions
 from pytest import fixture
 
 from butterfree.constants import DataType
 from butterfree.constants.columns import TIMESTAMP_COLUMN
+from butterfree.transform import FeatureSet
+from butterfree.transform.aggregated_feature_set import AggregatedFeatureSet
 from butterfree.transform.features import Feature, KeyFeature, TimestampFeature
+from butterfree.transform.transformations import (
+    AggregatedTransform,
+    SparkFunctionTransform,
+)
+from butterfree.transform.utils import Function
 
 
 def make_dataframe(spark_context, spark_session):
@@ -297,3 +305,77 @@ def key_id():
 @fixture
 def timestamp_c():
     return TimestampFeature()
+
+
+@fixture
+def feature_set():
+    feature_set = FeatureSet(
+        name="feature_set",
+        entity="entity",
+        description="description",
+        features=[
+            Feature(
+                name="feature1",
+                description="test",
+                transformation=SparkFunctionTransform(
+                    functions=[
+                        Function(functions.avg, DataType.FLOAT),
+                        Function(functions.stddev_pop, DataType.DOUBLE),
+                    ]
+                ).with_window(
+                    partition_by="id",
+                    order_by=TIMESTAMP_COLUMN,
+                    mode="fixed_windows",
+                    window_definition=["2 minutes", "15 minutes"],
+                ),
+            ),
+        ],
+        keys=[
+            KeyFeature(
+                name="id",
+                description="The user's Main ID or device ID",
+                dtype=DataType.BIGINT,
+            )
+        ],
+        timestamp=TimestampFeature(),
+    )
+
+    return feature_set
+
+
+@fixture
+def agg_feature_set():
+    feature_set = AggregatedFeatureSet(
+        name="feature_set",
+        entity="entity",
+        description="description",
+        features=[
+            Feature(
+                name="feature1",
+                description="test",
+                transformation=AggregatedTransform(
+                    functions=[
+                        Function(functions.avg, DataType.DOUBLE),
+                        Function(functions.stddev_pop, DataType.FLOAT),
+                    ],
+                ),
+            ),
+            Feature(
+                name="feature2",
+                description="test",
+                transformation=AggregatedTransform(
+                    functions=[Function(functions.count, DataType.ARRAY_STRING)]
+                ),
+            ),
+        ],
+        keys=[
+            KeyFeature(
+                name="id",
+                description="The user's Main ID or device ID",
+                dtype=DataType.BIGINT,
+            )
+        ],
+        timestamp=TimestampFeature(),
+    ).with_windows(definitions=["1 week", "2 days"])
+
+    return feature_set

@@ -52,7 +52,9 @@ class Reader(ABC, HookableComponent):
         self.transformations.append(new_transformation)
         return self
 
-    def with_incremantal_strategy(self, incremental_strategy: IncrementalStrategy) -> Reader:
+    def with_incremantal_strategy(
+        self, incremental_strategy: IncrementalStrategy
+    ) -> Reader:
         """Define the incremental strategy for the Reader.
         
         Args:
@@ -78,8 +80,13 @@ class Reader(ABC, HookableComponent):
         :return: Spark dataframe
         """
 
-    def build(self, client: SparkClient, columns: List[Any] = None, start_date=None,
-        end_date=None,) -> None:
+    def build(
+        self,
+        client: SparkClient,
+        columns: List[Any] = None,
+        start_date=None,
+        end_date=None,
+    ) -> None:
         """Register the data got from the reader in the Spark metastore.
 
         Create a temporary view in Spark metastore referencing the data
@@ -100,12 +107,13 @@ class Reader(ABC, HookableComponent):
         transformed_df = self._apply_transformations(column_selection_df)
 
         if self.incremental_strategy:
-            transformed_df = self.incremental_strategy.filter_with_incremental_strategy(transformed_df, start_date, end_date)
+            transformed_df = self.incremental_strategy.filter_with_incremental_strategy(
+                transformed_df, start_date, end_date
+            )
 
         post_hook_df = self.run_post_hooks(transformed_df)
 
         post_hook_df.createOrReplaceTempView(self.id)
-
 
     def _select_columns(self, columns: List[str], client: SparkClient) -> DataFrame:
         df = self.consume(client)

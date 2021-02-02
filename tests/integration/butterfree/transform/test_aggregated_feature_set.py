@@ -241,3 +241,53 @@ class TestAggregatedFeatureSet:
 
         # assert
         assert_dataframe_equality(output_df, target_df_pivot_agg)
+
+    def test_construct_rolling_windows_with_date_boundaries(
+            self, feature_set_dates_dataframe, rolling_windows_output_date_boundaries,
+    ):
+        # given
+
+        spark_client = SparkClient()
+
+        # arrange
+
+        feature_set = AggregatedFeatureSet(
+            name="feature_set",
+            entity="entity",
+            description="description",
+            features=[
+                Feature(
+                    name="feature",
+                    description="test",
+                    transformation=AggregatedTransform(
+                        functions=[
+                            Function(F.avg, DataType.DOUBLE),
+                            Function(F.stddev_pop, DataType.DOUBLE),
+                        ],
+                    ),
+                ),
+            ],
+            keys=[
+                KeyFeature(
+                    name="id",
+                    description="The user's Main ID or device ID",
+                    dtype=DataType.INTEGER,
+                )
+            ],
+            timestamp=TimestampFeature(),
+        ).with_windows(definitions=["1 day", "1 week"])
+
+        # act
+        output_df = feature_set.construct(
+            feature_set_dates_dataframe,
+            client=spark_client,
+            start_date="2016-04-11",
+            end_date="2016-04-12",
+        ).orderBy("timestamp")
+
+        target_df = rolling_windows_output_date_boundaries.orderBy(
+            feature_set.timestamp_column
+        ).select(feature_set.columns)
+
+        # assert
+        assert_dataframe_equality(output_df, target_df)

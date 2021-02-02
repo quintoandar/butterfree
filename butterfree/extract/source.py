@@ -58,7 +58,7 @@ class Source(HookableComponent):
         self.query = query
 
     def construct(
-            self, client: SparkClient, start_date: str = None, end_date: str = None
+        self, client: SparkClient, start_date: str = None, end_date: str = None
     ) -> DataFrame:
         """Construct an entry point dataframe for a feature set.
 
@@ -81,7 +81,9 @@ class Source(HookableComponent):
 
         """
         for reader in self.readers:
-            reader.build(client=client, start_date=start_date, end_date=end_date)  # create temporary views for each reader
+            reader.build(
+                client=client, start_date=start_date, end_date=end_date
+            )  # create temporary views for each reader
 
         dataframe = client.sql(self.query)
 

@@ -205,7 +205,6 @@ class HistoricalFeatureStoreWriter(Writer):
             partitionBy=self.PARTITION_BY,
         )
 
-
     def _assert_validation_count(
         self, table_name: str, written_count: int, dataframe_count: int
     ) -> None:
