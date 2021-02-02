@@ -75,8 +75,11 @@ class Writer(ABC, HookableComponent):
         """
 
     @abstractmethod
-    def check_schema(self, client, dataframe: DataFrame, table_name, database=None):
+    def check_schema(
+        self, client: Any, dataframe: DataFrame, table_name: str, database: str = None
+    ) -> DataFrame:
         """Instantiate the schema check hook to check schema between dataframe and database.
+
         Args:
             client: client for Spark or Cassandra connections with external services.
             dataframe: Spark dataframe containing data from a feature set.

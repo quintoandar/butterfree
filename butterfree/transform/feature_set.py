@@ -1,7 +1,7 @@
 """FeatureSet entity."""
 import itertools
 from functools import reduce
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import pyspark.sql.functions as F
 from pyspark.sql import Window
@@ -379,10 +379,12 @@ class FeatureSet(HookableComponent):
 
         return df.select([column for column in self.columns])
 
-    def define_start_date(self, start_date: str = None):
+    def define_start_date(self, start_date: str = None) -> Optional[str]:
         """Get feature set start date.
+
         Args:
             start_date: start date regarding source dataframe.
+
         Returns:
             start date.
         """

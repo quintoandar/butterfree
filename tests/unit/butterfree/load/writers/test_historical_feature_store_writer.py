@@ -48,11 +48,11 @@ class TestHistoricalFeatureStoreWriter:
         )
 
     def test_write_interval_mode(
-            self,
-            feature_set_dataframe,
-            historical_feature_set_dataframe,
-            mocker,
-            feature_set,
+        self,
+        feature_set_dataframe,
+        historical_feature_set_dataframe,
+        mocker,
+        feature_set,
     ):
         # given
         spark_client = SparkClient()
@@ -79,23 +79,23 @@ class TestHistoricalFeatureStoreWriter:
         assert_dataframe_equality(historical_feature_set_dataframe, result_df)
 
         assert (
-                writer.db_config.format_
-                == spark_client.write_dataframe.call_args[1]["format_"]
+            writer.db_config.format_
+            == spark_client.write_dataframe.call_args[1]["format_"]
         )
         assert (
-                writer.db_config.mode == spark_client.write_dataframe.call_args[1]["mode"]
+            writer.db_config.mode == spark_client.write_dataframe.call_args[1]["mode"]
         )
         assert (
-                writer.PARTITION_BY
-                == spark_client.write_dataframe.call_args[1]["partitionBy"]
+            writer.PARTITION_BY
+            == spark_client.write_dataframe.call_args[1]["partitionBy"]
         )
 
     def test_write_interval_mode_invalid_partition_mode(
-            self,
-            feature_set_dataframe,
-            historical_feature_set_dataframe,
-            mocker,
-            feature_set,
+        self,
+        feature_set_dataframe,
+        historical_feature_set_dataframe,
+        mocker,
+        feature_set,
     ):
         # given
         spark_client = SparkClient()
@@ -123,7 +123,7 @@ class TestHistoricalFeatureStoreWriter:
         historical_feature_set_dataframe,
         feature_set,
         spark_session,
-        mocker
+        mocker,
     ):
         # given
         spark_client = SparkClient()
@@ -177,7 +177,7 @@ class TestHistoricalFeatureStoreWriter:
         spark_client.read_table.assert_called_once()
 
     def test_validate_interval_mode(
-            self, historical_feature_set_dataframe, mocker, feature_set
+        self, historical_feature_set_dataframe, mocker, feature_set
     ):
         # given
         spark_client = mocker.stub("spark_client")
@@ -193,7 +193,7 @@ class TestHistoricalFeatureStoreWriter:
         spark_client.read.assert_called_once()
 
     def test_validate_false(
-            self, historical_feature_set_dataframe, mocker, feature_set
+        self, historical_feature_set_dataframe, mocker, feature_set
     ):
         # given
         spark_client = mocker.stub("spark_client")

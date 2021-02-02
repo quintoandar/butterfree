@@ -72,13 +72,14 @@ def create_ymd(dataframe):
         .withColumn("day", F.dayofmonth(F.col("timestamp")))
     )
 
+
 class TestFeatureSetPipeline:
     def test_feature_set_pipeline(
-            self,
-            mocked_df,
-            spark_session,
-            fixed_windows_output_feature_set_dataframe,
-            mocker,
+        self,
+        mocked_df,
+        spark_session,
+        fixed_windows_output_feature_set_dataframe,
+        mocker,
     ):
         # arrange
         table_reader_id = "a_source"
@@ -181,12 +182,12 @@ class TestFeatureSetPipeline:
         shutil.rmtree("test_folder")
 
     def test_feature_set_pipeline_with_dates(
-            self,
-            mocked_date_df,
-            spark_session,
-            fixed_windows_output_feature_set_date_dataframe,
-            feature_set_pipeline,
-            mocker,
+        self,
+        mocked_date_df,
+        spark_session,
+        fixed_windows_output_feature_set_date_dataframe,
+        feature_set_pipeline,
+        mocker,
     ):
         # arrange
         table_reader_table = "b_table"
@@ -205,12 +206,12 @@ class TestFeatureSetPipeline:
         assert_dataframe_equality(df, fixed_windows_output_feature_set_date_dataframe)
 
     def test_feature_set_pipeline_with_execution_date(
-            self,
-            mocked_date_df,
-            spark_session,
-            fixed_windows_output_feature_set_date_dataframe,
-            feature_set_pipeline,
-            mocker,
+        self,
+        mocked_date_df,
+        spark_session,
+        fixed_windows_output_feature_set_date_dataframe,
+        feature_set_pipeline,
+        mocker,
     ):
         # arrange
         table_reader_table = "b_table"
@@ -249,7 +250,7 @@ class TestFeatureSetPipeline:
 
         test_pipeline = FeatureSetPipeline(
             source=Source(
-                readers=[TableReader(id="reader", table="test", ).add_post_hook(hook1)],
+                readers=[TableReader(id="reader", table="test",).add_post_hook(hook1)],
                 query="select * from reader",
             ).add_post_hook(hook1),
             feature_set=FeatureSet(
@@ -273,9 +274,9 @@ class TestFeatureSetPipeline:
                 ],
                 timestamp=TimestampFeature(),
             )
-                .add_pre_hook(hook1)
-                .add_post_hook(hook1),
-            sink=Sink(writers=[historical_writer], ).add_pre_hook(hook1),
+            .add_pre_hook(hook1)
+            .add_post_hook(hook1),
+            sink=Sink(writers=[historical_writer],).add_pre_hook(hook1),
         )
 
         # act
@@ -287,7 +288,7 @@ class TestFeatureSetPipeline:
         assert_dataframe_equality(output_df, target_df)
 
     def test_pipeline_interval_run(
-            self, mocked_date_df, pipeline_interval_run_target_dfs, spark_session
+        self, mocked_date_df, pipeline_interval_run_target_dfs, spark_session
     ):
         """Testing pipeline's idempotent interval run feature.
         Source data:
@@ -368,7 +369,7 @@ class TestFeatureSetPipeline:
         test_pipeline = FeatureSetPipeline(
             source=Source(
                 readers=[
-                    TableReader(id="id", table="input_data", ).with_incremental_strategy(
+                    TableReader(id="id", table="input_data",).with_incremental_strategy(
                         IncrementalStrategy("ts")
                     ),
                 ],
@@ -378,14 +379,14 @@ class TestFeatureSetPipeline:
                 name="feature_set_interval",
                 entity="entity",
                 description="",
-                keys=[KeyFeature(name="id", description="", dtype=DataType.INTEGER, )],
+                keys=[KeyFeature(name="id", description="", dtype=DataType.INTEGER,)],
                 timestamp=TimestampFeature(from_column="ts"),
                 features=[
                     Feature(name="feature", description="", dtype=DataType.INTEGER),
                     Feature(name="run_id", description="", dtype=DataType.INTEGER),
                 ],
             ),
-            sink=Sink([historical_writer], ),
+            sink=Sink([historical_writer],),
         )
 
         # act and assert

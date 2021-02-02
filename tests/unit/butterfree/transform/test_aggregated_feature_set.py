@@ -364,7 +364,7 @@ class TestAggregatedFeatureSet:
         assert start_date == "2020-07-27"
 
     def test_feature_set_start_date(
-            self, timestamp_c, feature_set_with_distinct_dataframe,
+        self, timestamp_c, feature_set_with_distinct_dataframe,
     ):
         fs = AggregatedFeatureSet(
             name="name",

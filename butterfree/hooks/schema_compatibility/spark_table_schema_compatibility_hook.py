@@ -8,8 +8,10 @@ from butterfree.hooks.hook import Hook
 
 class SparkTableSchemaCompatibilityHook(Hook):
     """Hook to verify the schema compatibility with a Spark's table.
+
     Verifies if all columns presented on the dataframe exists and are the same
     type on the target Spark's table.
+
     Attributes:
         spark_client: client to connect to Spark's metastore.
         table: table name.
@@ -22,11 +24,15 @@ class SparkTableSchemaCompatibilityHook(Hook):
 
     def run(self, dataframe: DataFrame) -> DataFrame:
         """Check the schema compatibility from a given Dataframe.
+
         This method does not change anything on the Dataframe.
+
         Args:
             dataframe: dataframe to verify schema compatibility.
+
         Returns:
             unchanged dataframe.
+
         Raises:
             ValueError if the schemas are incompatible.
         """

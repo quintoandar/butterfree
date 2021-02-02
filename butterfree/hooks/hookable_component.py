@@ -11,14 +11,17 @@ from butterfree.hooks.hook import Hook
 
 class HookableComponent:
     """Defines a component with the ability to hold pre and post hook functions.
+
     All main module of Butterfree have a common object that enables their integration:
     dataframes. Spark's dataframe is the glue that enables the transmission of data
     between the main modules. Hooks have a simple interface, they are functions that
     accepts a dataframe and outputs a dataframe. These Hooks can be triggered before or
     after the main execution of a component.
+
     Components from Butterfree that inherit HookableComponent entity, are components
     that can define a series of steps to occur before or after the execution of their
     main functionality.
+
     Attributes:
         pre_hooks: function steps to trigger before component main functionality.
         post_hooks: function steps to trigger after component main functionality.
@@ -26,7 +29,7 @@ class HookableComponent:
         enable_post_hooks: property to indicate if the component can define post_hooks.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.pre_hooks = []
         self.post_hooks = []
         self.enable_pre_hooks = True
@@ -68,7 +71,7 @@ class HookableComponent:
         return self.__enable_pre_hooks
 
     @enable_pre_hooks.setter
-    def enable_pre_hooks(self, value: List[Hook]) -> None:
+    def enable_pre_hooks(self, value: bool) -> None:
         if not isinstance(value, bool):
             raise ValueError("enable_pre_hooks accepts only boolean values.")
         self.__enable_pre_hooks = value
@@ -79,17 +82,20 @@ class HookableComponent:
         return self.__enable_post_hooks
 
     @enable_post_hooks.setter
-    def enable_post_hooks(self, value: List[Hook]) -> None:
+    def enable_post_hooks(self, value: bool) -> None:
         if not isinstance(value, bool):
             raise ValueError("enable_post_hooks accepts only boolean values.")
         self.__enable_post_hooks = value
 
     def add_pre_hook(self, *hooks: Hook) -> HookableComponent:
         """Add a pre-hook steps to the component.
+
         Args:
             hooks: Hook steps to add to pre_hook list.
+
         Returns:
             Component with the Hook inserted in pre_hook list.
+
         Raises:
             ValueError: if the component does not accept pre-hooks.
         """
@@ -100,10 +106,13 @@ class HookableComponent:
 
     def add_post_hook(self, *hooks: Hook) -> HookableComponent:
         """Add a post-hook steps to the component.
+
         Args:
             hooks: Hook steps to add to post_hook list.
+
         Returns:
             Component with the Hook inserted in post_hook list.
+
         Raises:
             ValueError: if the component does not accept post-hooks.
         """
@@ -114,8 +123,10 @@ class HookableComponent:
 
     def run_pre_hooks(self, dataframe: DataFrame) -> DataFrame:
         """Run all defined pre-hook steps from a given dataframe.
+
         Args:
             dataframe: data to input in the defined pre-hook steps.
+
         Returns:
             dataframe after passing for all defined pre-hooks.
         """
@@ -125,8 +136,10 @@ class HookableComponent:
 
     def run_post_hooks(self, dataframe: DataFrame) -> DataFrame:
         """Run all defined post-hook steps from a given dataframe.
+
         Args:
             dataframe: data to input in the defined post-hook steps.
+
         Returns:
             dataframe after passing for all defined post-hooks.
         """

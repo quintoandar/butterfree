@@ -92,11 +92,14 @@ class MetastoreConfig(AbstractWriteConfig):
 
     def get_path_with_partitions(self, key: str, dataframe: DataFrame) -> List:
         """Get options for AWS S3 from partitioned parquet file.
+
         Options will be a dictionary with the write and read configuration for
         Spark to AWS S3.
+
         Args:
             key: path to save data into AWS S3 bucket.
             dataframe: spark dataframe containing data from a feature set.
+
         Returns:
             A list of string for file-system backed data sources.
         """

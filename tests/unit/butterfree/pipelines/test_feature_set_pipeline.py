@@ -19,10 +19,6 @@ from butterfree.pipelines.feature_set_pipeline import FeatureSetPipeline
 from butterfree.transform import FeatureSet
 from butterfree.transform.features import Feature, KeyFeature, TimestampFeature
 from butterfree.transform.transformations import SparkFunctionTransform
-from butterfree.transform.transformations import (
-    AggregatedTransform,
-    SparkFunctionTransform,
-)
 from butterfree.transform.utils import Function
 
 

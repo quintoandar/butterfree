@@ -7,9 +7,11 @@ from pyspark.sql import DataFrame
 
 class IncrementalStrategy:
     """Define an incremental strategy to be used on data sources.
+
     Entity responsible for defining a column expression that will be used to
     filter the original data source. The purpose is to get only the data related
     to a specific pipeline execution time interval.
+
     Attributes:
         column: column expression on which incremental filter will be applied.
             The expression need to result on a date or timestamp format, so the
@@ -21,8 +23,10 @@ class IncrementalStrategy:
 
     def from_milliseconds(self, column_name: str) -> IncrementalStrategy:
         """Create a column expression from ts column defined as milliseconds.
+
         Args:
             column_name: column name where the filter will be applied.
+
         Returns:
             `IncrementalStrategy` with the defined column expression.
         """
@@ -30,9 +34,11 @@ class IncrementalStrategy:
 
     def from_string(self, column_name: str, mask: str = None) -> IncrementalStrategy:
         """Create a column expression from ts column defined as a simple string.
+
         Args:
             column_name: column name where the filter will be applied.
             mask: mask defining the date/timestamp format on the string.
+
         Returns:
             `IncrementalStrategy` with the defined column expression.
         """
@@ -45,10 +51,12 @@ class IncrementalStrategy:
         day_column: str = "day",
     ) -> IncrementalStrategy:
         """Create a column expression from year, month and day partitions.
+
         Args:
             year_column: column name from the year partition.
             month_column: column name from the month partition.
             day_column: column name from the day partition.
+
         Returns:
             `IncrementalStrategy` with the defined column expression.
         """
@@ -60,13 +68,17 @@ class IncrementalStrategy:
 
     def get_expression(self, start_date: str = None, end_date: str = None) -> str:
         """Get the incremental filter expression using the defined dates.
+
         Both arguments can be set to defined a specific date interval, but  it's
         only necessary to set one of the arguments for this method to work.
+
         Args:
             start_date: date lower bound to use in the filter.
             end_date: date upper bound to use in the filter.
+
         Returns:
             Filter expression based on defined column and bounds.
+
         Raises:
             ValuerError: If both arguments, start_date and end_date, are None.
             ValueError: If the column expression was not defined.
@@ -86,10 +98,12 @@ class IncrementalStrategy:
         self, dataframe: DataFrame, start_date: str = None, end_date: str = None
     ) -> DataFrame:
         """Filters the dataframe according to the date boundaries.
+
         Args:
             dataframe: dataframe that will be filtered.
             start_date: date lower bound to use in the filter.
             end_date: date upper bound to use in the filter.
+
         Returns:
             Filtered dataframe based on defined time boundaries.
         """

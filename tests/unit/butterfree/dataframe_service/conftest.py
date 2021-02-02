@@ -26,6 +26,7 @@ def input_df(spark_context, spark_session):
         spark_context.parallelize(data, 1), schema="timestamp timestamp"
     )
 
+
 @pytest.fixture()
 def test_partitioning_input_df(spark_context, spark_session):
     data = [

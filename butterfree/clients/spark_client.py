@@ -34,7 +34,7 @@ class SparkClient(AbstractClient):
     def read(
         self,
         format: str,
-        path: Any = None,
+        path: Optional[str] = None,
         schema: Optional[StructType] = None,
         stream: bool = False,
         **options: Any,
@@ -57,13 +57,15 @@ class SparkClient(AbstractClient):
         """
         if not isinstance(format, str):
             raise ValueError("format needs to be a string with the desired read format")
-        if not isinstance(path, (str, list)):
-            raise ValueError("path needs to be a string or a list of string")
+        if not isinstance(path, str):
+            raise ValueError("path needs to be a string")
 
         df_reader: Union[
             DataStreamReader, DataFrameReader
         ] = self.conn.readStream if stream else self.conn.read
+
         df_reader = df_reader.schema(schema) if schema else df_reader
+
         return df_reader.format(format).load(path, **options)
 
     def read_table(self, table: str, database: str = None) -> DataFrame:
@@ -230,6 +232,7 @@ class SparkClient(AbstractClient):
         self, partitions: List[Dict[str, Any]], table: str, database: str = None
     ) -> None:
         """Add partitions to an existing table.
+
         Args:
             partitions: partitions to add to the table.
                 It's expected a list of partition dicts to add to the table.

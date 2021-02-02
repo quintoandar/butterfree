@@ -87,6 +87,7 @@ def fixed_windows_output_feature_set_dataframe(spark_context, spark_session):
 
     return df
 
+
 @pytest.fixture()
 def mocked_date_df(spark_context, spark_session):
     data = [

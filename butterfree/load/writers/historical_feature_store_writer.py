@@ -1,7 +1,7 @@
 """Holds the Historical Feature Store writer class."""
 
 import os
-from typing import Union
+from typing import Any, Union
 
 from pyspark.sql.dataframe import DataFrame
 from pyspark.sql.functions import dayofmonth, month, year
@@ -179,7 +179,7 @@ class HistoricalFeatureStoreWriter(Writer):
 
     def _incremental_mode(
         self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient
-    ):
+    ) -> None:
 
         partition_overwrite_mode = spark_client.conn.conf.get(
             "spark.sql.sources.partitionOverwriteMode"
@@ -271,8 +271,11 @@ class HistoricalFeatureStoreWriter(Writer):
         )
         return repartition_df(dataframe, self.PARTITION_BY, self.num_partitions)
 
-    def check_schema(self, client, dataframe, table_name, database=None):
+    def check_schema(
+        self, client: Any, dataframe: DataFrame, table_name: str, database: str = None
+    ) -> DataFrame:
         """Instantiate the schema check hook to check schema between dataframe and database.
+
         Args:
             client: client for Spark or Cassandra connections with external services.
             dataframe: Spark dataframe containing data from a feature set.

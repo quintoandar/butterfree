@@ -243,7 +243,7 @@ class TestAggregatedFeatureSet:
         assert_dataframe_equality(output_df, target_df_pivot_agg)
 
     def test_construct_rolling_windows_with_date_boundaries(
-            self, feature_set_dates_dataframe, rolling_windows_output_date_boundaries,
+        self, feature_set_dates_dataframe, rolling_windows_output_date_boundaries,
     ):
         # given
 

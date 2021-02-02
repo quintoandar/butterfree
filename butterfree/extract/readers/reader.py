@@ -2,7 +2,7 @@
 
 from abc import ABC, abstractmethod
 from functools import reduce
-from typing import Any, Callable, Dict, List
+from typing import Any, Callable, Dict, List, Optional
 
 from pyspark.sql import DataFrame
 
@@ -54,15 +54,14 @@ class Reader(ABC, HookableComponent):
 
     def with_incremantal_strategy(
         self, incremental_strategy: IncrementalStrategy
-    ) -> Reader:
+    ) -> "Reader":
         """Define the incremental strategy for the Reader.
-        
+
         Args:
             incremental_strategy: definition of the incremental strategy.
-            
+
         Returns:
             Reader with defined incremental strategy.
-
         """
         self.incremental_strategy = incremental_strategy
         return self
@@ -84,8 +83,8 @@ class Reader(ABC, HookableComponent):
         self,
         client: SparkClient,
         columns: List[Any] = None,
-        start_date=None,
-        end_date=None,
+        start_date: str = None,
+        end_date: str = None,
     ) -> None:
         """Register the data got from the reader in the Spark metastore.
 
@@ -115,7 +114,9 @@ class Reader(ABC, HookableComponent):
 
         post_hook_df.createOrReplaceTempView(self.id)
 
-    def _select_columns(self, columns: List[str], client: SparkClient) -> DataFrame:
+    def _select_columns(
+        self, columns: Optional[List[Any]], client: SparkClient
+    ) -> DataFrame:
         df = self.consume(client)
         return df.selectExpr(
             *(

@@ -490,7 +490,7 @@ class AggregatedFeatureSet(FeatureSet):
         return schema
 
     @staticmethod
-    def _get_biggest_window_in_days(definitions: List[str]):
+    def _get_biggest_window_in_days(definitions: List[str]) -> float:
         windows_list = []
         for window in definitions:
             windows_list.append(
@@ -498,10 +498,12 @@ class AggregatedFeatureSet(FeatureSet):
             )
         return max(windows_list) / (60 * 60 * 24)
 
-    def define_start_date(self, start_date: str = None):
+    def define_start_date(self, start_date: str = None) -> Optional[str]:
         """Get aggregated feature set start date.
+
         Args:
             start_date: start date regarding source dataframe.
+
         Returns:
             start date.
         """

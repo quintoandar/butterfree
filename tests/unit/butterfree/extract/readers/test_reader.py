@@ -156,7 +156,7 @@ class TestReader:
         assert column_target_df.collect() == result_df.collect()
 
     def test_build_with_incremental_strategy(
-            self, incremental_source_df, spark_client, spark_session
+        self, incremental_source_df, spark_client, spark_session
     ):
         # arrange
         readers = [

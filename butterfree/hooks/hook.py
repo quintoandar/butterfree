@@ -11,8 +11,10 @@ class Hook(ABC):
     @abstractmethod
     def run(self, dataframe: DataFrame) -> DataFrame:
         """Run interface for Hook.
+
         Args:
             dataframe: dataframe to use in the Hook.
+
         Returns:
             dataframe result from the Hook.
         """

@@ -257,8 +257,11 @@ class OnlineFeatureStoreWriter(Writer):
         db_schema = self.db_config.translate(feature_set.get_schema())
         return db_schema
 
-    def check_schema(self, client, dataframe, table_name, database=None):
+    def check_schema(
+        self, client: Any, dataframe: DataFrame, table_name: str, database: str = None
+    ) -> DataFrame:
         """Instantiate the schema check hook to check schema between dataframe and database.
+
         Args:
             client: client for Spark or Cassandra connections with external services.
             dataframe: Spark dataframe containing data from a feature set.
