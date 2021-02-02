@@ -109,7 +109,7 @@ class MetastoreConfig(AbstractWriteConfig):
         )
         for row in dataframe_values:
             path_list.append(
-                f"s3a://{self.bucket}/{key}/year={row['year']}/"
+                f"{self.file_system}://{self.path}/{key}/year={row['year']}/"
                 f"month={row['month']}/day={row['day']}"
             )
 

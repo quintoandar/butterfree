@@ -151,7 +151,7 @@ class TestOnlineFeatureStoreWriter:
         assert isinstance(handler, StreamingQuery)
 
     @pytest.mark.parametrize("has_checkpoint", [True, False])
-    def test_write_stream(self, feature_set, has_checkpoint, monkeypatch):
+    def test_write_stream(self, feature_set, has_checkpoint, monkeypatch, mocker):
         # arrange
         spark_client = SparkClient()
         spark_client.write_stream = Mock()
@@ -173,6 +173,10 @@ class TestOnlineFeatureStoreWriter:
 
         writer = OnlineFeatureStoreWriter(cassandra_config)
         writer.filter_latest = Mock()
+
+        writer.check_schema_hook = mocker.stub("check_schema_hook")
+        writer.check_schema_hook.run = mocker.stub("run")
+        writer.check_schema_hook.run.return_value = dataframe
 
         # act
         stream_handler = writer.write(feature_set, dataframe, spark_client)
@@ -252,6 +256,10 @@ class TestOnlineFeatureStoreWriter:
         spark_client.write_dataframe = mocker.stub("write_dataframe")
         writer = OnlineFeatureStoreWriter(cassandra_config).with_(json_transform)
 
+        writer.check_schema_hook = mocker.stub("check_schema_hook")
+        writer.check_schema_hook.run = mocker.stub("run")
+        writer.check_schema_hook.run.return_value = feature_set_dataframe
+
         # when
         writer.write(feature_set, feature_set_dataframe, spark_client)
 
@@ -285,6 +293,10 @@ class TestOnlineFeatureStoreWriter:
         kafka_config = KafkaConfig()
         writer = OnlineFeatureStoreWriter(kafka_config).with_(json_transform)
 
+        writer.check_schema_hook = mocker.stub("check_schema_hook")
+        writer.check_schema_hook.run = mocker.stub("run")
+        writer.check_schema_hook.run.return_value = feature_set_dataframe
+
         # when
         writer.write(feature_set, feature_set_dataframe, spark_client)
 
@@ -307,6 +319,10 @@ class TestOnlineFeatureStoreWriter:
         custom_writer = OnlineFeatureStoreWriter(custom_kafka_config).with_(
             json_transform
         )
+
+        custom_writer.check_schema_hook = mocker.stub("check_schema_hook")
+        custom_writer.check_schema_hook.run = mocker.stub("run")
+        custom_writer.check_schema_hook.run.return_value = feature_set_dataframe
 
         # when
         custom_writer.write(feature_set, feature_set_dataframe, spark_client)

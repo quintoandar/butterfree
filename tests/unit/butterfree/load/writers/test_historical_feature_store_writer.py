@@ -318,7 +318,14 @@ class TestHistoricalFeatureStoreWriter:
         # given
         spark_client = mocker.stub("spark_client")
         spark_client.write_table = mocker.stub("write_table")
+
         writer = HistoricalFeatureStoreWriter().with_(json_transform)
+
+        schema_dataframe = writer._create_partitions(feature_set_dataframe)
+        json_dataframe = writer._apply_transformations(schema_dataframe)
+        writer.check_schema_hook = mocker.stub("check_schema_hook")
+        writer.check_schema_hook.run = mocker.stub("run")
+        writer.check_schema_hook.run.return_value = json_dataframe
 
         # when
         writer.write(

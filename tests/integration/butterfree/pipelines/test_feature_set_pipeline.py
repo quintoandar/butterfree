@@ -163,7 +163,7 @@ class TestFeatureSetPipeline:
                 ],
                 timestamp=TimestampFeature(),
             ),
-            sink=Sink(writers=[historical_writer],),
+            sink=Sink(writers=[historical_writer]),
         )
         test_pipeline.run()
 

@@ -52,7 +52,7 @@ class Reader(ABC, HookableComponent):
         self.transformations.append(new_transformation)
         return self
 
-    def with_incremantal_strategy(
+    def with_incremental_strategy(
         self, incremental_strategy: IncrementalStrategy
     ) -> "Reader":
         """Define the incremental strategy for the Reader.
