@@ -2,20 +2,18 @@
 
 ## Features
 
-A feature is based on the `master` branch and merged back into the `master` branch.
-
-![](https://docs.microsoft.com/en-us/azure/devops/repos/git/media/branching-guidance/featurebranching.png?view=azure-devops)
+A feature is based on the `staging` branch and merged back into the `stagimg` branch.
 
 
 ### Working Locally
 
 ```
-# checkout master, fetch the latest changes and pull them from remote into local
-git checkout master
+# checkout staging, fetch the latest changes and pull them from remote into local
+git checkout staging
 git fetch
-git pull origin master
+git pull origin staging
 
-# create a feature branch that is based off master
+# create a feature branch that is based off staging
 git checkout -b <username>/some-description
 
 # do your work
@@ -24,10 +22,10 @@ git commit -m "first commit"
 git add another
 git commit -m "second commit"
 
-# rebase against master to pull in any changes that have been made
+# rebase against staging to pull in any changes that have been made
 # since you started your feature branch.
 git fetch
-git rebase origin/master
+git rebase origin/staging
 
 # push your local changes up to the remote
 git push
@@ -35,24 +33,24 @@ git push
 # if you've already pushed changes and have rebased, your history has changed
 # so you will need to force the push
 git fetch
-git rebase origin/master
+git rebase origin/staging
 git push --force-with-lease
 ````
 
 
 ### GitHub workflow
 
-- Open a Pull Request against `master`. Check our PR guidelines [here](https://github.com/quintoandar/butterfree/blob/master/CONTRIBUTING.md#pull-request-guideline).
+- Open a Pull Request against `staging`. Check our PR guidelines [here](https://github.com/quintoandar/butterfree/blob/master/CONTRIBUTING.md#pull-request-guideline).
 - When the Pull Request has been approved, merge using `squash and merge`, adding a brief description:
 ie, ` Enable stream pipelines in Butterfree`.
 - This squashes all your commits into a single clean commit. Remember to clean detailed descriptions, otherwise our git logs will be a mess.
 
-If you are unable to squash merge because of conflicts, you need to rebase against `master` again:
+If you are unable to squash merge because of conflicts, you need to rebase against `staging` again:
 
 ```
 # in your feature branch
 git fetch
-git rebase origin/master
+git rebase origin/staging
 # fix conflicts if they exist
 git push --force-with-lease
 ```
@@ -67,9 +65,9 @@ The release will always occur when we change the version in the setup.py file.
 
 ```
 # create a feature branch
-git checkout master
+git checkout staging
 git fetch
-git pull origin master
+git pull origin staging
 git checkout -b release/<version>
 
 # finalize the changelog, bump the version into setup.py and update the documentation then:
@@ -121,7 +119,6 @@ git checkout master@<version>
 git fetch
 git pull origin master
 git checkout -b hotfix/<version>
-git checkout -b describe-the-problem
 
 git add patch.fix
 git add setup.py
@@ -133,7 +130,7 @@ Don't forget to update the Changelog and the version in `setup.py`.
 
 ### Github workflow
 
-- Open a Pull Request against `hotfix/<version>`
+- Open a Pull Request against `master`.
 - When the PR's approved and the code is tested, `squash and merge` to squash your commits into a single commit.
 - A tag will automatically be triggered in our CI/CD. This tag/release will use the version for its title and push a new version
 of Butterfree's python package to our private server.
