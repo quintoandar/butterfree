@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from functools import reduce
 from typing import Any, Callable, Dict, List
 
-from pyspark.sql.dataframe import DataFrame
+from pyspark.sql import DataFrame
 
 from butterfree.clients import SparkClient
 from butterfree.transform import FeatureSet
