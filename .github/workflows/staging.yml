@@ -1,8 +1,8 @@
 name: "Publish Dev Package"
 on:
   push:
-    paths:
-      - 'setup.py'
+    branches:
+      - staging
 
 
 jobs:
@@ -22,7 +22,7 @@ jobs:
       run: make package
 
     - name: Get version
-      run: echo "version=$(grep __version__ setup.py | head -1 | cut -d \" -f2 | cut -d \' -f2)" >> $GITHUB_ENV
+      run: echo "version=$(grep __version__ setup.py | head -1 | cut -d \" -f2 | cut -d \' -f2 ).dev$(git rev-parse --short "$GITHUB_SHA")" >> $GITHUB_ENV
 
     - name: Create release
       uses: actions/create-release@v1
