@@ -1,4 +1,4 @@
-name: "Publish"
+name: "Publish Dev Package"
 on:
   push:
     paths:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   Pipeline:
-    if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/staging'
 
     runs-on: ubuntu-16.04
     container: quintoandar/python-3-7-java
@@ -31,6 +31,7 @@ jobs:
       with:
         tag_name: ${{ env.version }}
         release_name: Release ${{ env.version }}
+        prerelease: true
 
     - name: Release already exist
       if: ${{ failure() }}
