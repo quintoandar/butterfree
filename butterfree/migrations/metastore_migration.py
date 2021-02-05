@@ -8,8 +8,8 @@ from butterfree.migrations import Migration
 class MetastoreMigration(Migration):
     """Metastore class for Migrations."""
 
-    def run_query(self) -> Any:
-        """Execute a query regarding Metastore.
+    def create_query(self) -> Any:
+        """Create a query regarding Metastore.
 
         Returns:
             Schema object.
