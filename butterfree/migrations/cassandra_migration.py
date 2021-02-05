@@ -8,8 +8,8 @@ from butterfree.migrations import Migration
 class CassandraMigration(Migration):
     """Cassandra class for Migrations."""
 
-    def run_query(self) -> Any:
-        """Execute a query regarding Cassandra.
+    def create_query(self) -> Any:
+        """Create a query regarding Cassandra.
 
         Returns:
             Schema object.

@@ -8,8 +8,8 @@ class Migration(ABC):
     """Abstract base class for Migrations."""
 
     @abstractmethod
-    def run_query(self) -> Any:
-        """Execute a query regarding a data source.
+    def create_query(self) -> Any:
+        """Create a query regarding a data source.
 
         Returns:
             Schema object.
