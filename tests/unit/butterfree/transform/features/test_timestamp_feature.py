@@ -32,8 +32,8 @@ class TestTimestampFeature:
 
         df = df.withColumn("timestamp", df["timestamp"].cast(StringType())).collect()
 
-        assert df[0]["timestamp"] == "2020-02-12 21:18:31"
-        assert df[1]["timestamp"] == "2020-02-12 21:18:42"
+        assert df[0]["timestamp"] == "2020-02-12 21:18:31.112"
+        assert df[1]["timestamp"] == "2020-02-12 21:18:42.223"
 
     def test_transform_ms(self, feature_set_dataframe_ms):
 
@@ -43,8 +43,22 @@ class TestTimestampFeature:
 
         df = df.withColumn("timestamp", df["timestamp"].cast(StringType())).collect()
 
-        assert df[0]["timestamp"] == "2020-02-12 21:18:31"
-        assert df[1]["timestamp"] == "2020-02-12 21:18:42"
+        assert df[0]["timestamp"] == "2020-02-12 21:18:31.112"
+        assert df[1]["timestamp"] == "2020-02-12 21:18:42.223"
+
+    def test_transform_ms_from_column_small_time_diff(
+        self, feature_set_dataframe_small_time_diff
+    ):
+
+        test_key = TimestampFeature(from_ms=True)
+
+        df = test_key.transform(feature_set_dataframe_small_time_diff).orderBy(
+            "timestamp"
+        )
+
+        df = df.withColumn("timestamp", df["timestamp"].cast(StringType())).collect()
+
+        assert df[0]["timestamp"] != df[1]["timestamp"]
 
     def test_transform_mask(self, feature_set_dataframe_date):
 

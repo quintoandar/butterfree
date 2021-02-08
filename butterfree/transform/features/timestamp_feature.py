@@ -67,7 +67,7 @@ class TimestampFeature(Feature):
 
         if self.from_ms:
             dataframe = dataframe.withColumn(
-                column_name, from_unixtime(dataframe[column_name] / 1000.0)
+                column_name, to_timestamp(dataframe[column_name] / 1000)
             )
         if self.mask:
             dataframe = dataframe.withColumn(
