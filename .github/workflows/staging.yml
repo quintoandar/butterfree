@@ -2,8 +2,7 @@ name: "Publish Dev Package"
 on:
   push:
     paths:
-      - 'setup.py'
-
+      - "setup.py"
 
 jobs:
   Pipeline:
@@ -13,33 +12,33 @@ jobs:
     container: quintoandar/python-3-7-java
 
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-    - name: Install dependencies
-      run: make ci-install
+      - name: Install dependencies
+        run: make ci-install
 
-    - name: Get version
-      run: echo "version=$(grep __version__ setup.py | head -1 | cut -d \" -f2 | cut -d \' -f2 )" >> $GITHUB_ENV
+      - name: Get version
+        run: echo "version=$(grep __version__ setup.py | head -1 | cut -d \" -f2 | cut -d \' -f2 )" >> $GITHUB_ENV
 
-    - name: Build package
-      run: make package
+      - name: Build package
+        run: make package
 
-    - name: Create release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ env.version }}
-        release_name: Release ${{ env.version }}
-        prerelease: true
+      - name: Create release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ env.version }}
+          release_name: Release ${{ env.version }}
+          prerelease: true
 
-    - name: Release already exist
-      if: ${{ failure() }}
-      run: echo Release already exist
+      - name: Release already exist
+        if: ${{ failure() }}
+        run: echo Release already exist
 
-    - name: Publish release to pypi.org
-      if: ${{ success() }}
-      env:
-        PYPI_USERNAME: ${{ secrets.PYPI_USERNAME }}
-        PYPI_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-      run:  PYTHONPATH=./pip/deps python -m twine upload -u $PYPI_USERNAME -p $PYPI_PASSWORD --verbose dist/*
+      - name: Publish release to pypi.org
+        if: ${{ success() }}
+        env:
+          PYPI_USERNAME: ${{ secrets.PYPI_USERNAME }}
+          PYPI_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+        run: PYTHONPATH=./pip/deps python -m twine upload -u $PYPI_USERNAME -p $PYPI_PASSWORD --verbose dist/*
