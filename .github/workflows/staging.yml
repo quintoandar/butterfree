@@ -24,6 +24,12 @@ jobs:
     - name: Get version
       run: echo "version=$(grep __version__ setup.py | head -1 | cut -d \" -f2 | cut -d \' -f2 ).dev$(git rev-parse --short "$GITHUB_SHA")" >> $GITHUB_ENV
 
+    - name: Change package name and path
+      run: |
+        mkdir ./dist/p/ \;
+        find . -wholename "./dist/butterfree-*.whl" -exec mv '{}' ./dist/p/butterfree-${{ env.version }}-py3-none-any.whl \;
+        find . -wholename "./dist/butterfree-*.tar.gz" -exec mv '{}' ./dist/p/butterfree-${{ env.version }}.tar.gz \;
+
     - name: Create release
       uses: actions/create-release@v1
       env:
@@ -42,4 +48,4 @@ jobs:
       env:
         PYPI_USERNAME: ${{ secrets.PYPI_USERNAME }}
         PYPI_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-      run:  PYTHONPATH=./pip/deps python -m twine upload -u $PYPI_USERNAME -p $PYPI_PASSWORD --verbose dist/*
+      run:  PYTHONPATH=./pip/deps python -m twine upload -u $PYPI_USERNAME -p $PYPI_PASSWORD --verbose ./dist/p/*
