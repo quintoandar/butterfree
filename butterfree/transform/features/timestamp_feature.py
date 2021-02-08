@@ -1,6 +1,6 @@
 """TimestampFeature entity."""
 from pyspark.sql import DataFrame
-from pyspark.sql.functions import from_unixtime, to_timestamp
+from pyspark.sql.functions import to_timestamp
 
 from butterfree.constants import DataType
 from butterfree.constants.columns import TIMESTAMP_COLUMN
