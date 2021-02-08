@@ -17,7 +17,7 @@ jobs:
 
     - name: Install dependencies
       run: make ci-install
-
+ 
     - name: Get version
       run: echo "version=$(grep __version__ setup.py | head -1 | cut -d \" -f2 | cut -d \' -f2 )" >> $GITHUB_ENV
 
@@ -42,4 +42,4 @@ jobs:
       env:
         PYPI_USERNAME: ${{ secrets.PYPI_USERNAME }}
         PYPI_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-      run:  PYTHONPATH=./pip/deps python -m twine upload -u $PYPI_USERNAME -p $PYPI_PASSWORD --verbose dist/*
+      run:  PYTHONPATH=./pip/deps python -m twine upload -u $PYPI_USERNAME -p $PYPI_PASSWORD --verbose ./dist/p/*
