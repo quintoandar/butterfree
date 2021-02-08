@@ -24,6 +24,11 @@ jobs:
     - name: Get version
       run: echo "version=$(grep __version__ setup.py | head -1 | cut -d \" -f2 | cut -d \' -f2 ).dev$(git rev-parse --short "$GITHUB_SHA")" >> $GITHUB_ENV
 
+    - name: Change name package
+      run: |
+        find . -wholename "./dist/butterfree-*.whl" -exec mv '{}' ./dist/butterfree-${{ env.version }}-py3-none-any.whl \;
+        find . -wholename "./dist/butterfree-*.tar.gz" -exec mv '{}' ./dist/butterfree-${{ env.version }}.tar.gz \;
+
     - name: Create release
       uses: actions/create-release@v1
       env:
