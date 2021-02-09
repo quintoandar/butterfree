@@ -23,8 +23,8 @@ jobs:
 
     - name: Build package
       run: |
-        make package
         make version-dev HASH_COMMIT="${{ env.version }}"
+        make package
 
     - name: Create release
       uses: actions/create-release@v1
