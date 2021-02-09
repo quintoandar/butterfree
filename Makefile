@@ -1,3 +1,11 @@
+# globals
+
+PACKAGE_NAME := $(shell grep __package_name__ setup.py | head -1 | cut -d \" -f2 | cut -d \' -f2)
+VERSION := $(shell grep __version__ setup.py | head -1 | cut -d \" -f2 | cut -d \' -f2)
+
+
+#custom targets
+
 .PHONY: environment
 ## create virtual environment for butterfree
 environment:
@@ -119,16 +127,20 @@ clean:
 	@find ./ -name '*~' -exec rm -f {} \;
 
 .PHONY: version
-## dump package name into VERSION env variable and show
+## dump version into VERSION env variable and show
 version:
-	@export VERSION=$(grep __version__ setup.py | head -1 | cut -d \" -f2 | cut -d \' -f2)
-	@$(info VERSION is [${VERSION}])
+	@echo "VERSION: $(VERSION)"
+
+.PHONY: version-dev
+## dump version-dev into HASH_COMMIT env variable and show
+version-dev:
+	@sed -i 's/$(VERSION)/$(HASH_COMMIT)/g' setup.py
+	@echo "VERSION: $(HASH_COMMIT)"
 
 .PHONY: package-name
 ## dump package name into PACKAGE_NAME env variable and show
 package-name:
-	@PACKAGE_NAME=$(grep __package_name__ setup.py | head -1 | cut -d \" -f2 | cut -d \' -f2 | sed 's/.*/&${build}/')
-	@echo $PACKAGE_NAME
+	@echo "PACKAGE_NAME: $(PACKAGE_NAME)"
 
 .PHONY: package
 ## build butterfree package wheel
