@@ -127,18 +127,18 @@ clean:
 	@find ./ -name '*~' -exec rm -f {} \;
 
 .PHONY: version
-## dump version into VERSION env variable and show
+## show version
 version:
 	@echo "VERSION: $(VERSION)"
 
 .PHONY: version-dev
-## dump version-dev into HASH_COMMIT env variable and show
+## change the version with the version received in the VERSION_DEV variable and show
 version-dev:
-	@sed -i 's/$(VERSION)/$(HASH_COMMIT)/g' setup.py
-	@echo "VERSION: $(HASH_COMMIT)"
+	@sed -i 's/$(VERSION)/$(VERSION_DEV)/g' setup.py
+	@echo "VERSION: $(VERSION_DEV)"
 
 .PHONY: package-name
-## dump package name into PACKAGE_NAME env variable and show
+## show package name
 package-name:
 	@echo "PACKAGE_NAME: $(PACKAGE_NAME)"
 

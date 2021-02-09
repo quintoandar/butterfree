@@ -23,7 +23,7 @@ jobs:
 
     - name: Build package
       run: |
-        make version-dev HASH_COMMIT="${{ env.version }}"
+        make version-dev VERSION_DEV="${{ env.version }}"
         make package
 
     - name: Create release
