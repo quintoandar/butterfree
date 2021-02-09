@@ -131,11 +131,11 @@ clean:
 version:
 	@echo "VERSION: $(VERSION)"
 
-.PHONY: version-dev
-## change the version with the version received in the VERSION_DEV variable and show
-version-dev:
-	@sed -i 's/$(VERSION)/$(VERSION_DEV)/g' setup.py
-	@echo "VERSION: $(VERSION_DEV)"
+.PHONY: change-version
+## change the version to string received in the NEW_VERSION variable and show
+change-version:
+	@sed -i 's/$(VERSION)/$(NEW_VERSION)/g' setup.py
+	@echo "VERSION: $(NEW_VERSION)"
 
 .PHONY: package-name
 ## show package name
