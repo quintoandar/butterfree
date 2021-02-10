@@ -19,7 +19,7 @@ jobs:
       run: make ci-install
 
     - name: Get version
-      run: echo "version=$(grep __version__ setup.py | head -1 | cut -d \" -f2 | cut -d \' -f2 ) >> $GITHUB_ENV
+      run: echo "version=$(grep __version__ setup.py | head -1 | cut -d \" -f2 | cut -d \' -f2 )" >> $GITHUB_ENV
 
     - name: Build package
       run: make package
