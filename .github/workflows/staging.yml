@@ -1,8 +1,8 @@
 name: "Publish Dev Package"
 on:
   push:
-    branches:
-      - staging
+    paths:
+      - 'setup.py'
 
 
 jobs:
@@ -19,12 +19,10 @@ jobs:
       run: make ci-install
 
     - name: Get version
-      run: echo "version=$(grep __version__ setup.py | head -1 | cut -d \" -f2 | cut -d \' -f2 ).dev$(git rev-parse --short "$GITHUB_SHA")" >> $GITHUB_ENV
+      run: echo "version=$(grep __version__ setup.py | head -1 | cut -d \" -f2 | cut -d \' -f2 )" >> $GITHUB_ENV
 
     - name: Build package
-      run: |
-        make change-version NEW_VERSION="${{ env.version }}"
-        make package
+      run: make package
 
     - name: Create release
       uses: actions/create-release@v1
