@@ -44,7 +44,7 @@ Or after listing `butterfree` in your `requirements.txt` file:
 pip install -r requirements.txt
 ```
 
-Dev Package are available for testing using the <version>.dev<hash> versions of the Butterfree on PyPi.
+Dev Package are available for testing using the <version>.devN versions of the Butterfree on PyPi.
 
 ## License
 [Apache License 2.0](https://github.com/quintoandar/butterfree/blob/staging/LICENSE)
