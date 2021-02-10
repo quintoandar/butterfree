@@ -55,10 +55,40 @@ git rebase origin/staging
 git push --force-with-lease
 ```
 
+## Pre-Releases
+
+The pre-release will always occur when we change the version in the setup.py file to staging branch.
+
+
+### Working Locally
+
+```
+# create a feature branch
+git checkout staging
+git fetch
+git pull origin staging
+git checkout -b pre-release/<version>
+
+# finalize the changelog in Unreleased and bump the version into setup.py then:
+git add CHANGELOG.md
+git add setup.py
+git commit -m "pre-release <version>"
+
+# push the new version
+git fetch
+git push --force-with-lease
+```
+
+### Github workflow
+
+- Open a Pull Request against `staging`.
+- When the PR's approved and the code is tested, `squash and merge` to squash your commits into a single commit.
+- The creation of the pre-release tag and the update of the PyPi version will be done 
+automatically from the Publish Dev Package workflow, you can follow [here](https://github.com/quintoandar/butterfree/actions?query=workflow%3A%22Publish+Dev+Package%22).
 
 ## Releases
 
-The release will always occur when we change the version in the setup.py file.
+The release will always occur when we change the version in the setup.py file to master branch.
 
 
 ### Working Locally
