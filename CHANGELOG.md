@@ -68,7 +68,7 @@ Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each 
 * [MLOP-632] Butterfree dev workflow, automate release description ([#279](https://github.com/quintoandar/butterfree/commit/245eaa594846166972241b03fddc61ee5117b1f7))
 
 ### Fixed
-* Change trigger for pipeline staging ([#287](https://github.com/quintoandar/butterfree/pull/287)) 
+* Change trigger for pipeline staging ([#287](https://github.com/quintoandar/butterfree/pull/287))
 
 ## [1.1.2](https://github.com/quintoandar/butterfree/releases/tag/1.1.2)
 ### Fixed
@@ -91,11 +91,11 @@ Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each 
 * Update README ([#257](https://github.com/quintoandar/butterfree/pull/257))
 
 ### Fixed
-* Fix Butterfree's workflow ([#262](https://github.com/quintoandar/butterfree/pull/262)) 
+* Fix Butterfree's workflow ([#262](https://github.com/quintoandar/butterfree/pull/262))
 * [FIX] Downgrade Python Version in Pyenv ([#227](https://github.com/quintoandar/butterfree/pull/227))
-* [FIX] Fix docs ([#229](https://github.com/quintoandar/butterfree/pull/229)) 
+* [FIX] Fix docs ([#229](https://github.com/quintoandar/butterfree/pull/229))
 * [FIX] Fix Docs - Add more dependencies ([#230](https://github.com/quintoandar/butterfree/pull/230))
-* Fix broken notebook URL ([#236](https://github.com/quintoandar/butterfree/pull/236)) 
+* Fix broken notebook URL ([#236](https://github.com/quintoandar/butterfree/pull/236))
 * Issue #77 Fix ([#245](https://github.com/quintoandar/butterfree/pull/245))
 
 ## [1.0.2](https://github.com/quintoandar/butterfree/releases/tag/1.0.2)
@@ -106,7 +106,7 @@ Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each 
 * [MLOP-426] Change branching strategy on butterfree to use only master branch ([#216](https://github.com/quintoandar/butterfree/pull/216))
 
 ### Fixed
-* [MLOP-440] Python 3.7 bump and Fixing Dependencies ([#220](https://github.com/quintoandar/butterfree/pull/220)) 
+* [MLOP-440] Python 3.7 bump and Fixing Dependencies ([#220](https://github.com/quintoandar/butterfree/pull/220))
 
 ## [1.0.1](https://github.com/quintoandar/butterfree/releases/tag/1.0.1)
 ### Added
