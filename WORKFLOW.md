@@ -2,7 +2,7 @@
 
 ## Features
 
-A feature is based on the `staging` branch and merged back into the `stagimg` branch.
+A feature is based on the `staging` branch and merged back into the `staging` branch.
 
 
 ### Working Locally
