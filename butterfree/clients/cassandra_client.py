@@ -157,3 +157,34 @@ class CassandraClient(AbstractClient):
         query = self._get_create_table_query(columns, table)
 
         self.sql(query)
+
+    @staticmethod
+    def _get_add_columns_query(columns: List[CassandraColumn], table_name: str):
+
+        parsed_columns = []
+        for col in columns:
+            parsed_columns.append(f"{col['column_name']} {col['type']}")
+
+        parsed_columns = ", ".join(parsed_columns)
+
+        query = f"ALTER TABLE {table_name} " f"ADD ({parsed_columns});"
+
+        return query
+
+    def add_columns_to_table(
+        self, columns: List[CassandraColumn], table_name: str
+    ) -> None:
+        """
+        Add columns to a Cassandra table.
+
+        Attributes:
+            columns: a list dictionaries in the format
+                [{"column_name": "example1", type: "cql_type", primary_key: True}, ...]
+            table_name: Cassandra table name.
+        """
+        if not self._session:
+            raise RuntimeError("There's no session available for this query")
+
+        query = self._get_add_columns_query(columns, table_name)
+
+        self._session.execute(query)
