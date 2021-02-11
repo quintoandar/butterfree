@@ -2,7 +2,10 @@
 
 import logging
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Any, List, Tuple
+
+from butterfree.pipelines import FeatureSetPipeline
+from butterfree.transform import FeatureSet
 
 FORMAT_RED = "\033[0;91m"
 FORMAT_CYAN = "\033[0;96m"
@@ -75,6 +78,24 @@ class Migration(ABC):
     @abstractmethod
     def apply_migration(self, *args, **kwargs) -> None:
         """Apply the migration in the respective database."""
+
+    def _parse_feature_set_pipeline(self, feature_set_pipeline: FeatureSetPipeline) -> List[Tuple[str, FeatureSet]]:
+        feature_set = feature_set_pipeline.feature_set
+        writers = [writer.dbconfig._migration_class for writer in feature_set_pipeline.sink.writers]
+
+        return [(writer, feature_set) for writer in writers]
+
+    def migration(self, pipelines: List[FeatureSetPipeline]) -> None:
+        """Construct and apply the migrations"""
+        db_list = [self._parse_feature_set_pipeline(pipeline) for pipeline in pipelines]
+
+        for db, fs in db_list:
+            db_schema = db.get_table_schema(feature_set=fs)
+            fs_schema = fs.get_schema()
+
+            self.validate_schema(fs_schema, db_schema)
+            self.create_query()
+            self.apply_migration()
 
     def send_logs_to_s3(self) -> None:
         """Send all migration logs to S3."""

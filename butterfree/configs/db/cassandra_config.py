@@ -3,6 +3,7 @@ from typing import Any, Dict, List, Optional
 
 from butterfree.configs import environment
 from butterfree.configs.db import AbstractWriteConfig
+from butterfree.migrations import CassandraMigration
 
 
 class CassandraConfig(AbstractWriteConfig):
@@ -49,6 +50,7 @@ class CassandraConfig(AbstractWriteConfig):
         self.stream_processing_time = stream_processing_time
         self.stream_output_mode = stream_output_mode
         self.stream_checkpoint_path = stream_checkpoint_path
+        self._migration_class = CassandraMigration()
 
     @property
     def username(self) -> Optional[str]:
