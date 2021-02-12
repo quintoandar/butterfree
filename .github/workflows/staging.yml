@@ -1,4 +1,4 @@
-name: "Publish"
+name: "Publish Dev Package"
 on:
   push:
     paths:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   Pipeline:
-    if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/staging'
 
     runs-on: ubuntu-16.04
     container: quintoandar/python-3-7-java
@@ -18,15 +18,11 @@ jobs:
     - name: Install dependencies
       run: make ci-install
 
+    - name: Get version
+      run: echo "version=$(grep __version__ setup.py | head -1 | cut -d \" -f2 | cut -d \' -f2 )" >> $GITHUB_ENV
+
     - name: Build package
       run: make package
-
-    - name: Get version
-      run: echo "version=$(grep __version__ setup.py | head -1 | cut -d \" -f2 | cut -d \' -f2)" >> $GITHUB_ENV
-
-    - name: Get release notes
-      id: get_release_notes
-      uses: ffurrer2/extract-release-notes@v1
 
     - name: Create release
       uses: actions/create-release@v1
@@ -35,7 +31,7 @@ jobs:
       with:
         tag_name: ${{ env.version }}
         release_name: Release ${{ env.version }}
-        body: ${{ steps.get_release_notes.outputs.release_notes }}
+        prerelease: true
 
     - name: Release already exist
       if: ${{ failure() }}

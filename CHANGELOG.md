@@ -3,6 +3,28 @@ All notable changes to this project will be documented in this file.
 
 Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each release or unreleased log for a better organization.
 
+## [1.1.3](https://github.com/quintoandar/butterfree/releases/tag/1.1.3)
+### Added
+* [MLOP-599] Apply mypy to ButterFree ([#273](https://github.com/quintoandar/butterfree/pull/273))
+
+### Changed
+* [MLOP-634] Butterfree dev workflow, set triggers for branches staging and master ([#280](https://github.com/quintoandar/butterfree/pull/280))
+* Keep milliseconds when using 'from_ms' argument in timestamp feature ([#284](https://github.com/quintoandar/butterfree/pull/284))
+* [MLOP-633] Butterfree dev workflow, update documentation ([#281](https://github.com/quintoandar/butterfree/commit/74278986a49f1825beee0fd8df65a585764e5524))
+* [MLOP-632] Butterfree dev workflow, automate release description ([#279](https://github.com/quintoandar/butterfree/commit/245eaa594846166972241b03fddc61ee5117b1f7))
+
+### Fixed
+* Change trigger for pipeline staging ([#287](https://github.com/quintoandar/butterfree/pull/287)) 
+
+## [1.1.2](https://github.com/quintoandar/butterfree/releases/tag/1.1.2)
+### Fixed
+* [HOTFIX] Add both cache and count back to Butterfree ([#274](https://github.com/quintoandar/butterfree/pull/274))
+* [MLOP-606] Change docker image in Github Actions Pipeline ([#275](https://github.com/quintoandar/butterfree/pull/275))
+* FIX Read the Docs build ([#272](https://github.com/quintoandar/butterfree/pull/272))
+* [BUG] Fix style ([#271](https://github.com/quintoandar/butterfree/pull/271))
+* [MLOP-594] Remove from_column in some transforms ([#270](https://github.com/quintoandar/butterfree/pull/270))
+* [MLOP-536] Rename S3 config to Metastore config ([#269](https://github.com/quintoandar/butterfree/pull/269))
+
 ## [1.1.1](https://github.com/quintoandar/butterfree/releases/tag/1.2.0)
 ### Added
 * [MLOP-590] Adapt KafkaConfig to receive a custom topic name ([#266](https://github.com/quintoandar/butterfree/pull/266))

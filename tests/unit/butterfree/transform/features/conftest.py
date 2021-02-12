@@ -18,8 +18,8 @@ def feature_set_dataframe(spark_context, spark_session):
 @fixture
 def feature_set_dataframe_ms_from_column(spark_context, spark_session):
     data = [
-        {"id": 1, "ts": 1581542311000, "feature": 100},
-        {"id": 2, "ts": 1581542322000, "feature": 200},
+        {"id": 1, "ts": 1581542311112, "feature": 100},
+        {"id": 2, "ts": 1581542322223, "feature": 200},
     ]
     return spark_session.read.json(spark_context.parallelize(data, 1))
 
@@ -27,8 +27,17 @@ def feature_set_dataframe_ms_from_column(spark_context, spark_session):
 @fixture
 def feature_set_dataframe_ms(spark_context, spark_session):
     data = [
-        {"id": 1, TIMESTAMP_COLUMN: 1581542311000, "feature": 100},
-        {"id": 2, TIMESTAMP_COLUMN: 1581542322000, "feature": 200},
+        {"id": 1, TIMESTAMP_COLUMN: 1581542311112, "feature": 100},
+        {"id": 2, TIMESTAMP_COLUMN: 1581542322223, "feature": 200},
+    ]
+    return spark_session.read.json(spark_context.parallelize(data, 1))
+
+
+@fixture
+def feature_set_dataframe_small_time_diff(spark_context, spark_session):
+    data = [
+        {"id": 1, TIMESTAMP_COLUMN: 1581542311001, "feature": 100},
+        {"id": 2, TIMESTAMP_COLUMN: 1581542311002, "feature": 200},
     ]
     return spark_session.read.json(spark_context.parallelize(data, 1))
 
