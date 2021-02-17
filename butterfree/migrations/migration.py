@@ -21,7 +21,7 @@ class Migration(ABC):
     """Abstract base class for Migrations."""
 
     @abstractmethod
-    def create_query(self, feature_set_pipeline, config, client) -> Any:
+    def create_query(self, fs_schema, db_schema, table_name) -> Any:
         """Create a query regarding a data source.
 
         Returns:
@@ -30,22 +30,22 @@ class Migration(ABC):
         """
 
     @staticmethod
-    def validate_schema(local_schema_object, db_schema_object) -> Any:
+    def validate_schema(fs_schema, db_schema) -> Any:
         """Provides schema validation for feature sets.
 
         Compares the schema of your local feature set to the
         corresponding table in a given database.
 
         Args:
-            local_schema_object: object that contains feature set's schemas.
-            db_schema_object: object that contains db table schema.
+            fs_schema: object that contains feature set's schemas.
+            db_schema: object that contains db table schema.
 
         """
         mismatches = []
 
-        for feature in local_schema_object:
+        for feature in fs_schema:
             matching_features = [
-                x for x in db_schema_object if x["column_name"] == feature.name
+                x for x in db_schema if x["column_name"] == feature.name
             ]
 
             if not matching_features:
@@ -58,45 +58,38 @@ class Migration(ABC):
                 (feature.name, feature.type, matching_features[0]["type"])
             )
 
-        error_message = (
-            f"{FORMAT_RED}"
-            f"\nFeatures types mismatches found between Wonka and Cassandra:"
-            f"{CLEAR_FORMATTING}"
-        )
-        for feature, wonka_type, cassandra_type in mismatches:
-            error_message += (
-                f"{FORMAT_RED}"
-                f"\nColumn '{feature}' type is inconsistent:"
-                f" '{wonka_type}' (Wonka) != '{cassandra_type}' (Cassandra)"
-                f"{CLEAR_FORMATTING}"
-            )
-        assert not mismatches, error_message
-        logging.info(
-            f"{FORMAT_BOLD_GREEN}" f"Entity is consistent \\o/" f"{CLEAR_FORMATTING}"
-        )
-
     @abstractmethod
-    def apply_migration(self, *args, **kwargs) -> None:
+    def apply_migration(self, query, db_client) -> None:
         """Apply the migration in the respective database."""
 
-    def _parse_feature_set_pipeline(self, feature_set_pipeline: FeatureSetPipeline) -> List[Tuple[str, FeatureSet]]:
+    @staticmethod
+    def _parse_feature_set_pipeline(
+        feature_set_pipeline: FeatureSetPipeline,
+    ) -> List[Tuple[str, FeatureSet]]:
         feature_set = feature_set_pipeline.feature_set
-        writers = [writer.dbconfig._migration_class for writer in feature_set_pipeline.sink.writers]
+        writers = [
+            writer.dbconfig._migration_class
+            for writer in feature_set_pipeline.sink.writers
+        ]
 
         return [(writer, feature_set) for writer in writers]
+
+    def send_logs_to_s3(self) -> None:
+        """Send all migration logs to S3."""
+        pass
 
     def migration(self, pipelines: List[FeatureSetPipeline]) -> None:
         """Construct and apply the migrations"""
         db_list = [self._parse_feature_set_pipeline(pipeline) for pipeline in pipelines]
 
-        for db, fs in db_list:
-            db_schema = db.get_table_schema(feature_set=fs)
+        for db_client, fs in db_list:
+            try:
+                db_schema = db_client.get_table_schema(table_name=fs.name)
+            except RuntimeError:
+                continue
             fs_schema = fs.get_schema()
 
             self.validate_schema(fs_schema, db_schema)
-            self.create_query()
-            self.apply_migration()
-
-    def send_logs_to_s3(self) -> None:
-        """Send all migration logs to S3."""
-        pass
+            query = self.create_query(fs_schema, db_schema, fs.name)
+            self.apply_migration(db_client, query)
+            self.send_logs_to_s3()
