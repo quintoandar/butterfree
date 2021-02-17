@@ -2,7 +2,7 @@
 
 import logging
 from abc import ABC, abstractmethod
-from typing import Any, List, Tuple
+from typing import Any, List, Tuple, Dict
 
 from butterfree.pipelines import FeatureSetPipeline
 from butterfree.transform import FeatureSet
@@ -30,7 +30,7 @@ class Migration(ABC):
         """
 
     @staticmethod
-    def validate_schema(local_schema_object, db_schema_object) -> Any:
+    def validate_schema(local_schema_object: List[Dict[str, Any]], db_schema_object: List[Dict[str, Any]]) -> Any:
         """Provides schema validation for feature sets.
 
         Compares the schema of your local feature set to the
@@ -45,35 +45,47 @@ class Migration(ABC):
 
         for feature in local_schema_object:
             matching_features = [
-                x for x in db_schema_object if x["column_name"] == feature.name
+                x for x in db_schema_object if x["column_name"] == feature["column_name"]
             ]
 
             if not matching_features:
                 continue
 
-            if feature.type == matching_features[0]["type"]:
+            if feature["type"] == matching_features[0]["type"]:
                 continue
 
             mismatches.append(
-                (feature.name, feature.type, matching_features[0]["type"])
+                (feature["column_name"], feature["type"], matching_features[0]["type"])
             )
 
         error_message = (
             f"{FORMAT_RED}"
-            f"\nFeatures types mismatches found between Wonka and Cassandra:"
+            f"\nFeatures types mismatches found between Feature Set and Database:"
             f"{CLEAR_FORMATTING}"
         )
-        for feature, wonka_type, cassandra_type in mismatches:
+
+        for feature, fs_type, db_type in mismatches:
             error_message += (
                 f"{FORMAT_RED}"
                 f"\nColumn '{feature}' type is inconsistent:"
-                f" '{wonka_type}' (Wonka) != '{cassandra_type}' (Cassandra)"
+                f" '{fs_type}' (Feature Set) != '{db_type}' (Database)"
                 f"{CLEAR_FORMATTING}"
             )
+
         assert not mismatches, error_message
+
         logging.info(
             f"{FORMAT_BOLD_GREEN}" f"Entity is consistent \\o/" f"{CLEAR_FORMATTING}"
         )
+
+    @abstractmethod
+    def get_schema(self, feature_set: FeatureSet) -> List[Dict[str, Any]]:
+        """Get a table schema in the respective database.
+
+        Returns:
+            Schema object.
+
+        """
 
     @abstractmethod
     def apply_migration(self, *args, **kwargs) -> None:
@@ -81,7 +93,7 @@ class Migration(ABC):
 
     def _parse_feature_set_pipeline(self, feature_set_pipeline: FeatureSetPipeline) -> List[Tuple[str, FeatureSet]]:
         feature_set = feature_set_pipeline.feature_set
-        writers = [writer.dbconfig._migration_class for writer in feature_set_pipeline.sink.writers]
+        writers = [writer.db_config._migration_class for writer in feature_set_pipeline.sink.writers]
 
         return [(writer, feature_set) for writer in writers]
 
