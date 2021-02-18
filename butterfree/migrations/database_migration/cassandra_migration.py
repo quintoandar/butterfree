@@ -2,17 +2,30 @@
 
 from typing import Any, Dict, List
 
-from butterfree.migrations import DatabaseMigration
+from butterfree.clients import CassandraClient
+from butterfree.configs.db import CassandraConfig
+from butterfree.migrations.database_migration.database_migration import (
+    DatabaseMigration,
+)
 
 
 class CassandraMigration(DatabaseMigration):
     """Cassandra class for Migrations."""
 
+    def __init__(self) -> None:
+        self._db_config = CassandraConfig()
+        self._client = CassandraClient(
+            cassandra_host=[self._db_config.host],
+            cassandra_key_space=self._db_config.keyspace,
+            cassandra_user=self._db_config.username,
+            cassandra_password=self._db_config.password,
+        )
+
     def create_query(
         self,
-        fs_schema: List[Dict[str, Any]],
-        db_schema: List[Dict[str, Any]],
         table_name: str,
+        db_schema: List[Dict[str, Any]] = None,
+        diff_schema: List[Dict[str, Any]] = None,
     ) -> Any:
         """Create a query regarding Cassandra.
 
