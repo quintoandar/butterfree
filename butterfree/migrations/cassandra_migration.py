@@ -16,7 +16,3 @@ class CassandraMigration(Migration):
 
         """
         pass
-
-    def apply_migration(self) -> None:
-        """Apply the migration in Cassandra."""
-        pass
