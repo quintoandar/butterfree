@@ -23,7 +23,7 @@ class DatabaseMigration(ABC):
 
         """
 
-    def validate_schema(
+    def _validate_schema(
         self, fs_schema: List[Dict[str, Any]], db_schema: List[Dict[str, Any]]
     ) -> Any:
         """Provides schema validation for feature sets.
@@ -37,7 +37,7 @@ class DatabaseMigration(ABC):
 
         """
 
-    def get_schema(self, db_client: Callable, table_name: str) -> List[Dict[str, Any]]:
+    def _get_schema(self, db_client: Callable, table_name: str) -> List[Dict[str, Any]]:
         """Get a table schema in the respective database.
 
         Returns:
@@ -45,10 +45,10 @@ class DatabaseMigration(ABC):
         """
         pass
 
-    def apply_migration(self, query: str, db_client: Callable) -> None:
+    def _apply_migration(self, query: str, db_client: Callable) -> None:
         """Apply the migration in the respective database."""
 
-    def send_logs_to_s3(self) -> None:
+    def _send_logs_to_s3(self) -> None:
         """Send all migration logs to S3."""
         pass
 
