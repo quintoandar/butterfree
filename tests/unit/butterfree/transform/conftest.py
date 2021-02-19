@@ -6,7 +6,6 @@ from pytest import fixture
 
 from butterfree.constants import DataType
 from butterfree.constants.columns import TIMESTAMP_COLUMN
-<<<<<<< HEAD
 from butterfree.transform import FeatureSet
 from butterfree.transform.aggregated_feature_set import AggregatedFeatureSet
 from butterfree.transform.features import Feature, KeyFeature, TimestampFeature
@@ -14,11 +13,6 @@ from butterfree.transform.transformations import (
     AggregatedTransform,
     SparkFunctionTransform,
 )
-=======
-from butterfree.transform.aggregated_feature_set import AggregatedFeatureSet
-from butterfree.transform.features import Feature, KeyFeature, TimestampFeature
-from butterfree.transform.transformations import AggregatedTransform
->>>>>>> style compliant
 from butterfree.transform.utils import Function
 
 
@@ -146,7 +140,7 @@ def make_rolling_windows_hour_slide_agg_dataframe(spark_context, spark_session):
         {
             "id": 1,
             "timestamp": "2016-04-11 12:00:00",
-            "feature1__avg_over_1_day_rolling_windows": 266.6666564941406,
+            "feature1__avg_over_1_day_rolling_windows": 266.6666666666667,
             "feature2__avg_over_1_day_rolling_windows": 300.0,
         },
         {
@@ -160,12 +154,6 @@ def make_rolling_windows_hour_slide_agg_dataframe(spark_context, spark_session):
             "timestamp": "2016-04-12 12:00:00",
             "feature1__avg_over_1_day_rolling_windows": 400.0,
             "feature2__avg_over_1_day_rolling_windows": 500.0,
-        },
-        {
-            "id": 1,
-            "timestamp": "2016-04-23 00:00:00",
-            "feature1__avg_over_1_day_rolling_windows": 1000.0,
-            "feature2__avg_over_1_day_rolling_windows": 1100.0,
         },
     ]
     df = spark_session.read.json(
@@ -354,7 +342,6 @@ def timestamp_c():
 
 
 @fixture
-<<<<<<< HEAD
 def feature_set():
     feature_set = FeatureSet(
         name="feature_set",
@@ -392,60 +379,26 @@ def feature_set():
 
 @fixture
 def agg_feature_set():
-    feature_set = AggregatedFeatureSet(
-        name="feature_set",
-=======
-def agg_feature_set():
     return AggregatedFeatureSet(
         name="name",
->>>>>>> style compliant
         entity="entity",
         description="description",
         features=[
             Feature(
                 name="feature1",
-<<<<<<< HEAD
                 description="test",
                 transformation=AggregatedTransform(
-                    functions=[
-                        Function(functions.avg, DataType.DOUBLE),
-                        Function(functions.stddev_pop, DataType.FLOAT),
-                    ],
-=======
-                description="unit test",
-                transformation=AggregatedTransform(
-                    functions=[Function(functions.avg, DataType.FLOAT)]
->>>>>>> style compliant
+                    functions=[Function(functions.avg, DataType.DOUBLE),],
                 ),
             ),
             Feature(
                 name="feature2",
-<<<<<<< HEAD
                 description="test",
                 transformation=AggregatedTransform(
-                    functions=[Function(functions.count, DataType.ARRAY_STRING)]
+                    functions=[Function(functions.avg, DataType.DOUBLE),]
                 ),
             ),
         ],
-        keys=[
-            KeyFeature(
-                name="id",
-                description="The user's Main ID or device ID",
-                dtype=DataType.BIGINT,
-            )
-        ],
-        timestamp=TimestampFeature(),
-    ).with_windows(definitions=["1 week", "2 days"])
-
-    return feature_set
-=======
-                description="unit test",
-                transformation=AggregatedTransform(
-                    functions=[Function(functions.avg, DataType.FLOAT)]
-                ),
-            ),
-        ],
-        keys=[KeyFeature(name="id", description="description", dtype=DataType.INTEGER)],
+        keys=[KeyFeature(name="id", description="description", dtype=DataType.BIGINT,)],
         timestamp=TimestampFeature(),
     )
->>>>>>> style compliant
