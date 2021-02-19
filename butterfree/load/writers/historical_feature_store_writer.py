@@ -146,7 +146,25 @@ class HistoricalFeatureStoreWriter(Writer):
         """
         dataframe = self._create_partitions(dataframe)
 
-        dataframe = self._apply_transformations(dataframe)
+        partition_df = self._apply_transformations(dataframe)
+
+        if self.debug_mode:
+            dataframe = partition_df
+        else:
+            dataframe = self.check_schema(
+                spark_client, partition_df, feature_set.name, self.database
+            )
+
+        if self.interval_mode:
+            if self.debug_mode:
+                spark_client.create_temporary_view(
+                    dataframe=dataframe,
+                    name=f"historical_feature_store__{feature_set.name}",
+                )
+                return
+
+            self._incremental_mode(feature_set, dataframe, spark_client)
+            return
 
         if self.interval_mode:
             partition_overwrite_mode = spark_client.conn.conf.get(
@@ -189,6 +207,34 @@ class HistoricalFeatureStoreWriter(Writer):
             table_name=feature_set.name,
             partition_by=self.PARTITION_BY,
             **self.db_config.get_options(s3_key),
+        )
+
+    def _incremental_mode(
+        self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient
+    ) -> None:
+
+        partition_overwrite_mode = spark_client.conn.conf.get(
+            "spark.sql.sources.partitionOverwriteMode"
+        ).lower()
+
+        if partition_overwrite_mode != "dynamic":
+            raise RuntimeError(
+                "m=load_incremental_table, "
+                "spark.sql.sources.partitionOverwriteMode={}, "
+                "msg=partitionOverwriteMode have to be configured to 'dynamic'".format(
+                    partition_overwrite_mode
+                )
+            )
+
+        s3_key = os.path.join("historical", feature_set.entity, feature_set.name)
+        options = {"path": self.db_config.get_options(s3_key).get("path")}
+
+        spark_client.write_dataframe(
+            dataframe=dataframe,
+            format_=self.db_config.format_,
+            mode=self.db_config.mode,
+            **options,
+            partitionBy=self.PARTITION_BY,
         )
 
     def _assert_validation_count(
