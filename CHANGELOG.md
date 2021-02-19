@@ -51,6 +51,10 @@ Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each 
 
 ## [1.1.3](https://github.com/quintoandar/butterfree/releases/tag/1.1.3)
 ### Added
+* [MLOP-636] Create migration classes ([#282](https://github.com/quintoandar/butterfree/pull/282))
+
+## [1.1.3](https://github.com/quintoandar/butterfree/releases/tag/1.1.3)
+### Added
 * [MLOP-599] Apply mypy to ButterFree ([#273](https://github.com/quintoandar/butterfree/pull/273))
 
 ### Changed
