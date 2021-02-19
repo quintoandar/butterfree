@@ -4,6 +4,7 @@ from unittest.mock import Mock
 from pyspark.sql import DataFrame
 from pyspark.sql import functions as F
 
+from butterfree.clients import SparkClient
 from butterfree.configs import environment
 from butterfree.configs.db import MetastoreConfig
 from butterfree.constants import DataType
