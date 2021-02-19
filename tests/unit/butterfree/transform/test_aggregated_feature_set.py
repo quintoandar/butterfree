@@ -89,6 +89,43 @@ class TestAggregatedFeatureSet:
         output_df = fs.construct(dataframe, spark_client, end_date="2016-05-01")
         assert_dataframe_equality(output_df, rolling_windows_agg_dataframe)
 
+    def test_agg_feature_set_with_smaller_slide(
+        self, key_id, timestamp_c, dataframe, rolling_windows_hour_slide_agg_dataframe
+    ):
+        spark_client = SparkClient()
+
+        fs = AggregatedFeatureSet(
+            name="name",
+            entity="entity",
+            description="description",
+            features=[
+                Feature(
+                    name="feature1",
+                    description="unit test",
+                    transformation=AggregatedTransform(
+                        functions=[Function(functions.avg, DataType.FLOAT)]
+                    ),
+                ),
+                Feature(
+                    name="feature2",
+                    description="unit test",
+                    transformation=AggregatedTransform(
+                        functions=[Function(functions.avg, DataType.FLOAT)]
+                    ),
+                ),
+            ],
+            keys=[key_id],
+            timestamp=timestamp_c,
+        ).with_windows(definitions=["1 day"], slide="12 hours")
+
+        # raises without end date
+        with pytest.raises(ValueError):
+            _ = fs.construct(dataframe, spark_client)
+
+        # filters with date smaller then mocked max
+        output_df = fs.construct(dataframe, spark_client, end_date="2016-04-17")
+        assert_dataframe_equality(output_df, rolling_windows_hour_slide_agg_dataframe)
+
     def test_get_schema(self, agg_feature_set):
         expected_schema = [
             {"column_name": "id", "type": LongType(), "primary_key": True},

@@ -301,7 +301,7 @@ class AggregatedFeatureSet(FeatureSet):
 
         return self
 
-    def with_windows(self, definitions: List[str]) -> "AggregatedFeatureSet":
+    def with_windows(self, definitions: List[str], slide: str = None) -> "AggregatedFeatureSet":
         """Create a list with windows defined."""
         self._windows = [
             Window(
@@ -309,6 +309,7 @@ class AggregatedFeatureSet(FeatureSet):
                 order_by=None,
                 mode="rolling_windows",
                 window_definition=definition,
+                slide=slide,
             )
             for definition in definitions
         ]
@@ -563,12 +564,6 @@ class AggregatedFeatureSet(FeatureSet):
         )
 
         if self._windows and end_date is not None:
-            # prepare our left table, a cartesian product between distinct keys
-            # and dates in range for this feature set
-            base_df = self._get_base_dataframe(
-                client=client, dataframe=output_df, end_date=end_date
-            )
-
             # run aggregations for each window
             agg_list = [
                 self._aggregate(
@@ -580,18 +575,44 @@ class AggregatedFeatureSet(FeatureSet):
                 for w in self._windows
             ]
 
-            # left join each aggregation result to our base dataframe
-            output_df = reduce(
-                lambda left, right: self._dataframe_join(
-                    left,
-                    right,
-                    on=self.keys_columns + [self.timestamp_column],
-                    how="left",
-                    num_processors=num_processors,
-                ),
-                agg_list,
-                base_df,
-            )
+            # prepare our left table, a cartesian product between distinct keys
+            # and dates in range for this feature set
+
+            # todo next versions won't use this logic anymore,
+            # leaving for the client to correct the usage of aggregations
+            # without events
+
+            # keeping this logic to maintain the same behavior for already implemented
+            # feature sets
+
+            if self._windows[0].slide == "1 day":
+                base_df = self._get_base_dataframe(
+                    client=client, dataframe=output_df, end_date=end_date
+                )
+
+                # left join each aggregation result to our base dataframe
+                output_df = reduce(
+                    lambda left, right: self._dataframe_join(
+                        left,
+                        right,
+                        on=self.keys_columns + [self.timestamp_column],
+                        how="left",
+                        num_processors=num_processors,
+                    ),
+                    agg_list,
+                    base_df,
+                )
+            else:
+                output_df = reduce(
+                    lambda left, right: self._dataframe_join(
+                        left,
+                        right,
+                        on=self.keys_columns + [self.timestamp_column],
+                        how="full outer",
+                        num_processors=num_processors,
+                    ),
+                    agg_list,
+                )
         else:
             output_df = self._aggregate(output_df, features=self.features)
 

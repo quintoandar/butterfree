@@ -61,8 +61,7 @@ class Window:
 
     Use the static methods in :class:`Window` to create a :class:`WindowSpec`.
     """
-
-    SLIDE_DURATION: str = "1 day"
+    DEFAULT_SLIDE_DURATION: str = "1 day"
 
     def __init__(
         self,
@@ -70,10 +69,12 @@ class Window:
         partition_by: Optional[Union[Column, str, List[str]]] = None,
         order_by: Optional[Union[Column, str]] = None,
         mode: str = None,
+        slide: str = None,
     ):
         self.partition_by = partition_by
         self.order_by = order_by or TIMESTAMP_COLUMN
         self.frame_boundaries = FrameBoundaries(mode, window_definition)
+        self.slide = slide or self.DEFAULT_SLIDE_DURATION
 
     def get_name(self) -> str:
         """Return window suffix name based on passed criteria."""
@@ -89,15 +90,10 @@ class Window:
     def get(self) -> Any:
         """Defines a common window to be used both in time and rows windows."""
         if self.frame_boundaries.mode == "rolling_windows":
-            if int(self.frame_boundaries.window_definition.split()[0]) <= 0:
-                raise KeyError(
-                    f"{self.frame_boundaries.window_definition} "
-                    f"have negative element."
-                )
             return functions.window(
                 TIMESTAMP_COLUMN,
                 self.frame_boundaries.window_definition,
-                slideDuration=self.SLIDE_DURATION,
+                slideDuration=self.slide,
             )
         elif self.order_by == TIMESTAMP_COLUMN:
             w = sql.Window.partitionBy(self.partition_by).orderBy(  # type: ignore
