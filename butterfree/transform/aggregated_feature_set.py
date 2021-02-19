@@ -301,7 +301,9 @@ class AggregatedFeatureSet(FeatureSet):
 
         return self
 
-    def with_windows(self, definitions: List[str], slide: str = None) -> "AggregatedFeatureSet":
+    def with_windows(
+        self, definitions: List[str], slide: str = None
+    ) -> "AggregatedFeatureSet":
         """Create a list with windows defined."""
         self._windows = [
             Window(

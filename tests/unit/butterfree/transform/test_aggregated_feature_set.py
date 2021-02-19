@@ -51,33 +51,16 @@ class TestAggregatedFeatureSet:
             ).construct(dataframe, spark_client)
 
     def test_agg_feature_set_with_window(
-        self, key_id, timestamp_c, dataframe, rolling_windows_agg_dataframe
+        self,
+        key_id,
+        timestamp_c,
+        dataframe,
+        rolling_windows_agg_dataframe,
+        agg_feature_set,
     ):
         spark_client = SparkClient()
 
-        fs = AggregatedFeatureSet(
-            name="name",
-            entity="entity",
-            description="description",
-            features=[
-                Feature(
-                    name="feature1",
-                    description="unit test",
-                    transformation=AggregatedTransform(
-                        functions=[Function(functions.avg, DataType.FLOAT)]
-                    ),
-                ),
-                Feature(
-                    name="feature2",
-                    description="unit test",
-                    transformation=AggregatedTransform(
-                        functions=[Function(functions.avg, DataType.FLOAT)]
-                    ),
-                ),
-            ],
-            keys=[key_id],
-            timestamp=timestamp_c,
-        ).with_windows(definitions=["1 week"])
+        fs = agg_feature_set.with_windows(definitions=["1 week"])
 
         # raises without end date
         with pytest.raises(ValueError):
@@ -90,33 +73,16 @@ class TestAggregatedFeatureSet:
         assert_dataframe_equality(output_df, rolling_windows_agg_dataframe)
 
     def test_agg_feature_set_with_smaller_slide(
-        self, key_id, timestamp_c, dataframe, rolling_windows_hour_slide_agg_dataframe
+        self,
+        key_id,
+        timestamp_c,
+        dataframe,
+        rolling_windows_hour_slide_agg_dataframe,
+        agg_feature_set,
     ):
         spark_client = SparkClient()
 
-        fs = AggregatedFeatureSet(
-            name="name",
-            entity="entity",
-            description="description",
-            features=[
-                Feature(
-                    name="feature1",
-                    description="unit test",
-                    transformation=AggregatedTransform(
-                        functions=[Function(functions.avg, DataType.FLOAT)]
-                    ),
-                ),
-                Feature(
-                    name="feature2",
-                    description="unit test",
-                    transformation=AggregatedTransform(
-                        functions=[Function(functions.avg, DataType.FLOAT)]
-                    ),
-                ),
-            ],
-            keys=[key_id],
-            timestamp=timestamp_c,
-        ).with_windows(definitions=["1 day"], slide="12 hours")
+        fs = agg_feature_set.with_windows(definitions=["1 day"], slide="12 hours")
 
         # raises without end date
         with pytest.raises(ValueError):

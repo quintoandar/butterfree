@@ -61,6 +61,7 @@ class Window:
 
     Use the static methods in :class:`Window` to create a :class:`WindowSpec`.
     """
+
     DEFAULT_SLIDE_DURATION: str = "1 day"
 
     def __init__(
