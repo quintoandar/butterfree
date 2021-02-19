@@ -388,14 +388,14 @@ def agg_feature_set():
                 name="feature1",
                 description="test",
                 transformation=AggregatedTransform(
-                    functions=[Function(functions.avg, DataType.DOUBLE),],
+                    functions=[Function(functions.avg, DataType.DOUBLE)],
                 ),
             ),
             Feature(
                 name="feature2",
                 description="test",
                 transformation=AggregatedTransform(
-                    functions=[Function(functions.avg, DataType.DOUBLE),]
+                    functions=[Function(functions.avg, DataType.DOUBLE)]
                 ),
             ),
         ],

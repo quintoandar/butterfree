@@ -1,10 +1,6 @@
 import pytest
 from pyspark.sql import functions
-from pyspark.sql.types import (
-    DoubleType,
-    LongType,
-    TimestampType,
-)
+from pyspark.sql.types import DoubleType, LongType, TimestampType
 
 from butterfree.clients import SparkClient
 from butterfree.constants import DataType
