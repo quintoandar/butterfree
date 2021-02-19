@@ -52,8 +52,6 @@ class TestAggregatedFeatureSet:
 
     def test_agg_feature_set_with_window(
         self,
-        key_id,
-        timestamp_c,
         dataframe,
         rolling_windows_agg_dataframe,
         agg_feature_set,
@@ -74,8 +72,6 @@ class TestAggregatedFeatureSet:
 
     def test_agg_feature_set_with_smaller_slide(
         self,
-        key_id,
-        timestamp_c,
         dataframe,
         rolling_windows_hour_slide_agg_dataframe,
         agg_feature_set,

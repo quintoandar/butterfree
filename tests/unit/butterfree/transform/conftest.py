@@ -445,7 +445,7 @@ def agg_feature_set():
                 ),
             ),
         ],
-        keys=[key_id],
-        timestamp=timestamp_c,
+        keys=[KeyFeature(name="id", description="description", dtype=DataType.INTEGER)],
+        timestamp=TimestampFeature(),
     )
 >>>>>>> style compliant
