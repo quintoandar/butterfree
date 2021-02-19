@@ -17,12 +17,8 @@ from butterfree.load.writers import (
 from butterfree.load.writers.writer import Writer
 from butterfree.pipelines.feature_set_pipeline import FeatureSetPipeline
 from butterfree.transform import FeatureSet
-from butterfree.transform.aggregated_feature_set import AggregatedFeatureSet
 from butterfree.transform.features import Feature, KeyFeature, TimestampFeature
-from butterfree.transform.transformations import (
-    AggregatedTransform,
-    SparkFunctionTransform,
-)
+from butterfree.transform.transformations import SparkFunctionTransform
 from butterfree.transform.utils import Function
 
 
@@ -104,115 +100,29 @@ class TestFeatureSetPipeline:
         assert len(pipeline.sink.writers) == 2
         assert all(isinstance(writer, Writer) for writer in pipeline.sink.writers)
 
-    def test_run(self, spark_session):
-        test_pipeline = FeatureSetPipeline(
-            spark_client=SparkClient(),
-            source=Mock(
-                spec=Source,
-                readers=[TableReader(id="source_a", database="db", table="table",)],
-                query="select * from source_a",
-            ),
-            feature_set=Mock(
-                spec=FeatureSet,
-                name="feature_set",
-                entity="entity",
-                description="description",
-                keys=[
-                    KeyFeature(
-                        name="user_id",
-                        description="The user's Main ID or device ID",
-                        dtype=DataType.INTEGER,
-                    )
-                ],
-                timestamp=TimestampFeature(from_column="ts"),
-                features=[
-                    Feature(
-                        name="listing_page_viewed__rent_per_month",
-                        description="Average of something.",
-                        transformation=SparkFunctionTransform(
-                            functions=[
-                                Function(functions.avg, DataType.FLOAT),
-                                Function(functions.stddev_pop, DataType.FLOAT),
-                            ],
-                        ).with_window(
-                            partition_by="user_id",
-                            order_by=TIMESTAMP_COLUMN,
-                            window_definition=["7 days", "2 weeks"],
-                            mode="fixed_windows",
-                        ),
-                    ),
-                ],
-            ),
-            sink=Mock(
-                spec=Sink, writers=[HistoricalFeatureStoreWriter(db_config=None)],
-            ),
-        )
-
+    def test_run(self, spark_session, feature_set_pipeline):
         # feature_set need to return a real df for streaming validation
         sample_df = spark_session.createDataFrame([{"a": "x", "b": "y", "c": "3"}])
-        test_pipeline.feature_set.construct.return_value = sample_df
+        feature_set_pipeline.feature_set.construct.return_value = sample_df
 
-        test_pipeline.run()
+        feature_set_pipeline.run()
 
-        test_pipeline.source.construct.assert_called_once()
-        test_pipeline.feature_set.construct.assert_called_once()
-        test_pipeline.sink.flush.assert_called_once()
-        test_pipeline.sink.validate.assert_called_once()
+        feature_set_pipeline.source.construct.assert_called_once()
+        feature_set_pipeline.feature_set.construct.assert_called_once()
+        feature_set_pipeline.sink.flush.assert_called_once()
+        feature_set_pipeline.sink.validate.assert_called_once()
 
-    def test_run_with_repartition(self, spark_session):
-        test_pipeline = FeatureSetPipeline(
-            spark_client=SparkClient(),
-            source=Mock(
-                spec=Source,
-                readers=[TableReader(id="source_a", database="db", table="table",)],
-                query="select * from source_a",
-            ),
-            feature_set=Mock(
-                spec=FeatureSet,
-                name="feature_set",
-                entity="entity",
-                description="description",
-                keys=[
-                    KeyFeature(
-                        name="user_id",
-                        description="The user's Main ID or device ID",
-                        dtype=DataType.INTEGER,
-                    )
-                ],
-                timestamp=TimestampFeature(from_column="ts"),
-                features=[
-                    Feature(
-                        name="listing_page_viewed__rent_per_month",
-                        description="Average of something.",
-                        transformation=SparkFunctionTransform(
-                            functions=[
-                                Function(functions.avg, DataType.FLOAT),
-                                Function(functions.stddev_pop, DataType.FLOAT),
-                            ],
-                        ).with_window(
-                            partition_by="user_id",
-                            order_by=TIMESTAMP_COLUMN,
-                            window_definition=["7 days", "2 weeks"],
-                            mode="fixed_windows",
-                        ),
-                    ),
-                ],
-            ),
-            sink=Mock(
-                spec=Sink, writers=[HistoricalFeatureStoreWriter(db_config=None)],
-            ),
-        )
-
+    def test_run_with_repartition(self, spark_session, feature_set_pipeline):
         # feature_set need to return a real df for streaming validation
         sample_df = spark_session.createDataFrame([{"a": "x", "b": "y", "c": "3"}])
-        test_pipeline.feature_set.construct.return_value = sample_df
+        feature_set_pipeline.feature_set.construct.return_value = sample_df
 
-        test_pipeline.run(partition_by=["id"])
+        feature_set_pipeline.run(partition_by=["id"])
 
-        test_pipeline.source.construct.assert_called_once()
-        test_pipeline.feature_set.construct.assert_called_once()
-        test_pipeline.sink.flush.assert_called_once()
-        test_pipeline.sink.validate.assert_called_once()
+        feature_set_pipeline.source.construct.assert_called_once()
+        feature_set_pipeline.feature_set.construct.assert_called_once()
+        feature_set_pipeline.sink.flush.assert_called_once()
+        feature_set_pipeline.sink.validate.assert_called_once()
 
     def test_source_raise(self):
         with pytest.raises(ValueError, match="source must be a Source instance"):
@@ -343,52 +253,26 @@ class TestFeatureSetPipeline:
                 sink=Mock(writers=[HistoricalFeatureStoreWriter(db_config=None)],),
             )
 
-    def test_run_agg_with_end_date(self, spark_session):
-        test_pipeline = FeatureSetPipeline(
-            spark_client=SparkClient(),
-            source=Mock(
-                spec=Source,
-                readers=[TableReader(id="source_a", database="db", table="table",)],
-                query="select * from source_a",
-            ),
-            feature_set=Mock(
-                spec=AggregatedFeatureSet,
-                name="feature_set",
-                entity="entity",
-                description="description",
-                keys=[
-                    KeyFeature(
-                        name="user_id",
-                        description="The user's Main ID or device ID",
-                        dtype=DataType.INTEGER,
-                    )
-                ],
-                timestamp=TimestampFeature(from_column="ts"),
-                features=[
-                    Feature(
-                        name="listing_page_viewed__rent_per_month",
-                        description="Average of something.",
-                        transformation=AggregatedTransform(
-                            functions=[
-                                Function(functions.avg, DataType.FLOAT),
-                                Function(functions.stddev_pop, DataType.FLOAT),
-                            ],
-                        ),
-                    ),
-                ],
-            ),
-            sink=Mock(
-                spec=Sink, writers=[HistoricalFeatureStoreWriter(db_config=None)],
-            ),
-        )
-
+    def test_run_agg_with_end_date(self, spark_session, feature_set_pipeline):
         # feature_set need to return a real df for streaming validation
         sample_df = spark_session.createDataFrame([{"a": "x", "b": "y", "c": "3"}])
-        test_pipeline.feature_set.construct.return_value = sample_df
+        feature_set_pipeline.feature_set.construct.return_value = sample_df
 
-        test_pipeline.run(end_date="2016-04-18")
+        feature_set_pipeline.run(end_date="2016-04-18")
 
-        test_pipeline.source.construct.assert_called_once()
-        test_pipeline.feature_set.construct.assert_called_once()
-        test_pipeline.sink.flush.assert_called_once()
-        test_pipeline.sink.validate.assert_called_once()
+        feature_set_pipeline.source.construct.assert_called_once()
+        feature_set_pipeline.feature_set.construct.assert_called_once()
+        feature_set_pipeline.sink.flush.assert_called_once()
+        feature_set_pipeline.sink.validate.assert_called_once()
+
+    def test_run_agg_with_start_date(self, spark_session, feature_set_pipeline):
+        # feature_set need to return a real df for streaming validation
+        sample_df = spark_session.createDataFrame([{"a": "x", "b": "y", "c": "3"}])
+        feature_set_pipeline.feature_set.construct.return_value = sample_df
+
+        feature_set_pipeline.run(start_date="2020-08-04")
+
+        feature_set_pipeline.source.construct.assert_called_once()
+        feature_set_pipeline.feature_set.construct.assert_called_once()
+        feature_set_pipeline.sink.flush.assert_called_once()
+        feature_set_pipeline.sink.validate.assert_called_once()

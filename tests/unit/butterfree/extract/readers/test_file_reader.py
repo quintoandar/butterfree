@@ -36,11 +36,11 @@ class TestFileReader:
 
         # act
         output_df = file_reader.consume(spark_client)
-        options = dict({"path": path}, **format_options if format_options else {})
+        options = dict(format_options if format_options else {})
 
         # assert
         spark_client.read.assert_called_once_with(
-            format=format, options=options, schema=schema, stream=False
+            format=format, schema=schema, stream=False, path=path, **options
         )
         assert target_df.collect() == output_df.collect()
 
@@ -51,7 +51,7 @@ class TestFileReader:
         schema = None
         format_options = None
         stream = True
-        options = dict({"path": path})
+        options = dict({})
 
         spark_client.read.return_value = target_df
         file_reader = FileReader(
@@ -64,11 +64,11 @@ class TestFileReader:
         # assert
 
         # assert call for schema infer
-        spark_client.read.assert_any_call(format=format, options=options)
+        spark_client.read.assert_any_call(format=format, path=path, **options)
         # assert call for stream read
         # stream
         spark_client.read.assert_called_with(
-            format=format, options=options, schema=output_df.schema, stream=stream
+            format=format, schema=output_df.schema, stream=stream, path=path, **options
         )
         assert target_df.collect() == output_df.collect()
 

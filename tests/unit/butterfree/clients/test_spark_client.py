@@ -1,4 +1,5 @@
-from typing import Any, Dict, Optional, Union
+from datetime import datetime
+from typing import Any, Optional, Union
 from unittest.mock import Mock
 
 import pytest
@@ -26,19 +27,20 @@ class TestSparkClient:
         assert start_conn is None
 
     @pytest.mark.parametrize(
-        "format, options, stream, schema",
+        "format, path, stream, schema, options",
         [
-            ("parquet", {"path": "path/to/file"}, False, None),
-            ("csv", {"path": "path/to/file", "header": True}, False, None),
-            ("json", {"path": "path/to/file"}, True, None),
+            ("parquet", ["path/to/file"], False, None, {}),
+            ("csv", "path/to/file", False, None, {"header": True}),
+            ("json", "path/to/file", True, None, {}),
         ],
     )
     def test_read(
         self,
         format: str,
-        options: Dict[str, Any],
         stream: bool,
         schema: Optional[StructType],
+        path: Any,
+        options: Any,
         target_df: DataFrame,
         mocked_spark_read: Mock,
     ) -> None:
@@ -48,26 +50,25 @@ class TestSparkClient:
         spark_client._session = mocked_spark_read
 
         # act
-        result_df = spark_client.read(format, options, schema, stream)
+        result_df = spark_client.read(
+            format=format, schema=schema, stream=stream, path=path, **options
+        )
 
         # assert
         mocked_spark_read.format.assert_called_once_with(format)
-        mocked_spark_read.options.assert_called_once_with(**options)
+        mocked_spark_read.load.assert_called_once_with(path, **options)
         assert target_df.collect() == result_df.collect()
 
     @pytest.mark.parametrize(
-        "format, options",
-        [(None, {"path": "path/to/file"}), ("csv", "not a valid options")],
+        "format, path", [(None, "path/to/file"), ("csv", 123)],
     )
-    def test_read_invalid_params(
-        self, format: Optional[str], options: Union[Dict[str, Any], str]
-    ) -> None:
+    def test_read_invalid_params(self, format: Optional[str], path: Any) -> None:
         # arrange
         spark_client = SparkClient()
 
         # act and assert
         with pytest.raises(ValueError):
-            spark_client.read(format, options)  # type: ignore
+            spark_client.read(format=format, path=path)  # type: ignore
 
     def test_sql(self, target_df: DataFrame) -> None:
         # arrange
@@ -252,3 +253,43 @@ class TestSparkClient:
 
         # assert
         assert_dataframe_equality(target_df, result_df)
+
+    def test_add_table_partitions(self, mock_spark_sql: Mock):
+        # arrange
+        target_command = (
+            f"ALTER TABLE `db`.`table` ADD IF NOT EXISTS "
+            f"PARTITION ( year = 2020, month = 8, day = 14 ) "
+            f"PARTITION ( year = 2020, month = 8, day = 15 ) "
+            f"PARTITION ( year = 2020, month = 8, day = 16 )"
+        )
+
+        spark_client = SparkClient()
+        spark_client._session = mock_spark_sql
+        partitions = [
+            {"year": 2020, "month": 8, "day": 14},
+            {"year": 2020, "month": 8, "day": 15},
+            {"year": 2020, "month": 8, "day": 16},
+        ]
+
+        # act
+        spark_client.add_table_partitions(partitions, "table", "db")
+
+        # assert
+        mock_spark_sql.assert_called_once_with(target_command)
+
+    @pytest.mark.parametrize(
+        "partition",
+        [
+            [{"float_partition": 2.72}],
+            [{123: 2020}],
+            [{"date": datetime(year=2020, month=8, day=18)}],
+        ],
+    )
+    def test_add_invalid_partitions(self, mock_spark_sql: Mock, partition):
+        # arrange
+        spark_client = SparkClient()
+        spark_client._session = mock_spark_sql
+
+        # act and assert
+        with pytest.raises(ValueError):
+            spark_client.add_table_partitions(partition, "table", "db")

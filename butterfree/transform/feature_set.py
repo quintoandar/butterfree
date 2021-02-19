@@ -1,7 +1,7 @@
 """FeatureSet entity."""
 import itertools
 from functools import reduce
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import pyspark.sql.functions as F
 from pyspark.sql import Window
@@ -9,6 +9,8 @@ from pyspark.sql.dataframe import DataFrame
 
 from butterfree.clients import SparkClient
 from butterfree.constants.columns import TIMESTAMP_COLUMN
+from butterfree.dataframe_service import IncrementalStrategy
+from butterfree.hooks import HookableComponent
 from butterfree.transform.features import Feature, KeyFeature, TimestampFeature
 from butterfree.transform.transformations import (
     AggregatedTransform,
@@ -16,7 +18,7 @@ from butterfree.transform.transformations import (
 )
 
 
-class FeatureSet:
+class FeatureSet(HookableComponent):
     """Holds metadata about the feature set and constructs the final dataframe.
 
     Attributes:
@@ -106,12 +108,14 @@ class FeatureSet:
         timestamp: TimestampFeature,
         features: List[Feature],
     ) -> None:
+        super().__init__()
         self.name = name
         self.entity = entity
         self.description = description
         self.keys = keys
         self.timestamp = timestamp
         self.features = features
+        self.incremental_strategy = IncrementalStrategy(column=TIMESTAMP_COLUMN)
 
     @property
     def name(self) -> str:
@@ -242,9 +246,6 @@ class FeatureSet:
 
     def get_schema(self) -> List[Dict[str, Any]]:
         """Get feature set schema.
-
-        Args:
-            feature_set: object processed with feature set metadata.
 
         Returns:
             List of dicts regarding cassandra feature set schema.
@@ -378,12 +379,24 @@ class FeatureSet:
 
         return df.select([column for column in self.columns])
 
+    def define_start_date(self, start_date: str = None) -> Optional[str]:
+        """Get feature set start date.
+
+        Args:
+            start_date: start date regarding source dataframe.
+
+        Returns:
+            start date.
+        """
+        return start_date
+
     def construct(
         self,
         dataframe: DataFrame,
         client: SparkClient,
         end_date: str = None,
         num_processors: int = None,
+        start_date: str = None,
     ) -> DataFrame:
         """Use all the features to build the feature set dataframe.
 
@@ -393,7 +406,8 @@ class FeatureSet:
         Args:
             dataframe: input dataframe to be transformed by the features.
             client: client responsible for connecting to Spark session.
-            end_date: user defined base date.
+            start_date: user defined start date.
+            end_date: user defined end date.
             num_processors: cluster total number of processors for repartitioning.
 
         Returns:
@@ -403,14 +417,22 @@ class FeatureSet:
         if not isinstance(dataframe, DataFrame):
             raise ValueError("source_df must be a dataframe")
 
+        pre_hook_df = self.run_pre_hooks(dataframe)
+
         output_df = reduce(
             lambda df, feature: feature.transform(df),
             self.keys + [self.timestamp] + self.features,
-            dataframe,
+            pre_hook_df,
         ).select(*self.columns)
 
         if not output_df.isStreaming:
             output_df = self._filter_duplicated_rows(output_df)
             output_df.cache().count()
 
-        return output_df
+        output_df = self.incremental_strategy.filter_with_incremental_strategy(
+            dataframe=output_df, start_date=start_date, end_date=end_date
+        )
+
+        post_hook_df = self.run_post_hooks(output_df)
+
+        return post_hook_df
