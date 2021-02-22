@@ -135,6 +135,35 @@ def make_rolling_windows_agg_dataframe(spark_context, spark_session):
     return df
 
 
+def make_rolling_windows_hour_slide_agg_dataframe(spark_context, spark_session):
+    data = [
+        {
+            "id": 1,
+            "timestamp": "2016-04-11 12:00:00",
+            "feature1__avg_over_1_day_rolling_windows": 266.6666666666667,
+            "feature2__avg_over_1_day_rolling_windows": 300.0,
+        },
+        {
+            "id": 1,
+            "timestamp": "2016-04-12 00:00:00",
+            "feature1__avg_over_1_day_rolling_windows": 300.0,
+            "feature2__avg_over_1_day_rolling_windows": 350.0,
+        },
+        {
+            "id": 1,
+            "timestamp": "2016-04-12 12:00:00",
+            "feature1__avg_over_1_day_rolling_windows": 400.0,
+            "feature2__avg_over_1_day_rolling_windows": 500.0,
+        },
+    ]
+    df = spark_session.read.json(
+        spark_context.parallelize(data).map(lambda x: json.dumps(x))
+    )
+    df = df.withColumn("timestamp", df.timestamp.cast(DataType.TIMESTAMP.spark))
+
+    return df
+
+
 def make_fs(spark_context, spark_session):
     df = make_dataframe(spark_context, spark_session)
     df = (
@@ -242,6 +271,11 @@ def rolling_windows_agg_dataframe(spark_context, spark_session):
 
 
 @fixture
+def rolling_windows_hour_slide_agg_dataframe(spark_context, spark_session):
+    return make_rolling_windows_hour_slide_agg_dataframe(spark_context, spark_session)
+
+
+@fixture
 def feature_set_with_distinct_dataframe(spark_context, spark_session):
     return make_fs_dataframe_with_distinct(spark_context, spark_session)
 
@@ -345,8 +379,8 @@ def feature_set():
 
 @fixture
 def agg_feature_set():
-    feature_set = AggregatedFeatureSet(
-        name="feature_set",
+    return AggregatedFeatureSet(
+        name="name",
         entity="entity",
         description="description",
         features=[
@@ -354,28 +388,17 @@ def agg_feature_set():
                 name="feature1",
                 description="test",
                 transformation=AggregatedTransform(
-                    functions=[
-                        Function(functions.avg, DataType.DOUBLE),
-                        Function(functions.stddev_pop, DataType.FLOAT),
-                    ],
+                    functions=[Function(functions.avg, DataType.DOUBLE)],
                 ),
             ),
             Feature(
                 name="feature2",
                 description="test",
                 transformation=AggregatedTransform(
-                    functions=[Function(functions.count, DataType.ARRAY_STRING)]
+                    functions=[Function(functions.avg, DataType.DOUBLE)]
                 ),
             ),
         ],
-        keys=[
-            KeyFeature(
-                name="id",
-                description="The user's Main ID or device ID",
-                dtype=DataType.BIGINT,
-            )
-        ],
+        keys=[KeyFeature(name="id", description="description", dtype=DataType.BIGINT,)],
         timestamp=TimestampFeature(),
-    ).with_windows(definitions=["1 week", "2 days"])
-
-    return feature_set
+    )
