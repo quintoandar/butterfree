@@ -1,13 +1,6 @@
 import pytest
 from pyspark.sql import functions
-from pyspark.sql.types import (
-    ArrayType,
-    DoubleType,
-    FloatType,
-    LongType,
-    StringType,
-    TimestampType,
-)
+from pyspark.sql.types import DoubleType, LongType, TimestampType
 
 from butterfree.clients import SparkClient
 from butterfree.constants import DataType
@@ -51,33 +44,11 @@ class TestAggregatedFeatureSet:
             ).construct(dataframe, spark_client)
 
     def test_agg_feature_set_with_window(
-        self, key_id, timestamp_c, dataframe, rolling_windows_agg_dataframe
+        self, dataframe, rolling_windows_agg_dataframe, agg_feature_set,
     ):
         spark_client = SparkClient()
 
-        fs = AggregatedFeatureSet(
-            name="name",
-            entity="entity",
-            description="description",
-            features=[
-                Feature(
-                    name="feature1",
-                    description="unit test",
-                    transformation=AggregatedTransform(
-                        functions=[Function(functions.avg, DataType.FLOAT)]
-                    ),
-                ),
-                Feature(
-                    name="feature2",
-                    description="unit test",
-                    transformation=AggregatedTransform(
-                        functions=[Function(functions.avg, DataType.FLOAT)]
-                    ),
-                ),
-            ],
-            keys=[key_id],
-            timestamp=timestamp_c,
-        ).with_windows(definitions=["1 week"])
+        fs = agg_feature_set.with_windows(definitions=["1 week"])
 
         # raises without end date
         with pytest.raises(ValueError):
@@ -88,6 +59,21 @@ class TestAggregatedFeatureSet:
         assert output_df.count() < rolling_windows_agg_dataframe.count()
         output_df = fs.construct(dataframe, spark_client, end_date="2016-05-01")
         assert_dataframe_equality(output_df, rolling_windows_agg_dataframe)
+
+    def test_agg_feature_set_with_smaller_slide(
+        self, dataframe, rolling_windows_hour_slide_agg_dataframe, agg_feature_set,
+    ):
+        spark_client = SparkClient()
+
+        fs = agg_feature_set.with_windows(definitions=["1 day"], slide="12 hours")
+
+        # raises without end date
+        with pytest.raises(ValueError):
+            _ = fs.construct(dataframe, spark_client)
+
+        # filters with date smaller then mocked max
+        output_df = fs.construct(dataframe, spark_client, end_date="2016-04-17")
+        assert_dataframe_equality(output_df, rolling_windows_hour_slide_agg_dataframe)
 
     def test_get_schema(self, agg_feature_set):
         expected_schema = [
@@ -104,28 +90,20 @@ class TestAggregatedFeatureSet:
                 "primary_key": False,
             },
             {
-                "column_name": "feature1__stddev_pop_over_1_week_rolling_windows",
-                "type": FloatType(),
+                "column_name": "feature2__avg_over_1_week_rolling_windows",
+                "type": DoubleType(),
                 "primary_key": False,
             },
             {
-                "column_name": "feature1__stddev_pop_over_2_days_rolling_windows",
-                "type": FloatType(),
-                "primary_key": False,
-            },
-            {
-                "column_name": "feature2__count_over_1_week_rolling_windows",
-                "type": ArrayType(StringType(), True),
-                "primary_key": False,
-            },
-            {
-                "column_name": "feature2__count_over_2_days_rolling_windows",
-                "type": ArrayType(StringType(), True),
+                "column_name": "feature2__avg_over_2_days_rolling_windows",
+                "type": DoubleType(),
                 "primary_key": False,
             },
         ]
 
-        schema = agg_feature_set.get_schema()
+        schema = agg_feature_set.with_windows(
+            definitions=["1 week", "2 days"]
+        ).get_schema()
 
         assert schema == expected_schema
 
@@ -358,7 +336,9 @@ class TestAggregatedFeatureSet:
         assert_dataframe_equality(target_df, output_df)
 
     def test_define_start_date(self, agg_feature_set):
-        start_date = agg_feature_set.define_start_date("2020-08-04")
+        start_date = agg_feature_set.with_windows(
+            definitions=["1 week", "2 days"]
+        ).define_start_date("2020-08-04")
 
         assert isinstance(start_date, str)
         assert start_date == "2020-07-27"
