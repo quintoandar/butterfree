@@ -42,7 +42,7 @@ class CassandraClient(AbstractClient):
     def __init__(
         self,
         host: List[str],
-        keyspace: str = None,
+        keyspace: str,
         user: Optional[str] = None,
         password: Optional[str] = None,
     ) -> None:

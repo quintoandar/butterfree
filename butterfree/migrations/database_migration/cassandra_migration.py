@@ -15,10 +15,10 @@ class CassandraMigration(DatabaseMigration):
     def __init__(self) -> None:
         self._db_config = CassandraConfig()
         self._client = CassandraClient(
-            cassandra_host=[self._db_config.host],
-            cassandra_key_space=self._db_config.keyspace,
-            cassandra_user=self._db_config.username,
-            cassandra_password=self._db_config.password,
+            host=[self._db_config.host],
+            keyspace=self._db_config.keyspace,  # type: ignore
+            user=self._db_config.username,
+            password=self._db_config.password,
         )
 
     def create_query(

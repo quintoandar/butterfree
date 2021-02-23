@@ -1,4 +1,4 @@
-"""Holds available migrations."""
+"""Holds available database migrations."""
 
 from butterfree.migrations.database_migration.cassandra_migration import (
     CassandraMigration,

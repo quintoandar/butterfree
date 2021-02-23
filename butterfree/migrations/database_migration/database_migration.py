@@ -1,5 +1,4 @@
 """Migration entity."""
-import logging
 from abc import ABC, abstractmethod
 from itertools import filterfalse
 from typing import Any, Dict, List, Optional
@@ -28,37 +27,46 @@ class DatabaseMigration(ABC):
         """Apply the migration in the respective database."""
         pass
 
-    def _validate_schema(
-        self, fs_schema: List[Dict[str, Any]], db_schema: List[Dict[str, Any]] = None,
-    ) -> Any:
-        """Provides schema validation for feature sets.
-
-        Compares the schema of your local feature set to the
-        corresponding table in a given database.
+    @staticmethod
+    def _get_diff(
+        fs_schema: List[Dict[str, Any]], db_schema: List[Dict[str, Any]] = None,
+    ) -> List[Dict[str, Any]]:
+        """Gets schema difference between feature set and the table of a given db.
 
         Args:
             fs_schema: object that contains feature set's schemas.
-            db_schema: object that contains the table og a given db schema.
+            db_schema: object that contains the table of a given db schema.
 
         """
-        mismatches = []
-
         if not db_schema:
             return fs_schema
 
-        diff_list = list(filterfalse(lambda x: x in db_schema, fs_schema))
+        schema_diff = list(filterfalse(lambda x: x in db_schema, fs_schema))
 
-        for feature in diff_list:
+        return schema_diff
+
+    @staticmethod
+    def _get_type_inconsistent_features(
+        schema_diff: List[Dict[str, Any]], db_schema: List[Dict[str, Any]]
+    ) -> List[Dict[str, Any]]:
+        """Gets data types inconsistencies between features.
+
+        Args:
+            schema_diff: object that contains difference between feature
+            set and the table of a given db.
+            db_schema: object that contains the table of a given db schema.
+
+        """
+        features_with_diff_types = []
+        for feature in schema_diff:
             matching_features = [
                 x for x in db_schema if x["column_name"] == feature["column_name"]
             ]
 
             if matching_features:
-                raise ValueError(f"The {feature['column_name']} can't be changed.")
+                features_with_diff_types.append(feature)
 
-            mismatches.append(feature)
-
-        return None if mismatches == [] else mismatches
+        return features_with_diff_types
 
     def _get_schema(
         self, db_client: Any, table_name: str

@@ -1,4 +1,3 @@
-import pytest
 from pyspark.sql.types import DoubleType, FloatType, LongType, TimestampType
 
 from butterfree.migrations.database_migration import CassandraMigration
@@ -28,7 +27,7 @@ class TestDatabaseMigration:
 
         m = CassandraMigration()
         m._client = mocker.stub("client")
-        schema = m._validate_schema(fs_schema, db_schema)
+        schema = m._get_diff(fs_schema, db_schema)
         assert not schema
 
     def test_validate_schema_diff(self, mocker):
@@ -55,15 +54,13 @@ class TestDatabaseMigration:
 
         m = CassandraMigration()
         m._client = mocker.stub("client")
-        schema = m._validate_schema(fs_schema, db_schema)
+        schema = m._get_diff(fs_schema, db_schema)
         assert schema == [
             {"column_name": "new_feature", "type": FloatType(), "primary_key": False},
         ]
 
     def test_validate_schema_diff_invalid(self, mocker):
-        fs_schema = [
-            {"column_name": "id", "type": LongType(), "primary_key": True},
-            {"column_name": "timestamp", "type": TimestampType(), "primary_key": False},
+        schema_diff = [
             {
                 "column_name": "feature1__avg_over_1_week_rolling_windows",
                 "type": FloatType(),
@@ -87,14 +84,20 @@ class TestDatabaseMigration:
             },
         ]
 
-        with pytest.raises(
-            ValueError,
-            match="The feature1__avg_over_1_week_rolling_windows can't be changed.",
-        ):
-            m = CassandraMigration()
-            m._client = mocker.stub("client")
+        m = CassandraMigration()
+        m._client = mocker.stub("client")
 
-            m._validate_schema(fs_schema, db_schema)
+        inconsistent_features = m._get_type_inconsistent_features(
+            schema_diff, db_schema
+        )
+
+        assert inconsistent_features == [
+            {
+                "column_name": "feature1__avg_over_1_week_rolling_windows",
+                "type": FloatType(),
+                "primary_key": False,
+            },
+        ]
 
     def test_validate_schema_without_db(self, mocker):
         fs_schema = [
@@ -111,7 +114,7 @@ class TestDatabaseMigration:
 
         m = CassandraMigration()
         m._client = mocker.stub("client")
-        schema = m._validate_schema(fs_schema, db_schema)
+        schema = m._get_diff(fs_schema, db_schema)
         assert schema == [
             {"column_name": "id", "type": LongType(), "primary_key": True},
             {"column_name": "timestamp", "type": TimestampType(), "primary_key": False},
