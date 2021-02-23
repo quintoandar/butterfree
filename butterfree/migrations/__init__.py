@@ -1,4 +1,4 @@
 """Holds available migrations."""
-from butterfree.migrations.migrator import Migrator
+from butterfree.migrations.migrate import Migrate
 
-__all__ = ["Migrator"]
+__all__ = ["Migrate"]

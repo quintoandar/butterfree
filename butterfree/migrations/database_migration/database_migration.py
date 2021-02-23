@@ -1,6 +1,7 @@
 """Migration entity."""
-
+import logging
 from abc import ABC, abstractmethod
+from itertools import filterfalse
 from typing import Any, Dict, List, Optional
 
 from butterfree.transform import FeatureSet
@@ -45,26 +46,17 @@ class DatabaseMigration(ABC):
         if not db_schema:
             return fs_schema
 
-        for feature in fs_schema:
+        diff_list = list(filterfalse(lambda x: x in db_schema, fs_schema))
+
+        for feature in diff_list:
             matching_features = [
                 x for x in db_schema if x["column_name"] == feature["column_name"]
             ]
 
-            if not matching_features:
-                mismatches.append(feature)
-                continue
+            if matching_features:
+                raise ValueError(f"The {feature['column_name']} can't be changed.")
 
-            if feature["type"] == matching_features[0]["type"]:
-                continue
-
-            mismatches.append(
-                {
-                    "column_name": feature["column_name"],
-                    "type": feature["type"],
-                    "primary_key": feature["primary_key"],
-                    "old_type": matching_features[0]["type"],
-                }
-            )
+            mismatches.append(feature)
 
         return None if mismatches == [] else mismatches
 
@@ -76,12 +68,7 @@ class DatabaseMigration(ABC):
         Returns:
             Schema object.
         """
-        try:
-            db_schema = db_client.get_schema(table_name)
-        except RuntimeError:
-            db_schema = None
-
-        return db_schema
+        pass
 
     def run(self, feature_set: FeatureSet) -> None:
         """Runs the migrations.
@@ -90,4 +77,4 @@ class DatabaseMigration(ABC):
             feature_set: the feature set.
 
         """
-        self._apply_migration(feature_set)
+        pass

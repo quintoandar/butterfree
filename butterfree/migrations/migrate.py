@@ -6,7 +6,7 @@ from butterfree.pipelines import FeatureSetPipeline
 from butterfree.transform import FeatureSet
 
 
-class Migrator:
+class Migrate:
     """Execute migration operations in a Database based on pipeline Writer.
 
     Attributes:
@@ -37,5 +37,5 @@ class Migrator:
             self._parse_feature_set_pipeline(pipeline) for pipeline in self.pipelines
         ]
 
-        for migrate, fs in migration_list:
-            migrate.run(fs)
+        for migration, fs in migration_list:
+            migration.run(fs)
