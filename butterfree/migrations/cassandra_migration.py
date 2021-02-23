@@ -27,7 +27,9 @@ class CassandraMigration(DatabaseMigration):
     """
 
     @staticmethod
-    def _get_alter_table_query(columns: List[Dict[str, Any]], table_name: str) -> str:
+    def _get_alter_table_add_query(
+        columns: List[Dict[str, Any]], table_name: str
+    ) -> str:
         parsed_columns = []
         for col in columns:
             parsed_columns.append(f"{col['column_name']} {col['type']}")
@@ -62,12 +64,25 @@ class CassandraMigration(DatabaseMigration):
 
         return f"CREATE TABLE {keyspace}.{table_name} " f"({columns_str});"
 
+    @staticmethod
+    def _get_alter_table_drop_query(
+        columns: List[Dict[str, Any]], table_name: str
+    ) -> str:
+        parsed_columns = []
+        for col in columns:
+            parsed_columns.append(f"{col['column_name']}")
+
+        parsed_columns = ", ".join(parsed_columns)  # type: ignore
+
+        return f"ALTER TABLE {table_name} DROP ({parsed_columns});"
+
     def create_query(
         self,
         table_name: str,
         schema_diff: List[Dict[str, Any]],
         db_schema: List[Dict[str, Any]] = None,
-    ) -> Any:
+        features_with_diff_types: List[Dict[str, Any]] = None,
+    ) -> List[str]:
         """Create a query regarding Cassandra.
 
         Returns:
@@ -75,6 +90,15 @@ class CassandraMigration(DatabaseMigration):
 
         """
         if not db_schema:
-            return self._get_create_table_query(schema_diff, table_name)
+            create_table_query = self._get_create_table_query(schema_diff, table_name)
+            return [create_table_query]
 
-        return self._get_alter_table_query(schema_diff, table_name)
+        alter_table_query = self._get_alter_table_add_query(schema_diff, table_name)
+
+        if features_with_diff_types:
+            drop_table_query = self._get_alter_table_drop_query(
+                features_with_diff_types, table_name
+            )
+            return [alter_table_query, drop_table_query]
+
+        return [alter_table_query]

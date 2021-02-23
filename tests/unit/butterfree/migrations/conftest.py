@@ -30,3 +30,11 @@ def dummy_schema():
         {"column_name": "pogchamp", "type": "uuid", "primary_key": False},
     ]
     return dummy_schema
+
+
+@fixture
+def features_with_diff_types():
+    features_with_diff_types = [
+        {"column_name": "ts", "type": "float", "primary_key": False},
+    ]
+    return features_with_diff_types
