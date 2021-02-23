@@ -13,8 +13,8 @@ class DatabaseMigration(ABC):
     def create_query(
         self,
         table_name: str,
+        schema_diff: List[Dict[str, Any]],
         db_schema: List[Dict[str, Any]] = None,
-        schema_diff: List[Dict[str, Any]] = None,
     ) -> Any:
         """Create a query regarding a data source.
 

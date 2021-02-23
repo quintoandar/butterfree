@@ -27,13 +27,3 @@ class TestCassandraMigration:
 
         assert isinstance(query, str)
         assert query, expected_query
-
-    def test_no_diff(self, dummy_db_schema):
-
-        cassandra_migration = CassandraMigration()
-
-        query = cassandra_migration.create_query(
-            table_name="test_table", db_schema=dummy_db_schema,
-        )
-
-        assert query is None
