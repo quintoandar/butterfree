@@ -1,3 +1,4 @@
+"""Migrations' Constants."""
 from butterfree.constants import columns
 
 PARTITION_BY = [

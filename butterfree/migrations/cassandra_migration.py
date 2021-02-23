@@ -10,9 +10,9 @@ class CassandraMigration(DatabaseMigration):
 
     def create_query(
         self,
-        fs_schema: List[Dict[str, Any]],
-        db_schema: List[Dict[str, Any]],
         table_name: str,
+        db_schema: List[Dict[str, Any]] = None,
+        schema_diff: List[Dict[str, Any]] = None,
     ) -> Any:
         """Create a query regarding Cassandra.
 

@@ -19,7 +19,7 @@ class MetastoreMigration(DatabaseMigration):
         )
 
     @staticmethod
-    def _get_parsed_columns(table_columns: List[Dict[str, Any]]) -> str:
+    def _get_parsed_columns(table_columns: List[Dict[str, Any]]) -> List[str]:
         parsed_columns = []
         for col in table_columns:
             parsed_columns.append(f"{col['column_name']} {col['type']}")
@@ -58,6 +58,7 @@ class MetastoreMigration(DatabaseMigration):
         schema_diff: List[Dict[str, Any]] = None,
     ) -> Any:
         """Create a query regarding Metastore.
+
         Returns:
             Schema object.
         """

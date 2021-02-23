@@ -17,6 +17,7 @@ class DatabaseMigration(ABC):
         schema_diff: List[Dict[str, Any]] = None,
     ) -> Any:
         """Create a query regarding a data source.
+
         Returns:
             The desired query for the given database.
         """
@@ -25,8 +26,10 @@ class DatabaseMigration(ABC):
         self, fs_schema: List[Dict[str, Any]], db_schema: List[Dict[str, Any]]
     ) -> Any:
         """Provides schema validation for feature sets.
+
         Compares the schema of your local feature set to the
         corresponding table in a given database.
+
         Args:
             fs_schema: object that contains feature set's schemas.
             db_schema: object that contains the table og a given db schema.
@@ -34,6 +37,7 @@ class DatabaseMigration(ABC):
 
     def _get_schema(self, db_client: Callable, table_name: str) -> List[Dict[str, Any]]:
         """Get a table schema in the respective database.
+
         Returns:
             Schema object.
         """
@@ -48,6 +52,7 @@ class DatabaseMigration(ABC):
 
     def run(self, pipelines: List[FeatureSetPipeline]) -> None:
         """Runs the migrations.
+
         Args:
             pipelines: the feature set pipelines.
         """
