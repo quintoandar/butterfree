@@ -15,9 +15,9 @@ class CassandraMigration(DatabaseMigration):
     The CassandraMigration class will be used, as the name suggests, for applying
     changes to a given Cassandra table. There are, however, some remarks that need
     to be highlighted:
-        - If an existing feature is renamed, then it'll be dropped and a new column
-        will be created, therefore a backfilling job may be required. The same logic
-        applies to data type changes;
+        - If an existing feature has its type changed, then it'll be dropped and a new
+        column with the same name and the new type will be created, therefore a backfilling
+        job may be required;
         - If new features are added to your feature set, then they're going to be added
         to the corresponding Cassandra table;
         - Since feature sets can be written both to a feature set and an entity table,
