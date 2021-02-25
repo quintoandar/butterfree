@@ -1,4 +1,5 @@
 """Migration entity."""
+import logging
 from abc import ABC, abstractmethod
 from itertools import filterfalse
 from typing import Any, Dict, List, Optional
@@ -23,12 +24,7 @@ class DatabaseMigration(ABC):
 
         """
 
-    def _apply_migration(self, feature_set: FeatureSet) -> None:
-        """Apply the migration in the respective database."""
-        pass
-
-    @staticmethod
-    def _get_diff(
+    def _get_diff(self,
         fs_schema: List[Dict[str, Any]], db_schema: List[Dict[str, Any]] = None,
     ) -> List[Dict[str, Any]]:
         """Gets schema difference between feature set and the table of a given db.
@@ -43,7 +39,7 @@ class DatabaseMigration(ABC):
 
         schema_diff = list(filterfalse(lambda x: x in db_schema, fs_schema))
 
-        return schema_diff
+        return self._get_type_inconsistent_features(schema_diff, db_schema)
 
     @staticmethod
     def _get_type_inconsistent_features(
@@ -73,16 +69,42 @@ class DatabaseMigration(ABC):
     ) -> Optional[List[Dict[str, Any]]]:
         """Get a table schema in the respective database.
 
+        Args:
+            db_client: Database client.
+            table_name: Table name to get schema.
+
         Returns:
             Schema object.
         """
-        pass
+        try:
+            db_schema = db_client.get_schema(table_name)
+        except:
+            db_schema = None
 
-    def run(self, feature_set: FeatureSet) -> None:
-        """Runs the migrations.
+        return db_schema
+
+    def apply_migration(self, feature_set: FeatureSet) -> None:
+        """Apply the migration in the respective database.
 
         Args:
             feature_set: the feature set.
 
         """
-        pass
+        logging.info(
+            f"Migrating feature set: {feature_set.name}"
+        )
+        fs_schema = feature_set.get_schema()
+
+        db_schema = self._get_schema(
+            db_client=self._client, table_name=feature_set.name
+        )
+
+        diff_schema = self._get_diff(fs_schema, db_schema)
+        query = self.create_query(feature_set.name, db_schema, diff_schema)
+
+        try:
+            self._client.sql(query)
+            logging.info(f"Success! The query applied is {query}")
+
+        except:
+            logging.error(f"Migration failed!")
