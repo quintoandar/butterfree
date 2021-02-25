@@ -1,7 +1,12 @@
 """Migration entity."""
 
+import atexit
+import io
+import logging
 from abc import ABC, abstractmethod
 from typing import Any, Callable, Dict, List
+
+import boto3
 
 from butterfree.pipelines import FeatureSetPipeline
 
@@ -22,6 +27,7 @@ class DatabaseMigration(ABC):
             The desired query for the given database.
 
         """
+        self.logger.info("Creating query for migration!")
 
     def _validate_schema(
         self, fs_schema: List[Dict[str, Any]], db_schema: List[Dict[str, Any]]
@@ -48,9 +54,31 @@ class DatabaseMigration(ABC):
     def _apply_migration(self, query: str, db_client: Callable) -> None:
         """Apply the migration in the respective database."""
 
+    @staticmethod
+    def _write_logs(body, bucket, key) -> None:
+        """Send all migration logs to S3."""
+        s3 = boto3.client("s3")
+        s3.put_object(Body=body, Bucket=bucket, Key=key)
+
     def _send_logs_to_s3(self) -> None:
         """Send all migration logs to S3."""
+        log_stringio = self._setup_logging()
+        atexit.register(
+            self._write_logs,
+            body=log_stringio.getvalue(),
+            bucket="bucket_name",
+            key="key_name",
+        )
         pass
+
+    @staticmethod
+    def _setup_logging() -> io.StringIO:
+        logger = logging.getLogger()
+        log_stringio = io.StringIO()
+        handler = logging.StreamHandler(log_stringio)
+        logger.addHandler(handler)
+
+        return log_stringio
 
     def run(self, pipelines: List[FeatureSetPipeline]) -> None:
         """Runs the migrations.
