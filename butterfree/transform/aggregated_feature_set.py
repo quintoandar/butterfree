@@ -610,7 +610,7 @@ class AggregatedFeatureSet(FeatureSet):
                         left,
                         right,
                         on=self.keys_columns + [self.timestamp_column],
-                        how="full outer",
+                        how="full_outer",
                         num_processors=num_processors,
                     ),
                     agg_list,
