@@ -118,4 +118,4 @@ class MetastoreConfig(AbstractWriteConfig):
 
     def translate(self, schema: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Translate feature set spark schema to the corresponding database."""
-        pass
+        return schema
