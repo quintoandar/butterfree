@@ -62,6 +62,9 @@ class DatabaseMigration(ABC):
             if matching_features:
                 features_with_diff_types.append(feature)
 
+        if not features_with_diff_types:
+            return schema_diff
+
         return features_with_diff_types
 
     def _get_schema(
