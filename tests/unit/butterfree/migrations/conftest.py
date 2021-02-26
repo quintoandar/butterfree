@@ -1,9 +1,7 @@
-from pyspark.sql import functions
 from pytest import fixture
 
 from butterfree.clients import SparkClient
 from butterfree.constants import DataType
-from butterfree.constants.columns import TIMESTAMP_COLUMN
 from butterfree.extract import Source
 from butterfree.extract.readers import TableReader
 from butterfree.load import Sink
@@ -11,8 +9,6 @@ from butterfree.load.writers import HistoricalFeatureStoreWriter
 from butterfree.pipelines import FeatureSetPipeline
 from butterfree.transform import FeatureSet
 from butterfree.transform.features import Feature, KeyFeature, TimestampFeature
-from butterfree.transform.transformations import SparkFunctionTransform
-from butterfree.transform.utils import Function
 
 
 @fixture()
@@ -29,7 +25,7 @@ def feature_set_pipeline():
             description="description",
             keys=[
                 KeyFeature(
-                    name="user_id",
+                    name="id",
                     description="The user's Main ID or device ID",
                     dtype=DataType.INTEGER,
                 )
@@ -37,19 +33,9 @@ def feature_set_pipeline():
             timestamp=TimestampFeature(from_column="ts"),
             features=[
                 Feature(
-                    name="listing_page_viewed__rent_per_month",
+                    name="feature_avg",
                     description="Average of something.",
-                    transformation=SparkFunctionTransform(
-                        functions=[
-                            Function(functions.avg, DataType.FLOAT),
-                            Function(functions.stddev_pop, DataType.FLOAT),
-                        ],
-                    ).with_window(
-                        partition_by="user_id",
-                        order_by=TIMESTAMP_COLUMN,
-                        window_definition=["7 days", "2 weeks"],
-                        mode="fixed_windows",
-                    ),
+                    dtype=DataType.FLOAT,
                 ),
             ],
         ),

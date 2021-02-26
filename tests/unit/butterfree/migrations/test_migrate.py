@@ -19,7 +19,6 @@ class TestMigrate:
         m = Migrate._parse_feature_set_pipeline(feature_set_pipeline)
 
         # then
-        assert m == (
-            feature_set_pipeline.sink.writers[0],
-            feature_set_pipeline.feature_set,
-        )
+        assert m == [
+            (feature_set_pipeline.sink.writers[0], feature_set_pipeline.feature_set,)
+        ]

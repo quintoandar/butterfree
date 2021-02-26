@@ -1,5 +1,4 @@
-"""Holds the Migrator Class."""
-from functools import reduce
+"""Holds the Migrate Class."""
 from typing import List, Tuple
 
 from butterfree.constants.databases import ALLOWED_DATABASE
@@ -22,14 +21,12 @@ class Migrate:
     @staticmethod
     def _parse_feature_set_pipeline(
         pipeline: FeatureSetPipeline,
-    ) -> Tuple[Writer, FeatureSet]:
+    ) -> List[Tuple[Writer, FeatureSet]]:
 
         feature_set = pipeline.feature_set
 
-        return reduce(
-            lambda feature_set, db_migration: (db_migration, feature_set),
-            pipeline.sink.writers,
-            feature_set,
+        return list(
+            map(lambda db_migration: (db_migration, feature_set), pipeline.sink.writers)
         )
 
     def _send_logs_to_s3(self) -> None:
@@ -38,10 +35,9 @@ class Migrate:
 
     def migration(self) -> None:
         """Construct and apply the migrations."""
-        migration_list = [
-            self._parse_feature_set_pipeline(pipeline) for pipeline in self.pipelines
-        ]
+        for pipeline in self.pipelines:
+            migration_list = self._parse_feature_set_pipeline(pipeline)
 
-        for writer, fs in migration_list:
-            migration = ALLOWED_DATABASE[writer.db_config._database_migration]
-            migration.run(fs)
+            for writer, fs in migration_list:
+                migration = ALLOWED_DATABASE[writer.db_config._database_migration]
+                migration.run(fs)
