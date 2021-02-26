@@ -34,6 +34,7 @@ class MetastoreConfig(AbstractWriteConfig):
         self.mode = mode
         self.format_ = format_
         self.file_system = file_system
+        self._database_migration = "metastore"
 
     @property
     def path(self) -> Optional[str]:

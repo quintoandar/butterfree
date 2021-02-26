@@ -49,6 +49,7 @@ class CassandraConfig(AbstractWriteConfig):
         self.stream_processing_time = stream_processing_time
         self.stream_output_mode = stream_output_mode
         self.stream_checkpoint_path = stream_checkpoint_path
+        self._database_migration = "cassandra"
 
     @property
     def username(self) -> Optional[str]:
