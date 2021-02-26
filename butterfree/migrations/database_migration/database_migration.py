@@ -24,8 +24,8 @@ class DatabaseMigration(ABC):
 
         """
 
-    def _get_diff(self,
-        fs_schema: List[Dict[str, Any]], db_schema: List[Dict[str, Any]] = None,
+    def _get_diff(
+        self, fs_schema: List[Dict[str, Any]], db_schema: List[Dict[str, Any]] = None,
     ) -> List[Dict[str, Any]]:
         """Gets schema difference between feature set and the table of a given db.
 
@@ -78,7 +78,7 @@ class DatabaseMigration(ABC):
         """
         try:
             db_schema = db_client.get_schema(table_name)
-        except:
+        except Exception:
             db_schema = None
 
         return db_schema
@@ -90,10 +90,9 @@ class DatabaseMigration(ABC):
             feature_set: the feature set.
 
         """
-        logging.info(
-            f"Migrating feature set: {feature_set.name}"
-        )
-        fs_schema = feature_set.get_schema()
+        logging.info(f"Migrating feature set: {feature_set.name}")
+
+        fs_schema = self._db_config.translate(feature_set.get_schema())
 
         db_schema = self._get_schema(
             db_client=self._client, table_name=feature_set.name
@@ -106,5 +105,5 @@ class DatabaseMigration(ABC):
             self._client.sql(query)
             logging.info(f"Success! The query applied is {query}")
 
-        except:
+        except Exception:
             logging.error(f"Migration failed!")

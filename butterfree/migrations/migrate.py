@@ -40,4 +40,4 @@ class Migrate:
 
             for writer, fs in migration_list:
                 migration = ALLOWED_DATABASE[writer.db_config._database_migration]
-                migration.run(fs)
+                migration.apply_migration(fs)
