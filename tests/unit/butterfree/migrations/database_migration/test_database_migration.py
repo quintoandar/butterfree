@@ -1,5 +1,3 @@
-from pyspark.sql.types import FloatType, LongType, TimestampType
-
 from butterfree.migrations.database_migration import CassandraMigration
 
 

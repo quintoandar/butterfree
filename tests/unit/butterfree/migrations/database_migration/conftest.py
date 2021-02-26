@@ -1,4 +1,3 @@
-from pyspark.sql.types import DoubleType, LongType, TimestampType
 from pytest import fixture
 
 from butterfree.constants import DataType
