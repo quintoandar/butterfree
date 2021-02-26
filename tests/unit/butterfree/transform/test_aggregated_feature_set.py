@@ -75,6 +75,28 @@ class TestAggregatedFeatureSet:
         output_df = fs.construct(dataframe, spark_client, end_date="2016-04-17")
         assert_dataframe_equality(output_df, rolling_windows_hour_slide_agg_dataframe)
 
+    def test_agg_feature_set_with_smaller_slide_and_multiple_windows(
+        self,
+        dataframe,
+        multiple_rolling_windows_hour_slide_agg_dataframe,
+        agg_feature_set,
+    ):
+        spark_client = SparkClient()
+
+        fs = agg_feature_set.with_windows(
+            definitions=["2 days", "3 days"], slide="12 hours"
+        )
+
+        # raises without end date
+        with pytest.raises(ValueError):
+            _ = fs.construct(dataframe, spark_client)
+
+        # filters with date smaller then mocked max
+        output_df = fs.construct(dataframe, spark_client, end_date="2016-04-17")
+        assert_dataframe_equality(
+            output_df, multiple_rolling_windows_hour_slide_agg_dataframe
+        )
+
     def test_get_schema(self, agg_feature_set):
         expected_schema = [
             {"column_name": "id", "type": LongType(), "primary_key": True},
