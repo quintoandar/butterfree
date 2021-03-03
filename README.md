@@ -1,7 +1,8 @@
 ## Butterfree
 _A tool for building feature stores. Transform your raw data into beautiful features._
 
-[![Release](https://img.shields.io/github/v/release/quintoandar/butterfree)]((https://pypi.org/project/butterfree/))
+[![Release](https://img.shields.io/github/v/release/quintoandar/butterfree)]((https://pypi.org/project/butterfree/)[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fquintoandar%2Fbutterfree.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fquintoandar%2Fbutterfree?ref=badge_shield)
+)
 ![Python Version](https://img.shields.io/badge/python-3.7%20%7C%203.8-brightgreen.svg)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
@@ -48,6 +49,9 @@ Dev Package are available for testing using the <version>.devN versions of the B
 
 ## License
 [Apache License 2.0](https://github.com/quintoandar/butterfree/blob/staging/LICENSE)
+
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fquintoandar%2Fbutterfree.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fquintoandar%2Fbutterfree?ref=badge_large)
 
 ## Contributing
 All contributions are welcome! Feel free to open Pull Requests. Check the development and contributing **guidelines** described [here](CONTRIBUTING.md).
