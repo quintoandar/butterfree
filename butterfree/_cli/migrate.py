@@ -2,7 +2,7 @@ import importlib
 import inspect
 import pkgutil
 import sys
-from typing import AnyStr, Set
+from typing import Set
 
 import setuptools
 import typer
@@ -13,7 +13,7 @@ from butterfree.pipelines import FeatureSetPipeline
 app = typer.Typer()
 
 
-def __find_modules(path: AnyStr) -> Set[AnyStr]:
+def __find_modules(path: str) -> Set[str]:
     modules = set()
     for pkg in setuptools.find_packages(path):
         modules.add(pkg)
@@ -31,7 +31,7 @@ def __find_modules(path: AnyStr) -> Set[AnyStr]:
     return modules
 
 
-def __fs_objects(path: AnyStr) -> Set[FeatureSetPipeline]:
+def __fs_objects(path: str) -> Set[FeatureSetPipeline]:
     cli_logger.info(f"Looking for python modules under {path}...")
     modules = __find_modules(path)
     if not modules:
@@ -89,7 +89,7 @@ PATH = typer.Argument(
 
 
 @app.command()
-def migrate(path: str = PATH):
+def migrate(path: str = PATH) -> Set[FeatureSetPipeline]:
     """Run database migrations for feature sets defined under PATH.
 
     Butterfree will scan a given path for classes that inherit from its
@@ -101,4 +101,4 @@ def migrate(path: str = PATH):
     import and instantiate them.
     """
     # TODO replace by a call to the Migration actor with all feature set objects
-    return list(fs for fs in __fs_objects(path))
+    return __fs_objects(path)
