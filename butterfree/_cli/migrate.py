@@ -88,9 +88,9 @@ PATH = typer.Argument(
 )
 
 
-@app.command()
+@app.callback()
 def migrate(path: str = PATH) -> Set[FeatureSetPipeline]:
-    """Run database migrations for feature sets defined under PATH.
+    """Scan and run database migrations for feature set pipelines defined under PATH.
 
     Butterfree will scan a given path for classes that inherit from its
     FeatureSetPipeline and create dry instances of it to extract schema and writer
@@ -100,5 +100,5 @@ def migrate(path: str = PATH) -> Set[FeatureSetPipeline]:
     All pipelines must be under python modules inside path, so we can dynamically
     import and instantiate them.
     """
-    # TODO replace by a call to the Migration actor with all feature set objects
+    # TODO call the Migration actor with all feature set pipeline objects
     return __fs_objects(path)
