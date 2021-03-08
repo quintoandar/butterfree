@@ -1,81 +1,56 @@
-from pyspark.sql.types import FloatType, LongType, TimestampType
+from pyspark.sql.types import DoubleType, FloatType, LongType, TimestampType
 
-from butterfree.migrations.database_migration import CassandraMigration
+from butterfree.migrations.database_migration import CassandraMigration, Diff
 
 
 class TestDatabaseMigration:
-    def test_validate_schema(self, mocker, db_schema):
-        fs_schema = [
-            {"column_name": "id", "type": LongType(), "primary_key": True},
-            {"column_name": "timestamp", "type": TimestampType(), "primary_key": False},
-        ]
-
-        m = CassandraMigration()
-        m._client = mocker.stub("client")
-        schema = m._get_diff(fs_schema, db_schema)
-        assert not schema
-
-    def test_validate_schema_diff(self, mocker, db_schema):
-        fs_schema = [
-            {"column_name": "id", "type": LongType(), "primary_key": True},
-            {"column_name": "timestamp", "type": TimestampType(), "primary_key": False},
-            {"column_name": "new_feature", "type": FloatType(), "primary_key": False},
-        ]
-
-        m = CassandraMigration()
-        m._client = mocker.stub("client")
-        schema = m._get_diff(fs_schema, db_schema)
-        assert schema == [
-            {"column_name": "new_feature", "type": FloatType(), "primary_key": False},
-        ]
-
-    def test_validate_schema_diff_invalid(self, mocker, db_schema):
-        schema_diff = [
-            {
-                "column_name": "feature1__avg_over_1_week_rolling_windows",
-                "type": FloatType(),
-                "primary_key": False,
-            },
-            {"column_name": "new_feature", "type": FloatType(), "primary_key": False},
-        ]
-
-        m = CassandraMigration()
-        m._client = mocker.stub("client")
-
-        inconsistent_features = m._get_type_inconsistent_features(
-            schema_diff, db_schema
-        )
-
-        assert inconsistent_features == [
-            {
-                "column_name": "feature1__avg_over_1_week_rolling_windows",
-                "type": FloatType(),
-                "primary_key": False,
-            },
-        ]
-
-    def test_validate_schema_without_db(self, mocker):
+    def test__get_diff_empty(self, mocker, db_schema):
         fs_schema = [
             {"column_name": "id", "type": LongType(), "primary_key": True},
             {"column_name": "timestamp", "type": TimestampType(), "primary_key": False},
             {
                 "column_name": "feature1__avg_over_1_week_rolling_windows",
-                "type": FloatType(),
+                "type": DoubleType(),
+                "primary_key": False,
+            },
+            {
+                "column_name": "feature1__avg_over_2_days_rolling_windows",
+                "type": DoubleType(),
                 "primary_key": False,
             },
         ]
-
-        db_schema = None
-
         m = CassandraMigration()
         m._client = mocker.stub("client")
-        schema = m._get_diff(fs_schema, db_schema)
-        assert schema == [
+        diff = m._get_diff(fs_schema, db_schema)
+        assert not diff
+
+    def test__get_diff(self, mocker, db_schema):
+        fs_schema = [
             {"column_name": "id", "type": LongType(), "primary_key": True},
-            {"column_name": "timestamp", "type": TimestampType(), "primary_key": False},
+            {"column_name": "timestamp", "type": TimestampType(), "primary_key": True},
+            {"column_name": "new_feature", "type": FloatType(), "primary_key": False},
             {
                 "column_name": "feature1__avg_over_1_week_rolling_windows",
                 "type": FloatType(),
                 "primary_key": False,
             },
         ]
+        expected_diff = {
+            Diff("timestamp", kind=Diff.Kind.ALTER_KEY, value=True),
+            Diff("new_feature", kind=Diff.Kind.ADD, value=None),
+            Diff(
+                "feature1__avg_over_2_days_rolling_windows",
+                kind=Diff.Kind.DROP,
+                value=None,
+            ),
+            Diff(
+                "feature1__avg_over_1_week_rolling_windows",
+                kind=Diff.Kind.ALTER_TYPE,
+                value=FloatType(),
+            ),
+        }
+
+        m = CassandraMigration()
+        m._client = mocker.stub("client")
+        diff = m._get_diff(fs_schema, db_schema)
+        assert diff == expected_diff
