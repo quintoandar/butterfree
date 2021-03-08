@@ -23,12 +23,12 @@ class Diff:
     kind: Kind
     value: Any
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash((self.column, self.kind, self.value))
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, type(self)):
-            return NotImplemented
+            raise NotImplementedError
         return (
             self.column == other.column
             and self.kind == other.kind
@@ -94,17 +94,17 @@ class DatabaseMigration(ABC):
                     break
 
         schema_diff = set(
-            Diff(col, kind=Diff.Kind.ADD, value=None) for col in add_columns
+            Diff(str(col), kind=Diff.Kind.ADD, value=None) for col in add_columns
         )
         schema_diff |= set(
-            Diff(col, kind=Diff.Kind.DROP, value=None) for col in drop_columns
+            Diff(str(col), kind=Diff.Kind.DROP, value=None) for col in drop_columns
         )
         schema_diff |= set(
-            Diff(col, kind=Diff.Kind.ALTER_TYPE, value=value)
+            Diff(str(col), kind=Diff.Kind.ALTER_TYPE, value=value)
             for col, value in alter_type_columns.items()
         )
         schema_diff |= set(
-            Diff(col, kind=Diff.Kind.ALTER_KEY, value=value)
+            Diff(str(col), kind=Diff.Kind.ALTER_KEY, value=value)
             for col, value in alter_key_columns.items()
         )
         return schema_diff
