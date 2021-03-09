@@ -36,8 +36,8 @@ class TestDatabaseMigration:
             },
         ]
         expected_diff = {
-            Diff("timestamp", kind=Diff.Kind.ALTER_KEY, value=True),
-            Diff("new_feature", kind=Diff.Kind.ADD, value=None),
+            Diff("timestamp", kind=Diff.Kind.ALTER_KEY, value=None),
+            Diff("new_feature", kind=Diff.Kind.ADD, value=FloatType()),
             Diff(
                 "feature1__avg_over_2_days_rolling_windows",
                 kind=Diff.Kind.DROP,

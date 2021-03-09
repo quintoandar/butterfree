@@ -15,9 +15,10 @@ class Diff:
         """Mapping actions to take given a difference between columns of a schema."""
 
         ADD = auto()
-        DROP = auto()
-        ALTER_TYPE = auto()
         ALTER_KEY = auto()
+        ALTER_TYPE = auto()
+        CREATE = auto()
+        DROP = auto()
 
     column: str
     kind: Kind
@@ -40,12 +41,7 @@ class DatabaseMigration(ABC):
     """Abstract base class for Migrations."""
 
     @abstractmethod
-    def create_query(
-        self,
-        table_name: str,
-        db_schema: List[Dict[str, Any]] = None,
-        diff_schema: List[Dict[str, Any]] = None,
-    ) -> Any:
+    def create_query(self, schema_diff: Set[Diff], table_name: str) -> Any:
         """Create a query regarding a data source.
 
         Returns:
@@ -59,7 +55,7 @@ class DatabaseMigration(ABC):
 
     @staticmethod
     def _get_diff(
-        fs_schema: List[Dict[str, Any]], db_schema: List[Dict[str, Any]],
+        fs_schema: List[Dict[str, Any]], db_schema: List[Dict[str, Any]] = None,
     ) -> Set[Diff]:
         """Gets schema difference between feature set and the table of a given db.
 
@@ -68,6 +64,23 @@ class DatabaseMigration(ABC):
             db_schema: object that contains the table of a given db schema.
 
         """
+        if not db_schema:
+            create_columns = dict()
+            for fs_item in fs_schema:
+                create_columns.update(
+                    {
+                        fs_item.get("column_name"): (
+                            fs_item.get("type"),
+                            fs_item.get("primary_key"),
+                        )
+                    }
+                )
+            schema_diff = set(
+                Diff(str(col), kind=Diff.Kind.CREATE, value=value)
+                for col, value in create_columns.items()
+            )
+            return schema_diff
+
         db_columns = set(item.get("column_name") for item in db_schema)
         fs_columns = set(item.get("column_name") for item in fs_schema)
 
@@ -78,9 +91,14 @@ class DatabaseMigration(ABC):
         # Dict[str, Any] where each key would be the column name itself...
         # but changing that could break things so:
         # TODO version 2 change get schema to return a dict(columns, properties)
+        add_type_columns = dict()
         alter_type_columns = dict()
         alter_key_columns = dict()
         for fs_item in fs_schema:
+            if fs_item.get("column_name") in add_columns:
+                add_type_columns.update(
+                    {fs_item.get("column_name"): fs_item.get("type")}
+                )
             for db_item in db_schema:
                 if fs_item.get("column_name") == db_item.get("column_name"):
                     if fs_item.get("type") != db_item.get("type"):
@@ -94,7 +112,8 @@ class DatabaseMigration(ABC):
                     break
 
         schema_diff = set(
-            Diff(str(col), kind=Diff.Kind.ADD, value=None) for col in add_columns
+            Diff(str(col), kind=Diff.Kind.ADD, value=value)
+            for col, value in add_type_columns.items()
         )
         schema_diff |= set(
             Diff(str(col), kind=Diff.Kind.DROP, value=None) for col in drop_columns
@@ -104,7 +123,7 @@ class DatabaseMigration(ABC):
             for col, value in alter_type_columns.items()
         )
         schema_diff |= set(
-            Diff(str(col), kind=Diff.Kind.ALTER_KEY, value=value)
+            Diff(str(col), kind=Diff.Kind.ALTER_KEY, value=None)
             for col, value in alter_key_columns.items()
         )
         return schema_diff
