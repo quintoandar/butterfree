@@ -17,7 +17,6 @@ class Diff:
         ADD = auto()
         ALTER_KEY = auto()
         ALTER_TYPE = auto()
-        CREATE = auto()
         DROP = auto()
 
     column: str
@@ -41,11 +40,17 @@ class DatabaseMigration(ABC):
     """Abstract base class for Migrations."""
 
     @abstractmethod
-    def create_query(self, schema_diff: Set[Diff], table_name: str) -> Any:
+    def create_query(
+        self,
+        fs_schema: List[Dict[str, Any]],
+        table_name: str,
+        db_schema: List[Dict[str, Any]] = None,
+        write_on_entity: bool = None,
+    ) -> Any:
         """Create a query regarding a data source.
 
         Returns:
-            The desired query for the given database.
+            The desired queries for the given database.
 
         """
 
@@ -55,7 +60,7 @@ class DatabaseMigration(ABC):
 
     @staticmethod
     def _get_diff(
-        fs_schema: List[Dict[str, Any]], db_schema: List[Dict[str, Any]] = None,
+        fs_schema: List[Dict[str, Any]], db_schema: List[Dict[str, Any]],
     ) -> Set[Diff]:
         """Gets schema difference between feature set and the table of a given db.
 
@@ -63,24 +68,10 @@ class DatabaseMigration(ABC):
             fs_schema: object that contains feature set's schemas.
             db_schema: object that contains the table of a given db schema.
 
-        """
-        if not db_schema:
-            create_columns = dict()
-            for fs_item in fs_schema:
-                create_columns.update(
-                    {
-                        fs_item.get("column_name"): (
-                            fs_item.get("type"),
-                            fs_item.get("primary_key"),
-                        )
-                    }
-                )
-            schema_diff = set(
-                Diff(str(col), kind=Diff.Kind.CREATE, value=value)
-                for col, value in create_columns.items()
-            )
-            return schema_diff
+        Returns:
+            Object with schema differences.
 
+        """
         db_columns = set(item.get("column_name") for item in db_schema)
         fs_columns = set(item.get("column_name") for item in fs_schema)
 

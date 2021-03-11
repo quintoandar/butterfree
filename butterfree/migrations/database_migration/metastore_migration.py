@@ -1,12 +1,11 @@
 """Metastore Migration entity."""
 
-from typing import Any, Set
+from typing import Any, Dict, List
 
 from butterfree.clients import SparkClient
 from butterfree.configs.db import MetastoreConfig
 from butterfree.migrations.database_migration.database_migration import (
     DatabaseMigration,
-    Diff,
 )
 
 
@@ -17,7 +16,13 @@ class MetastoreMigration(DatabaseMigration):
         self._db_config = MetastoreConfig()
         self._client = SparkClient()
 
-    def create_query(self, schema_diff: Set[Diff], table_name: str) -> Any:
+    def create_query(
+        self,
+        fs_schema: List[Dict[str, Any]],
+        table_name: str,
+        db_schema: List[Dict[str, Any]] = None,
+        write_on_entity: bool = None,
+    ) -> Any:
         """Create a query regarding Metastore.
 
         Returns:
