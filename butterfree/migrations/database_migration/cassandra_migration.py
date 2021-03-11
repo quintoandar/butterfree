@@ -41,7 +41,25 @@ class CassandraMigration(DatabaseMigration):
         )
 
     @staticmethod
-    def _get_alter_table_add_query(columns: List[Diff], table_name: str) -> str:
+    def _get_parsed_columns(columns: List[Diff]) -> List[str]:
+        """Parse columns from a list of Diff objects.
+
+        Args:
+            columns: list of Diff objects.
+
+        Returns:
+            Parsed columns.
+
+        """
+        parsed_columns = []
+        for col in columns:
+            parsed_columns.append(f"{col.column} {col.value}")
+
+        parsed_columns = ", ".join(parsed_columns)  # type: ignore
+
+        return parsed_columns
+
+    def _get_alter_table_add_query(self, columns: List[Diff], table_name: str) -> str:
         """Creates CQL statement to add columns to a table.
 
         Args:
@@ -52,16 +70,11 @@ class CassandraMigration(DatabaseMigration):
             Alter table query.
 
         """
-        parsed_columns = []
-        for col in columns:
-            parsed_columns.append(f"{col.column} {col.value}")
-
-        parsed_columns = ", ".join(parsed_columns)  # type: ignore
+        parsed_columns = self._get_parsed_columns(columns)
 
         return f"ALTER TABLE {table_name} ADD ({parsed_columns});"
 
-    @staticmethod
-    def _get_alter_column_type_query(columns: List[Diff], table_name: str) -> str:
+    def _get_alter_column_type_query(self, columns: List[Diff], table_name: str) -> str:
         """Creates CQL statement to alter columns' types.
 
         Args:
@@ -72,11 +85,7 @@ class CassandraMigration(DatabaseMigration):
             Alter column type query.
 
         """
-        parsed_columns = []
-        for col in columns:
-            parsed_columns.append(f"{col.column} {col.value}")
-
-        parsed_columns = ", ".join(parsed_columns)  # type: ignore
+        parsed_columns = self._get_parsed_columns(columns)
 
         return f"ALTER TABLE {table_name} ALTER ({parsed_columns});"
 
@@ -85,7 +94,7 @@ class CassandraMigration(DatabaseMigration):
         """Creates CQL statement to create a table.
 
         Args:
-            columns: object that contains column's schemas..
+            columns: object that contains column's schemas.
             table_name: table name.
 
         Returns:
@@ -115,8 +124,7 @@ class CassandraMigration(DatabaseMigration):
 
         return f"CREATE TABLE {keyspace}.{table_name} " f"({columns_str});"
 
-    @staticmethod
-    def _get_alter_table_drop_query(columns: List[Diff], table_name: str) -> str:
+    def _get_alter_table_drop_query(self, columns: List[Diff], table_name: str) -> str:
         """Creates CQL statement to drop columns from a table.
 
         Args:
@@ -127,21 +135,17 @@ class CassandraMigration(DatabaseMigration):
             Drop columns from a given table query.
 
         """
-        parsed_columns = []
-        for col in columns:
-            parsed_columns.append(f"{col.column}")
-
-        parsed_columns = ", ".join(parsed_columns)  # type: ignore
+        parsed_columns = self._get_parsed_columns(columns)
 
         return f"ALTER TABLE {table_name} DROP ({parsed_columns});"
 
     def _get_queries(
         self, schema_diff: Set[Diff], table_name: str, write_on_entity: bool = None
     ) -> List[str]:
-        """Creates CQL statement to drop columns from a table.
+        """Create the desired queries for migration.
 
         Args:
-            schema_diff: list of Diff objects with DROP kind.
+            schema_diff: list of Diff objects.
             table_name: table name.
 
         Returns:
