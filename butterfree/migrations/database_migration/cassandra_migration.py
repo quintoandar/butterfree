@@ -214,4 +214,4 @@ class CassandraMigration(DatabaseMigration):
 
         schema_diff = self._get_diff(fs_schema, db_schema)
 
-        return self._get_queries(schema_diff, table_name)
+        return self._get_queries(schema_diff, table_name, write_on_entity)
