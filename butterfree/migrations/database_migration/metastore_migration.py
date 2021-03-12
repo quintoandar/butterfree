@@ -170,10 +170,11 @@ class MetastoreMigration(DatabaseMigration):
                     "Features will not be dropped automatically "
                     "when data is loaded to an entity table"
                 )
-            drop_columns_query = self._get_alter_table_drop_query(
-                drop_items, table_name
-            )
-            queries.append(drop_columns_query)
+            else:
+                drop_columns_query = self._get_alter_table_drop_query(
+                    drop_items, table_name
+                )
+                queries.append(drop_columns_query)
         if alter_type_items:
             alter_column_types_query = self._get_alter_column_type_query(
                 alter_type_items, table_name
