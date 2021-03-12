@@ -14,6 +14,19 @@ class TestCassandraMigration:
 
         assert query, expected_query
 
+    def test_queries_on_entity(self, fs_schema, db_schema):
+        cassandra_migration = CassandraMigration()
+        expected_query = [
+            "ALTER TABLE table_name ADD (new_feature FloatType);",
+            "ALTER TABLE table_name ALTER "
+            "(feature1__avg_over_1_week_rolling_windows FloatType);",
+        ]
+        query = cassandra_migration.create_query(
+            fs_schema, "table_name", db_schema, True
+        )
+
+        assert query, expected_query
+
     def test_create_table_query(self, fs_schema):
 
         cassandra_migration = CassandraMigration()
