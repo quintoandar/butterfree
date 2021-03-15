@@ -23,8 +23,6 @@ class MetastoreConfig(AbstractWriteConfig):
 
     """
 
-    database = "metastore"
-
     def __init__(
         self,
         path: str = None,
@@ -36,6 +34,11 @@ class MetastoreConfig(AbstractWriteConfig):
         self.mode = mode
         self.format_ = format_
         self.file_system = file_system
+
+    @property
+    def database(self) -> str:
+        """Database name."""
+        return "metastore"
 
     @property
     def path(self) -> Optional[str]:

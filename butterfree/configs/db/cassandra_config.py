@@ -28,8 +28,6 @@ class CassandraConfig(AbstractWriteConfig):
 
     """
 
-    database = "cassandra"
-
     def __init__(
         self,
         username: str = None,
@@ -51,6 +49,11 @@ class CassandraConfig(AbstractWriteConfig):
         self.stream_processing_time = stream_processing_time
         self.stream_output_mode = stream_output_mode
         self.stream_checkpoint_path = stream_checkpoint_path
+
+    @property
+    def database(self) -> str:
+        """Database name."""
+        return "cassandra"
 
     @property
     def username(self) -> Optional[str]:

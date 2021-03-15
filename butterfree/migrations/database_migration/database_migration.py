@@ -3,12 +3,10 @@ import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum, auto
-from typing import Any, Dict, List, Set, Union
+from typing import Any, Dict, List, Set
 
-from butterfree.load.writers import (
-    HistoricalFeatureStoreWriter,
-    OnlineFeatureStoreWriter,
-)
+from butterfree.clients import AbstractClient
+from butterfree.load.writers.writer import Writer
 from butterfree.transform import FeatureSet
 
 
@@ -44,7 +42,7 @@ class Diff:
 class DatabaseMigration(ABC):
     """Abstract base class for Migrations."""
 
-    def __init__(self, client):
+    def __init__(self, client: AbstractClient) -> None:
         self._client = client
 
     @abstractmethod
@@ -256,11 +254,7 @@ class DatabaseMigration(ABC):
             db_schema = []
         return db_schema
 
-    def apply_migration(
-        self,
-        feature_set: FeatureSet,
-        writer: Union[HistoricalFeatureStoreWriter, OnlineFeatureStoreWriter],
-    ) -> None:
+    def apply_migration(self, feature_set: FeatureSet, writer: Writer,) -> None:
         """Apply the migration in the respective database.
 
         Args:
