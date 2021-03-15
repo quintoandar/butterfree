@@ -90,7 +90,7 @@ class CassandraMigration(DatabaseMigration):
         return f"ALTER TABLE {table_name} ALTER ({parsed_columns});"
 
     @staticmethod
-    def _get_create_table_query(columns: List[Dict[str, Any]], table_name: str,) -> str:
+    def _get_create_table_query(columns: List[Dict[str, Any]], table_name: str) -> str:
         """Creates CQL statement to create a table.
 
         Args:
@@ -193,30 +193,3 @@ class CassandraMigration(DatabaseMigration):
             logging.info("This operation is not supported by Cassandra DB.")
 
         return queries
-
-    def create_query(
-        self,
-        fs_schema: List[Dict[str, Any]],
-        table_name: str,
-        db_schema: List[Dict[str, Any]] = None,
-        write_on_entity: bool = None,
-    ) -> List[str]:
-        """Create a query regarding Cassandra.
-
-        Args:
-            fs_schema: object that contains feature set's schemas.
-            table_name: table name.
-            db_schema: object that contains the table of a given db schema.
-            write_on_entity: boolean flag that indicates if data is being
-            loaded into an entity table.
-
-        Returns:
-            List of queries regarding schemas' changes.
-
-        """
-        if not db_schema:
-            return [self._get_create_table_query(fs_schema, table_name)]
-
-        schema_diff = self._get_diff(fs_schema, db_schema)
-
-        return self._get_queries(schema_diff, table_name, write_on_entity)

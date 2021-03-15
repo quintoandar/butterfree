@@ -40,6 +40,37 @@ class DatabaseMigration(ABC):
     """Abstract base class for Migrations."""
 
     @abstractmethod
+    def _get_create_table_query(
+        self, columns: List[Dict[str, Any]], table_name: str
+    ) -> Any:
+        """Creates desired statement to create a table.
+
+        Args:
+            columns: object that contains column's schemas.
+            table_name: table name.
+
+        Returns:
+            Create table query.
+
+        """
+        pass
+
+    @abstractmethod
+    def _get_queries(
+        self, schema_diff: Set[Diff], table_name: str, write_on_entity: bool = None
+    ) -> Any:
+        """Create the desired queries for migration.
+
+        Args:
+            schema_diff: list of Diff objects.
+            table_name: table name.
+
+        Returns:
+            List of queries.
+
+        """
+        pass
+
     def create_query(
         self,
         fs_schema: List[Dict[str, Any]],
@@ -53,6 +84,12 @@ class DatabaseMigration(ABC):
             The desired queries for the given database.
 
         """
+        if not db_schema:
+            return [self._get_create_table_query(fs_schema, table_name)]
+
+        schema_diff = self._get_diff(fs_schema, db_schema)
+
+        return self._get_queries(schema_diff, table_name, write_on_entity)
 
     def _apply_migration(self, feature_set: FeatureSet) -> None:
         """Apply the migration in the respective database."""
