@@ -9,15 +9,15 @@ from butterfree.pipelines import FeatureSetPipeline
 
 
 def test_migrate_success(mocker):
-    migrate.Migrate.run = mocker.stub("migration")
+    mocker.patch.object(migrate.Migrate, "run")
     all_fs = migrate.migrate("tests/mocks/entities/")
     assert all(isinstance(fs, FeatureSetPipeline) for fs in all_fs)
     assert sorted([fs.feature_set.name for fs in all_fs]) == ["first", "second"]
 
 
 def test_migrate_all_pairs(mocker):
-    MetastoreMigration.apply_migration = mocker.stub("metastore_apply")
-    CassandraMigration.apply_migration = mocker.stub("cassandra_apply")
+    mocker.patch.object(MetastoreMigration, "apply_migration")
+    mocker.patch.object(CassandraMigration, "apply_migration")
     all_fs = migrate.migrate("tests/mocks/entities/")
 
     assert MetastoreMigration.apply_migration.call_count == 2
