@@ -276,6 +276,16 @@ class SparkClient(AbstractClient):
 
     @staticmethod
     def _filter_schema(schema: DataFrame) -> List[str]:
+        """Returns filtered schema with the desired information.
+
+        Attributes:
+            schema: desired table.
+
+        Returns:
+            A list of strings in the format
+            ['{"column_name": "example1", type: "Spark_type"}', ...]
+
+        """
         return (
             schema.filter(
                 ~schema.col_name.isin(
@@ -287,12 +297,22 @@ class SparkClient(AbstractClient):
         )
 
     def _convert_schema(self, schema: DataFrame) -> List[Dict[str, str]]:
-        schema_list = self._filter_schema(schema)
-        schema = []
-        for row in schema_list:
-            schema.append(json.loads(row))
+        """Returns schema with the desired information.
 
-        return schema
+        Attributes:
+            schema: desired table.
+
+        Returns:
+            A list of dictionaries in the format
+            [{"column_name": "example1", type: "Spark_type"}, ...]
+
+        """
+        schema_list = self._filter_schema(schema)
+        converted_schema = []
+        for row in schema_list:
+            converted_schema.append(json.loads(row))
+
+        return converted_schema
 
     def get_schema(self, table: str, database: str) -> List[Dict[str, str]]:
         """Returns desired table schema.
@@ -301,7 +321,7 @@ class SparkClient(AbstractClient):
             table: desired table.
 
         Returns:
-            A list dictionaries in the format
+            A list of dictionaries in the format
             [{"column_name": "example1", type: "Spark_type"}, ...]
 
         """
