@@ -3,8 +3,12 @@ import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum, auto
-from typing import Any, Dict, List, Set
+from typing import Any, Dict, List, Set, Union
 
+from butterfree.load.writers import (
+    HistoricalFeatureStoreWriter,
+    OnlineFeatureStoreWriter,
+)
 from butterfree.transform import FeatureSet
 
 
@@ -39,6 +43,9 @@ class Diff:
 
 class DatabaseMigration(ABC):
     """Abstract base class for Migrations."""
+
+    def __init__(self, client):
+        self._client = client
 
     @abstractmethod
     def _get_create_table_query(
@@ -173,10 +180,6 @@ class DatabaseMigration(ABC):
 
         return self._get_queries(schema_diff, table_name, write_on_entity)
 
-    def _apply_migration(self, feature_set: FeatureSet) -> None:
-        """Apply the migration in the respective database."""
-        pass
-
     @staticmethod
     def _get_diff(
         fs_schema: List[Dict[str, Any]], db_schema: List[Dict[str, Any]],
@@ -238,11 +241,47 @@ class DatabaseMigration(ABC):
         )
         return schema_diff
 
-    def run(self, feature_set: FeatureSet) -> None:
-        """Runs the migrations.
+    def _get_schema(self, table_name: str) -> List[Dict[str, Any]]:
+        """Get a table schema in the respective database.
+
+        Args:
+            table_name: Table name to get schema.
+
+        Returns:
+            Schema object.
+        """
+        try:
+            db_schema = self._client.get_schema(table_name)
+        except Exception:  # noqa
+            db_schema = []
+        return db_schema
+
+    def apply_migration(
+        self,
+        feature_set: FeatureSet,
+        writer: Union[HistoricalFeatureStoreWriter, OnlineFeatureStoreWriter],
+    ) -> None:
+        """Apply the migration in the respective database.
 
         Args:
             feature_set: the feature set.
-
+            writer: the writer being used to load the feature set.
         """
-        pass
+        logging.info(f"Migrating feature set: {feature_set.name}")
+
+        fs_schema = writer.db_config.translate(feature_set.get_schema())
+        db_schema = self._get_schema(feature_set.name)
+
+        table_name = (
+            feature_set.name if not writer.write_to_entity else feature_set.entity
+        )
+
+        queries = self.create_query(
+            fs_schema, table_name, db_schema, writer.write_to_entity
+        )
+
+        for q in queries:
+            logging.info(f"Applying {q}...")
+            self._client.sql(q)
+
+        logging.info(f"Feature Set migration finished successfully.")
