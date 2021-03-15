@@ -18,9 +18,10 @@ class MetastoreMigration(DatabaseMigration):
 
     def create_query(
         self,
+        fs_schema: List[Dict[str, Any]],
         table_name: str,
         db_schema: List[Dict[str, Any]] = None,
-        diff_schema: List[Dict[str, Any]] = None,
+        write_on_entity: bool = None,
     ) -> Any:
         """Create a query regarding Metastore.
 
