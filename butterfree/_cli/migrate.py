@@ -8,6 +8,7 @@ import setuptools
 import typer
 
 from butterfree._cli import cli_logger
+from butterfree.migrations.database_migration import ALLOWED_DATABASE
 from butterfree.pipelines import FeatureSetPipeline
 
 app = typer.Typer()
@@ -88,6 +89,28 @@ PATH = typer.Argument(
 )
 
 
+class Migrate:
+    """Execute migration operations in a Database based on pipeline Writer.
+
+    Attributes:
+        pipelines: list of Feature Set Pipelines to use to migration.
+    """
+
+    def __init__(self, pipelines: Set[FeatureSetPipeline]) -> None:
+        self.pipelines = pipelines
+
+    def _send_logs_to_s3(self) -> None:
+        """Send all migration logs to S3."""
+        pass
+
+    def run(self) -> None:
+        """Construct and apply the migrations."""
+        for pipeline in self.pipelines:
+            for writer in pipeline.sink.writers:
+                migration = ALLOWED_DATABASE[writer.db_config.database]
+                migration.apply_migration(pipeline.feature_set, writer)
+
+
 @app.callback()
 def migrate(path: str = PATH) -> Set[FeatureSetPipeline]:
     """Scan and run database migrations for feature set pipelines defined under PATH.
@@ -100,5 +123,6 @@ def migrate(path: str = PATH) -> Set[FeatureSetPipeline]:
     All pipelines must be under python modules inside path, so we can dynamically
     import and instantiate them.
     """
-    # TODO call the Migration actor with all feature set pipeline objects
-    return __fs_objects(path)
+    pipe_set = __fs_objects(path)
+    Migrate(pipe_set).run()
+    return pipe_set

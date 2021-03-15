@@ -28,6 +28,8 @@ class CassandraConfig(AbstractWriteConfig):
 
     """
 
+    database = "cassandra"
+
     def __init__(
         self,
         username: str = None,

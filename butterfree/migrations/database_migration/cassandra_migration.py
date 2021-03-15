@@ -32,11 +32,13 @@ class CassandraMigration(DatabaseMigration):
 
     def __init__(self) -> None:
         self._db_config = CassandraConfig()
-        self._client = CassandraClient(
-            host=[self._db_config.host],
-            keyspace=self._db_config.keyspace,  # type: ignore
-            user=self._db_config.username,
-            password=self._db_config.password,
+        super(CassandraMigration, self).__init__(
+            CassandraClient(
+                host=[self._db_config.host],
+                keyspace=self._db_config.keyspace,  # type: ignore
+                user=self._db_config.username,
+                password=self._db_config.password,
+            )
         )
 
     @staticmethod

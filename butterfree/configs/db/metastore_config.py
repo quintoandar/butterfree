@@ -23,6 +23,8 @@ class MetastoreConfig(AbstractWriteConfig):
 
     """
 
+    database = "metastore"
+
     def __init__(
         self,
         path: str = None,
