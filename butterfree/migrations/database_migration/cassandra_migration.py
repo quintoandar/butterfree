@@ -1,7 +1,6 @@
 """Cassandra Migration entity."""
 
-import logging
-from typing import Any, Dict, List, Set
+from typing import Any, Dict, List
 
 from butterfree.clients import CassandraClient
 from butterfree.configs.db import CassandraConfig
