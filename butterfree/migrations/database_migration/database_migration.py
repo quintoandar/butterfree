@@ -1,4 +1,5 @@
 """Migration entity."""
+import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum, auto
