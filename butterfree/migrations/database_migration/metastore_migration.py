@@ -1,7 +1,6 @@
 """Metastore Migration entity."""
 
-import logging
-from typing import Any, Dict, List, Set
+from typing import Any, Dict, List
 
 from butterfree.configs import environment
 from butterfree.constants.migrations import PARTITION_BY
@@ -130,57 +129,3 @@ class MetastoreMigration(DatabaseMigration):
         parsed_columns = self._get_parsed_columns(columns)
 
         return f"ALTER TABLE {table_name} DROP IF EXISTS ({parsed_columns});"
-
-    def _get_queries(
-        self, schema_diff: Set[Diff], table_name: str, write_on_entity: bool = None
-    ) -> List[str]:
-        """Create the desired queries for migration.
-
-        Args:
-            schema_diff: list of Diff objects.
-            table_name: table name.
-
-        Returns:
-            List of queries.
-        """
-        add_items = []
-        drop_items = []
-        alter_type_items = []
-        alter_key_items = []
-
-        for diff in schema_diff:
-            if diff.kind == Diff.Kind.ADD:
-                add_items.append(diff)
-            elif diff.kind == Diff.Kind.ALTER_TYPE:
-                alter_type_items.append(diff)
-            elif diff.kind == Diff.Kind.DROP:
-                drop_items.append(diff)
-            elif diff.kind == Diff.Kind.ALTER_KEY:
-                alter_key_items.append(diff)
-
-        queries = []
-        if add_items:
-            alter_table_add_query = self._get_alter_table_add_query(
-                add_items, table_name
-            )
-            queries.append(alter_table_add_query)
-        if drop_items:
-            if write_on_entity:
-                logging.info(
-                    "Features will not be dropped automatically "
-                    "when data is loaded to an entity table"
-                )
-            else:
-                drop_columns_query = self._get_alter_table_drop_query(
-                    drop_items, table_name
-                )
-                queries.append(drop_columns_query)
-        if alter_type_items:
-            alter_column_types_query = self._get_alter_column_type_query(
-                alter_type_items, table_name
-            )
-            queries.append(alter_column_types_query)
-        if alter_key_items:
-            logging.info("This operation is not supported by Spark.")
-
-        return queries
