@@ -1,5 +1,6 @@
 """SparkClient entity."""
 
+import json
 from typing import Any, Dict, List, Optional, Union
 
 from pyspark.sql import DataFrame, DataFrameReader, SparkSession
@@ -216,7 +217,8 @@ class SparkClient(AbstractClient):
             **options,
         )
 
-    def create_temporary_view(self, dataframe: DataFrame, name: str) -> Any:
+    @staticmethod
+    def create_temporary_view(dataframe: DataFrame, name: str) -> Any:
         """Create a temporary view from a given dataframe.
 
         Args:
@@ -271,3 +273,65 @@ class SparkClient(AbstractClient):
         )
 
         self.conn.sql(command)
+
+    @staticmethod
+    def _filter_schema(schema: DataFrame) -> List[str]:
+        """Returns filtered schema with the desired information.
+
+        Attributes:
+            schema: desired table.
+
+        Returns:
+            A list of strings in the format
+            ['{"column_name": "example1", type: "Spark_type"}', ...]
+
+        """
+        return (
+            schema.filter(
+                ~schema.col_name.isin(
+                    ["# Partition Information", "# col_name", "year", "month", "day"]
+                )
+            )
+            .toJSON()
+            .collect()
+        )
+
+    def _convert_schema(self, schema: DataFrame) -> List[Dict[str, str]]:
+        """Returns schema with the desired information.
+
+        Attributes:
+            schema: desired table.
+
+        Returns:
+            A list of dictionaries in the format
+            [{"column_name": "example1", type: "Spark_type"}, ...]
+
+        """
+        schema_list = self._filter_schema(schema)
+        converted_schema = []
+        for row in schema_list:
+            converted_schema.append(json.loads(row))
+
+        return converted_schema
+
+    def get_schema(self, table: str, database: str) -> List[Dict[str, str]]:
+        """Returns desired table schema.
+
+        Attributes:
+            table: desired table.
+
+        Returns:
+            A list of dictionaries in the format
+            [{"column_name": "example1", type: "Spark_type"}, ...]
+
+        """
+        query = f"DESCRIBE {database}.{table} "  # noqa
+
+        response = self.sql(query)
+
+        if not response:
+            raise RuntimeError(
+                f"No columns found for table: {table}" f"in database: {database}"
+            )
+
+        return self._convert_schema(response)
