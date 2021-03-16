@@ -15,6 +15,15 @@ def create_temp_view(dataframe: DataFrame, name: str) -> None:
     dataframe.createOrReplaceTempView(name)
 
 
+def create_db_and_table(spark, database, table, view):
+    spark.sql(f"create database if not exists {database}")
+    spark.sql(f"use {database}")
+    spark.sql(
+        f"create table if not exists {database}.{table} "  # noqa
+        f"as select * from {view}"  # noqa
+    )
+
+
 class TestSparkClient:
     def test_conn(self) -> None:
         # arrange
@@ -293,3 +302,27 @@ class TestSparkClient:
         # act and assert
         with pytest.raises(ValueError):
             spark_client.add_table_partitions(partition, "table", "db")
+
+    def test_get_schema(
+        self, target_df: DataFrame, spark_session: SparkSession
+    ) -> None:
+        # arrange
+        spark_client = SparkClient()
+        create_temp_view(dataframe=target_df, name="temp_view")
+        create_db_and_table(
+            spark=spark_session,
+            database="test_db",
+            table="test_table",
+            view="temp_view",
+        )
+
+        expected_schema = [
+            {"col_name": "col1", "data_type": "string"},
+            {"col_name": "col2", "data_type": "bigint"},
+        ]
+
+        # act
+        schema = spark_client.get_schema(table="test_table", database="test_db")
+
+        # assert
+        assert schema, expected_schema
