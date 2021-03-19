@@ -102,9 +102,7 @@ class Sink(HookableComponent):
 
         handlers = [
             writer.write(
-                feature_set=feature_set,
-                dataframe=dataframe,
-                spark_client=spark_client,
+                feature_set=feature_set, dataframe=dataframe, spark_client=spark_client,
             )
             for writer in self.writers
         ]
