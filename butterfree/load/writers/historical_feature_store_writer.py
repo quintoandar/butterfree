@@ -140,10 +140,7 @@ class HistoricalFeatureStoreWriter(Writer):
         """
         dataframe = self._create_partitions(dataframe)
 
-        partition_df = self._apply_transformations(dataframe)
-
-        if self.debug_mode:
-            dataframe = partition_df
+        dataframe = self._apply_transformations(dataframe)
 
         if self.interval_mode:
             if self.debug_mode:

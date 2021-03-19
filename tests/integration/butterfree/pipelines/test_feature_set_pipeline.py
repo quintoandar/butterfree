@@ -78,7 +78,6 @@ class TestFeatureSetPipeline:
         mocked_df,
         spark_session,
         fixed_windows_output_feature_set_dataframe,
-        mocker,
     ):
         # arrange
         table_reader_id = "a_source"
@@ -175,7 +174,6 @@ class TestFeatureSetPipeline:
         spark_session,
         fixed_windows_output_feature_set_date_dataframe,
         feature_set_pipeline,
-        mocker,
     ):
         # arrange
         table_reader_table = "b_table"
@@ -199,7 +197,6 @@ class TestFeatureSetPipeline:
         spark_session,
         fixed_windows_output_feature_set_date_dataframe,
         feature_set_pipeline,
-        mocker,
     ):
         # arrange
         table_reader_table = "b_table"
@@ -221,7 +218,7 @@ class TestFeatureSetPipeline:
         # assert
         assert_dataframe_equality(df, target_df)
 
-    def test_pipeline_with_hooks(self, spark_session, mocker):
+    def test_pipeline_with_hooks(self, spark_session):
         # arrange
         hook1 = AddHook(value=1)
 
