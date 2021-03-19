@@ -93,11 +93,6 @@ class TestFeatureSetPipeline:
             table_reader_table=table_reader_table,
         )
 
-        spark_client = SparkClient()
-        spark_client.conn.conf.set(
-            "spark.sql.sources.partitionOverwriteMode", "dynamic"
-        )
-
         dbconfig = Mock()
         dbconfig.mode = "overwrite"
         dbconfig.format_ = "parquet"
@@ -106,12 +101,6 @@ class TestFeatureSetPipeline:
         )
 
         historical_writer = HistoricalFeatureStoreWriter(db_config=dbconfig)
-
-        historical_writer.check_schema_hook = mocker.stub("check_schema_hook")
-        historical_writer.check_schema_hook.run = mocker.stub("run")
-        historical_writer.check_schema_hook.run.return_value = (
-            fixed_windows_output_feature_set_dataframe
-        )
 
         # act
         test_pipeline = FeatureSetPipeline(

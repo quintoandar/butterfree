@@ -97,15 +97,13 @@ class Sink(HookableComponent):
             Streaming handlers for each defined writer, if writing streaming dfs.
 
         """
-        pre_hook_df = self.run_pre_hooks(dataframe)
-
         if self.validation is not None:
-            self.validation.input(pre_hook_df).check()
+            self.validation.input(dataframe).check()
 
         handlers = [
             writer.write(
                 feature_set=feature_set,
-                dataframe=pre_hook_df,
+                dataframe=dataframe,
                 spark_client=spark_client,
             )
             for writer in self.writers
