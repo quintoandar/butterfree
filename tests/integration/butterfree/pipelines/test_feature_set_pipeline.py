@@ -74,10 +74,7 @@ def create_ymd(dataframe):
 
 class TestFeatureSetPipeline:
     def test_feature_set_pipeline(
-        self,
-        mocked_df,
-        spark_session,
-        fixed_windows_output_feature_set_dataframe,
+        self, mocked_df, spark_session, fixed_windows_output_feature_set_dataframe,
     ):
         # arrange
         table_reader_id = "a_source"
