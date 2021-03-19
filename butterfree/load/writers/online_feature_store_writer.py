@@ -7,7 +7,7 @@ from pyspark.sql import DataFrame, Window
 from pyspark.sql.functions import col, row_number
 from pyspark.sql.streaming import StreamingQuery
 
-from butterfree.clients import CassandraClient, SparkClient
+from butterfree.clients import SparkClient
 from butterfree.configs.db import AbstractWriteConfig, CassandraConfig
 from butterfree.constants.columns import TIMESTAMP_COLUMN
 from butterfree.hooks import Hook
