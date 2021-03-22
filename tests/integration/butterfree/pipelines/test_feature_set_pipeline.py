@@ -4,7 +4,6 @@ from unittest.mock import Mock
 from pyspark.sql import DataFrame
 from pyspark.sql import functions as F
 
-from butterfree.clients import SparkClient
 from butterfree.configs import environment
 from butterfree.configs.db import MetastoreConfig
 from butterfree.constants import DataType
@@ -419,7 +418,6 @@ class TestFeatureSetPipeline:
         spark_session,
         fixed_windows_output_feature_set_date_dataframe,
         feature_set_pipeline,
-        mocker,
     ):
         # arrange
         table_reader_table = "b_table"
@@ -443,7 +441,6 @@ class TestFeatureSetPipeline:
         spark_session,
         fixed_windows_output_feature_set_date_dataframe,
         feature_set_pipeline,
-        mocker,
     ):
         # arrange
         table_reader_table = "b_table"
@@ -465,7 +462,7 @@ class TestFeatureSetPipeline:
         # assert
         assert_dataframe_equality(df, target_df)
 
-    def test_pipeline_with_hooks(self, spark_session, mocker):
+    def test_pipeline_with_hooks(self, spark_session):
         # arrange
         hook1 = AddHook(value=1)
 
