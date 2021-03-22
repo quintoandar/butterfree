@@ -4,7 +4,6 @@ from unittest.mock import Mock
 from pyspark.sql import DataFrame
 from pyspark.sql import functions as F
 
-from butterfree.clients import SparkClient
 from butterfree.configs import environment
 from butterfree.configs.db import MetastoreConfig
 from butterfree.constants import DataType
@@ -75,11 +74,7 @@ def create_ymd(dataframe):
 
 class TestFeatureSetPipeline:
     def test_feature_set_pipeline(
-        self,
-        mocked_df,
-        spark_session,
-        fixed_windows_output_feature_set_dataframe,
-        mocker,
+        self, mocked_df, spark_session, fixed_windows_output_feature_set_dataframe,
     ):
         # arrange
         table_reader_id = "a_source"
@@ -93,11 +88,6 @@ class TestFeatureSetPipeline:
             table_reader_table=table_reader_table,
         )
 
-        spark_client = SparkClient()
-        spark_client.conn.conf.set(
-            "spark.sql.sources.partitionOverwriteMode", "dynamic"
-        )
-
         dbconfig = Mock()
         dbconfig.mode = "overwrite"
         dbconfig.format_ = "parquet"
@@ -106,12 +96,6 @@ class TestFeatureSetPipeline:
         )
 
         historical_writer = HistoricalFeatureStoreWriter(db_config=dbconfig)
-
-        historical_writer.check_schema_hook = mocker.stub("check_schema_hook")
-        historical_writer.check_schema_hook.run = mocker.stub("run")
-        historical_writer.check_schema_hook.run.return_value = (
-            fixed_windows_output_feature_set_dataframe
-        )
 
         # act
         test_pipeline = FeatureSetPipeline(
@@ -187,7 +171,6 @@ class TestFeatureSetPipeline:
         spark_session,
         fixed_windows_output_feature_set_date_dataframe,
         feature_set_pipeline,
-        mocker,
     ):
         # arrange
         table_reader_table = "b_table"
@@ -211,7 +194,6 @@ class TestFeatureSetPipeline:
         spark_session,
         fixed_windows_output_feature_set_date_dataframe,
         feature_set_pipeline,
-        mocker,
     ):
         # arrange
         table_reader_table = "b_table"
@@ -233,7 +215,7 @@ class TestFeatureSetPipeline:
         # assert
         assert_dataframe_equality(df, target_df)
 
-    def test_pipeline_with_hooks(self, spark_session, mocker):
+    def test_pipeline_with_hooks(self, spark_session):
         # arrange
         hook1 = AddHook(value=1)
 

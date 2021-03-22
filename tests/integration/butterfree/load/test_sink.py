@@ -9,7 +9,7 @@ from butterfree.load.writers import (
 )
 
 
-def test_sink(input_dataframe, feature_set, mocker):
+def test_sink(input_dataframe, feature_set):
     # arrange
     client = SparkClient()
     client.conn.conf.set("spark.sql.sources.partitionOverwriteMode", "dynamic")
@@ -34,11 +34,6 @@ def test_sink(input_dataframe, feature_set, mocker):
         db_config=s3config, interval_mode=True
     )
 
-    schema_dataframe = historical_writer._create_partitions(feature_set_df)
-    historical_writer.check_schema_hook = mocker.stub("check_schema_hook")
-    historical_writer.check_schema_hook.run = mocker.stub("run")
-    historical_writer.check_schema_hook.run.return_value = schema_dataframe
-
     # setup online writer
     # TODO: Change for CassandraConfig when Cassandra for test is ready
     online_config = Mock()
@@ -48,10 +43,6 @@ def test_sink(input_dataframe, feature_set, mocker):
         return_value={"path": "test_folder/online/entity/feature_set"}
     )
     online_writer = OnlineFeatureStoreWriter(db_config=online_config)
-
-    online_writer.check_schema_hook = mocker.stub("check_schema_hook")
-    online_writer.check_schema_hook.run = mocker.stub("run")
-    online_writer.check_schema_hook.run.return_value = feature_set_df
 
     writers = [historical_writer, online_writer]
     sink = Sink(writers)

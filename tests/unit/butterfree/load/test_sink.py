@@ -120,7 +120,7 @@ class TestSink:
         with pytest.raises(ValueError):
             Sink(writers=writer)
 
-    def test_flush_streaming_df(self, feature_set, mocker):
+    def test_flush_streaming_df(self, feature_set):
         """Testing the return of the streaming handlers by the sink."""
         # arrange
         spark_client = SparkClient()
@@ -137,22 +137,8 @@ class TestSink:
 
         online_feature_store_writer = OnlineFeatureStoreWriter()
 
-        online_feature_store_writer.check_schema_hook = mocker.stub("check_schema_hook")
-        online_feature_store_writer.check_schema_hook.run = mocker.stub("run")
-        online_feature_store_writer.check_schema_hook.run.return_value = (
-            mocked_stream_df
-        )
-
         online_feature_store_writer_on_entity = OnlineFeatureStoreWriter(
             write_to_entity=True
-        )
-
-        online_feature_store_writer_on_entity.check_schema_hook = mocker.stub(
-            "check_schema_hook"
-        )
-        online_feature_store_writer_on_entity.check_schema_hook.run = mocker.stub("run")
-        online_feature_store_writer_on_entity.check_schema_hook.run.return_value = (
-            mocked_stream_df
         )
 
         sink = Sink(
@@ -177,7 +163,7 @@ class TestSink:
             assert isinstance(handler, StreamingQuery)
 
     def test_flush_with_multiple_online_writers(
-        self, feature_set, feature_set_dataframe, mocker
+        self, feature_set, feature_set_dataframe
     ):
         """Testing the flow of writing to a feature-set table and to an entity table."""
         # arrange
@@ -189,22 +175,8 @@ class TestSink:
 
         online_feature_store_writer = OnlineFeatureStoreWriter()
 
-        online_feature_store_writer.check_schema_hook = mocker.stub("check_schema_hook")
-        online_feature_store_writer.check_schema_hook.run = mocker.stub("run")
-        online_feature_store_writer.check_schema_hook.run.return_value = (
-            feature_set_dataframe
-        )
-
         online_feature_store_writer_on_entity = OnlineFeatureStoreWriter(
             write_to_entity=True
-        )
-
-        online_feature_store_writer_on_entity.check_schema_hook = mocker.stub(
-            "check_schema_hook"
-        )
-        online_feature_store_writer_on_entity.check_schema_hook.run = mocker.stub("run")
-        online_feature_store_writer_on_entity.check_schema_hook.run.return_value = (
-            feature_set_dataframe
         )
 
         sink = Sink(
