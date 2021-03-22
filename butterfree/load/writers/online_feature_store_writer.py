@@ -7,7 +7,7 @@ from pyspark.sql import DataFrame, Window
 from pyspark.sql.functions import col, row_number
 from pyspark.sql.streaming import StreamingQuery
 
-from butterfree.clients import CassandraClient, SparkClient
+from butterfree.clients import SparkClient
 from butterfree.configs.db import AbstractWriteConfig, CassandraConfig
 from butterfree.constants.columns import TIMESTAMP_COLUMN
 from butterfree.hooks import Hook
@@ -179,22 +179,6 @@ class OnlineFeatureStoreWriter(Writer):
 
         """
         table_name = feature_set.entity if self.write_to_entity else feature_set.name
-
-        if not self.debug_mode:
-            config = (
-                self.db_config
-                if self.db_config == CassandraConfig
-                else CassandraConfig()
-            )
-
-            cassandra_client = CassandraClient(
-                host=[config.host],
-                keyspace=config.keyspace,
-                user=config.username,
-                password=config.password,
-            )
-
-            dataframe = self.check_schema(cassandra_client, dataframe, table_name)
 
         if dataframe.isStreaming:
             dataframe = self._apply_transformations(dataframe)
