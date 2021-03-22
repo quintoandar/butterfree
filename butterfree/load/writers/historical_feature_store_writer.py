@@ -141,14 +141,7 @@ class HistoricalFeatureStoreWriter(Writer):
         """
         dataframe = self._create_partitions(dataframe)
 
-        partition_df = self._apply_transformations(dataframe)
-
-        if self.debug_mode:
-            dataframe = partition_df
-        else:
-            dataframe = self.check_schema(
-                spark_client, partition_df, feature_set.name, self.database
-            )
+        dataframe = self._apply_transformations(dataframe)
 
         if self.interval_mode:
             if self.debug_mode:
