@@ -3,6 +3,7 @@
 from typing import Any, Dict, List
 
 from butterfree.clients import SparkClient
+from butterfree.configs import environment
 from butterfree.configs.db import MetastoreConfig
 from butterfree.constants.migrations import PARTITION_BY
 from butterfree.migrations.database_migration.database_migration import (
@@ -29,8 +30,11 @@ class MetastoreMigration(DatabaseMigration):
         data is being loaded into an entity table, then users can drop columns manually.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, database: str = None,) -> None:
         self._db_config = MetastoreConfig()
+        self.database = database or environment.get_variable(
+            "FEATURE_STORE_HISTORICAL_DATABASE"
+        )
         super(MetastoreMigration, self).__init__(SparkClient())
 
     @staticmethod

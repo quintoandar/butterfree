@@ -263,12 +263,12 @@ class DatabaseMigration(ABC):
         """
         logging.info(f"Migrating feature set: {feature_set.name}")
 
-        fs_schema = writer.db_config.translate(feature_set.get_schema())
-        db_schema = self._get_schema(feature_set.name)
-
         table_name = (
             feature_set.name if not writer.write_to_entity else feature_set.entity
         )
+
+        fs_schema = writer.db_config.translate(feature_set.get_schema())
+        db_schema = self._get_schema(table_name)
 
         queries = self.create_query(
             fs_schema, table_name, db_schema, writer.write_to_entity
