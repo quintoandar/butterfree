@@ -80,15 +80,15 @@ class OnlineFeatureStoreWriter(Writer):
 
     def __init__(
         self,
-        db_config: Union[AbstractWriteConfig, CassandraConfig] = None,
+        db_config: AbstractWriteConfig = None,
         debug_mode: bool = False,
         write_to_entity: bool = False,
         interval_mode: bool = False,
         check_schema_hook: Hook = None,
     ):
-        super(OnlineFeatureStoreWriter, self).__init__(debug_mode, interval_mode)
-        self.db_config = db_config or CassandraConfig()
-        self.write_to_entity = write_to_entity
+        super(OnlineFeatureStoreWriter, self).__init__(
+            db_config or CassandraConfig(), debug_mode, interval_mode, write_to_entity
+        )
         self.check_schema_hook = check_schema_hook
 
     @staticmethod

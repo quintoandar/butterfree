@@ -1,6 +1,10 @@
 from pyspark.sql.types import DoubleType, FloatType, LongType, TimestampType
 from pytest import fixture
 
+from butterfree.constants import DataType
+from butterfree.transform import FeatureSet
+from butterfree.transform.features import Feature, KeyFeature, TimestampFeature
+
 
 @fixture
 def db_schema():
@@ -32,3 +36,21 @@ def fs_schema():
             "primary_key": False,
         },
     ]
+
+
+@fixture
+def feature_set():
+    feature_set = FeatureSet(
+        name="feature_set",
+        entity="entity",
+        description="description",
+        features=[
+            Feature(name="feature_float", description="test", dtype=DataType.FLOAT,),
+        ],
+        keys=[
+            KeyFeature(name="id", description="The device ID", dtype=DataType.BIGINT,)
+        ],
+        timestamp=TimestampFeature(),
+    )
+
+    return feature_set

@@ -7,6 +7,7 @@ from typing import Any, Callable, Dict, List
 from pyspark.sql.dataframe import DataFrame
 
 from butterfree.clients import SparkClient
+from butterfree.configs.db import AbstractWriteConfig
 from butterfree.hooks import HookableComponent
 from butterfree.transform import FeatureSet
 
@@ -19,11 +20,19 @@ class Writer(ABC, HookableComponent):
 
     """
 
-    def __init__(self, debug_mode: bool = False, interval_mode: bool = False) -> None:
+    def __init__(
+        self,
+        db_config: AbstractWriteConfig,
+        debug_mode: bool = False,
+        interval_mode: bool = False,
+        write_to_entity: bool = False,
+    ) -> None:
         super().__init__()
+        self.db_config = db_config
         self.transformations: List[Dict[str, Any]] = []
         self.debug_mode = debug_mode
         self.interval_mode = interval_mode
+        self.write_to_entity = write_to_entity
 
     def with_(
         self, transformer: Callable[..., DataFrame], *args: Any, **kwargs: Any

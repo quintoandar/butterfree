@@ -42,6 +42,11 @@ class KafkaConfig(AbstractWriteConfig):
         self.stream_checkpoint_path = stream_checkpoint_path
 
     @property
+    def database(self) -> str:
+        """Database name."""
+        return "kafka"
+
+    @property
     def kafka_topic(self) -> Optional[str]:
         """Kafka topic name."""
         return self.__kafka_topic
