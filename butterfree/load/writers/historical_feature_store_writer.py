@@ -1,7 +1,7 @@
 """Holds the Historical Feature Store writer class."""
 
 import os
-from typing import Any, Union
+from typing import Any
 
 from pyspark.sql.dataframe import DataFrame
 from pyspark.sql.functions import dayofmonth, month, year
@@ -106,7 +106,7 @@ class HistoricalFeatureStoreWriter(Writer):
 
     def __init__(
         self,
-        db_config: Union[AbstractWriteConfig, MetastoreConfig] = None,
+        db_config: AbstractWriteConfig = None,
         database: str = None,
         num_partitions: int = None,
         validation_threshold: float = DEFAULT_VALIDATION_THRESHOLD,
@@ -114,8 +114,9 @@ class HistoricalFeatureStoreWriter(Writer):
         interval_mode: bool = False,
         check_schema_hook: Hook = None,
     ):
-        super(HistoricalFeatureStoreWriter, self).__init__(debug_mode, interval_mode)
-        self.db_config = db_config or MetastoreConfig()
+        super(HistoricalFeatureStoreWriter, self).__init__(
+            db_config or MetastoreConfig(), debug_mode, interval_mode
+        )
         self.database = database or environment.get_variable(
             "FEATURE_STORE_HISTORICAL_DATABASE"
         )

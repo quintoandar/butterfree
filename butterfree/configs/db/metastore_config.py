@@ -36,6 +36,11 @@ class MetastoreConfig(AbstractWriteConfig):
         self.file_system = file_system
 
     @property
+    def database(self) -> str:
+        """Database name."""
+        return "metastore"
+
+    @property
     def path(self) -> Optional[str]:
         """Bucket name."""
         return self.__path

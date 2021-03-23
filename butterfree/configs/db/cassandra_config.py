@@ -51,6 +51,11 @@ class CassandraConfig(AbstractWriteConfig):
         self.stream_checkpoint_path = stream_checkpoint_path
 
     @property
+    def database(self) -> str:
+        """Database name."""
+        return "cassandra"
+
+    @property
     def username(self) -> Optional[str]:
         """Username used in connection to Cassandra DB."""
         return self.__username

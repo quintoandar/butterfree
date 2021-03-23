@@ -9,3 +9,9 @@ from butterfree.migrations.database_migration.metastore_migration import (
 )
 
 __all__ = ["CassandraMigration", "MetastoreMigration", "Diff"]
+
+
+ALLOWED_DATABASE = {
+    "cassandra": CassandraMigration(),
+    "metastore": MetastoreMigration(),
+}

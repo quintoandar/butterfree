@@ -9,6 +9,11 @@ class AbstractWriteConfig(ABC):
 
     @property
     @abstractmethod
+    def database(self) -> str:
+        """Database name."""
+
+    @property
+    @abstractmethod
     def mode(self) -> Any:
         """Config option "mode" for spark write.
 
