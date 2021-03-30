@@ -227,7 +227,7 @@ class HistoricalFeatureStoreWriter(Writer):
                 feature set dataframe.
         """
         table_name = (
-            f"{feature_set.name}"
+            os.path.join("historical", feature_set.entity, feature_set.name)
             if self.interval_mode and not self.debug_mode
             else (
                 f"{self.database}.{feature_set.name}"
