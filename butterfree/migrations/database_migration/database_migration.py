@@ -9,6 +9,8 @@ from butterfree.clients import AbstractClient
 from butterfree.load.writers.writer import Writer
 from butterfree.transform import FeatureSet
 
+logger = logging.getLogger("migrate")
+
 
 @dataclass
 class Diff:
@@ -154,7 +156,7 @@ class DatabaseMigration(ABC):
             )
             queries.append(alter_column_types_query)
         if alter_key_items:
-            logging.info("This operation is not supported by Spark.")
+            logger.info("This operation is not supported by Spark.")
 
         return queries
 
@@ -261,7 +263,7 @@ class DatabaseMigration(ABC):
             feature_set: the feature set.
             writer: the writer being used to load the feature set.
         """
-        logging.info(f"Migrating feature set: {feature_set.name}")
+        logger.info(f"Migrating feature set: {feature_set.name}")
 
         table_name = (
             feature_set.name if not writer.write_to_entity else feature_set.entity
@@ -275,7 +277,7 @@ class DatabaseMigration(ABC):
         )
 
         for q in queries:
-            logging.info(f"Applying {q}...")
+            logger.info(f"Applying this query: {q} ...")
             self._client.sql(q)
 
-        logging.info(f"Feature Set migration finished successfully.")
+        logger.info(f"Feature Set migration finished successfully.")

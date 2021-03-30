@@ -1,5 +1,6 @@
 from pyspark.sql.types import DoubleType, FloatType, LongType, TimestampType
 
+from butterfree.load.writers import HistoricalFeatureStoreWriter
 from butterfree.migrations.database_migration import CassandraMigration, Diff
 
 
@@ -58,10 +59,10 @@ class TestDatabaseMigration:
     def test_apply_migration(self, feature_set, mocker):
         # given
         m = CassandraMigration()
-        m.apply_migration = mocker.stub("apply_migration")
+        # m.apply_migration = mocker.stub("apply_migration")
 
         # when
-        m.apply_migration(feature_set)
+        m.apply_migration(feature_set, HistoricalFeatureStoreWriter())
 
         # then
         m.apply_migration.assert_called_once()
