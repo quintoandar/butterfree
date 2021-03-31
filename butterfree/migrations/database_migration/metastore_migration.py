@@ -102,8 +102,6 @@ class MetastoreMigration(DatabaseMigration):
             Create table query.
 
         """
-        columns.extend(PARTITION_BY)
-
         parsed_columns = []
         for col in columns:
             parsed_columns.append(f"{col['column_name']} {col['type']}")
