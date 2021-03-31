@@ -42,7 +42,7 @@ class TestMetastoreMigration:
             "CREATE TABLE IF NOT EXISTS  test.table_name "
             "(id LongType, timestamp TimestampType, new_feature FloatType, "
             "feature1__avg_over_1_week_rolling_windows FloatType, year INT, "
-            "month INT, day INT) PARTITIONED BY (year, month, day);"
+            "month INT, day INT) PARTITIONED BY (year INT, month INT, day INT);"
         ]
 
         query = metastore_migration.create_query(fs_schema, "table_name")

@@ -112,9 +112,10 @@ class MetastoreMigration(DatabaseMigration):
         return (
             f"CREATE TABLE IF NOT EXISTS  "
             f"{self.database}.{table_name} ({parsed_columns}) "
-            f"PARTITIONED BY ({PARTITION_BY[0]['column_name']}, "
-            f"{PARTITION_BY[1]['column_name']}, "
-            f"{PARTITION_BY[2]['column_name']});"
+            f"PARTITIONED BY ("
+            f"{PARTITION_BY[0]['column_name']} {PARTITION_BY[0]['type']}, "
+            f"{PARTITION_BY[1]['column_name']} {PARTITION_BY[1]['type']}, "
+            f"{PARTITION_BY[2]['column_name']} {PARTITION_BY[2]['type']});"
         )
 
     def _get_alter_table_drop_query(self, columns: List[Diff], table_name: str) -> str:
