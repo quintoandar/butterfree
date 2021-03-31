@@ -21,20 +21,21 @@ from typing_extensions import final
 class DataType(Enum):
     """Holds constants for data types within Butterfree."""
 
-    TIMESTAMP = (TimestampType(), "timestamp")
-    BINARY = (BinaryType(), "boolean")
-    BOOLEAN = (BooleanType(), "boolean")
-    DATE = (DateType(), "timestamp")
-    DECIMAL = (DecimalType(), "decimal")
-    DOUBLE = (DoubleType(), "double")
-    FLOAT = (FloatType(), "float")
-    INTEGER = (IntegerType(), "int")
-    BIGINT = (LongType(), "bigint")
-    STRING = (StringType(), "text")
-    ARRAY_BIGINT = (ArrayType(LongType()), "frozen<list<bigint>>")
-    ARRAY_STRING = (ArrayType(StringType()), "frozen<list<text>>")
-    ARRAY_FLOAT = (ArrayType(FloatType()), "frozen<list<float>>")
+    TIMESTAMP = (TimestampType(), "timestamp", "TIMESTAMP")
+    BINARY = (BinaryType(), "boolean", "BINARY")
+    BOOLEAN = (BooleanType(), "boolean", "BOOLEAN")
+    DATE = (DateType(), "timestamp", "DATE")
+    DECIMAL = (DecimalType(), "decimal", "DECIMAL")
+    DOUBLE = (DoubleType(), "double", "DOUBLE")
+    FLOAT = (FloatType(), "float", "FLOAT")
+    INTEGER = (IntegerType(), "int", "INT")
+    BIGINT = (LongType(), "bigint", "BIGINT")
+    STRING = (StringType(), "text", "STRING")
+    ARRAY_BIGINT = (ArrayType(LongType()), "frozen<list<bigint>>", "ARRAY<BIGINT>")
+    ARRAY_STRING = (ArrayType(StringType()), "frozen<list<text>>", "ARRAY<STRING>")
+    ARRAY_FLOAT = (ArrayType(FloatType()), "frozen<list<float>>", "ARRAY<FLOAT>")
 
-    def __init__(self, spark: PySparkDataType, cassandra: str) -> None:
+    def __init__(self, spark: PySparkDataType, cassandra: str, spark_sql: str) -> None:
         self.spark = spark
         self.cassandra = cassandra
+        self.spark_sql = spark_sql

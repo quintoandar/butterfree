@@ -59,7 +59,7 @@ class TestDatabaseMigration:
     def test_apply_migration(self, feature_set, mocker):
         # given
         m = CassandraMigration()
-        # m.apply_migration = mocker.stub("apply_migration")
+        m.apply_migration = mocker.stub("apply_migration")
 
         # when
         m.apply_migration(feature_set, HistoricalFeatureStoreWriter())

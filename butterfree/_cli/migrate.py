@@ -15,9 +15,7 @@ from butterfree.extract.readers import FileReader
 from butterfree.migrations.database_migration import ALLOWED_DATABASE
 from butterfree.pipelines import FeatureSetPipeline
 
-app = typer.Typer(
-    name="Migrations", help="Apply the automatic migrations in a database."
-)
+app = typer.Typer(help="Apply the automatic migrations in a database.")
 
 logger = logging.getLogger("cli")
 
@@ -108,18 +106,20 @@ class Migrate:
         pipelines: list of Feature Set Pipelines to use to migration.
     """
 
-    def __init__(self, pipelines: Set[FeatureSetPipeline]) -> None:
+    def __init__(
+        self, pipelines: Set[FeatureSetPipeline], spark_client: SparkClient = None
+    ) -> None:
         self.pipelines = pipelines
+        self.spark_client = spark_client or SparkClient()
 
     def _send_logs_to_s3(self, file_local: bool) -> None:
         """Send all migration logs to S3."""
-        spark_client = SparkClient()
         file_reader = FileReader(id="name", path="logs/logging.json", format="json")
-        df = file_reader.consume(spark_client)
+        df = file_reader.consume(self.spark_client)
 
         path = environment.get_variable("FEATURE_STORE_S3_BUCKET")
 
-        spark_client.write_dataframe(
+        self.spark_client.write_dataframe(
             dataframe=df,
             format_="json",
             mode="append",
@@ -139,9 +139,9 @@ class Migrate:
         self._send_logs_to_s3(generate_logs)
 
 
-@app.command()
+@app.command("apply")
 def migrate(
-    path: str = PATH, generate_logs: bool = GENERATE_LOGS
+    path: str = PATH, generate_logs: bool = GENERATE_LOGS,
 ) -> Set[FeatureSetPipeline]:
     """Scan and run database migrations for feature set pipelines defined under PATH.
 
