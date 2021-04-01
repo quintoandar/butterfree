@@ -1,5 +1,7 @@
 import importlib
 import inspect
+import logging
+import os
 import pkgutil
 import sys
 from typing import Set
@@ -7,11 +9,15 @@ from typing import Set
 import setuptools
 import typer
 
-from butterfree._cli import cli_logger
+from butterfree.clients import SparkClient
+from butterfree.configs import environment
+from butterfree.extract.readers import FileReader
 from butterfree.migrations.database_migration import ALLOWED_DATABASE
 from butterfree.pipelines import FeatureSetPipeline
 
-app = typer.Typer()
+app = typer.Typer(help="Apply the automatic migrations in a database.")
+
+logger = logging.getLogger("migrate")
 
 
 def __find_modules(path: str) -> Set[str]:
@@ -33,18 +39,18 @@ def __find_modules(path: str) -> Set[str]:
 
 
 def __fs_objects(path: str) -> Set[FeatureSetPipeline]:
-    cli_logger.info(f"Looking for python modules under {path}...")
+    logger.info(f"Looking for python modules under {path}...")
     modules = __find_modules(path)
     if not modules:
         return set()
 
-    cli_logger.info(f"Importing modules...")
+    logger.info(f"Importing modules...")
     package = ".".join(path.strip("/").split("/"))
     imported = set(
         importlib.import_module(f".{name}", package=package) for name in modules
     )
 
-    cli_logger.info(f"Scanning modules...")
+    logger.info(f"Scanning modules...")
     content = {
         module: set(
             filter(
@@ -80,12 +86,16 @@ def __fs_objects(path: str) -> Set[FeatureSetPipeline]:
 
             instances.add(value)
 
-    cli_logger.info("Creating instances...")
+    logger.info("Creating instances...")
     return set(value() for value in instances)
 
 
 PATH = typer.Argument(
     ..., help="Full or relative path to where feature set pipelines are being defined.",
+)
+
+GENERATE_LOGS = typer.Option(
+    False, help="To generate the logs in local file 'logging.json'."
 )
 
 
@@ -96,23 +106,43 @@ class Migrate:
         pipelines: list of Feature Set Pipelines to use to migration.
     """
 
-    def __init__(self, pipelines: Set[FeatureSetPipeline]) -> None:
+    def __init__(
+        self, pipelines: Set[FeatureSetPipeline], spark_client: SparkClient = None
+    ) -> None:
         self.pipelines = pipelines
+        self.spark_client = spark_client or SparkClient()
 
-    def _send_logs_to_s3(self) -> None:
+    def _send_logs_to_s3(self, file_local: bool) -> None:
         """Send all migration logs to S3."""
-        pass
+        file_reader = FileReader(id="name", path="logs/logging.json", format="json")
+        df = file_reader.consume(self.spark_client)
 
-    def run(self) -> None:
+        path = environment.get_variable("FEATURE_STORE_S3_BUCKET")
+
+        self.spark_client.write_dataframe(
+            dataframe=df,
+            format_="json",
+            mode="append",
+            **{"path": f"s3a://{path}/logging"},
+        )
+
+        if not file_local:
+            os.rmdir("logs/logging.json")
+
+    def run(self, generate_logs: bool) -> None:
         """Construct and apply the migrations."""
         for pipeline in self.pipelines:
             for writer in pipeline.sink.writers:
                 migration = ALLOWED_DATABASE[writer.db_config.database]
                 migration.apply_migration(pipeline.feature_set, writer)
 
+        self._send_logs_to_s3(generate_logs)
 
-@app.callback()
-def migrate(path: str = PATH) -> Set[FeatureSetPipeline]:
+
+@app.command("apply")
+def migrate(
+    path: str = PATH, generate_logs: bool = GENERATE_LOGS,
+) -> Set[FeatureSetPipeline]:
     """Scan and run database migrations for feature set pipelines defined under PATH.
 
     Butterfree will scan a given path for classes that inherit from its
@@ -124,5 +154,5 @@ def migrate(path: str = PATH) -> Set[FeatureSetPipeline]:
     import and instantiate them.
     """
     pipe_set = __fs_objects(path)
-    Migrate(pipe_set).run()
+    Migrate(pipe_set).run(generate_logs)
     return pipe_set
