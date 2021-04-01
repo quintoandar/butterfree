@@ -4,10 +4,10 @@ from typing import Optional
 
 specification = {
     "ENVIRONMENT": "dev",
-    "CASSANDRA_HOST": "127.0.0.1:9042",
-    "CASSANDRA_KEYSPACE": "wonka",
-    "CASSANDRA_USERNAME": "cassandra",
-    "CASSANDRA_PASSWORD": "cassandra",
+    "CASSANDRA_HOST": "test",
+    "CASSANDRA_KEYSPACE": "test",
+    "CASSANDRA_USERNAME": "test",
+    "CASSANDRA_PASSWORD": "test",
     "FEATURE_STORE_S3_BUCKET": "test",
     "FEATURE_STORE_HISTORICAL_DATABASE": "test",
     "KAFKA_CONSUMER_CONNECTION_STRING": "test_host:1234,test_host2:1234",

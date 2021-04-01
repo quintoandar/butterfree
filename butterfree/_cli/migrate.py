@@ -17,7 +17,7 @@ from butterfree.pipelines import FeatureSetPipeline
 
 app = typer.Typer(help="Apply the automatic migrations in a database.")
 
-logger = logging.getLogger("cli")
+logger = logging.getLogger("migrate")
 
 
 def __find_modules(path: str) -> Set[str]:

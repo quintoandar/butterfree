@@ -165,17 +165,6 @@ docs:
 test-examples:
 	@PYTHONPATH=. python examples/test_examples.py
 
-.PHONY: cassandra
-cassandra:
-	docker stop $$(docker ps -a -q --filter ancestor=cassandra:3.11) || true
-	docker rm $$(docker ps -a -q --filter ancestor=cassandra:3.11) || true
-	docker network rm cassandra-local-server || true
-	docker network create cassandra-local-server || true
-	docker run --name local-cassandra --network cassandra-local-server -p 9042:9042 -d cassandra:3.11
-	docker run --name local-cassandra-1 --network cassandra-local-server -d -e CASSANDRA_SEEDS=local-cassandra cassandra:3.11
-	sleep 20
-	docker exec -ti local-cassandra cqlsh
-
 .DEFAULT_GOAL := help
 
 # Inspired by <http://marmelab.com/blog/2016/02/29/auto-documented-makefile.html>

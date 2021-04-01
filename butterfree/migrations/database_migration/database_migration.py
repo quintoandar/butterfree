@@ -9,7 +9,7 @@ from butterfree.clients import AbstractClient
 from butterfree.load.writers.writer import Writer
 from butterfree.transform import FeatureSet
 
-logger = logging.getLogger("migrate")
+logger = logging.getLogger("database_migrate")
 
 
 @dataclass
