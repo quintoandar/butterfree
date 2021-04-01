@@ -115,6 +115,7 @@ class Migrate:
 
     def __init__(self, pipelines: Set[FeatureSetPipeline],) -> None:
         self.pipelines = pipelines
+        self.spark_client = spark_client or SparkClient()
 
     def _send_logs_to_s3(self, file_local: bool, debug_mode: bool) -> None:
         """Send all migration logs to S3."""
@@ -168,6 +169,7 @@ class Migrate:
 
         self._send_logs_to_s3(generate_logs, debug_mode)
 
+        self._send_logs_to_s3(generate_logs)
 
 @app.command("apply")
 def migrate(
