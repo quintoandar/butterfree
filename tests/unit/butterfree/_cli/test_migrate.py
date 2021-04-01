@@ -37,8 +37,4 @@ class TestMigrate:
         CassandraMigration.apply_migration.assert_has_calls(
             cassandra_pairs, any_order=True
         )
-
-    # def test_migrate_send_logs(self, mocker):
-    #     mocker.patch.object(migrate.Migrate, "run")
-    #     migrate.migrate("tests/mocks/entities/")
-    #     migrate._send_logs_to_s3.assert_called_once()
+        migrate.Migrate._send_logs_to_s3.assert_called_once()
