@@ -122,4 +122,29 @@ class MetastoreConfig(AbstractWriteConfig):
 
     def translate(self, schema: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Translate feature set spark schema to the corresponding database."""
-        return schema
+        spark_sql_mapping = {
+            "TimestampType": "TIMESTAMP",
+            "BinaryType": "BINARY",
+            "BooleanType": "BOOLEAN",
+            "DateType": "DATE",
+            "DecimalType": "DECIMAL",
+            "DoubleType": "DOUBLE",
+            "FloatType": "FLOAT",
+            "IntegerType": "INT",
+            "LongType": "BIGINT",
+            "StringType": "STRING",
+            "ArrayType(LongType,true)": "ARRAY<BIGINT>",
+            "ArrayType(StringType,true)": "ARRAY<STRING>",
+            "ArrayType(FloatType,true)": "ARRAY<FLOAT>",
+        }
+        sql_schema = []
+        for features in schema:
+            sql_schema.append(
+                {
+                    "column_name": features["column_name"],
+                    "type": spark_sql_mapping[str(features["type"])],
+                    "primary_key": features["primary_key"],
+                }
+            )
+
+        return sql_schema
