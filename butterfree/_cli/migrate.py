@@ -11,13 +11,14 @@ import typer
 
 from butterfree.clients import SparkClient
 from butterfree.configs import environment
+from butterfree.configs.logger import __logger
 from butterfree.extract.readers import FileReader
 from butterfree.migrations.database_migration import ALLOWED_DATABASE
 from butterfree.pipelines import FeatureSetPipeline
 
 app = typer.Typer(help="Apply the automatic migrations in a database.")
 
-logger = logging.getLogger("migrate")
+logger = __logger("migrate", True)
 
 
 def __find_modules(path: str) -> Set[str]:
@@ -114,7 +115,7 @@ class Migrate:
 
     def _send_logs_to_s3(self, file_local: bool) -> None:
         """Send all migration logs to S3."""
-        file_reader = FileReader(id="name", path="logs/logging.json", format="json")
+        file_reader = FileReader(id="name", path="../logging.json", format="json")
         df = file_reader.consume(self.spark_client)
 
         path = environment.get_variable("FEATURE_STORE_S3_BUCKET")
@@ -126,10 +127,10 @@ class Migrate:
             **{"path": f"s3a://{path}/logging"},
         )
 
-        if not file_local:
-            os.rmdir("logs/logging.json")
+        if not file_local and os.path.exists("../logging.json"):
+            os.remove("../logging.json")
 
-    def run(self, generate_logs: bool) -> None:
+    def run(self, generate_logs: bool = False) -> None:
         """Construct and apply the migrations."""
         for pipeline in self.pipelines:
             for writer in pipeline.sink.writers:

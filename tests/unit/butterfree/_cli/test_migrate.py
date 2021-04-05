@@ -1,11 +1,16 @@
 from unittest.mock import call
 
 from butterfree._cli import migrate
+from butterfree._cli.main import app
 from butterfree.migrations.database_migration import (
     CassandraMigration,
     MetastoreMigration,
 )
 from butterfree.pipelines import FeatureSetPipeline
+
+from typer.testing import CliRunner
+
+runner = CliRunner()
 
 
 class TestMigrate:
@@ -38,3 +43,12 @@ class TestMigrate:
             cassandra_pairs, any_order=True
         )
         migrate.Migrate._send_logs_to_s3.assert_called_once()
+
+    def test_app_cli(self):
+        result = runner.invoke(app, "migrate")
+        assert result.exit_code == 0
+
+    def test_app_migrate(self, mocker):
+        mocker.patch.object(migrate.Migrate, "run")
+        result = runner.invoke(app, ["migrate", "apply", "tests/mocks/entities/"])
+        assert result.exit_code == 0
