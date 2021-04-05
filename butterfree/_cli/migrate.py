@@ -114,7 +114,9 @@ class Migrate:
 
     def _send_logs_to_s3(self, file_local: bool) -> None:
         """Send all migration logs to S3."""
-        file_reader = FileReader(id="name", path="../logging.json", format="json")
+        log_path = "../logging.json"
+
+        file_reader = FileReader(id="name", path=log_path, format="json")
         df = file_reader.consume(self.spark_client)
 
         path = environment.get_variable("FEATURE_STORE_S3_BUCKET")
@@ -126,8 +128,8 @@ class Migrate:
             **{"path": f"s3a://{path}/logging"},
         )
 
-        if not file_local and os.path.exists("../logging.json"):
-            os.remove("../logging.json")
+        if not file_local and os.path.exists(log_path):
+            os.remove(log_path)
 
     def run(self, generate_logs: bool = False) -> None:
         """Construct and apply the migrations."""
