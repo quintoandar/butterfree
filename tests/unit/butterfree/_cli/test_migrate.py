@@ -1,5 +1,7 @@
 from unittest.mock import call
 
+from typer.testing import CliRunner
+
 from butterfree._cli import migrate
 from butterfree._cli.main import app
 from butterfree.migrations.database_migration import (
@@ -7,8 +9,6 @@ from butterfree.migrations.database_migration import (
     MetastoreMigration,
 )
 from butterfree.pipelines import FeatureSetPipeline
-
-from typer.testing import CliRunner
 
 runner = CliRunner()
 
