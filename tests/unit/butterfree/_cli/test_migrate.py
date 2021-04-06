@@ -16,13 +16,10 @@ runner = CliRunner()
 
 class TestMigrate:
     def test_migrate_success(self, mocker):
-        mocker.patch.object(migrate.Migrate, "run")
         all_fs = migrate.migrate("tests/mocks/entities/")
         assert all(isinstance(fs, FeatureSetPipeline) for fs in all_fs)
         assert sorted([fs.feature_set.name for fs in all_fs]) == ["first", "second"]
 
-    def test_migrate_run_methods(self, mocker):
-        mocker.patch.object(CassandraMigration, "apply_migration")
         mocker.patch.object(migrate.Migrate, "_send_logs_to_s3")
 
         all_fs = migrate.migrate("tests/mocks/entities/", False, False)
