@@ -1,20 +1,18 @@
+import datetime
 import importlib
 import inspect
 import os
 import pkgutil
 import sys
-import boto3
-import datetime
 from typing import Set
 
+import boto3
 import setuptools
 import typer
 from botocore.exceptions import ClientError
 
-from butterfree.clients import SparkClient
 from butterfree.configs import environment
 from butterfree.configs.logger import __logger
-from butterfree.extract.readers import FileReader
 from butterfree.migrations.database_migration import ALLOWED_DATABASE
 from butterfree.pipelines import FeatureSetPipeline
 
@@ -109,20 +107,29 @@ class Migrate:
         pipelines: list of Feature Set Pipelines to use to migration.
     """
 
-    def __init__(
-        self, pipelines: Set[FeatureSetPipeline],
-    ) -> None:
+    def __init__(self, pipelines: Set[FeatureSetPipeline],) -> None:
         self.pipelines = pipelines
 
     def _send_logs_to_s3(self, file_local: bool) -> None:
         """Send all migration logs to S3."""
-        s3_client = boto3.client('s3')
+        s3_client = boto3.client("s3")
+
         file_name = "../logging.json"
-        date = datetime.date.today()
-        object_name = f"logs/{date}/logging.json"
+        timestamp = datetime.datetime.now()
+        object_name = (
+            f"logs/migrate/"
+            f"{timestamp.strftime('%Y-%m-%d')}"
+            f"/logging-{timestamp.strftime('%H:%M:%S')}.json"
+        )
         bucket = environment.get_variable("FEATURE_STORE_S3_BUCKET")
+
         try:
-            s3_client.upload_file(file_name, bucket, object_name, ExtraArgs={'ACL': 'bucket-owner-full-control'})
+            s3_client.upload_file(
+                file_name,
+                bucket,
+                object_name,
+                ExtraArgs={"ACL": "bucket-owner-full-control"},
+            )
         except ClientError:
             raise
 
