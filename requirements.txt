@@ -6,3 +6,4 @@ pyspark==3.*
 typer>=0.3,<0.4
 setuptools>=41,<42
 typing-extensions==3.7.4.3
+boto3==1.17.*

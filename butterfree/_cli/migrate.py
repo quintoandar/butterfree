@@ -3,10 +3,13 @@ import inspect
 import os
 import pkgutil
 import sys
+import boto3
+import datetime
 from typing import Set
 
 import setuptools
 import typer
+from botocore.exceptions import ClientError
 
 from butterfree.clients import SparkClient
 from butterfree.configs import environment
@@ -107,29 +110,24 @@ class Migrate:
     """
 
     def __init__(
-        self, pipelines: Set[FeatureSetPipeline], spark_client: SparkClient = None
+        self, pipelines: Set[FeatureSetPipeline],
     ) -> None:
         self.pipelines = pipelines
-        self.spark_client = spark_client or SparkClient()
 
     def _send_logs_to_s3(self, file_local: bool) -> None:
         """Send all migration logs to S3."""
-        log_path = "../logging.json"
+        s3_client = boto3.client('s3')
+        file_name = "../logging.json"
+        date = datetime.date.today()
+        object_name = f"logs/{date}/logging.json"
+        bucket = environment.get_variable("FEATURE_STORE_S3_BUCKET")
+        try:
+            s3_client.upload_file(file_name, bucket, object_name, ExtraArgs={'ACL': 'bucket-owner-full-control'})
+        except ClientError:
+            raise
 
-        file_reader = FileReader(id="name", path=log_path, format="json")
-        df = file_reader.consume(self.spark_client)
-
-        path = environment.get_variable("FEATURE_STORE_S3_BUCKET")
-
-        self.spark_client.write_dataframe(
-            dataframe=df,
-            format_="json",
-            mode="append",
-            **{"path": f"s3a://{path}/logging"},
-        )
-
-        if not file_local and os.path.exists(log_path):
-            os.remove(log_path)
+        if not file_local and os.path.exists(file_name):
+            os.remove(file_name)
 
     def run(self, generate_logs: bool = False) -> None:
         """Construct and apply the migrations."""
