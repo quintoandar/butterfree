@@ -3,9 +3,15 @@ from ssl import CERT_REQUIRED, PROTOCOL_TLSv1
 from typing import Dict, List, Optional
 
 from cassandra.auth import PlainTextAuthProvider
-from cassandra.cluster import Cluster, ResponseFuture, Session
-from cassandra.policies import RoundRobinPolicy
-from cassandra.query import dict_factory
+from cassandra.cluster import (
+    EXEC_PROFILE_DEFAULT,
+    Cluster,
+    ExecutionProfile,
+    ResponseFuture,
+    Session,
+)
+from cassandra.policies import DCAwareRoundRobinPolicy
+from cassandra.query import ConsistencyLevel, dict_factory
 from typing_extensions import TypedDict
 
 from butterfree.clients import AbstractClient
@@ -70,14 +76,20 @@ class CassandraClient(AbstractClient):
             else None
         )
 
+        execution_profiles = {
+            EXEC_PROFILE_DEFAULT: ExecutionProfile(
+                load_balancing_policy=DCAwareRoundRobinPolicy(),
+                consistency_level=ConsistencyLevel.LOCAL_QUORUM,
+                row_factory=dict_factory,
+            )
+        }
         cluster = Cluster(
             contact_points=self.host,
             auth_provider=auth_provider,
             ssl_options=ssl_opts,
-            load_balancing_policy=RoundRobinPolicy(),
+            execution_profiles=execution_profiles,
         )
         self._session = cluster.connect(self.keyspace)
-        self._session.row_factory = dict_factory
         return self._session
 
     def sql(self, query: str) -> ResponseFuture:

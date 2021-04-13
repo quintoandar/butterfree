@@ -21,6 +21,8 @@ class CassandraConfig(AbstractWriteConfig):
         stream_processing_time: processing time interval for streaming jobs.
         stream_output_mode: specify the mode from writing streaming data.
         stream_checkpoint_path: path on S3 to save checkpoints for the stream job.
+        read_consistency_level: read consistency level used in connection.
+        write_consistency_level: write consistency level used in connection.
 
     More information about processing_time, output_mode and checkpoint_path
     can be found in Spark documentation:
@@ -39,6 +41,8 @@ class CassandraConfig(AbstractWriteConfig):
         stream_processing_time: str = None,
         stream_output_mode: str = None,
         stream_checkpoint_path: str = None,
+        read_consistency_level: str = None,
+        write_consistency_level: str = None,
     ):
         self.username = username
         self.password = password
@@ -49,6 +53,8 @@ class CassandraConfig(AbstractWriteConfig):
         self.stream_processing_time = stream_processing_time
         self.stream_output_mode = stream_output_mode
         self.stream_checkpoint_path = stream_checkpoint_path
+        self.read_consistency_level = read_consistency_level
+        self.write_consistency_level = write_consistency_level
 
     @property
     def database(self) -> str:
@@ -150,6 +156,28 @@ class CassandraConfig(AbstractWriteConfig):
             "STREAM_CHECKPOINT_PATH"
         )
 
+    @property
+    def read_consistency_level(self) -> Optional[str]:
+        """Read consistency level for Cassandra."""
+        return self.__read_consistency_level
+
+    @read_consistency_level.setter
+    def read_consistency_level(self, value: str) -> None:
+        self.__read_consistency_level = value or environment.get_variable(
+            "CASSANDRA_READ_CONSISTENCY_LEVEL", "LOCAL_ONE"
+        )
+
+    @property
+    def write_consistency_level(self) -> Optional[str]:
+        """Write consistency level for Cassandra."""
+        return self.__write_consistency_level
+
+    @write_consistency_level.setter
+    def write_consistency_level(self, value: str) -> None:
+        self.__write_consistency_level = value or environment.get_variable(
+            "CASSANDRA_WRITE_CONSISTENCY_LEVEL", "LOCAL_QUORUM"
+        )
+
     def get_options(self, table: str) -> Dict[Optional[str], Optional[str]]:
         """Get options for connect to Cassandra DB.
 
@@ -169,6 +197,8 @@ class CassandraConfig(AbstractWriteConfig):
             "spark.cassandra.auth.username": self.username,
             "spark.cassandra.auth.password": self.password,
             "spark.cassandra.connection.host": self.host,
+            "spark.cassandra.input.consistency.level": self.read_consistency_level,
+            "spark.cassandra.output.consistency.level": self.write_consistency_level,
         }
 
     def translate(self, schema: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
