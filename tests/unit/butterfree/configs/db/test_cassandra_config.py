@@ -172,6 +172,15 @@ class TestCassandraConfig:
         # then
         assert cassandra_config.read_consistency_level == value
 
+    def test_read_consistency_level_custom_env_var(self, mocker, cassandra_config):
+        # given
+        value = "Custom Config"
+        mocker.patch("butterfree.configs.environment.get_variable", return_value=value)
+        cassandra_config.read_consistency_level = value
+
+        # then
+        assert cassandra_config.read_consistency_level == value
+
     def test_write_consistency_level(self, cassandra_config):
         # expecting
         default = "LOCAL_QUORUM"
@@ -180,6 +189,15 @@ class TestCassandraConfig:
     def test_write_consistency_level_custom(self, cassandra_config):
         # given
         value = "Custom Config"
+        cassandra_config.write_consistency_level = value
+
+        # then
+        assert cassandra_config.write_consistency_level == value
+
+    def test_write_consistency_level_custom_env_var(self, mocker, cassandra_config):
+        # given
+        value = "Custom Config"
+        mocker.patch("butterfree.configs.environment.get_variable", return_value=value)
         cassandra_config.write_consistency_level = value
 
         # then
