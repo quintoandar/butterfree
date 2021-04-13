@@ -14,10 +14,6 @@ specification = {
     "STREAM_CHECKPOINT_PATH": None,
     "CASSANDRA_READ_CONSISTENCY_LEVEL": None,
     "CASSANDRA_WRITE_CONSISTENCY_LEVEL": None,
-    "CASSANDRA_LOCAL_DC": None,
-}
-
-
 class UnspecifiedVariableError(RuntimeError):
     """Environment variables not set error.
 
