@@ -169,7 +169,7 @@ class CassandraConfig(AbstractWriteConfig):
 
     @property
     def write_consistency_level(self) -> Optional[str]:
-        """Write consistency level for Spark."""
+        """Write consistency level for Cassandra."""
         return self.__write_consistency_level
 
     @write_consistency_level.setter
