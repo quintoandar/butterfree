@@ -158,7 +158,7 @@ class CassandraConfig(AbstractWriteConfig):
 
     @property
     def read_consistency_level(self) -> Optional[str]:
-        """Read consistency level for Spark."""
+        """Read consistency level for Cassandra."""
         return self.__read_consistency_level
 
     @read_consistency_level.setter
