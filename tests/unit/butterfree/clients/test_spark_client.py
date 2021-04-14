@@ -65,7 +65,7 @@ class TestSparkClient:
 
         # assert
         mocked_spark_read.format.assert_called_once_with(format)
-        mocked_spark_read.load.assert_called_once_with(path, **options)
+        mocked_spark_read.load.assert_called_once_with(path=path, **options)
         assert target_df.collect() == result_df.collect()
 
     @pytest.mark.parametrize(
