@@ -174,7 +174,7 @@ class KafkaReader(Reader):
         """
         # read using client and cast key and value columns from binary to string
         raw_df = (
-            client.read(format="kafka", options=self.options, stream=self.stream)
+            client.read(format="kafka", stream=self.stream, **self.options)
             .withColumn("key", col("key").cast("string"))
             .withColumn("value", col("value").cast("string"))
         )
