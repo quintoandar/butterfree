@@ -58,7 +58,7 @@ class SparkClient(AbstractClient):
         """
         if not isinstance(format, str):
             raise ValueError("format needs to be a string with the desired read format")
-        if not isinstance(path, (str, list)):
+        if path and not isinstance(path, (str, list)):
             raise ValueError("path needs to be a string or a list of string")
 
         df_reader: Union[
@@ -67,7 +67,7 @@ class SparkClient(AbstractClient):
 
         df_reader = df_reader.schema(schema) if schema else df_reader
 
-        return df_reader.format(format).load(path, **options)  # type: ignore
+        return df_reader.format(format).load(path=path, **options)  # type: ignore
 
     def read_table(self, table: str, database: str = None) -> DataFrame:
         """Use the SparkSession.read interface to read a metastore table.
