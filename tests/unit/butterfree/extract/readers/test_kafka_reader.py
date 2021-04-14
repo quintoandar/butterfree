@@ -99,7 +99,7 @@ class TestKafkaReader:
 
         # assert
         spark_client.read.assert_called_once_with(
-            format="kafka", options=options, stream=kafka_reader.stream
+            format="kafka", stream=kafka_reader.stream, **options
         )
         assert_dataframe_equality(target_df, output_df)
 
