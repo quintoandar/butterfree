@@ -203,6 +203,28 @@ class TestCassandraConfig:
         # then
         assert cassandra_config.write_consistency_level == value
 
+    def test_local_dc(self, cassandra_config):
+        # expecting
+        default = None
+        assert cassandra_config.local_dc == default
+
+    def test_local_dc_custom(self, cassandra_config):
+        # given
+        value = "VPC_1"
+        cassandra_config.local_dc = value
+
+        # then
+        assert cassandra_config.local_dc == value
+
+    def test_local_dc_custom_env_var(self, mocker, cassandra_config):
+        # given
+        value = "VPC_1"
+        mocker.patch("butterfree.configs.environment.get_variable", return_value=value)
+        cassandra_config.local_dc = value
+
+        # then
+        assert cassandra_config.local_dc == value
+
     def test_set_credentials_on_instantiation(self):
         cassandra_config = CassandraConfig(  # noqa: S106
             username="username", password="password", host="host", keyspace="keyspace"
