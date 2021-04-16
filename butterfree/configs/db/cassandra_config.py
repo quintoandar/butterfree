@@ -43,6 +43,7 @@ class CassandraConfig(AbstractWriteConfig):
         stream_checkpoint_path: str = None,
         read_consistency_level: str = None,
         write_consistency_level: str = None,
+        local_dc: str = None,
     ):
         self.username = username
         self.password = password
@@ -55,6 +56,7 @@ class CassandraConfig(AbstractWriteConfig):
         self.stream_checkpoint_path = stream_checkpoint_path
         self.read_consistency_level = read_consistency_level
         self.write_consistency_level = write_consistency_level
+        self.local_dc = local_dc
 
     @property
     def database(self) -> str:
@@ -178,6 +180,15 @@ class CassandraConfig(AbstractWriteConfig):
             "CASSANDRA_WRITE_CONSISTENCY_LEVEL", "LOCAL_QUORUM"
         )
 
+    @property
+    def local_dc(self) -> Optional[str]:
+        """Local DC for Cassandra connection."""
+        return self.__local_dc
+
+    @local_dc.setter
+    def local_dc(self, value: str) -> None:
+        self.__local_dc = value or environment.get_variable("CASSANDRA_LOCAL_DC")
+
     def get_options(self, table: str) -> Dict[Optional[str], Optional[str]]:
         """Get options for connect to Cassandra DB.
 
@@ -197,6 +208,7 @@ class CassandraConfig(AbstractWriteConfig):
             "spark.cassandra.auth.username": self.username,
             "spark.cassandra.auth.password": self.password,
             "spark.cassandra.connection.host": self.host,
+            "spark.cassandra.connection.localDC": self.local_dc,
             "spark.cassandra.input.consistency.level": self.read_consistency_level,
             "spark.cassandra.output.consistency.level": self.write_consistency_level,
         }
