@@ -314,7 +314,7 @@ class SparkClient(AbstractClient):
 
         return converted_schema
 
-    def get_schema(self, table: str, database: str) -> List[Dict[str, str]]:
+    def get_schema(self, table: str, database: str = None) -> List[Dict[str, str]]:
         """Returns desired table schema.
 
         Attributes:

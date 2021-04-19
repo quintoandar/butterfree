@@ -1,6 +1,7 @@
 import datetime
 import importlib
 import inspect
+import json
 import os
 import pkgutil
 import sys
@@ -43,6 +44,7 @@ def __fs_objects(path: str) -> Set[FeatureSetPipeline]:
     logger.info(f"Looking for python modules under {path}...")
     modules = __find_modules(path)
     if not modules:
+        logger.error(f"Path: {path} not found!")
         return set()
 
     logger.info(f"Importing modules...")
@@ -112,36 +114,47 @@ class Migrate:
 
     def _send_logs_to_s3(self, file_local: bool) -> None:
         """Send all migration logs to S3."""
-        s3_client = boto3.client("s3")
-
         file_name = "../logging.json"
-        timestamp = datetime.datetime.now()
-        object_name = (
-            f"logs/migrate/"
-            f"{timestamp.strftime('%Y-%m-%d')}"
-            f"/logging-{timestamp.strftime('%H:%M:%S')}.json"
-        )
-        bucket = environment.get_variable("FEATURE_STORE_S3_BUCKET")
-
-        try:
-            s3_client.upload_file(
-                file_name,
-                bucket,
-                object_name,
-                ExtraArgs={"ACL": "bucket-owner-full-control"},
-            )
-        except ClientError:
-            raise
 
         if not file_local and os.path.exists(file_name):
+            s3_client = boto3.client("s3")
+
+            timestamp = datetime.datetime.now()
+            object_name = (
+                f"logs/migrate/"
+                f"{timestamp.strftime('%Y-%m-%d')}"
+                f"/logging-{timestamp.strftime('%H:%M:%S')}.json"
+            )
+            bucket = environment.get_variable("FEATURE_STORE_S3_BUCKET")
+
+            try:
+                s3_client.upload_file(
+                    file_name,
+                    bucket,
+                    object_name,
+                    ExtraArgs={"ACL": "bucket-owner-full-control"},
+                )
+            except ClientError:
+                raise
+
             os.remove(file_name)
+        else:
+            with open(file_name, "r") as json_f:
+                json_data = json.load(json_f)
+                print(json_data)
 
     def run(self, generate_logs: bool = False) -> None:
         """Construct and apply the migrations."""
         for pipeline in self.pipelines:
             for writer in pipeline.sink.writers:
-                migration = ALLOWED_DATABASE[writer.db_config.database]
-                migration.apply_migration(pipeline.feature_set, writer)
+                db = writer.db_config.database
+                if db != "metastore":
+                    migration = ALLOWED_DATABASE[db]
+                    migration.apply_migration(pipeline.feature_set, writer)
+                else:
+                    logger.warning(
+                        "Butterfree not supporting Metastore Migrations yet."
+                    )
 
         self._send_logs_to_s3(generate_logs)
 
