@@ -10,7 +10,6 @@ from butterfree.pipelines import FeatureSetPipeline
 runner = CliRunner()
 
     def test_migrate_all_pairs(self, mocker):
-        mocker.patch.object(MetastoreMigration, "apply_migration")
         mocker.patch.object(CassandraMigration, "apply_migration")
         mocker.patch.object(migrate.Migrate, "_send_logs_to_s3")
 
