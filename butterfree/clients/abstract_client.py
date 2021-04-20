@@ -23,3 +23,17 @@ class AbstractClient(ABC):
             Set of records.
         """
         pass
+
+    @abstractmethod
+    def get_schema(self, table: str, database: str = None) -> Any:
+        """Returns desired table schema.
+
+        Attributes:
+            table: desired table.
+
+        Returns:
+            A list of dictionaries in the format
+            [{"column_name": "example1", type: "Spark_type"}, ...]
+
+        """
+        pass

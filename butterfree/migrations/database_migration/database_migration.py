@@ -242,7 +242,9 @@ class DatabaseMigration(ABC):
         )
         return schema_diff
 
-    def _get_schema(self, table_name: str) -> List[Dict[str, Any]]:
+    def _get_schema(
+        self, table_name: str, database: str = None
+    ) -> List[Dict[str, Any]]:
         """Get a table schema in the respective database.
 
         Args:
@@ -252,7 +254,7 @@ class DatabaseMigration(ABC):
             Schema object.
         """
         try:
-            db_schema = self._client.get_schema(table_name)
+            db_schema = self._client.get_schema(table_name, database)
         except Exception:  # noqa
             db_schema = []
         return db_schema
@@ -271,7 +273,7 @@ class DatabaseMigration(ABC):
         )
 
         fs_schema = writer.db_config.translate(feature_set.get_schema())
-        db_schema = self._get_schema(table_name)
+        db_schema = self._get_schema(table_name, writer.database)
 
         queries = self.create_query(
             fs_schema, table_name, db_schema, writer.write_to_entity
