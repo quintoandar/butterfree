@@ -61,35 +61,36 @@ class CassandraClient(AbstractClient):
     @property
     def conn(self, *, ssl_path: str = None) -> Session:  # type: ignore
         """Establishes a Cassandra connection."""
-        auth_provider = (
-            PlainTextAuthProvider(username=self.user, password=self.password)
-            if self.user is not None
-            else None
-        )
-        ssl_opts = (
-            {
-                "ca_certs": ssl_path,
-                "ssl_version": PROTOCOL_TLSv1,
-                "cert_reqs": CERT_REQUIRED,
-            }
-            if ssl_path is not None
-            else None
-        )
-
-        execution_profiles = {
-            EXEC_PROFILE_DEFAULT: ExecutionProfile(
-                load_balancing_policy=DCAwareRoundRobinPolicy(),
-                consistency_level=ConsistencyLevel.LOCAL_QUORUM,
-                row_factory=dict_factory,
+        if not self._session:
+            auth_provider = (
+                PlainTextAuthProvider(username=self.user, password=self.password)
+                if self.user is not None
+                else None
             )
-        }
-        cluster = Cluster(
-            contact_points=self.host,
-            auth_provider=auth_provider,
-            ssl_options=ssl_opts,
-            execution_profiles=execution_profiles,
-        )
-        self._session = cluster.connect(self.keyspace)
+            ssl_opts = (
+                {
+                    "ca_certs": ssl_path,
+                    "ssl_version": PROTOCOL_TLSv1,
+                    "cert_reqs": CERT_REQUIRED,
+                }
+                if ssl_path is not None
+                else None
+            )
+
+            execution_profiles = {
+                EXEC_PROFILE_DEFAULT: ExecutionProfile(
+                    load_balancing_policy=DCAwareRoundRobinPolicy(),
+                    consistency_level=ConsistencyLevel.LOCAL_QUORUM,
+                    row_factory=dict_factory,
+                )
+            }
+            cluster = Cluster(
+                contact_points=self.host,
+                auth_provider=auth_provider,
+                ssl_options=ssl_opts,
+                execution_profiles=execution_profiles,
+            )
+            self._session = cluster.connect(self.keyspace)
         return self._session
 
     def sql(self, query: str) -> ResponseFuture:
@@ -99,9 +100,7 @@ class CassandraClient(AbstractClient):
             query: desired query.
 
         """
-        if not self._session:
-            raise RuntimeError("There's no session available for this query.")
-        return self._session.execute(query)
+        return self.conn.execute(query)
 
     def get_schema(self, table: str, database: str = None) -> List[Dict[str, str]]:
         """Returns desired table schema.
