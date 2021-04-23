@@ -1,8 +1,6 @@
 from typing import Any, Dict, List
 from unittest.mock import MagicMock
 
-import pytest
-
 from butterfree.clients import CassandraClient
 from butterfree.clients.cassandra_client import CassandraColumn
 
@@ -88,31 +86,3 @@ class TestCassandraClient:
         query = cassandra_client.sql.call_args[0][0]
 
         assert sanitize_string(query) == sanitize_string(expected_query)
-
-    def test_cassandra_without_session(self, cassandra_client: CassandraClient) -> None:
-        cassandra_client = cassandra_client
-
-        with pytest.raises(
-            RuntimeError, match="There's no session available for this query."
-        ):
-            cassandra_client.sql(
-                query="select feature1, feature2 from cassandra_feature_set"
-            )
-        with pytest.raises(
-            RuntimeError, match="There's no session available for this query."
-        ):
-            cassandra_client.create_table(
-                [
-                    {"column_name": "id", "type": "int", "primary_key": True},
-                    {
-                        "column_name": "rent_per_month",
-                        "type": "float",
-                        "primary_key": False,
-                    },
-                ],
-                "test",
-            )
-        with pytest.raises(
-            RuntimeError, match="There's no session available for this query."
-        ):
-            cassandra_client.get_schema("test")
