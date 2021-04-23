@@ -93,7 +93,7 @@ class DatabaseMigration(ABC):
         pass
 
     @abstractmethod
-    def _get_alter_column_type_query(self, columns: List[Diff], table_name: str) -> str:
+    def _get_alter_column_type_query(self, column: Diff, table_name: str) -> str:
         """Creates desired statement to alter columns' types.
 
         Args:
@@ -152,10 +152,11 @@ class DatabaseMigration(ABC):
                 )
                 queries.append(drop_columns_query)
         if alter_type_items:
-            alter_column_types_query = self._get_alter_column_type_query(
-                alter_type_items, table_name
-            )
-            queries.append(alter_column_types_query)
+            for item in alter_type_items:
+                alter_column_types_query = self._get_alter_column_type_query(
+                    item, table_name
+                )
+                queries.append(alter_column_types_query)
         if alter_key_items:
             logger.info("This operation is not supported by Spark.")
 

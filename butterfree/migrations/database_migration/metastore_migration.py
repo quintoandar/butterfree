@@ -74,7 +74,7 @@ class MetastoreMigration(DatabaseMigration):
             f"ADD IF NOT EXISTS columns ({parsed_columns});"
         )
 
-    def _get_alter_column_type_query(self, columns: List[Diff], table_name: str) -> str:
+    def _get_alter_column_type_query(self, column: Diff, table_name: str) -> str:
         """Creates SQL statement to alter columns' types.
 
         Args:
@@ -85,9 +85,9 @@ class MetastoreMigration(DatabaseMigration):
             Alter column type query.
 
         """
-        parsed_columns = self._get_parsed_columns(columns)
+        parsed_columns = self._get_parsed_columns([column])
 
-        return f"ALTER TABLE {table_name} ALTER COLUMN ({parsed_columns});"
+        return f"ALTER TABLE {table_name} ALTER COLUMN {parsed_columns};"
 
     def _get_create_table_query(
         self, columns: List[Dict[str, Any]], table_name: str
