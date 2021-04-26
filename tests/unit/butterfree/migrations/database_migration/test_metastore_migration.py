@@ -11,7 +11,7 @@ class TestMetastoreMigration:
             "ALTER TABLE table_name DROP IF EXISTS "
             "(feature1__avg_over_2_days_rolling_windows None);",
             "ALTER TABLE table_name ALTER COLUMN "
-            "(feature1__avg_over_1_week_rolling_windows FloatType);",
+            "feature1__avg_over_1_week_rolling_windows FloatType;",
         ]
 
         query = metastore_migration.create_query(fs_schema, "table_name", db_schema)
@@ -25,7 +25,7 @@ class TestMetastoreMigration:
             "ALTER TABLE test.table_name ADD IF NOT EXISTS "
             "columns (new_feature FloatType);",
             "ALTER TABLE table_name ALTER COLUMN "
-            "(feature1__avg_over_1_week_rolling_windows FloatType);",
+            "feature1__avg_over_1_week_rolling_windows FloatType;",
         ]
 
         query = metastore_migration.create_query(
