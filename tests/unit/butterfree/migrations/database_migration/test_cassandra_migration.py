@@ -8,7 +8,7 @@ class TestCassandraMigration:
             "ALTER TABLE table_name ADD (new_feature FloatType);",
             "ALTER TABLE table_name DROP (feature1__avg_over_2_days_rolling_windows);",
             "ALTER TABLE table_name ALTER "
-            "(feature1__avg_over_1_week_rolling_windows FloatType);",
+            "feature1__avg_over_1_week_rolling_windows FloatType;",
         ]
         query = cassandra_migration.create_query(fs_schema, "table_name", db_schema)
 
@@ -19,7 +19,7 @@ class TestCassandraMigration:
         expected_query = [
             "ALTER TABLE table_name ADD (new_feature FloatType);",
             "ALTER TABLE table_name ALTER "
-            "(feature1__avg_over_1_week_rolling_windows FloatType);",
+            "feature1__avg_over_1_week_rolling_windows FloatType;",
         ]
         query = cassandra_migration.create_query(
             fs_schema, "table_name", db_schema, True
