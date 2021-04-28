@@ -88,7 +88,9 @@ class CassandraMigration(DatabaseMigration):
         """
         parsed_columns = self._get_parsed_columns([column])
 
-        return f"ALTER TABLE {table_name} ALTER {parsed_columns};"
+        return (
+            f"ALTER TABLE {table_name} ALTER {parsed_columns.replace(' ', ' TYPE ')};"
+        )
 
     @staticmethod
     def _get_create_table_query(columns: List[Dict[str, Any]], table_name: str) -> str:
