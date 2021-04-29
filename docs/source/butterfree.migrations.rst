@@ -1,5 +1,5 @@
-butterfree.configs package
-==========================
+butterfree.migrations package
+=============================
 
 Subpackages
 -----------
@@ -7,13 +7,13 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
-   butterfree.configs.db
+   butterfree.migrations.database_migration
 
 Submodules
 ----------
 
 
-.. automodule:: butterfree.configs.environment
+.. automodule:: butterfree.migrations.migrate
    :members:
    :undoc-members:
    :show-inheritance:
@@ -21,7 +21,7 @@ Submodules
 Module contents
 ---------------
 
-.. automodule:: butterfree.configs
+.. automodule:: butterfree.migrations
    :members:
    :undoc-members:
    :show-inheritance:
