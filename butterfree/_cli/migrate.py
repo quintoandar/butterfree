@@ -148,12 +148,12 @@ class Migrate:
         for pipeline in self.pipelines:
             for writer in pipeline.sink.writers:
                 db = writer.db_config.database
-                if db != "metastore":
+                if db == "cassandra":
                     migration = ALLOWED_DATABASE[db]
                     migration.apply_migration(pipeline.feature_set, writer)
                 else:
                     logger.warning(
-                        "Butterfree not supporting Metastore Migrations yet."
+                        f"Butterfree not supporting {db} Migrations yet."
                     )
 
         self._send_logs_to_s3(generate_logs)
