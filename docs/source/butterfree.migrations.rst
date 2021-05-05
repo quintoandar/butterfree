@@ -9,15 +9,6 @@ Subpackages
 
    butterfree.migrations.database_migration
 
-Submodules
-----------
-
-
-.. automodule:: butterfree.migrations.migrate
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 Module contents
 ---------------
 
