@@ -152,9 +152,7 @@ class Migrate:
                     migration = ALLOWED_DATABASE[db]
                     migration.apply_migration(pipeline.feature_set, writer)
                 else:
-                    logger.warning(
-                        f"Butterfree not supporting {db} Migrations yet."
-                    )
+                    logger.warning(f"Butterfree not supporting {db} Migrations yet.")
 
         self._send_logs_to_s3(generate_logs)
 
