@@ -101,6 +101,11 @@ GENERATE_LOGS = typer.Option(
     False, help="To generate the logs in local file 'logging.json'."
 )
 
+DEBUG_MODE = typer.Option(
+    False,
+    help="To view the queries resulting from the migration, DON'T apply the migration.",
+)
+
 
 class Migrate:
     """Execute migration operations in a Database based on pipeline Writer.
@@ -112,7 +117,7 @@ class Migrate:
     def __init__(self, pipelines: Set[FeatureSetPipeline],) -> None:
         self.pipelines = pipelines
 
-    def _send_logs_to_s3(self, file_local: bool) -> None:
+    def _send_logs_to_s3(self, file_local: bool, debug_mode: bool) -> None:
         """Send all migration logs to S3."""
         file_name = "../logging.json"
 
@@ -120,11 +125,19 @@ class Migrate:
             s3_client = boto3.client("s3")
 
             timestamp = datetime.datetime.now()
-            object_name = (
-                f"logs/migrate/"
-                f"{timestamp.strftime('%Y-%m-%d')}"
-                f"/logging-{timestamp.strftime('%H:%M:%S')}.json"
-            )
+
+            if debug_mode:
+                object_name = (
+                    f"logs/migrate-debug-mode/"
+                    f"{timestamp.strftime('%Y-%m-%d')}"
+                    f"/logging-{timestamp.strftime('%H:%M:%S')}.json"
+                )
+            else:
+                object_name = (
+                    f"logs/migrate/"
+                    f"{timestamp.strftime('%Y-%m-%d')}"
+                    f"/logging-{timestamp.strftime('%H:%M:%S')}.json"
+                )
             bucket = environment.get_variable("FEATURE_STORE_S3_BUCKET")
 
             try:
@@ -143,23 +156,23 @@ class Migrate:
                 json_data = json.load(json_f)
                 print(json_data)
 
-    def run(self, generate_logs: bool = False) -> None:
+    def run(self, generate_logs: bool = False, debug_mode: bool = False) -> None:
         """Construct and apply the migrations."""
         for pipeline in self.pipelines:
             for writer in pipeline.sink.writers:
                 db = writer.db_config.database
                 if db == "cassandra":
                     migration = ALLOWED_DATABASE[db]
-                    migration.apply_migration(pipeline.feature_set, writer)
+                    migration.apply_migration(pipeline.feature_set, writer, debug_mode)
                 else:
                     logger.warning(f"Butterfree not supporting {db} Migrations yet.")
 
-        self._send_logs_to_s3(generate_logs)
+        self._send_logs_to_s3(generate_logs, debug_mode)
 
 
 @app.command("apply")
 def migrate(
-    path: str = PATH, generate_logs: bool = GENERATE_LOGS,
+    path: str = PATH, generate_logs: bool = GENERATE_LOGS, debug_mode: bool = DEBUG_MODE
 ) -> Set[FeatureSetPipeline]:
     """Scan and run database migrations for feature set pipelines defined under PATH.
 
@@ -172,5 +185,5 @@ def migrate(
     import and instantiate them.
     """
     pipe_set = __fs_objects(path)
-    Migrate(pipe_set).run(generate_logs)
+    Migrate(pipe_set).run(generate_logs, debug_mode)
     return pipe_set
