@@ -10,6 +10,7 @@ The main idea is for this repository to be a set of tools for easing [ETLs](http
 - [Load](#load)
 - [Streaming](#streaming)
 - [Setup Configuration](#setup-configuration)
+- [Command-line Interface](#command-line-interface)
 
 ## What is going on here
 
@@ -61,3 +62,8 @@ We also support streaming pipelines in Butterfree. More information is available
 ## Setup Configuration
 
 Some configurations are needed to run your ETL pipelines. Detailed information is provided at the [Configuration Section](configuration.md)
+
+## Command-line Interface
+
+Butterfree has its own command-line interface, to manage your feature sets. Detailed information
+provided by the [Command-line Interface](cli.md) section.

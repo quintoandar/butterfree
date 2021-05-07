@@ -12,7 +12,9 @@ Subpackages
    butterfree.constants
    butterfree.dataframe_service
    butterfree.extract
+   butterfree.hooks
    butterfree.load
+   butterfree.migrations
    butterfree.pipelines
    butterfree.reports
    butterfree.testing

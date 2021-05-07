@@ -23,11 +23,10 @@ Submodules
    :show-inheritance:
 
 
-.. automodule:: butterfree.configs.db.s3_config
+.. automodule:: butterfree.configs.db.metastore_config
    :members:
    :undoc-members:
    :show-inheritance:
-
 
 Module contents
 ---------------

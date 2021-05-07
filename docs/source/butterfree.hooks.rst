@@ -1,5 +1,5 @@
-butterfree.configs package
-==========================
+butterfree.hooks package
+========================
 
 Subpackages
 -----------
@@ -7,19 +7,19 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
-   butterfree.configs.db
+   butterfree.hooks.schema_compatibility
 
 Submodules
 ----------
 
 
-.. automodule:: butterfree.configs.environment
+.. automodule:: butterfree.hooks.hook
    :members:
    :undoc-members:
    :show-inheritance:
 
 
-.. automodule:: butterfree.configs.logger
+.. automodule:: butterfree.hooks.hookable_component
    :members:
    :undoc-members:
    :show-inheritance:
@@ -27,7 +27,7 @@ Submodules
 Module contents
 ---------------
 
-.. automodule:: butterfree.configs
+.. automodule:: butterfree.hooks
    :members:
    :undoc-members:
    :show-inheritance:

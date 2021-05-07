@@ -22,3 +22,4 @@ Navigation
    stream
    configuration
    modules
+   cli
