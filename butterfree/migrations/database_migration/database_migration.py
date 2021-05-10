@@ -260,12 +260,15 @@ class DatabaseMigration(ABC):
             db_schema = []
         return db_schema
 
-    def apply_migration(self, feature_set: FeatureSet, writer: Writer,) -> None:
+    def apply_migration(
+        self, feature_set: FeatureSet, writer: Writer, debug_mode: bool
+    ) -> None:
         """Apply the migration in the respective database.
 
         Args:
             feature_set: the feature set.
             writer: the writer being used to load the feature set.
+            debug_mode: if active, it brings up the queries generated.
         """
         logger.info(f"Migrating feature set: {feature_set.name}")
 
@@ -280,8 +283,16 @@ class DatabaseMigration(ABC):
             fs_schema, table_name, db_schema, writer.write_to_entity
         )
 
-        for q in queries:
-            logger.info(f"Applying this query: {q} ...")
-            self._client.sql(q)
+        if debug_mode:
+            print(
+                "#### DEBUG MODE ###\n"
+                f"Feature set: {feature_set.name}\n"
+                "Queries:\n"
+                f"{queries}"
+            )
+        else:
+            for q in queries:
+                logger.info(f"Applying this query: {q} ...")
+                self._client.sql(q)
 
-        logger.info(f"Feature Set migration finished successfully.")
+            logger.info(f"Feature Set migration finished successfully.")
