@@ -17,16 +17,16 @@ class TestMigrate:
         assert all(isinstance(fs, FeatureSetPipeline) for fs in all_fs)
         assert sorted([fs.feature_set.name for fs in all_fs]) == ["first", "second"]
 
-    def test_migrate_all_pairs(self, mocker):
+    def test_migrate_run_methods(self, mocker):
         mocker.patch.object(CassandraMigration, "apply_migration")
         mocker.patch.object(migrate.Migrate, "_send_logs_to_s3")
 
-        all_fs = migrate.migrate("tests/mocks/entities/")
+        all_fs = migrate.migrate("tests/mocks/entities/", False, False)
 
         assert CassandraMigration.apply_migration.call_count == 2
 
         cassandra_pairs = [
-            call(pipe.feature_set, pipe.sink.writers[1]) for pipe in all_fs
+            call(pipe.feature_set, pipe.sink.writers[1], False) for pipe in all_fs
         ]
         CassandraMigration.apply_migration.assert_has_calls(
             cassandra_pairs, any_order=True
