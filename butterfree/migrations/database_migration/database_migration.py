@@ -261,7 +261,7 @@ class DatabaseMigration(ABC):
         return db_schema
 
     def apply_migration(
-        self, feature_set: FeatureSet, writer: Writer, debug_mode: bool = False
+        self, feature_set: FeatureSet, writer: Writer, debug_mode: bool
     ) -> None:
         """Apply the migration in the respective database.
 
