@@ -284,14 +284,14 @@ class DatabaseMigration(ABC):
             fs_schema, table_name, db_schema, writer.write_to_entity
         )
 
-        if queries and debug_mode:
+        if debug_mode:
             print(
                 "#### DEBUG MODE ###\n"
                 f"Feature set: {feature_set.name}\n"
                 "Queries:\n"
                 f"{queries}"
             )
-        elif not debug_mode:
+        else:
             for q in queries:
                 logger.info(f"Applying this query: {q} ...")
                 self._client.sql(q)
