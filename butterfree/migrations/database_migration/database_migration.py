@@ -1,5 +1,4 @@
 """Migration entity."""
-import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum, auto
@@ -141,12 +140,7 @@ class DatabaseMigration(ABC):
             )
             queries.append(alter_table_add_query)
         if drop_items:
-            if write_on_entity:
-                logging.info(
-                    "Features will not be dropped automatically "
-                    "when data is loaded to an entity table"
-                )
-            else:
+            if not write_on_entity:
                 drop_columns_query = self._get_alter_table_drop_query(
                     drop_items, table_name
                 )
@@ -158,7 +152,9 @@ class DatabaseMigration(ABC):
                 )
                 queries.append(alter_column_types_query)
         if alter_key_items:
-            logger.info("This operation is not supported by Spark.")
+            logger.warning(
+                "The 'change the primary key column' action is not supported by Spark."
+            )
 
         return queries
 
@@ -217,6 +213,11 @@ class DatabaseMigration(ABC):
             for db_item in db_schema:
                 if fs_item.get("column_name") == db_item.get("column_name"):
                     if fs_item.get("type") != db_item.get("type"):
+                        if fs_item.get("primary_key") is True:
+                            logger.warning(
+                                "Type changes are not applied to "
+                                "columns that are the primary key."
+                            )
                         alter_type_columns.update(
                             {fs_item.get("column_name"): fs_item.get("type")}
                         )
@@ -283,16 +284,19 @@ class DatabaseMigration(ABC):
             fs_schema, table_name, db_schema, writer.write_to_entity
         )
 
-        if debug_mode:
+        if queries and debug_mode:
             print(
                 "#### DEBUG MODE ###\n"
                 f"Feature set: {feature_set.name}\n"
                 "Queries:\n"
                 f"{queries}"
             )
-        else:
+        elif not debug_mode:
             for q in queries:
                 logger.info(f"Applying this query: {q} ...")
                 self._client.sql(q)
 
             logger.info(f"Feature Set migration finished successfully.")
+
+            # inform in drone console which feature set was migrated
+            print(f"The {feature_set.name} feature set was migrated.")
