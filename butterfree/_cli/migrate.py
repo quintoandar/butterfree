@@ -1,7 +1,6 @@
 import datetime
 import importlib
 import inspect
-import json
 import os
 import pkgutil
 import sys
@@ -151,10 +150,10 @@ class Migrate:
                 raise
 
             os.remove(file_name)
+        elif os.path.exists(file_name):
+            print("Logs written to ../logging.json")
         else:
-            with open(file_name, "r") as json_f:
-                json_data = json.load(json_f)
-                print(json_data)
+            print("No logs were generated.")
 
     def run(self, generate_logs: bool = False, debug_mode: bool = False) -> None:
         """Construct and apply the migrations."""
