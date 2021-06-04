@@ -88,7 +88,7 @@ class AggregatedTransform(TransformComponent):
                 """
             )
 
-        base_name = "__".join([self._parent.name, function.__name__])
+        base_name = "__".join([self._parent.name, str(function.__name__).lower()])
         return base_name
 
     @property
