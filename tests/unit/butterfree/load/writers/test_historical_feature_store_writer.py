@@ -51,7 +51,7 @@ class TestHistoricalFeatureStoreWriter:
     ):
         # given
         spark_client = SparkClient()
-        spark_client.write_dataframe = mocker.stub("write_dataframe")
+        spark_client.write_table = mocker.stub("write_table")
         spark_client.conn.conf.set(
             "spark.sql.sources.partitionOverwriteMode", "dynamic"
         )
@@ -63,21 +63,15 @@ class TestHistoricalFeatureStoreWriter:
             dataframe=feature_set_dataframe,
             spark_client=spark_client,
         )
-        result_df = spark_client.write_dataframe.call_args[1]["dataframe"]
+        result_df = spark_client.write_table.call_args[1]["dataframe"]
 
         # then
         assert_dataframe_equality(historical_feature_set_dataframe, result_df)
 
+        assert writer.database == spark_client.write_table.call_args[1]["database"]
+        assert feature_set.name == spark_client.write_table.call_args[1]["table_name"]
         assert (
-            writer.db_config.format_
-            == spark_client.write_dataframe.call_args[1]["format_"]
-        )
-        assert (
-            writer.db_config.mode == spark_client.write_dataframe.call_args[1]["mode"]
-        )
-        assert (
-            writer.PARTITION_BY
-            == spark_client.write_dataframe.call_args[1]["partitionBy"]
+            writer.PARTITION_BY == spark_client.write_table.call_args[1]["partition_by"]
         )
 
     def test_write_interval_mode_invalid_partition_mode(
@@ -130,9 +124,14 @@ class TestHistoricalFeatureStoreWriter:
         historical_feature_set_dataframe,
         feature_set,
         spark_session,
+        mocker,
     ):
         # given
         spark_client = SparkClient()
+        spark_client.write_dataframe = mocker.stub("write_dataframe")
+        spark_client.conn.conf.set(
+            "spark.sql.sources.partitionOverwriteMode", "dynamic"
+        )
         writer = HistoricalFeatureStoreWriter(debug_mode=True, interval_mode=True)
 
         # when
