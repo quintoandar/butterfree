@@ -1,6 +1,6 @@
 """AggregatedFeatureSet entity."""
 import itertools
-from datetime import timedelta
+from datetime import datetime, timedelta
 from functools import reduce
 from typing import Any, Dict, List, Optional, Union
 
@@ -8,6 +8,7 @@ from pyspark import sql
 from pyspark.sql import DataFrame, functions
 
 from butterfree.clients import SparkClient
+from butterfree.constants.window_definitions import ALLOWED_WINDOWS
 from butterfree.dataframe_service import repartition_df
 from butterfree.transform import FeatureSet
 from butterfree.transform.features import Feature, KeyFeature, TimestampFeature
@@ -300,7 +301,9 @@ class AggregatedFeatureSet(FeatureSet):
 
         return self
 
-    def with_windows(self, definitions: List[str]) -> "AggregatedFeatureSet":
+    def with_windows(
+        self, definitions: List[str], slide: str = None
+    ) -> "AggregatedFeatureSet":
         """Create a list with windows defined."""
         self._windows = [
             Window(
@@ -308,6 +311,7 @@ class AggregatedFeatureSet(FeatureSet):
                 order_by=None,
                 mode="rolling_windows",
                 window_definition=definition,
+                slide=slide,
             )
             for definition in definitions
         ]
@@ -488,12 +492,45 @@ class AggregatedFeatureSet(FeatureSet):
 
         return schema
 
+    @staticmethod
+    def _get_biggest_window_in_days(definitions: List[str]) -> float:
+        windows_list = []
+        for window in definitions:
+            windows_list.append(
+                int(window.split()[0]) * ALLOWED_WINDOWS[window.split()[1]]
+            )
+        return max(windows_list) / (60 * 60 * 24)
+
+    def define_start_date(self, start_date: str = None) -> Optional[str]:
+        """Get aggregated feature set start date.
+
+        Args:
+            start_date: start date regarding source dataframe.
+
+        Returns:
+            start date.
+        """
+        if self._windows and start_date:
+            window_definition = [
+                definition.frame_boundaries.window_definition
+                for definition in self._windows
+            ]
+            biggest_window = self._get_biggest_window_in_days(window_definition)
+
+            return (
+                datetime.strptime(start_date, "%Y-%m-%d")
+                - timedelta(days=int(biggest_window) + 1)
+            ).strftime("%Y-%m-%d")
+
+        return start_date
+
     def construct(
         self,
         dataframe: DataFrame,
         client: SparkClient,
         end_date: str = None,
         num_processors: int = None,
+        start_date: str = None,
     ) -> DataFrame:
         """Use all the features to build the feature set dataframe.
 
@@ -506,6 +543,7 @@ class AggregatedFeatureSet(FeatureSet):
             client: client responsible for connecting to Spark session.
             end_date: user defined max date for having aggregated data (exclusive).
             num_processors: cluster total number of processors for repartitioning.
+            start_date: user defined min date for having aggregated data.
 
         Returns:
             Spark dataframe with all the feature columns.
@@ -519,19 +557,15 @@ class AggregatedFeatureSet(FeatureSet):
         if not isinstance(dataframe, DataFrame):
             raise ValueError("source_df must be a dataframe")
 
+        pre_hook_df = self.run_pre_hooks(dataframe)
+
         output_df = reduce(
             lambda df, feature: feature.transform(df),
             self.keys + [self.timestamp],
-            dataframe,
+            pre_hook_df,
         )
 
         if self._windows and end_date is not None:
-            # prepare our left table, a cartesian product between distinct keys
-            # and dates in range for this feature set
-            base_df = self._get_base_dataframe(
-                client=client, dataframe=output_df, end_date=end_date
-            )
-
             # run aggregations for each window
             agg_list = [
                 self._aggregate(
@@ -543,20 +577,50 @@ class AggregatedFeatureSet(FeatureSet):
                 for w in self._windows
             ]
 
-            # left join each aggregation result to our base dataframe
-            output_df = reduce(
-                lambda left, right: self._dataframe_join(
-                    left,
-                    right,
-                    on=self.keys_columns + [self.timestamp_column],
-                    how="left",
-                    num_processors=num_processors,
-                ),
-                agg_list,
-                base_df,
-            )
+            # prepare our left table, a cartesian product between distinct keys
+            # and dates in range for this feature set
+
+            # todo next versions won't use this logic anymore,
+            # leaving for the client to correct the usage of aggregations
+            # without events
+
+            # keeping this logic to maintain the same behavior for already implemented
+            # feature sets
+
+            if self._windows[0].slide == "1 day":
+                base_df = self._get_base_dataframe(
+                    client=client, dataframe=output_df, end_date=end_date
+                )
+
+                # left join each aggregation result to our base dataframe
+                output_df = reduce(
+                    lambda left, right: self._dataframe_join(
+                        left,
+                        right,
+                        on=self.keys_columns + [self.timestamp_column],
+                        how="left",
+                        num_processors=num_processors,
+                    ),
+                    agg_list,
+                    base_df,
+                )
+            else:
+                output_df = reduce(
+                    lambda left, right: self._dataframe_join(
+                        left,
+                        right,
+                        on=self.keys_columns + [self.timestamp_column],
+                        how="full_outer",
+                        num_processors=num_processors,
+                    ),
+                    agg_list,
+                )
         else:
             output_df = self._aggregate(output_df, features=self.features)
+
+        output_df = self.incremental_strategy.filter_with_incremental_strategy(
+            dataframe=output_df, start_date=start_date, end_date=end_date
+        )
 
         output_df = output_df.select(*self.columns).replace(  # type: ignore
             float("nan"), None
@@ -565,4 +629,6 @@ class AggregatedFeatureSet(FeatureSet):
             output_df = self._filter_duplicated_rows(output_df)
             output_df.cache().count()
 
-        return output_df
+        post_hook_df = self.run_post_hooks(output_df)
+
+        return post_hook_df

@@ -17,11 +17,22 @@ Submodules
    :show-inheritance:
 
 
+.. automodule:: butterfree.constants.migrations
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
 .. automodule:: butterfree.constants.spark_constants
    :members:
    :undoc-members:
    :show-inheritance:
 
+
+.. automodule:: butterfree.constants.window_definitions
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 Module contents
 ---------------

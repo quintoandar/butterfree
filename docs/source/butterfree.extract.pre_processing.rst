@@ -34,7 +34,6 @@ Submodules
    :undoc-members:
    :show-inheritance:
 
-
 Module contents
 ---------------
 

@@ -40,11 +40,12 @@ class FeatureSetPipeline:
         ... )
         >>> from butterfree.load import Sink
         >>> from butterfree.load.writers import HistoricalFeatureStoreWriter
-        >>> import pyspark.sql.functions as F
+        >>> from pyspark.sql import functions
 
         >>> def divide(df, fs, column1, column2):
         ...     name = fs.get_output_columns()[0]
-        ...     df = df.withColumn(name, F.col(column1) / F.col(column2))
+        ...     df = df.withColumn(name,
+        ...            functions.col(column1) / functions.col(column2))
         ...     return df
 
         >>> pipeline = FeatureSetPipeline(
@@ -67,7 +68,8 @@ class FeatureSetPipeline:
         ...                name="feature1",
         ...                description="test",
         ...            transformation=SparkFunctionTransform(
-        ...                 functions=[F.avg, F.stddev_pop]
+        ...                 functions=[Function(functions.avg, DataType.DOUBLE),
+        ...                         Function(functions.stddev_pop, DataType.DOUBLE)],
         ...             ).with_window(
         ...                 partition_by="id",
         ...                 order_by=TIMESTAMP_COLUMN,
@@ -112,6 +114,19 @@ class FeatureSetPipeline:
         This last method (run) will execute the pipeline flow, it'll read from
         the defined sources, compute all the transformations and save the data
         to the specified locations.
+
+         We can run the pipeline over a range of dates by passing an end-date
+        and a start-date, where it will only bring data within this date range.
+
+        >>> pipeline.run(end_date="2020-08-04", start_date="2020-07-04")
+
+        Or run up to a date, where it will only bring data up to the specific date.
+
+        >>> pipeline.run(end_date="2020-08-04")
+
+        Or just a specific date, where you will only bring data for that day.
+
+        >>> pipeline.run_for_date(execution_date="2020-08-04")
 
     """
 
@@ -179,6 +194,7 @@ class FeatureSetPipeline:
         partition_by: List[str] = None,
         order_by: List[str] = None,
         num_processors: int = None,
+        start_date: str = None,
     ) -> None:
         """Runs the defined feature set pipeline.
 
@@ -192,7 +208,11 @@ class FeatureSetPipeline:
         soon. Use only if strictly necessary.
 
         """
-        dataframe = self.source.construct(client=self.spark_client)
+        dataframe = self.source.construct(
+            client=self.spark_client,
+            start_date=self.feature_set.define_start_date(start_date),
+            end_date=end_date,
+        )
 
         if partition_by:
             order_by = order_by or partition_by
@@ -203,6 +223,7 @@ class FeatureSetPipeline:
         dataframe = self.feature_set.construct(
             dataframe=dataframe,
             client=self.spark_client,
+            start_date=start_date,
             end_date=end_date,
             num_processors=num_processors,
         )
@@ -219,3 +240,30 @@ class FeatureSetPipeline:
                 feature_set=self.feature_set,
                 spark_client=self.spark_client,
             )
+
+    def run_for_date(
+        self,
+        execution_date: str = None,
+        partition_by: List[str] = None,
+        order_by: List[str] = None,
+        num_processors: int = None,
+    ) -> None:
+        """Runs the defined feature set pipeline for a specific date.
+
+        The pipeline consists in the following steps:
+
+        - Constructs the input dataframe from the data source.
+        - Construct the feature set dataframe using the defined Features.
+        - Load the data to the configured sink locations.
+
+        It's important to notice, however, that both parameters partition_by
+        and num_processors are WIP, we intend to enhance their functionality
+        soon. Use only if strictly necessary.
+        """
+        self.run(
+            start_date=execution_date,
+            end_date=execution_date,
+            partition_by=partition_by,
+            order_by=order_by,
+            num_processors=num_processors,
+        )

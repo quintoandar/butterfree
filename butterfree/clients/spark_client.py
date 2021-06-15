@@ -1,5 +1,6 @@
 """SparkClient entity."""
 
+import json
 from typing import Any, Dict, List, Optional, Union
 
 from pyspark.sql import DataFrame, DataFrameReader, SparkSession
@@ -34,9 +35,10 @@ class SparkClient(AbstractClient):
     def read(
         self,
         format: str,
-        options: Dict[str, Any],
+        path: Optional[Union[str, List[str]]] = None,
         schema: Optional[StructType] = None,
         stream: bool = False,
+        **options: Any,
     ) -> DataFrame:
         """Use the SparkSession.read interface to load data into a dataframe.
 
@@ -45,9 +47,10 @@ class SparkClient(AbstractClient):
 
         Args:
             format: string with the format to be used by the DataframeReader.
-            options: options to setup the DataframeReader.
+            path: optional string or a list of string for file-system.
             stream:  flag to indicate if data must be read in stream mode.
             schema: an optional pyspark.sql.types.StructType for the input schema.
+            options: options to setup the DataframeReader.
 
         Returns:
             Dataframe
@@ -55,14 +58,16 @@ class SparkClient(AbstractClient):
         """
         if not isinstance(format, str):
             raise ValueError("format needs to be a string with the desired read format")
-        if not isinstance(options, dict):
-            raise ValueError("options needs to be a dict with the setup configurations")
+        if path and not isinstance(path, (str, list)):
+            raise ValueError("path needs to be a string or a list of string")
 
         df_reader: Union[
             DataStreamReader, DataFrameReader
         ] = self.conn.readStream if stream else self.conn.read
+
         df_reader = df_reader.schema(schema) if schema else df_reader
-        return df_reader.format(format).options(**options).load()
+
+        return df_reader.format(format).load(path=path, **options)  # type: ignore
 
     def read_table(self, table: str, database: str = None) -> DataFrame:
         """Use the SparkSession.read interface to read a metastore table.
@@ -212,7 +217,8 @@ class SparkClient(AbstractClient):
             **options,
         )
 
-    def create_temporary_view(self, dataframe: DataFrame, name: str) -> Any:
+    @staticmethod
+    def create_temporary_view(dataframe: DataFrame, name: str) -> Any:
         """Create a temporary view from a given dataframe.
 
         Args:
@@ -223,3 +229,109 @@ class SparkClient(AbstractClient):
         if not dataframe.isStreaming:
             return dataframe.createOrReplaceTempView(name)
         return dataframe.writeStream.format("memory").queryName(name).start()
+
+    def add_table_partitions(
+        self, partitions: List[Dict[str, Any]], table: str, database: str = None
+    ) -> None:
+        """Add partitions to an existing table.
+
+        Args:
+            partitions: partitions to add to the table.
+                It's expected a list of partition dicts to add to the table.
+                Example: `[{"year": 2020, "month": 8, "day": 14}, ...]`
+            table: table to add the partitions.
+            database: name of the database where the table is saved.
+        """
+        for partition_dict in partitions:
+            if not all(
+                (
+                    isinstance(key, str)
+                    and (isinstance(value, str) or isinstance(value, int))
+                )
+                for key, value in partition_dict.items()
+            ):
+                raise ValueError(
+                    "Partition keys must be column names "
+                    "and values must be string or int."
+                )
+
+        database_expr = f"`{database}`." if database else ""
+        key_values_expr = [
+            ", ".join(
+                [
+                    "{} = {}".format(k, v)
+                    if not isinstance(v, str)
+                    else "{} = '{}'".format(k, v)
+                    for k, v in partition.items()
+                ]
+            )
+            for partition in partitions
+        ]
+        partitions_expr = " ".join(f"PARTITION ( {expr} )" for expr in key_values_expr)
+        command = (
+            f"ALTER TABLE {database_expr}`{table}` ADD IF NOT EXISTS {partitions_expr}"
+        )
+
+        self.conn.sql(command)
+
+    @staticmethod
+    def _filter_schema(schema: DataFrame) -> List[str]:
+        """Returns filtered schema with the desired information.
+
+        Attributes:
+            schema: desired table.
+
+        Returns:
+            A list of strings in the format
+            ['{"column_name": "example1", type: "Spark_type"}', ...]
+
+        """
+        return (
+            schema.filter(
+                ~schema.col_name.isin(
+                    ["# Partition Information", "# col_name", "year", "month", "day"]
+                )
+            )
+            .toJSON()
+            .collect()
+        )
+
+    def _convert_schema(self, schema: DataFrame) -> List[Dict[str, str]]:
+        """Returns schema with the desired information.
+
+        Attributes:
+            schema: desired table.
+
+        Returns:
+            A list of dictionaries in the format
+            [{"column_name": "example1", type: "Spark_type"}, ...]
+
+        """
+        schema_list = self._filter_schema(schema)
+        converted_schema = []
+        for row in schema_list:
+            converted_schema.append(json.loads(row))
+
+        return converted_schema
+
+    def get_schema(self, table: str, database: str = None) -> List[Dict[str, str]]:
+        """Returns desired table schema.
+
+        Attributes:
+            table: desired table.
+
+        Returns:
+            A list of dictionaries in the format
+            [{"column_name": "example1", type: "Spark_type"}, ...]
+
+        """
+        query = f"DESCRIBE {database}.{table} "  # noqa
+
+        response = self.sql(query)
+
+        if not response:
+            raise RuntimeError(
+                f"No columns found for table: {table}" f"in database: {database}"
+            )
+
+        return self._convert_schema(response)

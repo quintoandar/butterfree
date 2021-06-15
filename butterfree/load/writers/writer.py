@@ -7,10 +7,12 @@ from typing import Any, Callable, Dict, List
 from pyspark.sql.dataframe import DataFrame
 
 from butterfree.clients import SparkClient
+from butterfree.configs.db import AbstractWriteConfig
+from butterfree.hooks import HookableComponent
 from butterfree.transform import FeatureSet
 
 
-class Writer(ABC):
+class Writer(ABC, HookableComponent):
     """Abstract base class for Writers.
 
     Args:
@@ -18,8 +20,19 @@ class Writer(ABC):
 
     """
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        db_config: AbstractWriteConfig,
+        debug_mode: bool = False,
+        interval_mode: bool = False,
+        write_to_entity: bool = False,
+    ) -> None:
+        super().__init__()
+        self.db_config = db_config
         self.transformations: List[Dict[str, Any]] = []
+        self.debug_mode = debug_mode
+        self.interval_mode = interval_mode
+        self.write_to_entity = write_to_entity
 
     def with_(
         self, transformer: Callable[..., DataFrame], *args: Any, **kwargs: Any
@@ -68,6 +81,19 @@ class Writer(ABC):
             dataframe: Spark dataframe containing data from a feature set.
             spark_client: client for Spark connections with external services.
 
+        """
+
+    @abstractmethod
+    def check_schema(
+        self, client: Any, dataframe: DataFrame, table_name: str, database: str = None
+    ) -> DataFrame:
+        """Instantiate the schema check hook to check schema between dataframe and database.
+
+        Args:
+            client: client for Spark or Cassandra connections with external services.
+            dataframe: Spark dataframe containing data from a feature set.
+            table_name: table name where the dataframe will be saved.
+            database: database name where the dataframe will be saved.
         """
 
     @abstractmethod

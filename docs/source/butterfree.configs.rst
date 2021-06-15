@@ -19,6 +19,11 @@ Submodules
    :show-inheritance:
 
 
+.. automodule:: butterfree.configs.logger
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 

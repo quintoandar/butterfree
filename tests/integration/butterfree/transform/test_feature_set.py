@@ -77,3 +77,47 @@ class TestFeatureSet:
 
         # assert
         assert_dataframe_equality(output_df, target_df)
+
+    def test_construct_with_date_boundaries(
+        self, feature_set_dates_dataframe, feature_set_dates_output_dataframe
+    ):
+        # given
+
+        spark_client = SparkClient()
+
+        # arrange
+
+        feature_set = FeatureSet(
+            name="feature_set",
+            entity="entity",
+            description="description",
+            features=[
+                Feature(name="feature", description="test", dtype=DataType.FLOAT,),
+            ],
+            keys=[
+                KeyFeature(
+                    name="id",
+                    description="The user's Main ID or device ID",
+                    dtype=DataType.INTEGER,
+                )
+            ],
+            timestamp=TimestampFeature(),
+        )
+
+        output_df = (
+            feature_set.construct(
+                feature_set_dates_dataframe,
+                client=spark_client,
+                start_date="2016-04-11",
+                end_date="2016-04-12",
+            )
+            .orderBy(feature_set.timestamp_column)
+            .select(feature_set.columns)
+        )
+
+        target_df = feature_set_dates_output_dataframe.orderBy(
+            feature_set.timestamp_column
+        ).select(feature_set.columns)
+
+        # assert
+        assert_dataframe_equality(output_df, target_df)

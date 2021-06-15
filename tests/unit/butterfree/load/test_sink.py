@@ -136,6 +136,7 @@ class TestSink:
         mocked_stream_df.start.return_value = Mock(spec=StreamingQuery)
 
         online_feature_store_writer = OnlineFeatureStoreWriter()
+
         online_feature_store_writer_on_entity = OnlineFeatureStoreWriter(
             write_to_entity=True
         )
@@ -173,6 +174,7 @@ class TestSink:
         feature_set.name = "my_feature_set"
 
         online_feature_store_writer = OnlineFeatureStoreWriter()
+
         online_feature_store_writer_on_entity = OnlineFeatureStoreWriter(
             write_to_entity=True
         )

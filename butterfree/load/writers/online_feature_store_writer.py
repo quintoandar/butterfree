@@ -10,6 +10,8 @@ from pyspark.sql.streaming import StreamingQuery
 from butterfree.clients import SparkClient
 from butterfree.configs.db import AbstractWriteConfig, CassandraConfig
 from butterfree.constants.columns import TIMESTAMP_COLUMN
+from butterfree.hooks import Hook
+from butterfree.hooks.schema_compatibility import CassandraTableSchemaCompatibilityHook
 from butterfree.load.writers.writer import Writer
 from butterfree.transform import FeatureSet
 
@@ -66,20 +68,30 @@ class OnlineFeatureStoreWriter(Writer):
         Both methods (writer and validate) will need the Spark Client,
         Feature Set and DataFrame, to write or to validate,
         according to OnlineFeatureStoreWriter class arguments.
+
+        There's an important aspect to be highlighted here: if you're using
+        the incremental mode, we do not check if your data is the newest before
+        writing to the online feature store.
+
+        This behavior is known and will be fixed soon.
     """
 
     __name__ = "Online Feature Store Writer"
 
     def __init__(
         self,
-        db_config: Union[AbstractWriteConfig, CassandraConfig] = None,
+        db_config: AbstractWriteConfig = None,
+        database: str = None,
         debug_mode: bool = False,
         write_to_entity: bool = False,
+        interval_mode: bool = False,
+        check_schema_hook: Hook = None,
     ):
-        super(OnlineFeatureStoreWriter, self).__init__()
-        self.db_config = db_config or CassandraConfig()
-        self.debug_mode = debug_mode
-        self.write_to_entity = write_to_entity
+        super(OnlineFeatureStoreWriter, self).__init__(
+            db_config or CassandraConfig(), debug_mode, interval_mode, write_to_entity
+        )
+        self.check_schema_hook = check_schema_hook
+        self.database = database
 
     @staticmethod
     def filter_latest(dataframe: DataFrame, id_columns: List[Any]) -> DataFrame:
@@ -236,3 +248,21 @@ class OnlineFeatureStoreWriter(Writer):
         """
         db_schema = self.db_config.translate(feature_set.get_schema())
         return db_schema
+
+    def check_schema(
+        self, client: Any, dataframe: DataFrame, table_name: str, database: str = None
+    ) -> DataFrame:
+        """Instantiate the schema check hook to check schema between dataframe and database.
+
+        Args:
+            client: client for Spark or Cassandra connections with external services.
+            dataframe: Spark dataframe containing data from a feature set.
+            table_name: table name where the dataframe will be saved.
+            database: database name where the dataframe will be saved.
+        """
+        if not self.check_schema_hook:
+            self.check_schema_hook = CassandraTableSchemaCompatibilityHook(
+                client, table_name
+            )
+
+        return self.check_schema_hook.run(dataframe)

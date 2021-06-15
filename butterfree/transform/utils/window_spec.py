@@ -5,6 +5,7 @@ from pyspark import sql
 from pyspark.sql import Column, WindowSpec, functions
 
 from butterfree.constants.columns import TIMESTAMP_COLUMN
+from butterfree.constants.window_definitions import ALLOWED_WINDOWS
 
 
 class FrameBoundaries:
@@ -15,21 +16,6 @@ class FrameBoundaries:
         window_definition: time ranges to be used in the windows,
         it can be second(s), minute(s), hour(s), day(s), week(s) and year(s),
     """
-
-    __ALLOWED_WINDOWS = {
-        "second": 1,
-        "seconds": 1,
-        "minute": 60,
-        "minutes": 60,
-        "hour": 3600,
-        "hours": 3600,
-        "day": 86400,
-        "days": 86400,
-        "week": 604800,
-        "weeks": 604800,
-        "year": 29030400,
-        "years": 29030400,
-    }
 
     def __init__(self, mode: Optional[str], window_definition: str):
         self.mode = mode
@@ -46,7 +32,7 @@ class FrameBoundaries:
     def window_unit(self) -> str:
         """Returns window unit."""
         unit = self.window_definition.split()[1]
-        if unit not in self.__ALLOWED_WINDOWS and self.mode != "row_windows":
+        if unit not in ALLOWED_WINDOWS and self.mode != "row_windows":
             raise ValueError("Not allowed")
 
         return unit
@@ -59,7 +45,7 @@ class FrameBoundaries:
             span = self.window_size - 1
             return window.rowsBetween(-span, 0)
         if self.mode == "fixed_windows":
-            span = self.__ALLOWED_WINDOWS[self.window_unit] * self.window_size
+            span = ALLOWED_WINDOWS[self.window_unit] * self.window_size
             return window.rangeBetween(-span, 0)
 
 
@@ -76,7 +62,7 @@ class Window:
     Use the static methods in :class:`Window` to create a :class:`WindowSpec`.
     """
 
-    SLIDE_DURATION: str = "1 day"
+    DEFAULT_SLIDE_DURATION: str = "1 day"
 
     def __init__(
         self,
@@ -84,10 +70,12 @@ class Window:
         partition_by: Optional[Union[Column, str, List[str]]] = None,
         order_by: Optional[Union[Column, str]] = None,
         mode: str = None,
+        slide: str = None,
     ):
         self.partition_by = partition_by
         self.order_by = order_by or TIMESTAMP_COLUMN
         self.frame_boundaries = FrameBoundaries(mode, window_definition)
+        self.slide = slide or self.DEFAULT_SLIDE_DURATION
 
     def get_name(self) -> str:
         """Return window suffix name based on passed criteria."""
@@ -103,15 +91,10 @@ class Window:
     def get(self) -> Any:
         """Defines a common window to be used both in time and rows windows."""
         if self.frame_boundaries.mode == "rolling_windows":
-            if int(self.frame_boundaries.window_definition.split()[0]) <= 0:
-                raise KeyError(
-                    f"{self.frame_boundaries.window_definition} "
-                    f"have negative element."
-                )
             return functions.window(
                 TIMESTAMP_COLUMN,
                 self.frame_boundaries.window_definition,
-                slideDuration=self.SLIDE_DURATION,
+                slideDuration=self.slide,
             )
         elif self.order_by == TIMESTAMP_COLUMN:
             w = sql.Window.partitionBy(self.partition_by).orderBy(  # type: ignore

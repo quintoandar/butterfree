@@ -3,9 +3,15 @@ from ssl import CERT_REQUIRED, PROTOCOL_TLSv1
 from typing import Dict, List, Optional
 
 from cassandra.auth import PlainTextAuthProvider
-from cassandra.cluster import Cluster, ResponseFuture, Session
-from cassandra.policies import RoundRobinPolicy
-from cassandra.query import dict_factory
+from cassandra.cluster import (
+    EXEC_PROFILE_DEFAULT,
+    Cluster,
+    ExecutionProfile,
+    ResponseFuture,
+    Session,
+)
+from cassandra.policies import DCAwareRoundRobinPolicy
+from cassandra.query import ConsistencyLevel, dict_factory
 from typing_extensions import TypedDict
 
 from butterfree.clients import AbstractClient
@@ -33,53 +39,58 @@ class CassandraClient(AbstractClient):
     """Cassandra Client.
 
     Attributes:
-        cassandra_user: username to use in connection.
-        cassandra_password: password to use in connection.
-        cassandra_key_space: key space used in connection.
-        cassandra_host: cassandra endpoint used in connection.
+        user: username to use in connection.
+        password: password to use in connection.
+        keyspace: key space used in connection.
+        host: cassandra endpoint used in connection.
     """
 
     def __init__(
         self,
-        cassandra_host: List[str],
-        cassandra_key_space: str,
-        cassandra_user: Optional[str] = None,
-        cassandra_password: Optional[str] = None,
+        host: List[str],
+        keyspace: str,
+        user: Optional[str] = None,
+        password: Optional[str] = None,
     ) -> None:
-        self.cassandra_host = cassandra_host
-        self.cassandra_key_space = cassandra_key_space
-        self.cassandra_user = cassandra_user
-        self.cassandra_password = cassandra_password
+        self.host = host
+        self.keyspace = keyspace
+        self.user = user
+        self.password = password
         self._session: Optional[Session] = None
 
     @property
     def conn(self, *, ssl_path: str = None) -> Session:  # type: ignore
         """Establishes a Cassandra connection."""
-        auth_provider = (
-            PlainTextAuthProvider(
-                username=self.cassandra_user, password=self.cassandra_password
+        if not self._session:
+            auth_provider = (
+                PlainTextAuthProvider(username=self.user, password=self.password)
+                if self.user is not None
+                else None
             )
-            if self.cassandra_user is not None
-            else None
-        )
-        ssl_opts = (
-            {
-                "ca_certs": ssl_path,
-                "ssl_version": PROTOCOL_TLSv1,
-                "cert_reqs": CERT_REQUIRED,
-            }
-            if ssl_path is not None
-            else None
-        )
+            ssl_opts = (
+                {
+                    "ca_certs": ssl_path,
+                    "ssl_version": PROTOCOL_TLSv1,
+                    "cert_reqs": CERT_REQUIRED,
+                }
+                if ssl_path is not None
+                else None
+            )
 
-        cluster = Cluster(
-            contact_points=self.cassandra_host,
-            auth_provider=auth_provider,
-            ssl_options=ssl_opts,
-            load_balancing_policy=RoundRobinPolicy(),
-        )
-        self._session = cluster.connect(self.cassandra_key_space)
-        self._session.row_factory = dict_factory
+            execution_profiles = {
+                EXEC_PROFILE_DEFAULT: ExecutionProfile(
+                    load_balancing_policy=DCAwareRoundRobinPolicy(),
+                    consistency_level=ConsistencyLevel.LOCAL_QUORUM,
+                    row_factory=dict_factory,
+                )
+            }
+            cluster = Cluster(
+                contact_points=self.host,
+                auth_provider=auth_provider,
+                ssl_options=ssl_opts,
+                execution_profiles=execution_profiles,
+            )
+            self._session = cluster.connect(self.keyspace)
         return self._session
 
     def sql(self, query: str) -> ResponseFuture:
@@ -89,11 +100,9 @@ class CassandraClient(AbstractClient):
             query: desired query.
 
         """
-        if not self._session:
-            raise RuntimeError("There's no session available for this query.")
-        return self._session.execute(query)
+        return self.conn.execute(query)
 
-    def get_schema(self, table: str) -> List[Dict[str, str]]:
+    def get_schema(self, table: str, database: str = None) -> List[Dict[str, str]]:
         """Returns desired table schema.
 
         Attributes:
@@ -106,7 +115,7 @@ class CassandraClient(AbstractClient):
         """
         query = (
             f"SELECT column_name, type FROM system_schema.columns "  # noqa
-            f"WHERE keyspace_name = '{self.cassandra_key_space}' "  # noqa
+            f"WHERE keyspace_name = '{self.keyspace}' "  # noqa
             f"  AND table_name = '{table}';"  # noqa
         )
 
@@ -114,8 +123,7 @@ class CassandraClient(AbstractClient):
 
         if not response:
             raise RuntimeError(
-                f"No columns found for table: {table}"
-                f"in key space: {self.cassandra_key_space}"
+                f"No columns found for table: {table}" f"in key space: {self.keyspace}"
             )
 
         return response
@@ -143,7 +151,7 @@ class CassandraClient(AbstractClient):
         else:
             columns_str = joined_parsed_columns
 
-        query = f"CREATE TABLE {self.cassandra_key_space}.{table} " f"({columns_str}); "
+        query = f"CREATE TABLE {self.keyspace}.{table} " f"({columns_str}); "
 
         return query
 

@@ -105,7 +105,7 @@ checks: style-check quality-check type-check
 ## fix stylistic errors with black
 apply-style:
 	@python -m black -t py36 --exclude="build/|buck-out/|dist/|_build/|pip/|\.pip/|\.git/|\.hg/|\.mypy_cache/|\.tox/|\.venv/" .
-	@python -m isort -rc butterfree/ tests/
+	@python -m isort -rc --atomic butterfree/ tests/
 
 .PHONY: clean
 ## clean unused artifacts
@@ -122,6 +122,7 @@ clean:
 	@find ./ -type f -name 'coverage.xml' -exec rm -f {} \;
 	@find ./ -type f -name '.coverage*' -exec rm -f {} \;
 	@find ./ -type f -name '*derby.log' -exec rm -f {} \;
+	@find ./ -type f -name 'logging.json' -exec rm -f {} \;
 	@find ./ -name '*.pyc' -exec rm -f {} \;
 	@find ./ -name '*.pyo' -exec rm -f {} \;
 	@find ./ -name '*~' -exec rm -f {} \;

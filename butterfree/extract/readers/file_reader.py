@@ -87,9 +87,7 @@ class FileReader(Reader):
         self.path = path
         self.format = format
         self.schema = schema
-        self.options = dict(
-            {"path": self.path}, **format_options if format_options else {}
-        )
+        self.options = dict(format_options if format_options else {})
         self.stream = stream
 
     def consume(self, client: SparkClient) -> DataFrame:
@@ -106,11 +104,15 @@ class FileReader(Reader):
 
         """
         schema = (
-            client.read(format=self.format, options=self.options,).schema
+            client.read(format=self.format, path=self.path, **self.options).schema
             if (self.stream and not self.schema)
             else self.schema
         )
 
         return client.read(
-            format=self.format, options=self.options, schema=schema, stream=self.stream,
+            format=self.format,
+            schema=schema,
+            stream=self.stream,
+            path=self.path,
+            **self.options,
         )

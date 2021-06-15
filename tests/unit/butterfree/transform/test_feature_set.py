@@ -12,13 +12,11 @@ from tests.unit.butterfree.transform.conftest import (
 
 from butterfree.clients import SparkClient
 from butterfree.constants import DataType
-from butterfree.constants.columns import TIMESTAMP_COLUMN
 from butterfree.testing.dataframe import assert_dataframe_equality
 from butterfree.transform import FeatureSet
-from butterfree.transform.features import Feature, KeyFeature, TimestampFeature
+from butterfree.transform.features import Feature
 from butterfree.transform.transformations import (
     AggregatedTransform,
-    SparkFunctionTransform,
     SQLExpressionTransform,
 )
 from butterfree.transform.utils import Function
@@ -341,7 +339,7 @@ class TestFeatureSet:
                 timestamp=timestamp_c,
             ).construct(dataframe, spark_client)
 
-    def test_get_schema(self):
+    def test_get_schema(self, feature_set):
         expected_schema = [
             {"column_name": "id", "type": LongType(), "primary_key": True},
             {"column_name": "timestamp", "type": TimestampType(), "primary_key": False},
@@ -367,37 +365,6 @@ class TestFeatureSet:
             },
         ]
 
-        feature_set = FeatureSet(
-            name="feature_set",
-            entity="entity",
-            description="description",
-            features=[
-                Feature(
-                    name="feature1",
-                    description="test",
-                    transformation=SparkFunctionTransform(
-                        functions=[
-                            Function(F.avg, DataType.FLOAT),
-                            Function(F.stddev_pop, DataType.DOUBLE),
-                        ]
-                    ).with_window(
-                        partition_by="id",
-                        order_by=TIMESTAMP_COLUMN,
-                        mode="fixed_windows",
-                        window_definition=["2 minutes", "15 minutes"],
-                    ),
-                ),
-            ],
-            keys=[
-                KeyFeature(
-                    name="id",
-                    description="The user's Main ID or device ID",
-                    dtype=DataType.BIGINT,
-                )
-            ],
-            timestamp=TimestampFeature(),
-        )
-
         schema = feature_set.get_schema()
 
         assert schema == expected_schema
@@ -421,3 +388,9 @@ class TestFeatureSet:
                 keys=[key_id],
                 timestamp=timestamp_c,
             ).construct(dataframe, spark_client)
+
+    def test_define_start_date(self, feature_set):
+        start_date = feature_set.define_start_date("2020-08-04")
+
+        assert isinstance(start_date, str)
+        assert start_date == "2020-08-04"

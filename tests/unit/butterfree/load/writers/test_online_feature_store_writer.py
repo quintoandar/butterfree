@@ -94,6 +94,7 @@ class TestOnlineFeatureStoreWriter:
         latest_feature_set_dataframe,
         feature_set,
         spark_session,
+        mocker,
     ):
         # given
         spark_client = SparkClient()
@@ -110,9 +111,7 @@ class TestOnlineFeatureStoreWriter:
         # then
         assert_dataframe_equality(latest_feature_set_dataframe, result_df)
 
-    def test_write_in_debug_and_stream_mode(
-        self, feature_set, spark_session,
-    ):
+    def test_write_in_debug_and_stream_mode(self, feature_set, spark_session):
         # arrange
         spark_client = SparkClient()
 
