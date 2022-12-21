@@ -52,6 +52,29 @@ Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each 
 ## [1.1.3](https://github.com/quintoandar/butterfree/releases/tag/1.1.3)
 ### Added
 * [MLOP-636] Create migration classes ([#282](https://github.com/quintoandar/butterfree/pull/282))
+* [MLOP-635] Rebase Incremental Job/Interval Run branch for test on selected feature sets ([#278](https://github.com/quintoandar/butterfree/pull/278))
+* Allow slide selection ([#293](https://github.com/quintoandar/butterfree/pull/293))
+* [MLOP-637] Implement diff method ([#292](https://github.com/quintoandar/butterfree/pull/292))
+* [MLOP-640] Create CLI with migrate command ([#298](https://github.com/quintoandar/butterfree/pull/298))
+* [MLOP-645] Implement query method, cassandra ([#291](https://github.com/quintoandar/butterfree/pull/291))
+* [MLOP-671] Implement get_schema on Spark client ([#301](https://github.com/quintoandar/butterfree/pull/301))
+* [MLOP-648] Implement query method, metastore ([#294](https://github.com/quintoandar/butterfree/pull/294))
+* [MLOP-647] / [MLOP-646] Apply migrations ([#300](https://github.com/quintoandar/butterfree/pull/300))
+* [MLOP-639] Track logs in S3 ([#306](https://github.com/quintoandar/butterfree/pull/306))
+* [MLOP-702] Debug mode for Automate Migration ([#322](https://github.com/quintoandar/butterfree/pull/322))
+
+### Changed
+* Keep milliseconds when using 'from_ms' argument in timestamp feature ([#284](https://github.com/quintoandar/butterfree/pull/284))
+* Read and write consistency level options ([#309](https://github.com/quintoandar/butterfree/pull/309))
+* [MLOP-691] Include step to add partition to SparkMetastore during writing of Butterfree ([#327](https://github.com/quintoandar/butterfree/pull/327))
+
+### Fixed
+* [BUG] Apply create_partitions to historical validate ([#303](https://github.com/quintoandar/butterfree/pull/303))
+* [BUG] Fix key path for validate read ([#304](https://github.com/quintoandar/butterfree/pull/304))
+* [FIX] Add Partition types for Metastore ([#305](https://github.com/quintoandar/butterfree/pull/305))
+* Change solution for tracking logs ([#308](https://github.com/quintoandar/butterfree/pull/308))
+* [BUG] Fix Cassandra Connect Session ([#316](https://github.com/quintoandar/butterfree/pull/316))
+* Fix method to generate agg feature name. ([#326](https://github.com/quintoandar/butterfree/pull/326))
 
 ## [1.1.3](https://github.com/quintoandar/butterfree/releases/tag/1.1.3)
 ### Added
