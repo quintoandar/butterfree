@@ -6,6 +6,15 @@ Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each 
 ## [Unreleased]
 
 
+## [1.2.1](https://github.com/quintoandar/butterfree/releases/tag/1.2.1)
+### Changed
+* Update README.md ([#331](https://github.com/quintoandar/butterfree/pull/331))
+* Update Github Actions Workflow runner ([#332](https://github.com/quintoandar/butterfree/pull/332))
+* Delete sphinx version. ([#334](https://github.com/quintoandar/butterfree/pull/334))
+
+### Fixed
+* Add the missing link for H3 geohash ([#330](https://github.com/quintoandar/butterfree/pull/330))
+
 ## [1.2.0](https://github.com/quintoandar/butterfree/releases/tag/1.2.0)
 ### Added
 * [MLOP-636] Create migration classes ([#282](https://github.com/quintoandar/butterfree/pull/282))
