@@ -148,7 +148,7 @@ class TestFeatureSetPipeline:
 
         # act and assert
         dbconfig.get_path_with_partitions = Mock(
-            return_value=["historical/entity/feature_set",]
+            return_value=["historical/entity/feature_set"]
         )
 
         # assert
