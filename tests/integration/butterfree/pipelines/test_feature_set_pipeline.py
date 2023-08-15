@@ -80,22 +80,15 @@ class TestFeatureSetPipeline:
         table_reader_id = "a_source"
         table_reader_table = "table"
         table_reader_db = environment.get_variable("FEATURE_STORE_HISTORICAL_DATABASE")
-        create_temp_view(dataframe=mocked_df, name=table_reader_id)
-        create_db_and_table(
-            spark=spark_session,
-            table_reader_id=table_reader_id,
-            table_reader_db=table_reader_db,
-            table_reader_table=table_reader_table,
-        )
 
-        dbconfig = Mock()
-        dbconfig.mode = "overwrite"
-        dbconfig.format_ = "parquet"
+        path = "test_folder/historical/entity/feature_set"
+
+        dbconfig = MetastoreConfig()
         dbconfig.get_options = Mock(
-            return_value={"path": "test_folder/historical/entity/feature_set"}
+            return_value={"mode": "overwrite", "format_": "parquet", "path": path}
         )
 
-        historical_writer = HistoricalFeatureStoreWriter(db_config=dbconfig)
+        historical_writer = HistoricalFeatureStoreWriter(db_config=dbconfig, debug_mode=True)
 
         # act
         test_pipeline = FeatureSetPipeline(
@@ -151,9 +144,16 @@ class TestFeatureSetPipeline:
         )
         test_pipeline.run()
 
+
+         # act and assert
+        dbconfig.get_path_with_partitions = Mock(
+            return_value=[
+                "historical/entity/feature_set",
+            ]
+        )
+
         # assert
-        path = dbconfig.get_options("historical/entity/feature_set").get("path")
-        df = spark_session.read.parquet(path).orderBy(TIMESTAMP_COLUMN)
+        df = spark_session.sql("select * from historical_feature_store__feature_set")
 
         target_df = fixed_windows_output_feature_set_dataframe.orderBy(
             test_pipeline.feature_set.timestamp_column
@@ -161,9 +161,7 @@ class TestFeatureSetPipeline:
 
         # assert
         assert_dataframe_equality(df, target_df)
-
-        # tear down
-        shutil.rmtree("test_folder")
+        
 
     def test_feature_set_pipeline_with_dates(
         self,

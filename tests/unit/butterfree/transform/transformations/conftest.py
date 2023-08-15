@@ -62,7 +62,7 @@ def target_df_spark(spark_context, spark_session):
             "timestamp": "2016-04-11 11:31:11",
             "feature1": 200,
             "feature2": 200,
-            "feature__cos": 0.4871876750070059,
+            "feature__cos": 0.48718767500700594,
         },
         {
             "id": 1,
