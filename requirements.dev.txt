@@ -1,11 +1,9 @@
-cmake==3.18.4
-h3==3.7.0
-pyarrow==0.15.1
+h3==3.7.4
 jupyter==1.0.0
 twine==3.1.1
 mypy==0.790
-pyspark-stubs==3.0.0
 sphinx==3.5.4
 sphinxemoji==0.1.8
 sphinx-rtd-theme==0.5.2
 recommonmark==0.7.1
+pyarrow>=1.0.0
