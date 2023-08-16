@@ -77,9 +77,18 @@ class TestFeatureSetPipeline:
         self, mocked_df, spark_session, fixed_windows_output_feature_set_dataframe,
     ):
         # arrange
+
         table_reader_id = "a_source"
         table_reader_table = "table"
         table_reader_db = environment.get_variable("FEATURE_STORE_HISTORICAL_DATABASE")
+
+        create_temp_view(dataframe=mocked_df, name=table_reader_id)
+        create_db_and_table(
+            spark=spark_session,
+            table_reader_id=table_reader_id,
+            table_reader_db=table_reader_db,
+            table_reader_table=table_reader_table,
+        )
 
         path = "test_folder/historical/entity/feature_set"
 
