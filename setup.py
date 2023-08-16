@@ -34,7 +34,7 @@ setup(
     license="Copyright",
     author="QuintoAndar",
     install_requires=requirements,
-    extras_require={"h3": ["cmake==3.16.3", "h3==3.4.2"]},
+    extras_require={"h3": ["h3>=3.7.4,<4"]},
     python_requires=">=3.7, <4",
     entry_points={"console_scripts": ["butterfree=butterfree._cli.main:app"]},
     include_package_data=True,
