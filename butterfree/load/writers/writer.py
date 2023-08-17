@@ -26,6 +26,7 @@ class Writer(ABC, HookableComponent):
         debug_mode: bool = False,
         interval_mode: bool = False,
         write_to_entity: bool = False,
+        row_count_validation: bool = True,
     ) -> None:
         super().__init__()
         self.db_config = db_config
@@ -33,6 +34,7 @@ class Writer(ABC, HookableComponent):
         self.debug_mode = debug_mode
         self.interval_mode = interval_mode
         self.write_to_entity = write_to_entity
+        self.row_count_validation = row_count_validation
 
     def with_(
         self, transformer: Callable[..., DataFrame], *args: Any, **kwargs: Any
