@@ -23,7 +23,6 @@ Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each 
 
 ## [1.2.0](https://github.com/quintoandar/butterfree/releases/tag/1.2.0)
 
-
 ### Added
 * [MLOP-636] Create migration classes ([#282](https://github.com/quintoandar/butterfree/pull/282))
 * [MLOP-635] Rebase Incremental Job/Interval Run branch for test on selected feature sets ([#278](https://github.com/quintoandar/butterfree/pull/278))
@@ -49,9 +48,6 @@ Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each 
 * Change solution for tracking logs ([#308](https://github.com/quintoandar/butterfree/pull/308))
 * [BUG] Fix Cassandra Connect Session ([#316](https://github.com/quintoandar/butterfree/pull/316))
 * Fix method to generate agg feature name. ([#326](https://github.com/quintoandar/butterfree/pull/326))
-
-### Added
-* [MLOP-636] Create migration classes ([#282](https://github.com/quintoandar/butterfree/pull/282))
 
 ## [1.1.3](https://github.com/quintoandar/butterfree/releases/tag/1.1.3)
 ### Added
