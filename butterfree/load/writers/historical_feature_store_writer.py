@@ -113,9 +113,14 @@ class HistoricalFeatureStoreWriter(Writer):
         debug_mode: bool = False,
         interval_mode: bool = False,
         check_schema_hook: Hook = None,
+        row_count_validation: bool = True
     ):
         super(HistoricalFeatureStoreWriter, self).__init__(
-            db_config or MetastoreConfig(), debug_mode, interval_mode
+            db_config or MetastoreConfig(),
+            debug_mode,
+            interval_mode,
+            False,
+            row_count_validation,
         )
         self.database = database or environment.get_variable(
             "FEATURE_STORE_HISTORICAL_DATABASE"

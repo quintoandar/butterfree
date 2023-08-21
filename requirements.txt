@@ -1,9 +1,8 @@
 cassandra-driver>=3.22.0,<4.0
 mdutils>=1.2.2,<2.0
-pandas>=0.24,<1.1
+pandas>=0.24,<2.0
 parameters-validation>=1.1.5,<2.0
 pyspark==3.*
 typer>=0.3,<0.4
-setuptools>=41,<42
-typing-extensions==3.7.4.3
+typing-extensions>3.7.4,<5
 boto3==1.17.*

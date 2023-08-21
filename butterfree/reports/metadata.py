@@ -162,7 +162,7 @@ class Metadata:
                 "features": [
                     {
                         "column_name": c["column_name"],
-                        "data_type": str(c["type"]),
+                        "data_type": str(c["type"]).replace("()", ""),
                         "description": desc,
                     }
                     for c, desc in params._features
@@ -208,7 +208,7 @@ class Metadata:
 
         features = ["Column name", "Data type", "Description"]
         for c, desc in params._features:
-            features.extend([c["column_name"], str(c["type"]), desc])
+            features.extend([c["column_name"], str(c["type"]).replace("()", ""), desc])
 
         count_rows = len(features) // 3
 

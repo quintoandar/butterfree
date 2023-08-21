@@ -69,14 +69,15 @@ class Sink(HookableComponent):
         """
         failures = []
         for writer in self.writers:
-            try:
-                writer.validate(
-                    feature_set=feature_set,
-                    dataframe=dataframe,
-                    spark_client=spark_client,
-                )
-            except AssertionError as e:
-                failures.append(e)
+            if writer.row_count_validation:
+                try:
+                    writer.validate(
+                        feature_set=feature_set,
+                        dataframe=dataframe,
+                        spark_client=spark_client,
+                    )
+                except AssertionError as e:
+                    failures.append(e)
 
         if failures:
             raise RuntimeError(
