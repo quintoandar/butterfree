@@ -113,7 +113,7 @@ class HistoricalFeatureStoreWriter(Writer):
         debug_mode: bool = False,
         interval_mode: bool = False,
         check_schema_hook: Hook = None,
-        row_count_validation: bool = True
+        row_count_validation: bool = True,
     ):
         super(HistoricalFeatureStoreWriter, self).__init__(
             db_config or MetastoreConfig(),
