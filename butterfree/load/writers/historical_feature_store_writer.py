@@ -161,32 +161,6 @@ class HistoricalFeatureStoreWriter(Writer):
                     "be configured to 'dynamic'".format(partition_overwrite_mode)
                 )
 
-        if self.interval_mode:
-            partition_overwrite_mode = spark_client.conn.conf.get(
-                "spark.sql.sources.partitionOverwriteMode"
-            ).lower()
-
-            if partition_overwrite_mode != "dynamic":
-                raise RuntimeError(
-                    "m=load_incremental_table, "
-                    "spark.sql.sources.partitionOverwriteMode={}, "
-                    "msg=partitionOverwriteMode have to "
-                    "be configured to 'dynamic'".format(partition_overwrite_mode)
-                )
-
-        if self.interval_mode:
-            partition_overwrite_mode = spark_client.conn.conf.get(
-                "spark.sql.sources.partitionOverwriteMode"
-            ).lower()
-
-            if partition_overwrite_mode != "dynamic":
-                raise RuntimeError(
-                    "m=load_incremental_table, "
-                    "spark.sql.sources.partitionOverwriteMode={}, "
-                    "msg=partitionOverwriteMode have to "
-                    "be configured to 'dynamic'".format(partition_overwrite_mode)
-                )
-
         if self.debug_mode:
             spark_client.create_temporary_view(
                 dataframe=dataframe,
