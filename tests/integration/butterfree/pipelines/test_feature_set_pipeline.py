@@ -101,8 +101,6 @@ class TestFeatureSetPipeline:
             db_config=dbconfig, debug_mode=True
         )
 
-        historical_writer = HistoricalFeatureStoreWriter(db_config=dbconfig)
-
         # act
         test_pipeline = FeatureSetPipeline(
             source=Source(
