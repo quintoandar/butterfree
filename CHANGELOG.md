@@ -5,8 +5,14 @@ Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each 
 
 ## [Unreleased]
 
+## [1.2.2](https://github.com/quintoandar/butterfree/releases/tag/1.2.2)
+
+### Changed
+* Optional row count validation ([#284](https://github.com/quintoandar/butterfree/pull/284))
+* Bump several libs versions ([#333](https://github.com/quintoandar/butterfree/pull/333))
 
 ## [1.2.1](https://github.com/quintoandar/butterfree/releases/tag/1.2.1)
+
 ### Changed
 * Update README.md ([#331](https://github.com/quintoandar/butterfree/pull/331))
 * Update Github Actions Workflow runner ([#332](https://github.com/quintoandar/butterfree/pull/332))
@@ -16,6 +22,7 @@ Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each 
 * Add the missing link for H3 geohash ([#330](https://github.com/quintoandar/butterfree/pull/330))
 
 ## [1.2.0](https://github.com/quintoandar/butterfree/releases/tag/1.2.0)
+
 ### Added
 * [MLOP-636] Create migration classes ([#282](https://github.com/quintoandar/butterfree/pull/282))
 * [MLOP-635] Rebase Incremental Job/Interval Run branch for test on selected feature sets ([#278](https://github.com/quintoandar/butterfree/pull/278))
