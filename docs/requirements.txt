@@ -4,5 +4,5 @@ sphinxemoji==0.1.6
 typing-extensions==3.7.4.2
 cmake==3.18.4
 h3==3.7.0
-pyarrow==0.15.1
+pyarrow==14.0.1
 
