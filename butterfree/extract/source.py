@@ -49,7 +49,7 @@ class Source(HookableComponent):
         temporary views regarding each reader and, after, will run the
         desired query and return a dataframe.
 
-        The `eager_evaluation` param forces Spark to apply the currently 
+        The `eager_evaluation` param forces Spark to apply the currently
         mapped changes to the DataFrame. When this parameter is set to
         False, Spark follows its standard behaviour of lazy evaluation.
         Lazy evaluation can improve Spark's performance as it allows

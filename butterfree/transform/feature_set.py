@@ -98,7 +98,7 @@ class FeatureSet(HookableComponent):
     our dataframe (regarding the number of rows). A detailed explation of this
     method can be found at filter_duplicated_rows docstring.
 
-    The `eager_evaluation` param forces Spark to apply the currently 
+    The `eager_evaluation` param forces Spark to apply the currently
     mapped changes to the DataFrame. When this parameter is set to
     False, Spark follows its standard behaviour of lazy evaluation.
     Lazy evaluation can improve Spark's performance as it allows
