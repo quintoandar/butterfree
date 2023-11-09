@@ -58,10 +58,7 @@ class Source(HookableComponent):
     """
 
     def __init__(
-        self,
-        readers: List[Reader] = None,
-        query: str = "",
-        eager_evaluation: bool = True,
+        self, readers: List[Reader], query: str = "", eager_evaluation: bool = True,
     ) -> None:
         super().__init__()
         self.enable_pre_hooks = False
