@@ -5,6 +5,12 @@ Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each 
 
 ## [Unreleased]
 
+## [1.2.3](https://github.com/quintoandar/butterfree/releases/tag/1.2.3)
+* Optional params ([#347](https://github.com/quintoandar/butterfree/pull/347))
+
+### Changed
+* Optional row count validation ([#340](https://github.com/quintoandar/butterfree/pull/340))
+
 ## [1.2.2](https://github.com/quintoandar/butterfree/releases/tag/1.2.2)
 
 ### Changed
