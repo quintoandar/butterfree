@@ -197,6 +197,8 @@ class AggregatedFeatureSet(FeatureSet):
         keys: List[KeyFeature],
         timestamp: TimestampFeature,
         features: List[Feature],
+        deduplicate_rows: bool = True,
+        eager_evaluation: bool = True,
     ):
         self._windows: List[Any] = []
         self._pivot_column: Optional[str] = None
@@ -204,7 +206,14 @@ class AggregatedFeatureSet(FeatureSet):
         self._distinct_subset: List[Any] = []
         self._distinct_keep: Optional[str] = None
         super(AggregatedFeatureSet, self).__init__(
-            name, entity, description, keys, timestamp, features,
+            name,
+            entity,
+            description,
+            keys,
+            timestamp,
+            features,
+            deduplicate_rows,
+            eager_evaluation,
         )
 
     @property
@@ -626,8 +635,10 @@ class AggregatedFeatureSet(FeatureSet):
             float("nan"), None
         )
         if not output_df.isStreaming:
-            output_df = self._filter_duplicated_rows(output_df)
-            output_df.cache().count()
+            if self.deduplicate_rows:
+                output_df = self._filter_duplicated_rows(output_df)
+            if self.eager_evaluation:
+                output_df.cache().count()
 
         post_hook_df = self.run_post_hooks(output_df)
 
