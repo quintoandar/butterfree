@@ -49,13 +49,22 @@ class Source(HookableComponent):
         temporary views regarding each reader and, after, will run the
         desired query and return a dataframe.
 
+        The `eager_evaluation` param forces Spark to apply the currently
+        mapped changes to the DataFrame. When this parameter is set to
+        False, Spark follows its standard behaviour of lazy evaluation.
+        Lazy evaluation can improve Spark's performance as it allows
+        Spark to build the best version of the execution plan.
+
     """
 
-    def __init__(self, readers: List[Reader], query: str) -> None:
+    def __init__(
+        self, readers: List[Reader], query: str, eager_evaluation: bool = True,
+    ) -> None:
         super().__init__()
         self.enable_pre_hooks = False
         self.readers = readers
         self.query = query
+        self.eager_evaluation = eager_evaluation
 
     def construct(
         self, client: SparkClient, start_date: str = None, end_date: str = None
@@ -87,7 +96,7 @@ class Source(HookableComponent):
 
         dataframe = client.sql(self.query)
 
-        if not dataframe.isStreaming:
+        if not dataframe.isStreaming and self.eager_evaluation:
             dataframe.cache().count()
 
         post_hook_df = self.run_post_hooks(dataframe)

@@ -97,6 +97,12 @@ class FeatureSet(HookableComponent):
     values over key columns and timestamp column, we do this in order to reduce
     our dataframe (regarding the number of rows). A detailed explation of this
     method can be found at filter_duplicated_rows docstring.
+
+    The `eager_evaluation` param forces Spark to apply the currently
+    mapped changes to the DataFrame. When this parameter is set to
+    False, Spark follows its standard behaviour of lazy evaluation.
+    Lazy evaluation can improve Spark's performance as it allows
+    Spark to build the best version of the execution plan.
     """
 
     def __init__(
@@ -107,6 +113,8 @@ class FeatureSet(HookableComponent):
         keys: List[KeyFeature],
         timestamp: TimestampFeature,
         features: List[Feature],
+        deduplicate_rows: bool = True,
+        eager_evaluation: bool = True,
     ) -> None:
         super().__init__()
         self.name = name
@@ -116,6 +124,8 @@ class FeatureSet(HookableComponent):
         self.timestamp = timestamp
         self.features = features
         self.incremental_strategy = IncrementalStrategy(column=TIMESTAMP_COLUMN)
+        self.deduplicate_rows = deduplicate_rows
+        self.eager_evaluation = eager_evaluation
 
     @property
     def name(self) -> str:
@@ -426,8 +436,10 @@ class FeatureSet(HookableComponent):
         ).select(*self.columns)
 
         if not output_df.isStreaming:
-            output_df = self._filter_duplicated_rows(output_df)
-            output_df.cache().count()
+            if self.deduplicate_rows:
+                output_df = self._filter_duplicated_rows(output_df)
+            if self.eager_evaluation:
+                output_df.cache().count()
 
         output_df = self.incremental_strategy.filter_with_incremental_strategy(
             dataframe=output_df, start_date=start_date, end_date=end_date
