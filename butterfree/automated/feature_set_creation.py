@@ -2,7 +2,6 @@ import re
 from dataclasses import dataclass
 from typing import List, Optional, Tuple
 
-import pandas as pd
 from pyspark.sql import DataFrame
 
 from butterfree.constants.data_type import DataType
@@ -51,7 +50,7 @@ class FeatureSetCreation:
 
         return features
 
-    def _get_data_type(self, field_name: str, df: pd.DataFrame) -> str:
+    def _get_data_type(self, field_name: str, df: DataFrame) -> str:
         for field in df.schema.jsonValue()["fields"]:
             if field["name"] == field_name:
 
