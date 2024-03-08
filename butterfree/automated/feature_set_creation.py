@@ -24,7 +24,7 @@ BUTTERFREE_DTYPES = {
 
 
 @dataclass(frozen=True)
-class Table:
+class Table: # noqa: D101
     id: str
     database: str
     name: str
