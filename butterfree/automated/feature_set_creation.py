@@ -76,8 +76,8 @@ class FeatureSetCreation:
         return ""
 
     def _get_tables_with_regex(self, sql_query: str) -> Tuple[List[Table], str]:
-        modified_sql_query = sql_query
 
+        modified_sql_query = sql_query
         tables = []
         stop_words = ["left", "right", "full outer", "inner", "where", "join", "on"]
         keywords = ["from", "join"]
@@ -89,15 +89,14 @@ class FeatureSetCreation:
             matches = pattern.finditer(sql_query)
 
             for match in matches:
-                table_name = match.group(1)
+                full_table_name = match.group(1)
                 id = match.group(2).strip()
-                table = table_name
 
                 if id in stop_words:
-                    id = table
+                    id = full_table_name
 
-                if "." in table_name:
-                    database, table = table_name.split(".")
+                if "." in full_table_name:
+                    database, table = full_table_name.split(".")
 
                     modified_sql_query = re.sub(
                         rf"\b{database}\.{table}\b", table, modified_sql_query
@@ -106,9 +105,9 @@ class FeatureSetCreation:
                     tables.append(Table(id=id, database=database, name=table))
                 else:
                     modified_sql_query = re.sub(
-                        rf"\b{table}\b", table, modified_sql_query
+                        rf"\b{full_table_name}\b", full_table_name, modified_sql_query
                     )
-                    tables.append(Table(id=id, database="TBD", name=table))
+                    tables.append(Table(id=id, database="TBD", name=full_table_name))
 
         return tables, modified_sql_query
 
