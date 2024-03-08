@@ -33,9 +33,6 @@ class Table:  # noqa: D101
 class FeatureSetCreation:
     """Class to auto-generate readers and features."""
 
-    def __init__(self):
-        pass
-
     def _get_features_with_regex(self, sql_query: str) -> List[str]:
         features = []
         sql_query = " ".join(sql_query.split())
@@ -67,12 +64,13 @@ class FeatureSetCreation:
                     if "type" in field_type_keys and "elementType" in field_type_keys:
                         return (
                             "."
-                            + BUTTERFREE_DTYPES[field_type["type"]][
+                            + BUTTERFREE_DTYPES[field_type["type"]][  # type: ignore
                                 field_type["elementType"]
                             ]
                         )
 
                 return "." + BUTTERFREE_DTYPES[field["type"]]
+
         return ""
 
     def _get_tables_with_regex(self, sql_query: str) -> Tuple[List[Table], str]:
@@ -184,7 +182,7 @@ class FeatureSetCreation:
             data_type = "."
 
             if df is None:
-                df = spark.sql(sql_query)  # noqa: F821
+                df = spark.sql(sql_query)  # type: ignore # noqa: F821
 
             data_type = self._get_data_type(feature, df)
 
