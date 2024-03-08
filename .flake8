@@ -1,6 +1,0 @@
-[flake8]
-ignore =
-    # D100: docstring for modules might not be so useful
-    D100
-    # Complains about \s and \w even if are regex
-    W605
