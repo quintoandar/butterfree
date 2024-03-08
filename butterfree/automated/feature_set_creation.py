@@ -187,8 +187,6 @@ class FeatureSetCreation:
             """
             features_formatted.append(feature_string)
 
-        final_string = ("features=[" "\t{}" "    ],\n" "),").format(
-            "".join(features_formatted)
-        )
+        final_string = ("features=[\t{}],\n),").format("".join(features_formatted))
 
         return final_string
