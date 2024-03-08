@@ -2,6 +2,7 @@ import re
 from dataclasses import dataclass
 from typing import List, Optional, Tuple
 
+import pandas as pd
 from pyspark.sql import DataFrame
 
 from butterfree.constants.data_type import DataType
@@ -33,7 +34,7 @@ class FeatureSetCreation:
     def __init__(self):
         pass
 
-    def _get_features_with_regex(self, sql_query: str):
+    def _get_features_with_regex(self, sql_query: str) -> List[str]:
         features = []
         sql_query = " ".join(sql_query.split())
         first_pattern = re.compile("[(]?([\w.*]+)[)]?,", re.IGNORECASE)
@@ -51,7 +52,7 @@ class FeatureSetCreation:
 
         return features
 
-    def _get_data_type(self, field_name, df):
+    def _get_data_type(self, field_name: str, df: pd.DataFrame) -> str:
         for field in df.schema.jsonValue()["fields"]:
             if field["name"] == field_name:
 
