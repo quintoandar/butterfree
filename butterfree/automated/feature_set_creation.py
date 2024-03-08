@@ -79,7 +79,16 @@ class FeatureSetCreation:
 
         modified_sql_query = sql_query
         tables = []
-        stop_words = ["left", "right", "full outer", "inner", "where", "join", "on"]
+        stop_words = [
+            "left",
+            "right",
+            "full outer",
+            "inner",
+            "where",
+            "join",
+            "on",
+            "as",
+        ]
         keywords = ["from", "join"]
 
         for keyword in keywords:
@@ -165,7 +174,7 @@ class FeatureSetCreation:
 
         Especially if you want automatic type inference without passing a reference dataframe.
         The utility will only work in an environment where a spark session is available in the environment
-        """
+        """  # noqa: E501
 
         features = self._get_features_with_regex(sql_query)
         features_formatted = []
@@ -175,7 +184,7 @@ class FeatureSetCreation:
             data_type = "."
 
             if df is None:
-                df = spark.sql(sql_query)
+                df = spark.sql(sql_query)  # noqa: F821
 
             data_type = self._get_data_type(feature, df)
 
