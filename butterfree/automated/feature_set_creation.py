@@ -1,6 +1,9 @@
-from typing import Optional
+"""Class to auto-generate readers and features."""
 import re
+from typing import Optional
+
 from pyspark.sql import DataFrame
+
 from butterfree.constants.data_type import DataType
 
 BUTTERFREE_DTYPES = {
@@ -20,10 +23,11 @@ BUTTERFREE_DTYPES = {
 
 
 def get_features_with_regex(sql_query):
+    """Return feature names from a SQL query."""
     features = []
     sql_query = " ".join(sql_query.split())
-    first_pattern = re.compile("[(]?([\w.*]+)[)]?,", re.IGNORECASE)
-    second_pattern = re.compile("(\w+)\s(from)", re.IGNORECASE)
+    first_pattern = re.compile("[(]?([\w.*]+)[)]?,", re.IGNORECASE) # noqa
+    second_pattern = re.compile("(\w+)\s(from)", re.IGNORECASE) # noqa
 
     for pattern in [first_pattern, second_pattern]:
         matches = pattern.finditer(sql_query)
@@ -39,6 +43,7 @@ def get_features_with_regex(sql_query):
 
 
 def get_data_type(field_name, df):
+    """Return features data types according to a data sample."""
     for field in df.schema.jsonValue()["fields"]:
         if field["name"] == field_name:
 
@@ -61,6 +66,7 @@ def get_data_type(field_name, df):
 
 
 def get_tables_with_regex(sql_query):
+    """Return table names from a SQL query."""
     modified_sql_query = sql_query
 
     tables = []
@@ -95,10 +101,13 @@ def get_tables_with_regex(sql_query):
 
 
 class FeatureSetCreation:
+    """Class to auto-generate readers and features."""
+
     def __init__(self):
         pass
 
     def get_readers(self, sql_query):
+        """Return butterfree formated readers according to a SQL query."""
         tables, modified_sql_query = get_tables_with_regex(sql_query.lower())
         readers = []
         for table in tables:
@@ -128,6 +137,7 @@ class FeatureSetCreation:
         return final_string
 
     def get_features(self, sql_query, df: Optional[DataFrame]):
+        """Return feature names and datatypes from a SQL query and a DataFrame."""
         features = get_features_with_regex(sql_query)
         features_formatted = []
         for feature in features:
