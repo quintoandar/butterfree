@@ -72,7 +72,7 @@ class FeatureSetCreation:
                 return "." + BUTTERFREE_DTYPES[field["type"]]
         return ""
 
-    def _get_tables_with_regex(self, sql_query: str) -> Tuple[List[dict], str]:
+    def _get_tables_with_regex(self, sql_query: str) -> Tuple[List[Table], str]:
         modified_sql_query = sql_query
 
         tables = []
@@ -100,12 +100,12 @@ class FeatureSetCreation:
                         rf"\b{database}\.{table}\b", table, modified_sql_query
                     )
 
-                    tables.append({"id": id, "database": database, "table": table})
+                    tables.append(Table(id=id, database=database, name=table))
                 else:
                     modified_sql_query = re.sub(
                         rf"\b{table}\b", table, modified_sql_query
                     )
-                    tables.append({"id": id, "database": "TBD", "table": table})
+                    tables.append(Table(id=id, database="TBD", name=table))
 
         return tables, modified_sql_query
 
@@ -115,9 +115,9 @@ class FeatureSetCreation:
         for table in tables:
             table_reader_string = f"""
             TableReader(
-                id="{table['id']}",
-                database="{table['database']}",
-                table="{table['table']}"
+                id="{table.id}",
+                database="{table.database}",
+                table="{table.name}"
             ),
             """
             readers.append(table_reader_string)
