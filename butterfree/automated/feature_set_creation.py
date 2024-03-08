@@ -31,6 +31,8 @@ class Table: # noqa: D101
 
 
 class FeatureSetCreation:
+    """Class to auto-generate readers and features."""
+
     def __init__(self):
         pass
 
