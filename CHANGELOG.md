@@ -5,7 +5,10 @@ Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each 
 
 ## [Unreleased]
 
-### Changed
+## [1.2.4](https://github.com/quintoandar/butterfree/releases/tag/1.2.4)
+* Auto create feature sets ([#351](https://github.com/quintoandar/butterfree/pull/351))
+
+## [1.2.3](https://github.com/quintoandar/butterfree/releases/tag/1.2.3)
 * Optional params ([#347](https://github.com/quintoandar/butterfree/pull/347))
 
 ## [1.2.3](https://github.com/quintoandar/butterfree/releases/tag/1.2.3)
