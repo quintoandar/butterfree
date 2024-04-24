@@ -7,7 +7,7 @@ on:
         name: Recover With OpenSSL
         runs-on: ubuntu-20.04
         steps:
-          - uses: actions/checkout@v3
+          - uses: actions/checkout@v2
             env:
               MY_CLIENT_SECRET: ${{ secrets.PYPI_USERNAME }}
               MY_OPENSSL_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
