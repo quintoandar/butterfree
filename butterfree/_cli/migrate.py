@@ -168,7 +168,6 @@ class Migrate:
 
         self._send_logs_to_s3(generate_logs, debug_mode)
 
-        self._send_logs_to_s3(generate_logs)
 
 @app.command("apply")
 def migrate(
