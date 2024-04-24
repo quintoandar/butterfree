@@ -9,7 +9,7 @@ jobs:
   Pipeline:
     if: github.ref == 'refs/heads/master'
 
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     container: quintoandar/python-3-7-java
 
     steps:
