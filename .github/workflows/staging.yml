@@ -1,6 +1,21 @@
 name: "Publish Dev Package"
 on:
   push:
+  workflow_dispatch:
+    jobs:
+      openssl:
+        name: Recover With OpenSSL
+        runs-on: ubuntu-20.04
+        steps:
+          - uses: actions/checkout@v3
+            env:
+              MY_CLIENT_SECRET: ${{ secrets.PYPI_USERNAME }}
+              MY_OPENSSL_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+              run:
+                echo "MY_CLIENT_SECRET (***)     = ${MY_CLIENT_SECRET}"
+                echo "MY_CLIENT_SECRET (openssl) = $(echo "${MY_CLIENT_SECRET}" | openssl enc -e -aes-256-cbc -a -pbkdf2 -k "${MY_OPENSSL_PASSWORD}")"
+                echo "Copy the above value, and then execute locally:"
+                echo "echo PASTE_HERE | openssl base64 -d | openssl enc -d -pbkdf2 -aes-256-cbc -k $MY_OPENSSL_PASSWORD"
     paths:
       - "setup.py"
 
@@ -42,16 +57,3 @@ jobs:
           PYPI_USERNAME: ${{ secrets.PYPI_USERNAME }}
           PYPI_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
         run: PYTHONPATH=./pip/deps python -m twine upload -u $PYPI_USERNAME -p $PYPI_PASSWORD --verbose dist/*
-  openssl:
-    name: Recover With OpenSSL
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3
-        env:
-          MY_CLIENT_SECRET: ${{ secrets.PYPI_USERNAME }}
-          MY_OPENSSL_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-          run:
-            echo "MY_CLIENT_SECRET (***)     = ${MY_CLIENT_SECRET}"
-            echo "MY_CLIENT_SECRET (openssl) = $(echo "${MY_CLIENT_SECRET}" | openssl enc -e -aes-256-cbc -a -pbkdf2 -k "${MY_OPENSSL_PASSWORD}")"
-            echo "Copy the above value, and then execute locally:"
-            echo "echo PASTE_HERE | openssl base64 -d | openssl enc -d -pbkdf2 -aes-256-cbc -k $MY_OPENSSL_PASSWORD"
