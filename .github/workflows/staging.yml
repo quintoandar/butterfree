@@ -12,7 +12,7 @@ jobs:
     container: quintoandar/python-3-7-java
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Install dependencies
         run: make ci-install
