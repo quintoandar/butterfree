@@ -7,6 +7,7 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
+   butterfree.automated
    butterfree.clients
    butterfree.configs
    butterfree.constants
