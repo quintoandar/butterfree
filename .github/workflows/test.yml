@@ -9,11 +9,11 @@ on:
 
 jobs:
   Pipeline:
-    runs-on: checklist-as-code-runner-jrjc2-x5z8g
+    runs-on: ubuntu-22.04
     container: quintoandar/python-3-7-java
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v2
 
     - name: Install dependencies
       run: make ci-install
