@@ -54,7 +54,7 @@ def feature_set():
         Feature(name="feature", description="Description", dtype=DataType.INTEGER),
     ]
     return FeatureSet(
-        "test_sink_feature_set2",
+        "test_sink_feature_set",
         "test_sink_entity",
         "description",
         keys=key_features,

@@ -52,10 +52,6 @@ def test_sink(input_dataframe, feature_set):
     sink.flush(feature_set, feature_set_df, client)
 
     # get historical results
-    # historical_result_df = client.read_table(
-    #     feature_set.name,
-    #     historical_writer.database,
-    # )
     historical_result_df = client.read(
         s3config.format_,
         path=s3config.get_path_with_partitions(feature_set.name, feature_set_df),
