@@ -9,7 +9,7 @@ jobs:
     if: github.ref == 'refs/heads/staging'
 
     runs-on: ubuntu-22.04
-    container: quintoandar/python-3-7-java
+    container: python:3.9.19-bullseye
 
     steps:
       - uses: actions/checkout@v2
