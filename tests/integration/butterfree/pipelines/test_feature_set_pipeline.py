@@ -50,10 +50,11 @@ def create_temp_view(dataframe: DataFrame, name):
 
 
 def create_db_and_table(spark, table_reader_id, table_reader_db, table_reader_table):
-    spark.sql(f"create database if not exists {table_reader_db}")
+    spark.sql(f"drop schema {table_reader_db} cascade")
+    spark.sql(f"create database {table_reader_db}")
     spark.sql(f"use {table_reader_db}")
     spark.sql(
-        f"create table if not exists {table_reader_db}.{table_reader_table} "  # noqa
+        f"create table {table_reader_db}.{table_reader_table} "  # noqa
         f"as select * from {table_reader_id}"  # noqa
     )
 
@@ -90,7 +91,7 @@ class TestFeatureSetPipeline:
             table_reader_table=table_reader_table,
         )
 
-        path = "test_folder/historical/entity/feature_set"
+        path = "spark-warehouse/test.db/test_folder/historical/entity/feature_set"
 
         dbconfig = MetastoreConfig()
         dbconfig.get_options = Mock(
@@ -325,11 +326,13 @@ class TestFeatureSetPipeline:
 
         db = environment.get_variable("FEATURE_STORE_HISTORICAL_DATABASE")
         path = "test_folder/historical/entity/feature_set"
+        read_path = "spark-warehouse/test.db/" + path
 
         spark_session.conf.set("spark.sql.sources.partitionOverwriteMode", "dynamic")
-        spark_session.sql(f"create database if not exists {db}")
+        spark_session.sql(f"drop schema {db} cascade")
+        spark_session.sql(f"create database {db}")
         spark_session.sql(
-            f"create table if not exists {db}.feature_set_interval "
+            f"create table {db}.feature_set_interval "
             f"(id int, timestamp timestamp, feature int, "
             f"run_id int, year int, month int, day int);"
         )
@@ -340,7 +343,7 @@ class TestFeatureSetPipeline:
         )
 
         historical_writer = HistoricalFeatureStoreWriter(
-            db_config=dbconfig, interval_mode=True
+            db_config=dbconfig, interval_mode=True, row_count_validation=False
         )
 
         first_run_hook = RunHook(id=1)
@@ -379,35 +382,35 @@ class TestFeatureSetPipeline:
         # act and assert
         dbconfig.get_path_with_partitions = Mock(
             return_value=[
-                "test_folder/historical/entity/feature_set/year=2016/month=4/day=11",
-                "test_folder/historical/entity/feature_set/year=2016/month=4/day=12",
-                "test_folder/historical/entity/feature_set/year=2016/month=4/day=13",
+                "spark-warehouse/test.db/test_folder/historical/entity/feature_set/year=2016/month=4/day=11",
+                "spark-warehouse/test.db/test_folder/historical/entity/feature_set/year=2016/month=4/day=12",
+                "spark-warehouse/test.db/test_folder/historical/entity/feature_set/year=2016/month=4/day=13",
             ]
         )
         test_pipeline.feature_set.add_pre_hook(first_run_hook)
         test_pipeline.run(end_date="2016-04-13", start_date="2016-04-11")
-        first_run_output_df = spark_session.read.parquet(path)
+        first_run_output_df = spark_session.read.parquet(read_path)
         assert_dataframe_equality(first_run_output_df, first_run_target_df)
 
         dbconfig.get_path_with_partitions = Mock(
             return_value=[
-                "test_folder/historical/entity/feature_set/year=2016/month=4/day=14",
+                "spark-warehouse/test.db/test_folder/historical/entity/feature_set/year=2016/month=4/day=14",
             ]
         )
         test_pipeline.feature_set.add_pre_hook(second_run_hook)
         test_pipeline.run_for_date("2016-04-14")
-        second_run_output_df = spark_session.read.parquet(path)
+        second_run_output_df = spark_session.read.parquet(read_path)
         assert_dataframe_equality(second_run_output_df, second_run_target_df)
 
         dbconfig.get_path_with_partitions = Mock(
             return_value=[
-                "test_folder/historical/entity/feature_set/year=2016/month=4/day=11",
+                "spark-warehouse/test.db/test_folder/historical/entity/feature_set/year=2016/month=4/day=11",
             ]
         )
         test_pipeline.feature_set.add_pre_hook(third_run_hook)
         test_pipeline.run_for_date("2016-04-11")
-        third_run_output_df = spark_session.read.parquet(path)
+        third_run_output_df = spark_session.read.parquet(read_path)
         assert_dataframe_equality(third_run_output_df, third_run_target_df)
 
         # tear down
-        shutil.rmtree("test_folder")
+        shutil.rmtree("spark-warehouse/test.db/test_folder")

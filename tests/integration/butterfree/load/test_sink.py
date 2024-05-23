@@ -24,10 +24,10 @@ def test_sink(input_dataframe, feature_set):
     s3config.mode = "overwrite"
     s3config.format_ = "parquet"
     s3config.get_options = Mock(
-        return_value={"path": "test_folder/historical/entity/feature_set"}
+        return_value={"path": "test_folder/historical/entity/feature_set", "mode": "overwrite"}
     )
     s3config.get_path_with_partitions = Mock(
-        return_value="test_folder/historical/entity/feature_set"
+        return_value="spark-warehouse/test.db/test_folder/historical/entity/feature_set"
     )
 
     historical_writer = HistoricalFeatureStoreWriter(
@@ -52,6 +52,10 @@ def test_sink(input_dataframe, feature_set):
     sink.flush(feature_set, feature_set_df, client)
 
     # get historical results
+    # historical_result_df = client.read_table(
+    #     feature_set.name,
+    #     historical_writer.database,
+    # )
     historical_result_df = client.read(
         s3config.format_,
         path=s3config.get_path_with_partitions(feature_set.name, feature_set_df),
