@@ -67,7 +67,7 @@ class TestSource:
             query=f"select a.*, b.feature2 "  # noqa
             f"from {table_reader_id} a "  # noqa
             f"inner join {file_reader_id} b on a.id = b.id ",  # noqa
-            eager_evaluation=False
+            eager_evaluation=False,
         )
 
         result_df = source.construct(client=spark_client)

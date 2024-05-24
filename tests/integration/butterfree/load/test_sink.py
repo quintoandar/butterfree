@@ -24,7 +24,10 @@ def test_sink(input_dataframe, feature_set):
     s3config.mode = "overwrite"
     s3config.format_ = "parquet"
     s3config.get_options = Mock(
-        return_value={"path": "test_folder/historical/entity/feature_set", "mode": "overwrite"}
+        return_value={
+            "path": "test_folder/historical/entity/feature_set",
+            "mode": "overwrite",
+        }
     )
     s3config.get_path_with_partitions = Mock(
         return_value="spark-warehouse/test.db/test_folder/historical/entity/feature_set"
