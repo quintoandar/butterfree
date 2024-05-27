@@ -21,8 +21,16 @@ class TestMetadata:
         pipeline = FeatureSetPipeline(
             source=Source(
                 readers=[
-                    TableReader(id="source_a", database="db", table="table",),
-                    FileReader(id="source_b", path="path", format="parquet",),
+                    TableReader(
+                        id="source_a",
+                        database="db",
+                        table="table",
+                    ),
+                    FileReader(
+                        id="source_b",
+                        path="path",
+                        format="parquet",
+                    ),
                 ],
                 query="select a.*, b.specific_feature "
                 "from source_a left join source_b on a.id=b.id",
@@ -105,8 +113,16 @@ class TestMetadata:
         pipeline = FeatureSetPipeline(
             source=Source(
                 readers=[
-                    TableReader(id="source_a", database="db", table="table",),
-                    FileReader(id="source_b", path="path", format="parquet",),
+                    TableReader(
+                        id="source_a",
+                        database="db",
+                        table="table",
+                    ),
+                    FileReader(
+                        id="source_b",
+                        path="path",
+                        format="parquet",
+                    ),
                 ],
                 query="select a.*, b.specific_feature "
                 "from source_a left join source_b on a.id=b.id",

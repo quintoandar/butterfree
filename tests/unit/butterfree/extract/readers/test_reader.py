@@ -148,7 +148,8 @@ class TestReader:
 
         # act
         file_reader.build(
-            client=spark_client, columns=[("col1", "new_col1"), ("col2", "new_col2")],
+            client=spark_client,
+            columns=[("col1", "new_col1"), ("col2", "new_col2")],
         )
         result_df = spark_session.sql("select * from test")
 

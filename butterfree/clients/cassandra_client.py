@@ -129,7 +129,9 @@ class CassandraClient(AbstractClient):
         return response
 
     def _get_create_table_query(
-        self, columns: List[CassandraColumn], table: str,
+        self,
+        columns: List[CassandraColumn],
+        table: str,
     ) -> str:
         """Creates CQL statement to create a table."""
         parsed_columns = []

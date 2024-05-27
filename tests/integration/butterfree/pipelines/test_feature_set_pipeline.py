@@ -75,7 +75,10 @@ def create_ymd(dataframe):
 
 class TestFeatureSetPipeline:
     def test_feature_set_pipeline(
-        self, mocked_df, spark_session, fixed_windows_output_feature_set_dataframe,
+        self,
+        mocked_df,
+        spark_session,
+        fixed_windows_output_feature_set_dataframe,
     ):
         # arrange
 
@@ -139,7 +142,9 @@ class TestFeatureSetPipeline:
                         description="unit test",
                         dtype=DataType.FLOAT,
                         transformation=CustomTransform(
-                            transformer=divide, column1="feature1", column2="feature2",
+                            transformer=divide,
+                            column1="feature1",
+                            column2="feature2",
                         ),
                     ),
                 ],
@@ -238,7 +243,12 @@ class TestFeatureSetPipeline:
 
         test_pipeline = FeatureSetPipeline(
             source=Source(
-                readers=[TableReader(id="reader", table="test",).add_post_hook(hook1)],
+                readers=[
+                    TableReader(
+                        id="reader",
+                        table="test",
+                    ).add_post_hook(hook1)
+                ],
                 query="select * from reader",
             ).add_post_hook(hook1),
             feature_set=FeatureSet(
@@ -264,7 +274,9 @@ class TestFeatureSetPipeline:
             )
             .add_pre_hook(hook1)
             .add_post_hook(hook1),
-            sink=Sink(writers=[historical_writer],).add_pre_hook(hook1),
+            sink=Sink(
+                writers=[historical_writer],
+            ).add_pre_hook(hook1),
         )
 
         # act
@@ -359,9 +371,10 @@ class TestFeatureSetPipeline:
         test_pipeline = FeatureSetPipeline(
             source=Source(
                 readers=[
-                    TableReader(id="id", table="input_data",).with_incremental_strategy(
-                        IncrementalStrategy("ts")
-                    ),
+                    TableReader(
+                        id="id",
+                        table="input_data",
+                    ).with_incremental_strategy(IncrementalStrategy("ts")),
                 ],
                 query="select * from id ",
             ),
@@ -369,14 +382,22 @@ class TestFeatureSetPipeline:
                 name="feature_set_interval",
                 entity="entity",
                 description="",
-                keys=[KeyFeature(name="id", description="", dtype=DataType.INTEGER,)],
+                keys=[
+                    KeyFeature(
+                        name="id",
+                        description="",
+                        dtype=DataType.INTEGER,
+                    )
+                ],
                 timestamp=TimestampFeature(from_column="ts"),
                 features=[
                     Feature(name="feature", description="", dtype=DataType.INTEGER),
                     Feature(name="run_id", description="", dtype=DataType.INTEGER),
                 ],
             ),
-            sink=Sink([historical_writer],),
+            sink=Sink(
+                [historical_writer],
+            ),
         )
 
         # act and assert

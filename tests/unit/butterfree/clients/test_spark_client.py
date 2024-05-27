@@ -69,7 +69,8 @@ class TestSparkClient:
         assert target_df.collect() == result_df.collect()
 
     @pytest.mark.parametrize(
-        "format, path", [(None, "path/to/file"), ("csv", 123)],
+        "format, path",
+        [(None, "path/to/file"), ("csv", 123)],
     )
     def test_read_invalid_params(self, format: Optional[str], path: Any) -> None:
         # arrange
@@ -115,7 +116,8 @@ class TestSparkClient:
         assert target_df == result_df
 
     @pytest.mark.parametrize(
-        "database, table", [("database", None), ("database", 123)],
+        "database, table",
+        [("database", None), ("database", 123)],
     )
     def test_read_table_invalid_params(
         self, database: str, table: Optional[int]
@@ -128,7 +130,8 @@ class TestSparkClient:
             spark_client.read_table(table, database)  # type: ignore
 
     @pytest.mark.parametrize(
-        "format, mode", [("parquet", "append"), ("csv", "overwrite")],
+        "format, mode",
+        [("parquet", "append"), ("csv", "overwrite")],
     )
     def test_write_dataframe(
         self, format: str, mode: str, mocked_spark_write: Mock
@@ -137,7 +140,8 @@ class TestSparkClient:
         mocked_spark_write.save.assert_called_with(format=format, mode=mode)
 
     @pytest.mark.parametrize(
-        "format, mode", [(None, "append"), ("parquet", 1)],
+        "format, mode",
+        [(None, "append"), ("parquet", 1)],
     )
     def test_write_dataframe_invalid_params(
         self, target_df: DataFrame, format: Optional[str], mode: Union[str, int]

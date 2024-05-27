@@ -21,7 +21,9 @@ class TestCustomTransform:
             description="unit test",
             dtype=DataType.BIGINT,
             transformation=CustomTransform(
-                transformer=divide, column1="feature1", column2="feature2",
+                transformer=divide,
+                column1="feature1",
+                column2="feature2",
             ),
         )
 
@@ -44,7 +46,9 @@ class TestCustomTransform:
             description="unit test",
             dtype=DataType.BIGINT,
             transformation=CustomTransform(
-                transformer=divide, column1="feature1", column2="feature2",
+                transformer=divide,
+                column1="feature1",
+                column2="feature2",
             ),
         )
 
@@ -59,7 +63,9 @@ class TestCustomTransform:
             description="unit test",
             dtype=DataType.BIGINT,
             transformation=CustomTransform(
-                transformer=divide, column1="feature1", column2="feature2",
+                transformer=divide,
+                column1="feature1",
+                column2="feature2",
             ),
         )
 

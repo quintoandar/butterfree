@@ -5,7 +5,14 @@ from butterfree.extract.readers import TableReader
 
 class TestTableReader:
     @pytest.mark.parametrize(
-        "database, table", [("database", 123), (123, None,)],
+        "database, table",
+        [
+            ("database", 123),
+            (
+                123,
+                None,
+            ),
+        ],
     )
     def test_init_invalid_params(self, database, table):
         # act and assert

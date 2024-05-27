@@ -14,7 +14,8 @@ class TestSource:
 
         # when
         source_selector = Source(
-            readers=[reader], query=f"select * from {reader_id}",  # noqa
+            readers=[reader],
+            query=f"select * from {reader_id}",  # noqa
         )
 
         result_df = source_selector.construct(spark_client)
@@ -32,7 +33,8 @@ class TestSource:
 
         # when
         source_selector = Source(
-            readers=[reader], query=f"select * from {reader_id}",  # noqa
+            readers=[reader],
+            query=f"select * from {reader_id}",  # noqa
         )
 
         result_df = source_selector.construct(spark_client)

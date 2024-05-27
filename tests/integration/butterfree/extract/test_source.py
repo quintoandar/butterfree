@@ -1,11 +1,11 @@
 from typing import List
 
 from pyspark.sql import DataFrame
-from tests.integration import INPUT_PATH
 
 from butterfree.clients import SparkClient
 from butterfree.extract import Source
 from butterfree.extract.readers import FileReader, TableReader
+from tests.integration import INPUT_PATH
 
 
 def create_temp_view(dataframe: DataFrame, name):
@@ -34,7 +34,10 @@ def compare_dataframes(
 
 class TestSource:
     def test_source(
-        self, target_df_source, target_df_table_reader, spark_session,
+        self,
+        target_df_source,
+        target_df_table_reader,
+        spark_session,
     ):
         # given
         spark_client = SparkClient()

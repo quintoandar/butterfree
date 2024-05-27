@@ -93,7 +93,8 @@ def __fs_objects(path: str) -> Set[FeatureSetPipeline]:
 
 
 PATH = typer.Argument(
-    ..., help="Full or relative path to where feature set pipelines are being defined.",
+    ...,
+    help="Full or relative path to where feature set pipelines are being defined.",
 )
 
 GENERATE_LOGS = typer.Option(
@@ -113,7 +114,10 @@ class Migrate:
         pipelines: list of Feature Set Pipelines to use to migration.
     """
 
-    def __init__(self, pipelines: Set[FeatureSetPipeline],) -> None:
+    def __init__(
+        self,
+        pipelines: Set[FeatureSetPipeline],
+    ) -> None:
         self.pipelines = pipelines
 
     def _send_logs_to_s3(self, file_local: bool, debug_mode: bool) -> None:

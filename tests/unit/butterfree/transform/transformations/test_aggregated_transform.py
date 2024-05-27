@@ -44,7 +44,10 @@ class TestAggregatedTransform:
         assert all(
             [
                 a == b
-                for a, b in zip(df_columns, ["feature1__avg", "feature1__stddev_pop"],)
+                for a, b in zip(
+                    df_columns,
+                    ["feature1__avg", "feature1__stddev_pop"],
+                )
             ]
         )
 

@@ -84,7 +84,10 @@ class H3HashTransform(TransformComponent):
     """
 
     def __init__(
-        self, h3_resolutions: List[int], lat_column: str, lng_column: str,
+        self,
+        h3_resolutions: List[int],
+        lat_column: str,
+        lng_column: str,
     ):
         super().__init__()
         self.h3_resolutions = h3_resolutions

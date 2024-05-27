@@ -76,7 +76,11 @@ class AggregatedTransform(TransformComponent):
         Function = namedtuple("Function", ["function", "data_type"])
 
         return [
-            Function(f.func(expression), f.data_type.spark,) for f in self.functions
+            Function(
+                f.func(expression),
+                f.data_type.spark,
+            )
+            for f in self.functions
         ]
 
     def _get_output_name(self, function: object) -> str:

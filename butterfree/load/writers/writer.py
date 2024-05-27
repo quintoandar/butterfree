@@ -72,7 +72,10 @@ class Writer(ABC, HookableComponent):
 
     @abstractmethod
     def write(
-        self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient,
+        self,
+        feature_set: FeatureSet,
+        dataframe: DataFrame,
+        spark_client: SparkClient,
     ) -> Any:
         """Loads the data from a feature set into the Feature Store.
 

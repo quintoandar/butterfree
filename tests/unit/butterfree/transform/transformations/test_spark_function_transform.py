@@ -126,7 +126,9 @@ class TestSparkFunctionTransform:
             transformation=SparkFunctionTransform(
                 functions=[Function(functions.avg, DataType.DOUBLE)],
             ).with_window(
-                partition_by="id", mode="row_windows", window_definition=["2 events"],
+                partition_by="id",
+                mode="row_windows",
+                window_definition=["2 events"],
             ),
         )
 

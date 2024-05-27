@@ -43,7 +43,15 @@ class TestSQLExpressionTransform:
 
         df_columns = test_feature.get_output_columns()
 
-        assert all([a == b for a, b in zip(df_columns, ["feature1_over_feature2"],)])
+        assert all(
+            [
+                a == b
+                for a, b in zip(
+                    df_columns,
+                    ["feature1_over_feature2"],
+                )
+            ]
+        )
 
     def test_feature_transform_output(self, feature_set_dataframe):
         test_feature = Feature(

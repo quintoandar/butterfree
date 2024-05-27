@@ -45,10 +45,18 @@ def feature_set():
         entity="entity",
         description="description",
         features=[
-            Feature(name="feature_float", description="test", dtype=DataType.FLOAT,),
+            Feature(
+                name="feature_float",
+                description="test",
+                dtype=DataType.FLOAT,
+            ),
         ],
         keys=[
-            KeyFeature(name="id", description="The device ID", dtype=DataType.BIGINT,)
+            KeyFeature(
+                name="id",
+                description="The device ID",
+                dtype=DataType.BIGINT,
+            )
         ],
         timestamp=TimestampFeature(),
     )

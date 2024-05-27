@@ -180,7 +180,8 @@ class DatabaseMigration(ABC):
 
     @staticmethod
     def _get_diff(
-        fs_schema: List[Dict[str, Any]], db_schema: List[Dict[str, Any]],
+        fs_schema: List[Dict[str, Any]],
+        db_schema: List[Dict[str, Any]],
     ) -> Set[Diff]:
         """Gets schema difference between feature set and the table of a given db.
 
