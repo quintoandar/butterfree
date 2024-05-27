@@ -3,10 +3,7 @@ from unittest.mock import Mock
 
 from butterfree.clients import SparkClient
 from butterfree.load import Sink
-from butterfree.load.writers import (
-    HistoricalFeatureStoreWriter,
-    OnlineFeatureStoreWriter,
-)
+from butterfree.load.writers import HistoricalFeatureStoreWriter, OnlineFeatureStoreWriter
 
 
 def test_sink(input_dataframe, feature_set):

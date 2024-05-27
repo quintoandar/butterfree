@@ -3,10 +3,7 @@ from pyspark.sql.types import LongType, StringType, StructField, StructType
 
 from butterfree.configs.environment import specification
 from butterfree.extract.readers import KafkaReader
-from butterfree.testing.dataframe import (
-    assert_dataframe_equality,
-    create_df_from_collection,
-)
+from butterfree.testing.dataframe import assert_dataframe_equality, create_df_from_collection
 
 
 class TestKafkaReader:

@@ -1,16 +1,7 @@
-from pyspark.sql.types import (
-    ArrayType,
-    IntegerType,
-    StringType,
-    StructField,
-    StructType,
-)
+from pyspark.sql.types import ArrayType, IntegerType, StringType, StructField, StructType
 
 from butterfree.extract.pre_processing import explode_json_column
-from butterfree.testing.dataframe import (
-    assert_dataframe_equality,
-    create_df_from_collection,
-)
+from butterfree.testing.dataframe import assert_dataframe_equality, create_df_from_collection
 
 
 def test_explode_json_column(spark_context, spark_session):

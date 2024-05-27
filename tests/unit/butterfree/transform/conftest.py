@@ -9,10 +9,7 @@ from butterfree.constants.columns import TIMESTAMP_COLUMN
 from butterfree.transform import FeatureSet
 from butterfree.transform.aggregated_feature_set import AggregatedFeatureSet
 from butterfree.transform.features import Feature, KeyFeature, TimestampFeature
-from butterfree.transform.transformations import (
-    AggregatedTransform,
-    SparkFunctionTransform,
-)
+from butterfree.transform.transformations import AggregatedTransform, SparkFunctionTransform
 from butterfree.transform.utils import Function
 
 

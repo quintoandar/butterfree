@@ -10,10 +10,7 @@ from butterfree.extract import Source
 from butterfree.extract.readers import FileReader, TableReader
 from butterfree.extract.readers.reader import Reader
 from butterfree.load import Sink
-from butterfree.load.writers import (
-    HistoricalFeatureStoreWriter,
-    OnlineFeatureStoreWriter,
-)
+from butterfree.load.writers import HistoricalFeatureStoreWriter, OnlineFeatureStoreWriter
 from butterfree.load.writers.writer import Writer
 from butterfree.pipelines.feature_set_pipeline import FeatureSetPipeline
 from butterfree.transform import FeatureSet

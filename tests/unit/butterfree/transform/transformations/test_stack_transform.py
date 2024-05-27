@@ -1,10 +1,7 @@
 import pytest
 
 from butterfree.constants import DataType
-from butterfree.testing.dataframe import (
-    assert_dataframe_equality,
-    create_df_from_collection,
-)
+from butterfree.testing.dataframe import assert_dataframe_equality, create_df_from_collection
 from butterfree.transform.features import Feature, KeyFeature
 from butterfree.transform.transformations import StackTransform
 

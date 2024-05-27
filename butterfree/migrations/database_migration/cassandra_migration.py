@@ -4,10 +4,7 @@ from typing import Any, Dict, List
 
 from butterfree.clients import CassandraClient
 from butterfree.configs.db import CassandraConfig
-from butterfree.migrations.database_migration.database_migration import (
-    DatabaseMigration,
-    Diff,
-)
+from butterfree.migrations.database_migration.database_migration import DatabaseMigration, Diff
 
 
 class CassandraMigration(DatabaseMigration):

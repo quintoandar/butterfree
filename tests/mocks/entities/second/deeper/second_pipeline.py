@@ -2,10 +2,7 @@ from butterfree.constants.data_type import DataType
 from butterfree.extract import Source
 from butterfree.extract.readers import TableReader
 from butterfree.load import Sink
-from butterfree.load.writers import (
-    HistoricalFeatureStoreWriter,
-    OnlineFeatureStoreWriter,
-)
+from butterfree.load.writers import HistoricalFeatureStoreWriter, OnlineFeatureStoreWriter
 from butterfree.pipelines import FeatureSetPipeline
 from butterfree.transform import FeatureSet
 from butterfree.transform.features import Feature, KeyFeature, TimestampFeature

@@ -3,10 +3,7 @@ from typing import List
 
 from pyspark.sql.dataframe import DataFrame
 
-from butterfree.constants.spark_constants import (
-    DEFAULT_NUM_PARTITIONS,
-    PARTITION_PROCESSOR_RATIO,
-)
+from butterfree.constants.spark_constants import DEFAULT_NUM_PARTITIONS, PARTITION_PROCESSOR_RATIO
 
 
 def _num_partitions_definition(

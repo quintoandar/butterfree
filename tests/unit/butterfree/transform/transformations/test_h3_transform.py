@@ -64,9 +64,7 @@ class TestH3Transform:
             for m in modules:
                 del sys.modules[m]
             with pytest.raises(ModuleNotFoundError, match="you must install"):
-                from butterfree.transform.transformations.h3_transform import (  # noqa; noqa
-                    H3HashTransform,
-                )
+                from butterfree.transform.transformations.h3_transform import H3HashTransform  # noqa; noqa
 
     def test_with_stack(self, h3_input_df, h3_with_stack_target_df):
         # arrange

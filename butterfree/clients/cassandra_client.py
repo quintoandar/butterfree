@@ -3,13 +3,7 @@ from ssl import CERT_REQUIRED, PROTOCOL_TLSv1
 from typing import Dict, List, Optional
 
 from cassandra.auth import PlainTextAuthProvider
-from cassandra.cluster import (
-    EXEC_PROFILE_DEFAULT,
-    Cluster,
-    ExecutionProfile,
-    ResponseFuture,
-    Session,
-)
+from cassandra.cluster import EXEC_PROFILE_DEFAULT, Cluster, ExecutionProfile, ResponseFuture, Session
 from cassandra.policies import DCAwareRoundRobinPolicy
 from cassandra.query import ConsistencyLevel, dict_factory
 from typing_extensions import TypedDict
