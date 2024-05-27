@@ -1,4 +1,4 @@
-black==21.12b0
+black
 flake8==3.7.9
 flake8-isort
 flake8-docstrings==1.5.0
