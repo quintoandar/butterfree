@@ -1,7 +1,7 @@
 h3==3.7.7
 jupyter==1.0.0
 twine==3.1.1
-mypy==1.10.0
+mypy==0.790
 sphinx==7.3.7
 sphinxemoji==0.3.1
 sphinx-rtd-theme==2.0.0
