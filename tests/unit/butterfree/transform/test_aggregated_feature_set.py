@@ -4,10 +4,16 @@ from pyspark.sql.types import DoubleType, LongType, TimestampType
 
 from butterfree.clients import SparkClient
 from butterfree.constants import DataType
-from butterfree.testing.dataframe import assert_dataframe_equality, create_df_from_collection
+from butterfree.testing.dataframe import (
+    assert_dataframe_equality,
+    create_df_from_collection,
+)
 from butterfree.transform.aggregated_feature_set import AggregatedFeatureSet
 from butterfree.transform.features import Feature, KeyFeature, TimestampFeature
-from butterfree.transform.transformations import AggregatedTransform, SparkFunctionTransform
+from butterfree.transform.transformations import (
+    AggregatedTransform,
+    SparkFunctionTransform,
+)
 from butterfree.transform.utils import Function
 
 

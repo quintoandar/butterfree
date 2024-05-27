@@ -9,9 +9,17 @@ from butterfree.constants import DataType
 from butterfree.testing.dataframe import assert_dataframe_equality
 from butterfree.transform import FeatureSet
 from butterfree.transform.features import Feature
-from butterfree.transform.transformations import AggregatedTransform, SQLExpressionTransform
+from butterfree.transform.transformations import (
+    AggregatedTransform,
+    SQLExpressionTransform,
+)
 from butterfree.transform.utils import Function
-from tests.unit.butterfree.transform.conftest import feature_add, feature_divide, key_id, timestamp_c
+from tests.unit.butterfree.transform.conftest import (
+    feature_add,
+    feature_divide,
+    key_id,
+    timestamp_c,
+)
 
 
 class TestFeatureSet:

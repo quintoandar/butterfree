@@ -104,7 +104,7 @@ checks: style-check quality-check type-check
 .PHONY: apply-style
 ## fix stylistic errors with black
 apply-style:
-	@python -m black -t py36 --exclude="build/|buck-out/|dist/|_build/|pip/|\.pip/|\.git/|\.hg/|\.mypy_cache/|\.tox/|\.venv/" .
+	@python -m black -t py39 --exclude="build/|buck-out/|dist/|_build/|pip/|\.pip/|\.git/|\.hg/|\.mypy_cache/|\.tox/|\.venv/" .
 	@python -m isort --atomic butterfree/ tests/
 
 .PHONY: clean

@@ -1,7 +1,10 @@
 import pytest
 from pyspark.sql.functions import col, from_unixtime
 
-from butterfree.testing.dataframe import assert_dataframe_equality, create_df_from_collection
+from butterfree.testing.dataframe import (
+    assert_dataframe_equality,
+    create_df_from_collection,
+)
 
 
 def test_assert_dataframe_equality(spark_context, spark_session):

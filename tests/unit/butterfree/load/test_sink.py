@@ -5,7 +5,10 @@ from pyspark.sql.streaming import StreamingQuery
 
 from butterfree.clients import SparkClient
 from butterfree.load import Sink
-from butterfree.load.writers import HistoricalFeatureStoreWriter, OnlineFeatureStoreWriter
+from butterfree.load.writers import (
+    HistoricalFeatureStoreWriter,
+    OnlineFeatureStoreWriter,
+)
 from butterfree.validations import BasicValidation
 
 

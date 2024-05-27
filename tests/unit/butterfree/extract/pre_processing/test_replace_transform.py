@@ -1,7 +1,10 @@
 import pytest
 
 from butterfree.extract.pre_processing import replace
-from butterfree.testing.dataframe import assert_dataframe_equality, create_df_from_collection
+from butterfree.testing.dataframe import (
+    assert_dataframe_equality,
+    create_df_from_collection,
+)
 
 
 class TestReplaceTransform:

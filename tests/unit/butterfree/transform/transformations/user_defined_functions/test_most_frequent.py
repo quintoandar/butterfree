@@ -1,7 +1,9 @@
 from pyspark.sql.types import ArrayType
 
 from butterfree.testing.dataframe import assert_dataframe_equality
-from butterfree.transform.transformations.user_defined_functions import most_frequent_set
+from butterfree.transform.transformations.user_defined_functions import (
+    most_frequent_set,
+)
 
 
 def test_most_frequent_set_output(feature_set_dataframe, most_frequent_set_target_df):

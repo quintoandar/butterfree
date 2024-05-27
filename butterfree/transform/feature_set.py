@@ -12,7 +12,10 @@ from butterfree.constants.columns import TIMESTAMP_COLUMN
 from butterfree.dataframe_service import IncrementalStrategy
 from butterfree.hooks import HookableComponent
 from butterfree.transform.features import Feature, KeyFeature, TimestampFeature
-from butterfree.transform.transformations import AggregatedTransform, SparkFunctionTransform
+from butterfree.transform.transformations import (
+    AggregatedTransform,
+    SparkFunctionTransform,
+)
 
 
 class FeatureSet(HookableComponent):

@@ -6,7 +6,10 @@ from butterfree.clients import SparkClient
 from butterfree.configs import environment
 from butterfree.configs.db import MetastoreConfig
 from butterfree.constants.migrations import PARTITION_BY
-from butterfree.migrations.database_migration.database_migration import DatabaseMigration, Diff
+from butterfree.migrations.database_migration.database_migration import (
+    DatabaseMigration,
+    Diff,
+)
 
 
 class MetastoreMigration(DatabaseMigration):
