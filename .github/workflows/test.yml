@@ -19,8 +19,8 @@ jobs:
 
     - uses: actions/setup-java@v4
       with:
-        java-version: '17'
-        distribution: temurin
+        java-version: '11'
+        distribution: microsoft
 
     - uses: vemonet/setup-spark@v1
       with:
