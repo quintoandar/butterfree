@@ -24,7 +24,7 @@ jobs:
 
     - uses: vemonet/setup-spark@v1
       with:
-        spark-version: '3.4.3'
+        spark-version: '3.5.1'
         hadoop-version: '3'
 
     - name: Install dependencies
