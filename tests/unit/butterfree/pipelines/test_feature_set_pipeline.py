@@ -31,6 +31,9 @@ def get_reader():
 
     return table_reader
 
+def get_historical_writer():
+    return HistoricalFeatureStoreWriter(db_config=None)
+
 class TestFeatureSetPipeline:
     def test_feature_set_args(self):
         # arrange and act
@@ -181,7 +184,7 @@ class TestFeatureSetPipeline:
                 ),
                 sink=Mock(
                     spec=Sink,
-                    writers=[HistoricalFeatureStoreWriter(db_config=None)],
+                    writers=[get_historical_writer()],
                 ),
             )
 
@@ -230,7 +233,7 @@ class TestFeatureSetPipeline:
                 ),
                 sink=Mock(
                     spec=Sink,
-                    writers=[HistoricalFeatureStoreWriter(db_config=None)],
+                    writers=[get_historical_writer()],
                 ),
             )
 
@@ -266,7 +269,7 @@ class TestFeatureSetPipeline:
                     timestamp_column="ts",
                 ),
                 sink=Mock(
-                    writers=[HistoricalFeatureStoreWriter(db_config=None)],
+                    writers=[get_historical_writer()],
                 ),
             )
 
