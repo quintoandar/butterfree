@@ -31,8 +31,10 @@ def get_reader():
 
     return table_reader
 
+
 def get_historical_writer():
     return HistoricalFeatureStoreWriter(db_config=None)
+
 
 class TestFeatureSetPipeline:
     def test_feature_set_args(self):
