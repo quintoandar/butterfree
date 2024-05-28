@@ -2,9 +2,9 @@ h3==3.7.7
 jupyter==1.0.0
 twine==3.1.1
 mypy==1.10.0
-sphinx==7.3.7
-sphinxemoji==0.3.1
-sphinx-rtd-theme==2.0.0
+sphinx==3.5.4
+sphinxemoji==0.1.8
+sphinx-rtd-theme==0.5.2
 recommonmark==0.7.1
 pyarrow==16.1.0
 setuptools==70.0.0
