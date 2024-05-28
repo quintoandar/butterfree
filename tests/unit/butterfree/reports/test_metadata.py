@@ -117,7 +117,7 @@ class TestMetadata:
 
     def test_markdown(self):
 
-        pipeline = pipeline = get_pipeline()
+        pipeline = get_pipeline()
 
         target_md = (
             "\n# Feature_set\n\n## Description\n\n\ndescription  \n\n"

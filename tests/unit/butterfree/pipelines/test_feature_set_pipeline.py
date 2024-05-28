@@ -22,6 +22,15 @@ from butterfree.transform.transformations import SparkFunctionTransform
 from butterfree.transform.utils import Function
 
 
+def get_reader():
+    table_reader = TableReader(
+        id="source_a",
+        database="db",
+        table="table",
+    )
+
+    return table_reader
+
 class TestFeatureSetPipeline:
     def test_feature_set_args(self):
         # arrange and act
@@ -38,11 +47,7 @@ class TestFeatureSetPipeline:
         pipeline = FeatureSetPipeline(
             source=Source(
                 readers=[
-                    TableReader(
-                        id="source_a",
-                        database="db",
-                        table="table",
-                    ),
+                    get_reader(),
                     FileReader(
                         id="source_b",
                         path="path",
@@ -139,11 +144,7 @@ class TestFeatureSetPipeline:
                 source=Mock(
                     spark_client=SparkClient(),
                     readers=[
-                        TableReader(
-                            id="source_a",
-                            database="db",
-                            table="table",
-                        ),
+                        get_reader(),
                     ],
                     query="select * from source_a",
                 ),
@@ -193,11 +194,7 @@ class TestFeatureSetPipeline:
                 source=Mock(
                     spec=Source,
                     readers=[
-                        TableReader(
-                            id="source_a",
-                            database="db",
-                            table="table",
-                        ),
+                        get_reader(),
                     ],
                     query="select * from source_a",
                 ),
@@ -244,11 +241,7 @@ class TestFeatureSetPipeline:
                 source=Mock(
                     spec=Source,
                     readers=[
-                        TableReader(
-                            id="source_a",
-                            database="db",
-                            table="table",
-                        ),
+                        get_reader(),
                     ],
                     query="select * from source_a",
                 ),
