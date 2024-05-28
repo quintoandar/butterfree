@@ -9,8 +9,7 @@ on:
 
 jobs:
   Pipeline:
-    runs-on: ubuntu-22.04
-    container: python:3.9.19-bullseye
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
@@ -25,7 +24,7 @@ jobs:
 
     - uses: vemonet/setup-spark@v1
       with:
-        spark-version: '3.4.1'
+        spark-version: '3.4.3'
         hadoop-version: '3'
 
     - name: Install dependencies
