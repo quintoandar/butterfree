@@ -46,13 +46,13 @@ def __fs_objects(path: str) -> Set[FeatureSetPipeline]:
         logger.error(f"Path: {path} not found!")
         return set()
 
-    logger.info(f"Importing modules...")
+    logger.info("Importing modules...")
     package = ".".join(path.strip("/").split("/"))
     imported = set(
         importlib.import_module(f".{name}", package=package) for name in modules
     )
 
-    logger.info(f"Scanning modules...")
+    logger.info("Scanning modules...")
     content = {
         module: set(
             filter(

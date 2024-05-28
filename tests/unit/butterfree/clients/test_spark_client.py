@@ -270,7 +270,7 @@ class TestSparkClient:
     def test_add_table_partitions(self, mock_spark_sql: Mock):
         # arrange
         target_command = (
-            f"ALTER TABLE `db`.`table` ADD IF NOT EXISTS "
+            f"ALTER TABLE `db`.`table` ADD IF NOT EXISTS "  # noqa
             f"PARTITION ( year = 2020, month = 8, day = 14 ) "
             f"PARTITION ( year = 2020, month = 8, day = 15 ) "
             f"PARTITION ( year = 2020, month = 8, day = 16 )"

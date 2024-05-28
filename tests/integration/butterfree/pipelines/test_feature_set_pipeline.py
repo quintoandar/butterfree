@@ -403,9 +403,9 @@ class TestFeatureSetPipeline:
         # act and assert
         dbconfig.get_path_with_partitions = Mock(
             return_value=[
-                "spark-warehouse/test.db/test_folder/historical/entity/feature_set/year=2016/month=4/day=11",
-                "spark-warehouse/test.db/test_folder/historical/entity/feature_set/year=2016/month=4/day=12",
-                "spark-warehouse/test.db/test_folder/historical/entity/feature_set/year=2016/month=4/day=13",
+                "spark-warehouse/test.db/test_folder/historical/entity/feature_set/year=2016/month=4/day=11",  # noqa
+                "spark-warehouse/test.db/test_folder/historical/entity/feature_set/year=2016/month=4/day=12",  # noqa
+                "spark-warehouse/test.db/test_folder/historical/entity/feature_set/year=2016/month=4/day=13",  # noqa
             ]
         )
         test_pipeline.feature_set.add_pre_hook(first_run_hook)
@@ -415,7 +415,7 @@ class TestFeatureSetPipeline:
 
         dbconfig.get_path_with_partitions = Mock(
             return_value=[
-                "spark-warehouse/test.db/test_folder/historical/entity/feature_set/year=2016/month=4/day=14",
+                "spark-warehouse/test.db/test_folder/historical/entity/feature_set/year=2016/month=4/day=14",  # noqa
             ]
         )
         test_pipeline.feature_set.add_pre_hook(second_run_hook)
@@ -425,7 +425,7 @@ class TestFeatureSetPipeline:
 
         dbconfig.get_path_with_partitions = Mock(
             return_value=[
-                "spark-warehouse/test.db/test_folder/historical/entity/feature_set/year=2016/month=4/day=11",
+                "spark-warehouse/test.db/test_folder/historical/entity/feature_set/year=2016/month=4/day=11",  # noqa
             ]
         )
         test_pipeline.feature_set.add_pre_hook(third_run_hook)
