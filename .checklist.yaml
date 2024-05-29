@@ -1,4 +1,3 @@
-# Put your .checklist.yaml below and validate it
 apiVersion: quintoandar.com.br/checklist/v2
 kind: ServiceChecklist
 metadata:
@@ -17,12 +16,14 @@ spec:
     line: tech_platform
     owner: otavio.cals@quintoandar.com.br
 
-  services:
-    - type: api
-      name: butterfree
+  libraries:
+    - name: butterfree
+      type: common-usage
+      path: https://quintoandar.github.io/python-package-server/
       description: A lib to build Feature Stores.
+      registries:
+      - github-packages
       tier: T0
-      costCenter: C057
 
   channels:
     squad: 'mlops'
