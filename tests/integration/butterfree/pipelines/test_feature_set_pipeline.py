@@ -50,10 +50,11 @@ def create_temp_view(dataframe: DataFrame, name):
 
 
 def create_db_and_table(spark, table_reader_id, table_reader_db, table_reader_table):
-    spark.sql(f"create database if not exists {table_reader_db}")
+    spark.sql(f"drop schema {table_reader_db} cascade")
+    spark.sql(f"create database {table_reader_db}")
     spark.sql(f"use {table_reader_db}")
     spark.sql(
-        f"create table if not exists {table_reader_db}.{table_reader_table} "  # noqa
+        f"create table {table_reader_db}.{table_reader_table} "  # noqa
         f"as select * from {table_reader_id}"  # noqa
     )
 
@@ -74,7 +75,10 @@ def create_ymd(dataframe):
 
 class TestFeatureSetPipeline:
     def test_feature_set_pipeline(
-        self, mocked_df, spark_session, fixed_windows_output_feature_set_dataframe,
+        self,
+        mocked_df,
+        spark_session,
+        fixed_windows_output_feature_set_dataframe,
     ):
         # arrange
 
@@ -90,7 +94,7 @@ class TestFeatureSetPipeline:
             table_reader_table=table_reader_table,
         )
 
-        path = "test_folder/historical/entity/feature_set"
+        path = "spark-warehouse/test.db/test_folder/historical/entity/feature_set"
 
         dbconfig = MetastoreConfig()
         dbconfig.get_options = Mock(
@@ -138,7 +142,9 @@ class TestFeatureSetPipeline:
                         description="unit test",
                         dtype=DataType.FLOAT,
                         transformation=CustomTransform(
-                            transformer=divide, column1="feature1", column2="feature2",
+                            transformer=divide,
+                            column1="feature1",
+                            column2="feature2",
                         ),
                     ),
                 ],
@@ -237,7 +243,12 @@ class TestFeatureSetPipeline:
 
         test_pipeline = FeatureSetPipeline(
             source=Source(
-                readers=[TableReader(id="reader", table="test",).add_post_hook(hook1)],
+                readers=[
+                    TableReader(
+                        id="reader",
+                        table="test",
+                    ).add_post_hook(hook1)
+                ],
                 query="select * from reader",
             ).add_post_hook(hook1),
             feature_set=FeatureSet(
@@ -263,7 +274,9 @@ class TestFeatureSetPipeline:
             )
             .add_pre_hook(hook1)
             .add_post_hook(hook1),
-            sink=Sink(writers=[historical_writer],).add_pre_hook(hook1),
+            sink=Sink(
+                writers=[historical_writer],
+            ).add_pre_hook(hook1),
         )
 
         # act
@@ -325,11 +338,13 @@ class TestFeatureSetPipeline:
 
         db = environment.get_variable("FEATURE_STORE_HISTORICAL_DATABASE")
         path = "test_folder/historical/entity/feature_set"
+        read_path = "spark-warehouse/test.db/" + path
 
         spark_session.conf.set("spark.sql.sources.partitionOverwriteMode", "dynamic")
-        spark_session.sql(f"create database if not exists {db}")
+        spark_session.sql(f"drop schema {db} cascade")
+        spark_session.sql(f"create database {db}")
         spark_session.sql(
-            f"create table if not exists {db}.feature_set_interval "
+            f"create table {db}.feature_set_interval "
             f"(id int, timestamp timestamp, feature int, "
             f"run_id int, year int, month int, day int);"
         )
@@ -340,7 +355,7 @@ class TestFeatureSetPipeline:
         )
 
         historical_writer = HistoricalFeatureStoreWriter(
-            db_config=dbconfig, interval_mode=True
+            db_config=dbconfig, interval_mode=True, row_count_validation=False
         )
 
         first_run_hook = RunHook(id=1)
@@ -356,9 +371,10 @@ class TestFeatureSetPipeline:
         test_pipeline = FeatureSetPipeline(
             source=Source(
                 readers=[
-                    TableReader(id="id", table="input_data",).with_incremental_strategy(
-                        IncrementalStrategy("ts")
-                    ),
+                    TableReader(
+                        id="id",
+                        table="input_data",
+                    ).with_incremental_strategy(IncrementalStrategy("ts")),
                 ],
                 query="select * from id ",
             ),
@@ -366,48 +382,56 @@ class TestFeatureSetPipeline:
                 name="feature_set_interval",
                 entity="entity",
                 description="",
-                keys=[KeyFeature(name="id", description="", dtype=DataType.INTEGER,)],
+                keys=[
+                    KeyFeature(
+                        name="id",
+                        description="",
+                        dtype=DataType.INTEGER,
+                    )
+                ],
                 timestamp=TimestampFeature(from_column="ts"),
                 features=[
                     Feature(name="feature", description="", dtype=DataType.INTEGER),
                     Feature(name="run_id", description="", dtype=DataType.INTEGER),
                 ],
             ),
-            sink=Sink([historical_writer],),
+            sink=Sink(
+                [historical_writer],
+            ),
         )
 
         # act and assert
         dbconfig.get_path_with_partitions = Mock(
             return_value=[
-                "test_folder/historical/entity/feature_set/year=2016/month=4/day=11",
-                "test_folder/historical/entity/feature_set/year=2016/month=4/day=12",
-                "test_folder/historical/entity/feature_set/year=2016/month=4/day=13",
+                "spark-warehouse/test.db/test_folder/historical/entity/feature_set/year=2016/month=4/day=11",  # noqa
+                "spark-warehouse/test.db/test_folder/historical/entity/feature_set/year=2016/month=4/day=12",  # noqa
+                "spark-warehouse/test.db/test_folder/historical/entity/feature_set/year=2016/month=4/day=13",  # noqa
             ]
         )
         test_pipeline.feature_set.add_pre_hook(first_run_hook)
         test_pipeline.run(end_date="2016-04-13", start_date="2016-04-11")
-        first_run_output_df = spark_session.read.parquet(path)
+        first_run_output_df = spark_session.read.parquet(read_path)
         assert_dataframe_equality(first_run_output_df, first_run_target_df)
 
         dbconfig.get_path_with_partitions = Mock(
             return_value=[
-                "test_folder/historical/entity/feature_set/year=2016/month=4/day=14",
+                "spark-warehouse/test.db/test_folder/historical/entity/feature_set/year=2016/month=4/day=14",  # noqa
             ]
         )
         test_pipeline.feature_set.add_pre_hook(second_run_hook)
         test_pipeline.run_for_date("2016-04-14")
-        second_run_output_df = spark_session.read.parquet(path)
+        second_run_output_df = spark_session.read.parquet(read_path)
         assert_dataframe_equality(second_run_output_df, second_run_target_df)
 
         dbconfig.get_path_with_partitions = Mock(
             return_value=[
-                "test_folder/historical/entity/feature_set/year=2016/month=4/day=11",
+                "spark-warehouse/test.db/test_folder/historical/entity/feature_set/year=2016/month=4/day=11",  # noqa
             ]
         )
         test_pipeline.feature_set.add_pre_hook(third_run_hook)
         test_pipeline.run_for_date("2016-04-11")
-        third_run_output_df = spark_session.read.parquet(path)
+        third_run_output_df = spark_session.read.parquet(read_path)
         assert_dataframe_equality(third_run_output_df, third_run_target_df)
 
         # tear down
-        shutil.rmtree("test_folder")
+        shutil.rmtree("spark-warehouse/test.db/test_folder")

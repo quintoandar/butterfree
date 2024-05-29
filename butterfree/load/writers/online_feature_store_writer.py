@@ -116,7 +116,10 @@ class OnlineFeatureStoreWriter(Writer):
 
         window = Window.partitionBy(*id_columns).orderBy(col(TIMESTAMP_COLUMN).desc())
         return (
-            dataframe.select(col("*"), row_number().over(window).alias("rn"),)
+            dataframe.select(
+                col("*"),
+                row_number().over(window).alias("rn"),
+            )
             .filter(col("rn") == 1)
             .drop("rn")
         )
@@ -162,7 +165,10 @@ class OnlineFeatureStoreWriter(Writer):
         )
 
     def write(
-        self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient,
+        self,
+        feature_set: FeatureSet,
+        dataframe: DataFrame,
+        spark_client: SparkClient,
     ) -> Union[StreamingQuery, None]:
         """Loads the latest data from a feature set into the Feature Store.
 

@@ -19,7 +19,9 @@ def divide(df, fs, column1, column2):
 
 class TestAggregatedFeatureSet:
     def test_construct_without_window(
-        self, feature_set_dataframe, target_df_without_window,
+        self,
+        feature_set_dataframe,
+        target_df_without_window,
     ):
         # given
 
@@ -157,7 +159,9 @@ class TestAggregatedFeatureSet:
                 )
             ],
             timestamp=TimestampFeature(),
-        ).with_windows(definitions=["1 day", "1 week"],)
+        ).with_windows(
+            definitions=["1 day", "1 week"],
+        )
 
         # act & assert
         with pytest.raises(ValueError):
@@ -201,7 +205,9 @@ class TestAggregatedFeatureSet:
         assert_dataframe_equality(output_df, h3_target_df)
 
     def test_construct_with_pivot(
-        self, feature_set_df_pivot, target_df_pivot_agg,
+        self,
+        feature_set_df_pivot,
+        target_df_pivot_agg,
     ):
         # given
 
@@ -243,7 +249,9 @@ class TestAggregatedFeatureSet:
         assert_dataframe_equality(output_df, target_df_pivot_agg)
 
     def test_construct_rolling_windows_with_date_boundaries(
-        self, feature_set_dates_dataframe, rolling_windows_output_date_boundaries,
+        self,
+        feature_set_dates_dataframe,
+        rolling_windows_output_date_boundaries,
     ):
         # given
 

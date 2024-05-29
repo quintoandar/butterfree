@@ -36,9 +36,9 @@ if __name__ == "__main__":
         _, error = p.communicate()
         if p.returncode != 0:
             errors.append({"notebook": path, "error": error})
-            print(f"    >>> Error in execution!\n")
+            print("    >>> Error in execution!\n")
         else:
-            print(f"    >>> Successful execution\n")
+            print("    >>> Successful execution\n")
 
     if errors:
         print(">>> Errors in the following notebooks:")

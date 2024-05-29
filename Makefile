@@ -76,7 +76,7 @@ style-check:
 	@echo "Code Style"
 	@echo "=========="
 	@echo ""
-	@python -m black --check -t py36 --exclude="build/|buck-out/|dist/|_build/|pip/|\.pip/|\.git/|\.hg/|\.mypy_cache/|\.tox/|\.venv/" . && echo "\n\nSuccess" || (echo "\n\nFailure\n\nYou need to run \"make apply-style\" to apply style formatting to your code"; exit 1)
+	@python -m black --check -t py39 --exclude="build/|buck-out/|dist/|_build/|pip/|\.pip/|\.git/|\.hg/|\.mypy_cache/|\.tox/|\.venv/" . && echo "\n\nSuccess" || (echo "\n\nFailure\n\nYou need to run \"make apply-style\" to apply style formatting to your code"; exit 1)
 
 .PHONY: quality-check
 ## run code quality checks with flake8
@@ -104,8 +104,8 @@ checks: style-check quality-check type-check
 .PHONY: apply-style
 ## fix stylistic errors with black
 apply-style:
-	@python -m black -t py36 --exclude="build/|buck-out/|dist/|_build/|pip/|\.pip/|\.git/|\.hg/|\.mypy_cache/|\.tox/|\.venv/" .
-	@python -m isort -rc --atomic butterfree/ tests/
+	@python -m black -t py39 --exclude="build/|buck-out/|dist/|_build/|pip/|\.pip/|\.git/|\.hg/|\.mypy_cache/|\.tox/|\.venv/" .
+	@python -m isort --atomic butterfree/ tests/
 
 .PHONY: clean
 ## clean unused artifacts

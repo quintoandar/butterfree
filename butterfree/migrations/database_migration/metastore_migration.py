@@ -30,7 +30,10 @@ class MetastoreMigration(DatabaseMigration):
         data is being loaded into an entity table, then users can drop columns manually.
     """
 
-    def __init__(self, database: str = None,) -> None:
+    def __init__(
+        self,
+        database: str = None,
+    ) -> None:
         self._db_config = MetastoreConfig()
         self.database = database or environment.get_variable(
             "FEATURE_STORE_HISTORICAL_DATABASE"

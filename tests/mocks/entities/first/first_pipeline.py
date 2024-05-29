@@ -15,7 +15,13 @@ class FirstPipeline(FeatureSetPipeline):
     def __init__(self):
         super(FirstPipeline, self).__init__(
             source=Source(
-                readers=[TableReader(id="t", database="db", table="table",)],
+                readers=[
+                    TableReader(
+                        id="t",
+                        database="db",
+                        table="table",
+                    )
+                ],
                 query=f"select * from t",  # noqa
             ),
             feature_set=FeatureSet(
@@ -23,7 +29,11 @@ class FirstPipeline(FeatureSetPipeline):
                 entity="entity",
                 description="description",
                 features=[
-                    Feature(name="feature1", description="test", dtype=DataType.FLOAT,),
+                    Feature(
+                        name="feature1",
+                        description="test",
+                        dtype=DataType.FLOAT,
+                    ),
                     Feature(
                         name="feature2",
                         description="another test",
@@ -32,7 +42,9 @@ class FirstPipeline(FeatureSetPipeline):
                 ],
                 keys=[
                     KeyFeature(
-                        name="id", description="identifier", dtype=DataType.BIGINT,
+                        name="id",
+                        description="identifier",
+                        dtype=DataType.BIGINT,
                     )
                 ],
                 timestamp=TimestampFeature(),

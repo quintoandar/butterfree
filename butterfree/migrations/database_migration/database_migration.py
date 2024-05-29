@@ -180,7 +180,8 @@ class DatabaseMigration(ABC):
 
     @staticmethod
     def _get_diff(
-        fs_schema: List[Dict[str, Any]], db_schema: List[Dict[str, Any]],
+        fs_schema: List[Dict[str, Any]],
+        db_schema: List[Dict[str, Any]],
     ) -> Set[Diff]:
         """Gets schema difference between feature set and the table of a given db.
 
@@ -296,7 +297,7 @@ class DatabaseMigration(ABC):
                 logger.info(f"Applying this query: {q} ...")
                 self._client.sql(q)
 
-            logger.info(f"Feature Set migration finished successfully.")
+            logger.info("Feature Set migration finished successfully.")
 
             # inform in drone console which feature set was migrated
             print(f"The {feature_set.name} feature set was migrated.")

@@ -44,7 +44,10 @@ class TestAggregatedFeatureSet:
             ).construct(dataframe, spark_client)
 
     def test_agg_feature_set_with_window(
-        self, dataframe, rolling_windows_agg_dataframe, agg_feature_set,
+        self,
+        dataframe,
+        rolling_windows_agg_dataframe,
+        agg_feature_set,
     ):
         spark_client = SparkClient()
 
@@ -61,7 +64,10 @@ class TestAggregatedFeatureSet:
         assert_dataframe_equality(output_df, rolling_windows_agg_dataframe)
 
     def test_agg_feature_set_with_smaller_slide(
-        self, dataframe, rolling_windows_hour_slide_agg_dataframe, agg_feature_set,
+        self,
+        dataframe,
+        rolling_windows_hour_slide_agg_dataframe,
+        agg_feature_set,
     ):
         spark_client = SparkClient()
 
@@ -366,7 +372,9 @@ class TestAggregatedFeatureSet:
         assert start_date == "2020-07-27"
 
     def test_feature_set_start_date(
-        self, timestamp_c, feature_set_with_distinct_dataframe,
+        self,
+        timestamp_c,
+        feature_set_with_distinct_dataframe,
     ):
         fs = AggregatedFeatureSet(
             name="name",

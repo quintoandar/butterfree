@@ -51,7 +51,7 @@ def feature_set():
     ]
     ts_feature = TimestampFeature(from_column="timestamp")
     features = [
-        Feature(name="feature", description="Description", dtype=DataType.FLOAT),
+        Feature(name="feature", description="Description", dtype=DataType.INTEGER),
     ]
     return FeatureSet(
         "test_sink_feature_set",

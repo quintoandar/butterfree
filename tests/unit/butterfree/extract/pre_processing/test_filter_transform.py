@@ -28,7 +28,8 @@ class TestFilterDataFrame:
         assert result_df.collect() == target_df.collect()
 
     @pytest.mark.parametrize(
-        "condition", [None, 100],
+        "condition",
+        [None, 100],
     )
     def test_filter_with_invalidations(
         self, feature_set_dataframe, condition, spark_context, spark_session

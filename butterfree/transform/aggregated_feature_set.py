@@ -412,7 +412,9 @@ class AggregatedFeatureSet(FeatureSet):
         # repartition to have all rows for each group at the same partition
         # by doing that, we won't have to shuffle data on grouping by id
         dataframe = repartition_df(
-            dataframe, partition_by=groupby, num_processors=num_processors,
+            dataframe,
+            partition_by=groupby,
+            num_processors=num_processors,
         )
         grouped_data = dataframe.groupby(*groupby)
 

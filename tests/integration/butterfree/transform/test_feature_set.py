@@ -51,7 +51,9 @@ class TestFeatureSet:
                     description="unit test",
                     dtype=DataType.FLOAT,
                     transformation=CustomTransform(
-                        transformer=divide, column1="feature1", column2="feature2",
+                        transformer=divide,
+                        column1="feature1",
+                        column2="feature2",
                     ),
                 ),
             ],
@@ -92,7 +94,11 @@ class TestFeatureSet:
             entity="entity",
             description="description",
             features=[
-                Feature(name="feature", description="test", dtype=DataType.FLOAT,),
+                Feature(
+                    name="feature",
+                    description="test",
+                    dtype=DataType.FLOAT,
+                ),
             ],
             keys=[
                 KeyFeature(
