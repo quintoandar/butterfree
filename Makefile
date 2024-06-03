@@ -152,7 +152,7 @@ package:
 ## update Butterfree API docs
 update-docs:
 	cd ./docs; rm -rf source/butterfree.*
-	cd ./docs; sphinx-apidoc -T -E -o source/ ../butterfree
+	cd ./docs; sphinx-apidoc -o source/ ../butterfree
 	cd ./docs; make coverage
 
 .PHONY: docs
