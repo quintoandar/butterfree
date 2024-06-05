@@ -7,7 +7,15 @@ from butterfree.extract.readers import FileReader
 
 class TestFileReader:
     @pytest.mark.parametrize(
-        "path, format", [(None, "parquet"), ("path/to/file.json", 123), (123, None,)],
+        "path, format",
+        [
+            (None, "parquet"),
+            ("path/to/file.json", 123),
+            (
+                123,
+                None,
+            ),
+        ],
     )
     def test_init_invalid_params(self, path, format):
         # act and assert

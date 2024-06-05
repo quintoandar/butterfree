@@ -89,6 +89,8 @@ class CustomTransform(TransformComponent):
 
         """
         dataframe = self.transformer(
-            dataframe, self.parent, **self.transformer__kwargs,
+            dataframe,
+            self.parent,
+            **self.transformer__kwargs,
         )
         return dataframe

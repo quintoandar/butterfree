@@ -23,7 +23,13 @@ def feature_set_pipeline():
         spark_client=SparkClient(),
         source=Mock(
             spec=Source,
-            readers=[TableReader(id="source_a", database="db", table="table",)],
+            readers=[
+                TableReader(
+                    id="source_a",
+                    database="db",
+                    table="table",
+                )
+            ],
             query="select * from source_a",
         ),
         feature_set=Mock(
@@ -57,7 +63,10 @@ def feature_set_pipeline():
                 ),
             ],
         ),
-        sink=Mock(spec=Sink, writers=[HistoricalFeatureStoreWriter(db_config=None)],),
+        sink=Mock(
+            spec=Sink,
+            writers=[HistoricalFeatureStoreWriter(db_config=None)],
+        ),
     )
 
     return test_pipeline

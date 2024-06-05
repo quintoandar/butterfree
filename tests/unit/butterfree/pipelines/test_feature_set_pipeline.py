@@ -22,6 +22,20 @@ from butterfree.transform.transformations import SparkFunctionTransform
 from butterfree.transform.utils import Function
 
 
+def get_reader():
+    table_reader = TableReader(
+        id="source_a",
+        database="db",
+        table="table",
+    )
+
+    return table_reader
+
+
+def get_historical_writer():
+    return HistoricalFeatureStoreWriter(db_config=None)
+
+
 class TestFeatureSetPipeline:
     def test_feature_set_args(self):
         # arrange and act
@@ -38,8 +52,12 @@ class TestFeatureSetPipeline:
         pipeline = FeatureSetPipeline(
             source=Source(
                 readers=[
-                    TableReader(id="source_a", database="db", table="table",),
-                    FileReader(id="source_b", path="path", format="parquet",),
+                    get_reader(),
+                    FileReader(
+                        id="source_b",
+                        path="path",
+                        format="parquet",
+                    ),
                 ],
                 query="select a.*, b.specific_feature "
                 "from source_a left join source_b on a.id=b.id",
@@ -131,7 +149,7 @@ class TestFeatureSetPipeline:
                 source=Mock(
                     spark_client=SparkClient(),
                     readers=[
-                        TableReader(id="source_a", database="db", table="table",),
+                        get_reader(),
                     ],
                     query="select * from source_a",
                 ),
@@ -167,7 +185,8 @@ class TestFeatureSetPipeline:
                     ],
                 ),
                 sink=Mock(
-                    spec=Sink, writers=[HistoricalFeatureStoreWriter(db_config=None)],
+                    spec=Sink,
+                    writers=[get_historical_writer()],
                 ),
             )
 
@@ -180,7 +199,7 @@ class TestFeatureSetPipeline:
                 source=Mock(
                     spec=Source,
                     readers=[
-                        TableReader(id="source_a", database="db", table="table",),
+                        get_reader(),
                     ],
                     query="select * from source_a",
                 ),
@@ -215,7 +234,8 @@ class TestFeatureSetPipeline:
                     ],
                 ),
                 sink=Mock(
-                    spec=Sink, writers=[HistoricalFeatureStoreWriter(db_config=None)],
+                    spec=Sink,
+                    writers=[get_historical_writer()],
                 ),
             )
 
@@ -226,7 +246,7 @@ class TestFeatureSetPipeline:
                 source=Mock(
                     spec=Source,
                     readers=[
-                        TableReader(id="source_a", database="db", table="table",),
+                        get_reader(),
                     ],
                     query="select * from source_a",
                 ),
@@ -250,7 +270,9 @@ class TestFeatureSetPipeline:
                     key_columns=["user_id"],
                     timestamp_column="ts",
                 ),
-                sink=Mock(writers=[HistoricalFeatureStoreWriter(db_config=None)],),
+                sink=Mock(
+                    writers=[get_historical_writer()],
+                ),
             )
 
     def test_run_agg_with_end_date(self, spark_session, feature_set_pipeline):

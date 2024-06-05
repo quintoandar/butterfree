@@ -20,7 +20,11 @@ def feature_set():
     ]
     ts_feature = TimestampFeature(from_column=TIMESTAMP_COLUMN)
     features = [
-        Feature(name="feature", description="Description", dtype=DataType.BIGINT,)
+        Feature(
+            name="feature",
+            description="Description",
+            dtype=DataType.BIGINT,
+        )
     ]
     return FeatureSet(
         "feature_set",

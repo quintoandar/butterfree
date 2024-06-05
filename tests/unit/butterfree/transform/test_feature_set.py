@@ -3,12 +3,6 @@ from unittest.mock import Mock
 import pytest
 from pyspark.sql import functions as F
 from pyspark.sql.types import DoubleType, FloatType, LongType, TimestampType
-from tests.unit.butterfree.transform.conftest import (
-    feature_add,
-    feature_divide,
-    key_id,
-    timestamp_c,
-)
 
 from butterfree.clients import SparkClient
 from butterfree.constants import DataType
@@ -20,6 +14,12 @@ from butterfree.transform.transformations import (
     SQLExpressionTransform,
 )
 from butterfree.transform.utils import Function
+from tests.unit.butterfree.transform.conftest import (
+    feature_add,
+    feature_divide,
+    key_id,
+    timestamp_c,
+)
 
 
 class TestFeatureSet:
@@ -70,7 +70,14 @@ class TestFeatureSet:
                 None,
                 [feature_add, feature_divide],
             ),
-            ("name", "entity", "description", [key_id], timestamp_c, [None],),
+            (
+                "name",
+                "entity",
+                "description",
+                [key_id],
+                timestamp_c,
+                [None],
+            ),
         ],
     )
     def test_cannot_instantiate(

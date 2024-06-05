@@ -46,13 +46,13 @@ def __fs_objects(path: str) -> Set[FeatureSetPipeline]:
         logger.error(f"Path: {path} not found!")
         return set()
 
-    logger.info(f"Importing modules...")
+    logger.info("Importing modules...")
     package = ".".join(path.strip("/").split("/"))
     imported = set(
         importlib.import_module(f".{name}", package=package) for name in modules
     )
 
-    logger.info(f"Scanning modules...")
+    logger.info("Scanning modules...")
     content = {
         module: set(
             filter(
@@ -93,7 +93,8 @@ def __fs_objects(path: str) -> Set[FeatureSetPipeline]:
 
 
 PATH = typer.Argument(
-    ..., help="Full or relative path to where feature set pipelines are being defined.",
+    ...,
+    help="Full or relative path to where feature set pipelines are being defined.",
 )
 
 GENERATE_LOGS = typer.Option(
@@ -113,7 +114,10 @@ class Migrate:
         pipelines: list of Feature Set Pipelines to use to migration.
     """
 
-    def __init__(self, pipelines: Set[FeatureSetPipeline],) -> None:
+    def __init__(
+        self,
+        pipelines: Set[FeatureSetPipeline],
+    ) -> None:
         self.pipelines = pipelines
 
     def _send_logs_to_s3(self, file_local: bool, debug_mode: bool) -> None:

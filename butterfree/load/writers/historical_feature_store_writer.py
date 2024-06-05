@@ -130,7 +130,10 @@ class HistoricalFeatureStoreWriter(Writer):
         self.check_schema_hook = check_schema_hook
 
     def write(
-        self, feature_set: FeatureSet, dataframe: DataFrame, spark_client: SparkClient,
+        self,
+        feature_set: FeatureSet,
+        dataframe: DataFrame,
+        spark_client: SparkClient,
     ) -> None:
         """Loads the data from a feature set into the Historical Feature Store.
 

@@ -9,11 +9,23 @@ on:
 
 jobs:
   Pipeline:
-    runs-on: ubuntu-22.04
-    container: quintoandar/python-3-7-java
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.9'
+
+    - uses: actions/setup-java@v4
+      with:
+        java-version: '11'
+        distribution: microsoft
+
+    - uses: vemonet/setup-spark@v1
+      with:
+        spark-version: '3.5.1'
+        hadoop-version: '3'
 
     - name: Install dependencies
       run: make ci-install

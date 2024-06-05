@@ -61,9 +61,9 @@ class SparkClient(AbstractClient):
         if path and not isinstance(path, (str, list)):
             raise ValueError("path needs to be a string or a list of string")
 
-        df_reader: Union[
-            DataStreamReader, DataFrameReader
-        ] = self.conn.readStream if stream else self.conn.read
+        df_reader: Union[DataStreamReader, DataFrameReader] = (
+            self.conn.readStream if stream else self.conn.read
+        )
 
         df_reader = df_reader.schema(schema) if schema else df_reader
 

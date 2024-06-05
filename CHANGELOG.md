@@ -5,6 +5,10 @@ Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each 
 
 ## [Unreleased]
 
+## [1.3.0](https://github.com/quintoandar/butterfree/releases/tag/1.3.0)
+* Bump versions  ([#355](https://github.com/quintoandar/butterfree/pull/355))
+* Sphinx version ([#356](https://github.com/quintoandar/butterfree/pull/356))
+
 ## [1.2.4](https://github.com/quintoandar/butterfree/releases/tag/1.2.4)
 * Auto create feature sets ([#351](https://github.com/quintoandar/butterfree/pull/351))
 

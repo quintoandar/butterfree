@@ -455,6 +455,12 @@ def agg_feature_set():
                 ),
             ),
         ],
-        keys=[KeyFeature(name="id", description="description", dtype=DataType.BIGINT,)],
+        keys=[
+            KeyFeature(
+                name="id",
+                description="description",
+                dtype=DataType.BIGINT,
+            )
+        ],
         timestamp=TimestampFeature(),
     )
