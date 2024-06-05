@@ -7,7 +7,7 @@ on:
 
 jobs:
   Pipeline:
-    # if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/master'
 
     runs-on: ubuntu-latest
 
@@ -53,9 +53,9 @@ jobs:
       if: ${{ failure() }}
       run: echo Release already exist
 
-    # - name: Publish release to pypi.org
-    #   if: ${{ success() }}
-    #   env:
-    #     PYPI_USERNAME: ${{ secrets.PYPI_USERNAME }}
-    #     PYPI_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-    #   run:  PYTHONPATH=./pip/deps python -m twine upload -u $PYPI_USERNAME -p $PYPI_PASSWORD --verbose dist/*
+    - name: Publish release to pypi.org
+      if: ${{ success() }}
+      env:
+        PYPI_USERNAME: ${{ secrets.PYPI_USERNAME }}
+        PYPI_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+      run:  PYTHONPATH=./pip/deps python -m twine upload -u $PYPI_USERNAME -p $PYPI_PASSWORD --verbose dist/*
