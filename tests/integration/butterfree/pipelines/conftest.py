@@ -139,7 +139,10 @@ def feature_set_pipeline(
     feature_set_pipeline = FeatureSetPipeline(
         source=Source(
             readers=[
-                TableReader(id="b_source", table="b_table",).with_incremental_strategy(
+                TableReader(
+                    id="b_source",
+                    table="b_table",
+                ).with_incremental_strategy(
                     incremental_strategy=IncrementalStrategy(column="timestamp")
                 ),
             ],

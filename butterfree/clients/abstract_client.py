@@ -1,4 +1,5 @@
 """Abstract class for database clients."""
+
 from abc import ABC, abstractmethod
 from typing import Any
 

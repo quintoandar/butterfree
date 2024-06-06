@@ -1,4 +1,5 @@
 """Abstract Validation class."""
+
 from abc import ABC, abstractmethod
 
 from pyspark.sql.dataframe import DataFrame

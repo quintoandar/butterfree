@@ -1,4 +1,5 @@
 """FeatureSetPipeline entity."""
+
 from typing import List
 
 from butterfree.clients import SparkClient

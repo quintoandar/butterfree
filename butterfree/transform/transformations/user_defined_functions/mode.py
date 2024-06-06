@@ -1,4 +1,5 @@
 """Method to compute mode aggregation."""
+
 import pandas as pd
 from pyspark.sql.functions import pandas_udf
 from pyspark.sql.types import StringType

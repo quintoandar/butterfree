@@ -1,4 +1,5 @@
 """Aggregated Transform entity."""
+
 from collections import namedtuple
 from typing import List, Tuple
 

@@ -1,4 +1,5 @@
 """CassandraClient entity."""
+
 from ssl import CERT_REQUIRED, PROTOCOL_TLSv1
 from typing import Dict, List, Optional
 

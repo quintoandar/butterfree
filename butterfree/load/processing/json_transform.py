@@ -1,4 +1,5 @@
 """Json conversion for writers."""
+
 from pyspark.sql.dataframe import DataFrame
 from pyspark.sql.functions import struct, to_json
 

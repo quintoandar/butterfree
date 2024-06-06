@@ -1,4 +1,5 @@
 """Holds configurations to read and write with Spark to Kafka."""
+
 from typing import Any, Dict, List, Optional
 
 from butterfree.configs import environment

@@ -1,4 +1,5 @@
 """Holds function for defining window in DataFrames."""
+
 from typing import Any, List, Optional, Union
 
 from pyspark import sql

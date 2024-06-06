@@ -1,4 +1,5 @@
 """AggregatedFeatureSet entity."""
+
 import itertools
 from datetime import datetime, timedelta
 from functools import reduce

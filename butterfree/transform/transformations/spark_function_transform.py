@@ -1,4 +1,5 @@
 """Spark Function Transform entity."""
+
 from typing import Any, List
 
 from pyspark.sql import DataFrame

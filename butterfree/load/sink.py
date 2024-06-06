@@ -1,4 +1,5 @@
 """Holds the Sink class."""
+
 from typing import List, Optional
 
 from pyspark.sql.dataframe import DataFrame

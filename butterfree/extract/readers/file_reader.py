@@ -1,4 +1,5 @@
 """FileReader entity."""
+
 from typing import Any, Dict
 
 from pyspark.sql import DataFrame

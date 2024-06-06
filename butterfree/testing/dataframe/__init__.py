@@ -1,4 +1,5 @@
 """Methods to assert properties regarding Apache Spark Dataframes."""
+
 from json import dumps
 from typing import Any, Dict, List
 

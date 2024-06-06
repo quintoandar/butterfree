@@ -1,4 +1,5 @@
 """TimestampFeature entity."""
+
 from pyspark.sql import DataFrame
 from pyspark.sql.functions import to_timestamp
 

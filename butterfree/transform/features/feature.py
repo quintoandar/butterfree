@@ -1,4 +1,5 @@
 """Feature entity."""
+
 import warnings
 from typing import Any, List
 

@@ -259,9 +259,11 @@ class SparkClient(AbstractClient):
         key_values_expr = [
             ", ".join(
                 [
-                    "{} = {}".format(k, v)
-                    if not isinstance(v, str)
-                    else "{} = '{}'".format(k, v)
+                    (
+                        "{} = {}".format(k, v)
+                        if not isinstance(v, str)
+                        else "{} = '{}'".format(k, v)
+                    )
                     for k, v in partition.items()
                 ]
             )

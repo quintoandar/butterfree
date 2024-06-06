@@ -1,4 +1,5 @@
 """Module where filter DataFrames coming from readers."""
+
 from pyspark.sql.dataframe import DataFrame
 
 

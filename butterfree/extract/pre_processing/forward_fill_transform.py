@@ -1,4 +1,5 @@
 """Forward Fill Transform for dataframes."""
+
 import sys
 from typing import List, Union
 

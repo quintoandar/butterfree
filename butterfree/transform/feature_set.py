@@ -1,4 +1,5 @@
 """FeatureSet entity."""
+
 import itertools
 from functools import reduce
 from typing import Any, Dict, List, Optional

@@ -1,4 +1,5 @@
 """Holds functions for managing the running environment."""
+
 import os
 from typing import Optional
 
