@@ -1,5 +1,7 @@
 """TimestampFeature entity."""
 
+from typing import Optional
+
 from pyspark.sql import DataFrame
 from pyspark.sql.functions import to_timestamp
 
@@ -39,10 +41,10 @@ class TimestampFeature(Feature):
 
     def __init__(
         self,
-        from_column: str = None,
-        transformation: TransformComponent = None,
+        from_column: Optional[str] = None,
+        transformation: Optional[TransformComponent] = None,
         from_ms: bool = False,
-        mask: str = None,
+        mask: Optional[str] = None,
     ) -> None:
         description = "Time tag for the state of all features."
         super(TimestampFeature, self).__init__(
@@ -71,7 +73,7 @@ class TimestampFeature(Feature):
             ts_column = ts_column / 1000
 
         dataframe = dataframe.withColumn(
-            column_name, to_timestamp(ts_column, self.mask)
+            column_name, to_timestamp(ts_column, self.mask)  # type: ignore
         )
 
         return super().transform(dataframe)

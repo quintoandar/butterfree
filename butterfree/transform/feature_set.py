@@ -390,7 +390,7 @@ class FeatureSet(HookableComponent):
 
         return df.select([column for column in self.columns])
 
-    def define_start_date(self, start_date: str = None) -> Optional[str]:
+    def define_start_date(self, start_date: Optional[str] = None) -> Optional[str]:
         """Get feature set start date.
 
         Args:
@@ -405,9 +405,9 @@ class FeatureSet(HookableComponent):
         self,
         dataframe: DataFrame,
         client: SparkClient,
-        end_date: str = None,
-        num_processors: int = None,
-        start_date: str = None,
+        end_date: Optional[str] = None,
+        num_processors: Optional[int] = None,
+        start_date: Optional[str] = None,
     ) -> DataFrame:
         """Use all the features to build the feature set dataframe.
 

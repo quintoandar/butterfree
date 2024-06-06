@@ -1,7 +1,7 @@
 """Aggregated Transform entity."""
 
 from collections import namedtuple
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 
 from pyspark.sql import DataFrame
 from pyspark.sql.functions import col, expr, when
@@ -57,7 +57,9 @@ class AggregatedTransform(TransformComponent):
         NotImplementedError: ...
     """
 
-    def __init__(self, functions: List[Function], filter_expression: str = None):
+    def __init__(
+        self, functions: List[Function], filter_expression: Optional[str] = None
+    ):
         super(AggregatedTransform, self).__init__()
         self.functions = functions
         self.filter_expression = filter_expression

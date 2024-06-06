@@ -1,6 +1,6 @@
 """Holds the SourceSelector class."""
 
-from typing import List
+from typing import List, Optional
 
 from pyspark.sql import DataFrame
 
@@ -70,7 +70,10 @@ class Source(HookableComponent):
         self.eager_evaluation = eager_evaluation
 
     def construct(
-        self, client: SparkClient, start_date: str = None, end_date: str = None
+        self,
+        client: SparkClient,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
     ) -> DataFrame:
         """Construct an entry point dataframe for a feature set.
 

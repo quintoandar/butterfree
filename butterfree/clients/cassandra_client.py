@@ -103,7 +103,9 @@ class CassandraClient(AbstractClient):
         """
         return self.conn.execute(query)
 
-    def get_schema(self, table: str, database: str = None) -> List[Dict[str, str]]:
+    def get_schema(
+        self, table: str, database: Optional[str] = None
+    ) -> List[Dict[str, str]]:
         """Returns desired table schema.
 
         Attributes:

@@ -1,7 +1,7 @@
 """Holds the Historical Feature Store writer class."""
 
 import os
-from typing import Any
+from typing import Any, Optional
 
 from pyspark.sql.dataframe import DataFrame
 from pyspark.sql.functions import dayofmonth, month, year
@@ -106,13 +106,13 @@ class HistoricalFeatureStoreWriter(Writer):
 
     def __init__(
         self,
-        db_config: AbstractWriteConfig = None,
-        database: str = None,
-        num_partitions: int = None,
+        db_config: Optional[AbstractWriteConfig] = None,
+        database: Optional[str] = None,
+        num_partitions: Optional[int] = None,
         validation_threshold: float = DEFAULT_VALIDATION_THRESHOLD,
         debug_mode: bool = False,
         interval_mode: bool = False,
-        check_schema_hook: Hook = None,
+        check_schema_hook: Optional[Hook] = None,
         row_count_validation: bool = True,
     ):
         super(HistoricalFeatureStoreWriter, self).__init__(
@@ -152,7 +152,8 @@ class HistoricalFeatureStoreWriter(Writer):
         dataframe = self._apply_transformations(dataframe)
 
         if self.interval_mode:
-            partition_overwrite_mode = spark_client.conn.conf.get(
+
+            partition_overwrite_mode = spark_client.conn.conf.get(  # type: ignore
                 "spark.sql.sources.partitionOverwriteMode"
             ).lower()
 
@@ -249,7 +250,11 @@ class HistoricalFeatureStoreWriter(Writer):
         return repartition_df(dataframe, self.PARTITION_BY, self.num_partitions)
 
     def check_schema(
-        self, client: Any, dataframe: DataFrame, table_name: str, database: str = None
+        self,
+        client: Any,
+        dataframe: DataFrame,
+        table_name: str,
+        database: Optional[str] = None,
     ) -> DataFrame:
         """Instantiate the schema check hook to check schema between dataframe and database.
 

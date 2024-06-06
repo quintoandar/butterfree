@@ -32,9 +32,9 @@ class Function:
     @func.setter
     def func(self, value: Callable) -> None:
         """Definitions to be used in the transformation."""
-        if not value:
+        if value is None:
             raise ValueError("Function must not be empty.")
-        if not callable(value):
+        if callable(value) is None:
             raise TypeError("Function must be callable.")
 
         self._func = value

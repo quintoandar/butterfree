@@ -1,7 +1,7 @@
 """Forward Fill Transform for dataframes."""
 
 import sys
-from typing import List, Union
+from typing import List, Optional, Union
 
 from pyspark.sql import DataFrame, Window, functions
 
@@ -11,7 +11,7 @@ def forward_fill(
     partition_by: Union[str, List[str]],
     order_by: Union[str, List[str]],
     fill_column: str,
-    filled_column: str = None,
+    filled_column: Optional[str] = None,
 ) -> DataFrame:
     """Applies a forward fill to a single column.
 

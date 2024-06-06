@@ -1,5 +1,7 @@
 """Spark table schema compatibility Hook definition."""
 
+from typing import Optional
+
 from pyspark.sql import DataFrame
 
 from butterfree.clients import SparkClient
@@ -18,7 +20,9 @@ class SparkTableSchemaCompatibilityHook(Hook):
         database: database name.
     """
 
-    def __init__(self, spark_client: SparkClient, table: str, database: str = None):
+    def __init__(
+        self, spark_client: SparkClient, table: str, database: Optional[str] = None
+    ):
         self.spark_client = spark_client
         self.table_expression = (f"`{database}`." if database else "") + f"`{table}`"
 

@@ -33,18 +33,18 @@ class CassandraConfig(AbstractWriteConfig):
 
     def __init__(
         self,
-        username: str = None,
-        password: str = None,
-        host: str = None,
-        keyspace: str = None,
-        mode: str = None,
-        format_: str = None,
-        stream_processing_time: str = None,
-        stream_output_mode: str = None,
-        stream_checkpoint_path: str = None,
-        read_consistency_level: str = None,
-        write_consistency_level: str = None,
-        local_dc: str = None,
+        username: Optional[str] = None,
+        password: Optional[str] = None,
+        host: Optional[str] = None,
+        keyspace: Optional[str] = None,
+        mode: Optional[str] = None,
+        format_: Optional[str] = None,
+        stream_processing_time: Optional[str] = None,
+        stream_output_mode: Optional[str] = None,
+        stream_checkpoint_path: Optional[str] = None,
+        read_consistency_level: Optional[str] = None,
+        write_consistency_level: Optional[str] = None,
+        local_dc: Optional[str] = None,
     ):
         self.username = username
         self.password = password

@@ -3,7 +3,7 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum, auto
-from typing import Any, Dict, List, Set
+from typing import Any, Dict, List, Optional, Set
 
 from butterfree.clients import AbstractClient
 from butterfree.configs.logger import __logger
@@ -107,7 +107,10 @@ class DatabaseMigration(ABC):
         pass
 
     def _get_queries(
-        self, schema_diff: Set[Diff], table_name: str, write_on_entity: bool = None
+        self,
+        schema_diff: Set[Diff],
+        table_name: str,
+        write_on_entity: Optional[bool] = None,
     ) -> Any:
         """Create the desired queries for migration.
 
@@ -163,8 +166,8 @@ class DatabaseMigration(ABC):
         self,
         fs_schema: List[Dict[str, Any]],
         table_name: str,
-        db_schema: List[Dict[str, Any]] = None,
-        write_on_entity: bool = None,
+        db_schema: Optional[List[Dict[str, Any]]] = None,
+        write_on_entity: Optional[bool] = None,
     ) -> Any:
         """Create a query regarding a data source.
 
@@ -247,7 +250,7 @@ class DatabaseMigration(ABC):
         return schema_diff
 
     def _get_schema(
-        self, table_name: str, database: str = None
+        self, table_name: str, database: Optional[str] = None
     ) -> List[Dict[str, Any]]:
         """Get a table schema in the respective database.
 

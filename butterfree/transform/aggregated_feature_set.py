@@ -262,8 +262,8 @@ class AggregatedFeatureSet(FeatureSet):
     @staticmethod
     def _build_feature_column_name(
         feature_column: str,
-        pivot_value: Union[float, str] = None,
-        window: Window = None,
+        pivot_value: Optional[Union[float, str]] = None,
+        window: Optional[Window] = None,
     ) -> str:
         base_name = feature_column
         if pivot_value is not None:
@@ -312,7 +312,7 @@ class AggregatedFeatureSet(FeatureSet):
         return self
 
     def with_windows(
-        self, definitions: List[str], slide: str = None
+        self, definitions: List[str], slide: Optional[str] = None
     ) -> "AggregatedFeatureSet":
         """Create a list with windows defined."""
         self._windows = [
@@ -368,7 +368,7 @@ class AggregatedFeatureSet(FeatureSet):
         right: DataFrame,
         on: List[str],
         how: str,
-        num_processors: int = None,
+        num_processors: Optional[int] = None,
     ) -> DataFrame:
         # make both tables co-partitioned to improve join performance
         left = repartition_df(left, partition_by=on, num_processors=num_processors)
@@ -380,7 +380,7 @@ class AggregatedFeatureSet(FeatureSet):
         dataframe: DataFrame,
         features: List[Feature],
         window: Optional[Window] = None,
-        num_processors: int = None,
+        num_processors: Optional[int] = None,
     ) -> DataFrame:
         aggregations = [
             c.function for f in features for c in f.transformation.aggregations
@@ -513,7 +513,7 @@ class AggregatedFeatureSet(FeatureSet):
             )
         return max(windows_list) / (60 * 60 * 24)
 
-    def define_start_date(self, start_date: str = None) -> Optional[str]:
+    def define_start_date(self, start_date: Optional[str] = None) -> Optional[str]:
         """Get aggregated feature set start date.
 
         Args:
@@ -540,9 +540,9 @@ class AggregatedFeatureSet(FeatureSet):
         self,
         dataframe: DataFrame,
         client: SparkClient,
-        end_date: str = None,
-        num_processors: int = None,
-        start_date: str = None,
+        end_date: Optional[str] = None,
+        num_processors: Optional[int] = None,
+        start_date: Optional[str] = None,
     ) -> DataFrame:
         """Use all the features to build the feature set dataframe.
 

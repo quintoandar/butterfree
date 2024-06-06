@@ -1,6 +1,6 @@
 """Module where there are repartition methods."""
 
-from typing import List
+from typing import List, Optional
 
 from pyspark.sql.dataframe import DataFrame
 
@@ -11,7 +11,7 @@ from butterfree.constants.spark_constants import (
 
 
 def _num_partitions_definition(
-    num_processors: int = None, num_partitions: int = None
+    num_processors: Optional[int] = None, num_partitions: Optional[int] = None
 ) -> int:
     num_partitions = (
         num_processors * PARTITION_PROCESSOR_RATIO
@@ -25,8 +25,8 @@ def _num_partitions_definition(
 def repartition_df(
     dataframe: DataFrame,
     partition_by: List[str],
-    num_partitions: int = None,
-    num_processors: int = None,
+    num_partitions: Optional[int] = None,
+    num_processors: Optional[int] = None,
 ) -> DataFrame:
     """Partition the DataFrame.
 
@@ -48,8 +48,8 @@ def repartition_sort_df(
     dataframe: DataFrame,
     partition_by: List[str],
     order_by: List[str],
-    num_processors: int = None,
-    num_partitions: int = None,
+    num_processors: Optional[int] = None,
+    num_partitions: Optional[int] = None,
 ) -> DataFrame:
     """Partition and Sort the DataFrame.
 

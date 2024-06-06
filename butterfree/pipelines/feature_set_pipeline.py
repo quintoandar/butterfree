@@ -1,6 +1,6 @@
 """FeatureSetPipeline entity."""
 
-from typing import List
+from typing import List, Optional
 
 from butterfree.clients import SparkClient
 from butterfree.dataframe_service import repartition_sort_df
@@ -136,7 +136,7 @@ class FeatureSetPipeline:
         source: Source,
         feature_set: FeatureSet,
         sink: Sink,
-        spark_client: SparkClient = None,
+        spark_client: Optional[SparkClient],
     ):
         self.source = source
         self.feature_set = feature_set
@@ -191,11 +191,11 @@ class FeatureSetPipeline:
 
     def run(
         self,
-        end_date: str = None,
-        partition_by: List[str] = None,
-        order_by: List[str] = None,
-        num_processors: int = None,
-        start_date: str = None,
+        end_date: Optional[str] = None,
+        partition_by: Optional[List[str]] = None,
+        order_by: Optional[List[str]] = None,
+        num_processors: Optional[int] = None,
+        start_date: Optional[str] = None,
     ) -> None:
         """Runs the defined feature set pipeline.
 
@@ -244,10 +244,10 @@ class FeatureSetPipeline:
 
     def run_for_date(
         self,
-        execution_date: str = None,
-        partition_by: List[str] = None,
-        order_by: List[str] = None,
-        num_processors: int = None,
+        execution_date: Optional[str] = None,
+        partition_by: Optional[List[str]] = None,
+        order_by: Optional[List[str]] = None,
+        num_processors: Optional[int] = None,
     ) -> None:
         """Runs the defined feature set pipeline for a specific date.
 

@@ -1,5 +1,7 @@
 """KeyFeature entity."""
 
+from typing import Optional
+
 from butterfree.constants.data_type import DataType
 from butterfree.transform.features.feature import Feature
 from butterfree.transform.transformations import TransformComponent
@@ -31,8 +33,8 @@ class KeyFeature(Feature):
         name: str,
         description: str,
         dtype: DataType,
-        from_column: str = None,
-        transformation: TransformComponent = None,
+        from_column: Optional[str] = None,
+        transformation: Optional[TransformComponent] = None,
     ) -> None:
         super(KeyFeature, self).__init__(
             name=name,

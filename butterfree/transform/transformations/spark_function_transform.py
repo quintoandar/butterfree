@@ -1,6 +1,6 @@
 """Spark Function Transform entity."""
 
-from typing import Any, List
+from typing import Any, List, Optional
 
 from pyspark.sql import DataFrame
 
@@ -88,8 +88,8 @@ class SparkFunctionTransform(TransformComponent):
         self,
         partition_by: str,
         window_definition: List[str],
-        order_by: str = None,
-        mode: str = None,
+        order_by: Optional[str] = None,
+        mode: Optional[str] = None,
     ) -> "SparkFunctionTransform":
         """Create a list with windows defined."""
         if mode is not None:
@@ -104,7 +104,9 @@ class SparkFunctionTransform(TransformComponent):
             ]
         return self
 
-    def _get_output_name(self, function: object, window: Window = None) -> str:
+    def _get_output_name(
+        self, function: object, window: Optional[Window] = None
+    ) -> str:
         base_name = (
             "__".join([self._parent.name, function.__name__])
             if hasattr(function, "__name__")

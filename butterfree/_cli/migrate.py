@@ -89,7 +89,7 @@ def __fs_objects(path: str) -> Set[FeatureSetPipeline]:
             instances.add(value)
 
     logger.info("Creating instances...")
-    return set(value() for value in instances)
+    return set(value() for value in instances)  # type: ignore
 
 
 PATH = typer.Argument(

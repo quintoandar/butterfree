@@ -21,7 +21,9 @@ class Reader(ABC, HookableComponent):
 
     """
 
-    def __init__(self, id: str, incremental_strategy: IncrementalStrategy = None):
+    def __init__(
+        self, id: str, incremental_strategy: Optional[IncrementalStrategy] = None
+    ):
         super().__init__()
         self.id = id
         self.transformations: List[Dict[str, Any]] = []
@@ -82,9 +84,9 @@ class Reader(ABC, HookableComponent):
     def build(
         self,
         client: SparkClient,
-        columns: List[Any] = None,
-        start_date: str = None,
-        end_date: str = None,
+        columns: Optional[List[Any]] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
     ) -> None:
         """Register the data got from the reader in the Spark metastore.
 
