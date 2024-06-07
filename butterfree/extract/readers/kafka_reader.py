@@ -1,5 +1,6 @@
 """KafkaSource entity."""
-from typing import Any, Dict
+
+from typing import Any, Dict, Optional
 
 from pyspark.sql.dataframe import DataFrame, StructType
 from pyspark.sql.functions import col, struct
@@ -107,8 +108,8 @@ class KafkaReader(Reader):
         id: str,
         topic: str,
         value_schema: StructType,
-        connection_string: str = None,
-        topic_options: Dict[Any, Any] = None,
+        connection_string: Optional[str] = None,
+        topic_options: Optional[Dict[Any, Any]] = None,
         stream: bool = True,
     ):
         super().__init__(id)

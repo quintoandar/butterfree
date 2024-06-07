@@ -1,5 +1,7 @@
 """TableSource entity."""
 
+from typing import Optional
+
 from pyspark.sql import DataFrame
 
 from butterfree.clients import SparkClient
@@ -44,7 +46,7 @@ class TableReader(Reader):
 
     __name__ = "Table Reader"
 
-    def __init__(self, id: str, table: str, database: str = None):
+    def __init__(self, id: str, table: str, database: Optional[str] = None):
         super().__init__(id)
         if not isinstance(table, str):
             raise ValueError(

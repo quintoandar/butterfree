@@ -1,6 +1,7 @@
 """Feature entity."""
+
 import warnings
-from typing import Any, List
+from typing import Any, List, Optional
 
 from pyspark.sql import DataFrame
 from pyspark.sql.functions import col
@@ -41,9 +42,9 @@ class Feature:
         self,
         name: str,
         description: str,
-        dtype: DataType = None,
-        from_column: str = None,
-        transformation: TransformComponent = None,
+        dtype: Optional[DataType] = None,
+        from_column: Optional[str] = None,
+        transformation: Optional[TransformComponent] = None,
     ) -> None:
         self.name = name
         self.description = description

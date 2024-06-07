@@ -1,6 +1,7 @@
 """Abstract class for database clients."""
+
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Any, Optional
 
 
 class AbstractClient(ABC):
@@ -25,7 +26,7 @@ class AbstractClient(ABC):
         pass
 
     @abstractmethod
-    def get_schema(self, table: str, database: str = None) -> Any:
+    def get_schema(self, table: str, database: Optional[str] = None) -> Any:
         """Returns desired table schema.
 
         Attributes:

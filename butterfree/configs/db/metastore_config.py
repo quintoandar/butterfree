@@ -25,10 +25,10 @@ class MetastoreConfig(AbstractWriteConfig):
 
     def __init__(
         self,
-        path: str = None,
-        mode: str = None,
-        format_: str = None,
-        file_system: str = None,
+        path: Optional[str] = None,
+        mode: Optional[str] = None,
+        format_: Optional[str] = None,
+        file_system: Optional[str] = None,
     ):
         self.path = path
         self.mode = mode

@@ -1,4 +1,5 @@
 """Holds function for defining window in DataFrames."""
+
 from typing import Any, List, Optional, Union
 
 from pyspark import sql
@@ -69,8 +70,8 @@ class Window:
         window_definition: str,
         partition_by: Optional[Union[Column, str, List[str]]] = None,
         order_by: Optional[Union[Column, str]] = None,
-        mode: str = None,
-        slide: str = None,
+        mode: Optional[str] = None,
+        slide: Optional[str] = None,
     ):
         self.partition_by = partition_by
         self.order_by = order_by or TIMESTAMP_COLUMN

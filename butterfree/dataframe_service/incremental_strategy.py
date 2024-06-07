@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Optional
+
 from pyspark.sql import DataFrame
 
 
@@ -18,7 +20,7 @@ class IncrementalStrategy:
             filter can properly work with the defined upper and lower bounds.
     """
 
-    def __init__(self, column: str = None):
+    def __init__(self, column: Optional[str] = None):
         self.column = column
 
     def from_milliseconds(self, column_name: str) -> IncrementalStrategy:
@@ -32,7 +34,9 @@ class IncrementalStrategy:
         """
         return IncrementalStrategy(column=f"from_unixtime({column_name}/ 1000.0)")
 
-    def from_string(self, column_name: str, mask: str = None) -> IncrementalStrategy:
+    def from_string(
+        self, column_name: str, mask: Optional[str] = None
+    ) -> IncrementalStrategy:
         """Create a column expression from ts column defined as a simple string.
 
         Args:
@@ -66,7 +70,9 @@ class IncrementalStrategy:
             f"'-', string({day_column}))"
         )
 
-    def get_expression(self, start_date: str = None, end_date: str = None) -> str:
+    def get_expression(
+        self, start_date: Optional[str] = None, end_date: Optional[str] = None
+    ) -> str:
         """Get the incremental filter expression using the defined dates.
 
         Both arguments can be set to defined a specific date interval, but  it's
@@ -95,7 +101,10 @@ class IncrementalStrategy:
         return f"date({self.column}) <= date('{end_date}')"
 
     def filter_with_incremental_strategy(
-        self, dataframe: DataFrame, start_date: str = None, end_date: str = None
+        self,
+        dataframe: DataFrame,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
     ) -> DataFrame:
         """Filters the dataframe according to the date boundaries.
 

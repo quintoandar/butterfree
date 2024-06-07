@@ -1,7 +1,7 @@
 """Holds the Online Feature Store writer class."""
 
 import os
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Optional, Union
 
 from pyspark.sql import DataFrame, Window
 from pyspark.sql.functions import col, row_number
@@ -80,12 +80,12 @@ class OnlineFeatureStoreWriter(Writer):
 
     def __init__(
         self,
-        db_config: AbstractWriteConfig = None,
-        database: str = None,
-        debug_mode: bool = False,
-        write_to_entity: bool = False,
-        interval_mode: bool = False,
-        check_schema_hook: Hook = None,
+        db_config: Optional[AbstractWriteConfig] = None,
+        database: Optional[str] = None,
+        debug_mode: Optional[bool] = False,
+        write_to_entity: Optional[bool] = False,
+        interval_mode: Optional[bool] = False,
+        check_schema_hook: Optional[Hook] = None,
     ):
         super(OnlineFeatureStoreWriter, self).__init__(
             db_config or CassandraConfig(), debug_mode, interval_mode, write_to_entity
@@ -256,7 +256,11 @@ class OnlineFeatureStoreWriter(Writer):
         return db_schema
 
     def check_schema(
-        self, client: Any, dataframe: DataFrame, table_name: str, database: str = None
+        self,
+        client: Any,
+        dataframe: DataFrame,
+        table_name: str,
+        database: Optional[str] = None,
     ) -> DataFrame:
         """Instantiate the schema check hook to check schema between dataframe and database.
 

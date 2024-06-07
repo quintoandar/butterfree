@@ -1,7 +1,7 @@
 """Utils for date range generation."""
 
 from datetime import datetime
-from typing import Union
+from typing import Optional, Union
 
 from pyspark.sql import DataFrame, functions
 
@@ -14,7 +14,7 @@ def get_date_range(
     client: SparkClient,
     start_date: Union[str, datetime],
     end_date: Union[str, datetime],
-    step: int = None,
+    step: Optional[int] = None,
 ) -> DataFrame:
     """Create a date range dataframe.
 
@@ -44,7 +44,7 @@ def get_date_range(
             for c in ("start_date", "end_date")
         ]
     )
-    start_date, end_date = date_df.first()
+    start_date, end_date = date_df.first()  # type: ignore
     return client.conn.range(
         start_date, end_date + day_in_seconds, step  # type: ignore
     ).select(functions.col("id").cast(DataType.TIMESTAMP.spark).alias(TIMESTAMP_COLUMN))

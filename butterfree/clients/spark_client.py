@@ -69,7 +69,7 @@ class SparkClient(AbstractClient):
 
         return df_reader.format(format).load(path=path, **options)  # type: ignore
 
-    def read_table(self, table: str, database: str = None) -> DataFrame:
+    def read_table(self, table: str, database: Optional[str] = None) -> DataFrame:
         """Use the SparkSession.read interface to read a metastore table.
 
         Args:
@@ -179,9 +179,9 @@ class SparkClient(AbstractClient):
         database: Optional[str],
         table_name: str,
         path: str,
-        format_: str = None,
-        mode: str = None,
-        partition_by: List[str] = None,
+        format_: Optional[str] = None,
+        mode: Optional[str] = None,
+        partition_by: Optional[List[str]] = None,
         **options: Any,
     ) -> None:
         """Receive a spark DataFrame and write it as a table in metastore.
@@ -231,7 +231,10 @@ class SparkClient(AbstractClient):
         return dataframe.writeStream.format("memory").queryName(name).start()
 
     def add_table_partitions(
-        self, partitions: List[Dict[str, Any]], table: str, database: str = None
+        self,
+        partitions: List[Dict[str, Any]],
+        table: str,
+        database: Optional[str] = None,
     ) -> None:
         """Add partitions to an existing table.
 
@@ -259,9 +262,11 @@ class SparkClient(AbstractClient):
         key_values_expr = [
             ", ".join(
                 [
-                    "{} = {}".format(k, v)
-                    if not isinstance(v, str)
-                    else "{} = '{}'".format(k, v)
+                    (
+                        "{} = {}".format(k, v)
+                        if not isinstance(v, str)
+                        else "{} = '{}'".format(k, v)
+                    )
                     for k, v in partition.items()
                 ]
             )
@@ -314,7 +319,9 @@ class SparkClient(AbstractClient):
 
         return converted_schema
 
-    def get_schema(self, table: str, database: str = None) -> List[Dict[str, str]]:
+    def get_schema(
+        self, table: str, database: Optional[str] = None
+    ) -> List[Dict[str, str]]:
         """Returns desired table schema.
 
         Attributes:

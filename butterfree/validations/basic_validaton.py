@@ -1,5 +1,7 @@
 """Validation implementing basic checks over the dataframe."""
 
+from typing import Optional
+
 from pyspark.sql.dataframe import DataFrame
 
 from butterfree.constants.columns import TIMESTAMP_COLUMN
@@ -14,7 +16,7 @@ class BasicValidation(Validation):
 
     """
 
-    def __init__(self, dataframe: DataFrame = None):
+    def __init__(self, dataframe: Optional[DataFrame] = None):
         super().__init__(dataframe)
 
     def check(self) -> None:

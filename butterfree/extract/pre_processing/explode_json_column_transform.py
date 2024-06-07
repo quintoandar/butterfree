@@ -1,4 +1,5 @@
 """Explode json column for dataframes."""
+
 from pyspark.sql.dataframe import DataFrame, StructType
 from pyspark.sql.functions import from_json, get_json_object
 
