@@ -16,7 +16,9 @@ from butterfree.configs.logger import __logger
 from butterfree.migrations.database_migration import ALLOWED_DATABASE
 from butterfree.pipelines import FeatureSetPipeline
 
-app = typer.Typer(help="Apply the automatic migrations in a database.")
+app = typer.Typer(
+    help="Apply the automatic migrations in a database.", no_args_is_help=True
+)
 
 logger = __logger("migrate", True)
 
