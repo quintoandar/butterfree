@@ -34,7 +34,7 @@ class Function:
         """Definitions to be used in the transformation."""
         if value is None:
             raise ValueError("Function must not be empty.")
-        if callable(value) is None:
+        if callable(value) is False:
             raise TypeError("Function must be callable.")
 
         self._func = value

@@ -136,7 +136,7 @@ class FeatureSetPipeline:
         source: Source,
         feature_set: FeatureSet,
         sink: Sink,
-        spark_client: Optional[SparkClient],
+        spark_client: Optional[SparkClient] = None,
     ):
         self.source = source
         self.feature_set = feature_set
