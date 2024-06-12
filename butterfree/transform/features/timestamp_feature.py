@@ -41,6 +41,7 @@ class TimestampFeature(Feature):
 
     def __init__(
         self,
+        dtype: Optional[DataType] = DataType.TIMESTAMP,
         from_column: Optional[str] = None,
         transformation: Optional[TransformComponent] = None,
         from_ms: bool = False,
@@ -51,7 +52,7 @@ class TimestampFeature(Feature):
             name=TIMESTAMP_COLUMN,
             description=description,
             from_column=from_column,
-            dtype=DataType.TIMESTAMP,
+            dtype=dtype,
             transformation=transformation,
         )
         self.from_ms = from_ms

@@ -12,6 +12,7 @@ from pyspark.sql.types import (
     IntegerType,
     LongType,
     StringType,
+    TimestampNTZType,
     TimestampType,
 )
 from typing_extensions import final
@@ -21,6 +22,7 @@ from typing_extensions import final
 class DataType(Enum):
     """Holds constants for data types within Butterfree."""
 
+    TIMESTAMP_NTZ = (TimestampNTZType(), "timestamp", "TIMESTAMP_NTZ")
     TIMESTAMP = (TimestampType(), "timestamp", "TIMESTAMP")
     BINARY = (BinaryType(), "boolean", "BINARY")
     BOOLEAN = (BooleanType(), "boolean", "BOOLEAN")
