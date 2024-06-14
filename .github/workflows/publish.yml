@@ -7,7 +7,7 @@ on:
 
 jobs:
   Pipeline:
-    if: github.ref == 'refs/heads/master'
+    # if: github.ref == 'refs/heads/master'
 
     runs-on: ubuntu-latest
 
@@ -40,22 +40,22 @@ jobs:
       id: get_release_notes
       uses: ffurrer2/extract-release-notes@v1
 
-    - name: Create release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ env.version }}
-        release_name: Release ${{ env.version }}
-        body: ${{ steps.get_release_notes.outputs.release_notes }}
+    # - name: Create release
+    #   uses: actions/create-release@v1
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #   with:
+    #     tag_name: ${{ env.version }}
+    #     release_name: Release ${{ env.version }}
+    #     body: ${{ steps.get_release_notes.outputs.release_notes }}
 
-    - name: Release already exist
-      if: ${{ failure() }}
-      run: echo Release already exist
+    # - name: Release already exist
+    #   if: ${{ failure() }}
+    #   run: echo Release already exist
 
-    - name: Publish release to pypi.org
-      if: ${{ success() }}
-      env:
-        PYPI_USERNAME: ${{ secrets.PYPI_USERNAME }}
-        PYPI_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-      run:  PYTHONPATH=./pip/deps python -m twine upload -u $PYPI_USERNAME -p $PYPI_PASSWORD --verbose dist/*
+    # - name: Publish release to pypi.org
+    #   if: ${{ success() }}
+    #   env:
+    #     PYPI_USERNAME: ${{ secrets.PYPI_USERNAME }}
+    #     PYPI_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+    #   run:  PYTHONPATH=./pip/deps python -m twine upload -u $PYPI_USERNAME -p $PYPI_PASSWORD --verbose dist/*
