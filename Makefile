@@ -9,8 +9,8 @@ VERSION := $(shell grep __version__ setup.py | head -1 | cut -d \" -f2 | cut -d 
 .PHONY: environment
 ## create virtual environment for butterfree
 environment:
-	@pyenv install -s 3.7.13
-	@pyenv virtualenv 3.7.13 butterfree
+	@pyenv install -s 3.9.19
+	@pyenv virtualenv 3.9.19 butterfree
 	@pyenv local butterfree
 	@PYTHONPATH=. python -m pip install --upgrade pip
 

@@ -69,7 +69,7 @@ class CustomTransform(TransformComponent):
 
     @transformer.setter
     def transformer(self, method: Callable[..., Any]) -> None:
-        if not method:
+        if method is None:
             raise ValueError("A method must be provided to CustomTransform")
         self._transformer = method
 

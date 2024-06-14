@@ -67,7 +67,7 @@ class TestAggregatedTransform:
                 name="feature1",
                 description="unit test",
                 transformation=AggregatedTransform(
-                    functions=[Function(func="", data_type="")]
+                    functions=[Function(func=None, data_type="")]
                 ),
             )
 

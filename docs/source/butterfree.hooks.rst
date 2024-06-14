@@ -12,12 +12,16 @@ Subpackages
 Submodules
 ----------
 
+butterfree.hooks.hook module
+----------------------------
 
 .. automodule:: butterfree.hooks.hook
    :members:
    :undoc-members:
    :show-inheritance:
 
+butterfree.hooks.hookable\_component module
+-------------------------------------------
 
 .. automodule:: butterfree.hooks.hookable_component
    :members:

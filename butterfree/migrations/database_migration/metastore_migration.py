@@ -1,6 +1,6 @@
 """Metastore Migration entity."""
 
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from butterfree.clients import SparkClient
 from butterfree.configs import environment
@@ -32,7 +32,7 @@ class MetastoreMigration(DatabaseMigration):
 
     def __init__(
         self,
-        database: str = None,
+        database: Optional[str] = None,
     ) -> None:
         self._db_config = MetastoreConfig()
         self.database = database or environment.get_variable(

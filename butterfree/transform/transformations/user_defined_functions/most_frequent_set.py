@@ -1,4 +1,5 @@
 """Method to compute most frequent set aggregation."""
+
 from typing import Any
 
 import pandas as pd

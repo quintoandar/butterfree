@@ -14,12 +14,16 @@ Subpackages
 Submodules
 ----------
 
+butterfree.transform.aggregated\_feature\_set module
+----------------------------------------------------
 
 .. automodule:: butterfree.transform.aggregated_feature_set
    :members:
    :undoc-members:
    :show-inheritance:
 
+butterfree.transform.feature\_set module
+----------------------------------------
 
 .. automodule:: butterfree.transform.feature_set
    :members:

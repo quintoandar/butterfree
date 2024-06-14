@@ -2,7 +2,7 @@
 
 from abc import ABC, abstractmethod
 from functools import reduce
-from typing import Any, Callable, Dict, List
+from typing import Any, Callable, Dict, List, Optional
 
 from pyspark.sql.dataframe import DataFrame
 
@@ -23,10 +23,10 @@ class Writer(ABC, HookableComponent):
     def __init__(
         self,
         db_config: AbstractWriteConfig,
-        debug_mode: bool = False,
-        interval_mode: bool = False,
-        write_to_entity: bool = False,
-        row_count_validation: bool = True,
+        debug_mode: Optional[bool] = False,
+        interval_mode: Optional[bool] = False,
+        write_to_entity: Optional[bool] = False,
+        row_count_validation: Optional[bool] = True,
     ) -> None:
         super().__init__()
         self.db_config = db_config
@@ -90,7 +90,11 @@ class Writer(ABC, HookableComponent):
 
     @abstractmethod
     def check_schema(
-        self, client: Any, dataframe: DataFrame, table_name: str, database: str = None
+        self,
+        client: Any,
+        dataframe: DataFrame,
+        table_name: str,
+        database: Optional[str] = None,
     ) -> DataFrame:
         """Instantiate the schema check hook to check schema between dataframe and database.
 

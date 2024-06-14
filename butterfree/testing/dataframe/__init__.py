@@ -1,6 +1,7 @@
 """Methods to assert properties regarding Apache Spark Dataframes."""
+
 from json import dumps
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from pyspark import SparkContext
 from pyspark.sql import Column, DataFrame, SparkSession
@@ -72,7 +73,7 @@ def create_df_from_collection(
     data: List[Dict[Any, Any]],
     spark_context: SparkContext,
     spark_session: SparkSession,
-    schema: StructType = None,
+    schema: Optional[StructType] = None,
 ) -> DataFrame:
     """Creates a dataframe from a list of dicts."""
     return spark_session.read.json(

@@ -1,4 +1,5 @@
 """Holds configurations to read and write with Spark to Kafka."""
+
 from typing import Any, Dict, List, Optional
 
 from butterfree.configs import environment
@@ -25,13 +26,13 @@ class KafkaConfig(AbstractWriteConfig):
 
     def __init__(
         self,
-        kafka_topic: str = None,
-        kafka_connection_string: str = None,
-        mode: str = None,
-        format_: str = None,
-        stream_processing_time: str = None,
-        stream_output_mode: str = None,
-        stream_checkpoint_path: str = None,
+        kafka_topic: Optional[str] = None,
+        kafka_connection_string: Optional[str] = None,
+        mode: Optional[str] = None,
+        format_: Optional[str] = None,
+        stream_processing_time: Optional[str] = None,
+        stream_output_mode: Optional[str] = None,
+        stream_checkpoint_path: Optional[str] = None,
     ):
         self.kafka_topic = kafka_topic
         self.kafka_connection_string = kafka_connection_string
@@ -147,4 +148,4 @@ class KafkaConfig(AbstractWriteConfig):
             Kafka schema.
 
         """
-        pass
+        return [{}]

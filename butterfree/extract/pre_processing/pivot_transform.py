@@ -1,5 +1,6 @@
 """Pivot Transform for dataframes."""
-from typing import Callable, List, Union
+
+from typing import Callable, List, Optional, Union
 
 from pyspark.sql import DataFrame, functions
 from pyspark.sql.types import DataType
@@ -13,8 +14,8 @@ def pivot(
     pivot_column: str,
     agg_column: str,
     aggregation: Callable,
-    mock_value: Union[float, str] = None,
-    mock_type: Union[DataType, str] = None,
+    mock_value: Optional[Union[float, str]] = None,
+    mock_type: Optional[Union[DataType, str]] = None,
     with_forward_fill: bool = False,
 ) -> DataFrame:
     """Defines a pivot transformation.
