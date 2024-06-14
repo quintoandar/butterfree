@@ -50,7 +50,7 @@ def create_temp_view(dataframe: DataFrame, name):
 
 
 def create_db_and_table(spark, table_reader_id, table_reader_db, table_reader_table):
-    spark.sql(f"drop schema {table_reader_db} cascade")
+    spark.sql(f"drop schema if exists {table_reader_db} cascade")
     spark.sql(f"create database {table_reader_db}")
     spark.sql(f"use {table_reader_db}")
     spark.sql(
