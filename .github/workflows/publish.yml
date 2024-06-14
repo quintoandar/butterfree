@@ -1,8 +1,9 @@
 name: "Publish"
 on:
   push:
-    paths:
-      - 'setup.py'
+    # paths:
+      # - 'setup.py'
+  pull_request:
 
 
 jobs:
