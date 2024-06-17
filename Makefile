@@ -146,6 +146,7 @@ package-name:
 .PHONY: package
 ## build butterfree package wheel
 package:
+	@PYTHONPATH=. pip3 install wheel
 	@PYTHONPATH=. python -m setup sdist bdist_wheel
 
 .PHONY: update-docs
