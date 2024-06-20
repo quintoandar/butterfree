@@ -6,3 +6,4 @@ pyspark==3.5.1
 typer==0.4.2
 typing-extensions>3.7.4,<5
 boto3==1.17.*
+numpy==1.26.4
