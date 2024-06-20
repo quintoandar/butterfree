@@ -11,6 +11,9 @@ Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each 
 ## [1.3.2](https://github.com/quintoandar/butterfree/releases/tag/1.3.2)
 * Fix publish script ([#362](https://github.com/quintoandar/butterfree/pull/362))
 
+## [1.3.2](https://github.com/quintoandar/butterfree/releases/tag/1.3.2)
+* Fix publish script ([#360](https://github.com/quintoandar/butterfree/pull/362))
+
 ## [1.3.1](https://github.com/quintoandar/butterfree/releases/tag/1.3.1)
 * Timestamp NTZ available ([#360](https://github.com/quintoandar/butterfree/pull/360))
 
