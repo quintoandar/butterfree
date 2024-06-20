@@ -4,7 +4,6 @@ butterfree.migrations.database\_migration package
 Submodules
 ----------
 
-butterfree.migrations.database\_migration.cassandra\_migration module
 ---------------------------------------------------------------------
 
 .. automodule:: butterfree.migrations.database_migration.cassandra_migration

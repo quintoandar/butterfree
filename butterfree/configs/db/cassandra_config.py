@@ -228,26 +228,28 @@ class CassandraConfig(AbstractWriteConfig):
 
         """
         cassandra_mapping = {
-            "TimestampType": "timestamp",
-            "BinaryType": "boolean",
-            "BooleanType": "boolean",
-            "DateType": "timestamp",
-            "DecimalType": "decimal",
-            "DoubleType": "double",
-            "FloatType": "float",
-            "IntegerType": "int",
-            "LongType": "bigint",
-            "StringType": "text",
-            "ArrayType(LongType,true)": "frozen<list<bigint>>",
-            "ArrayType(StringType,true)": "frozen<list<text>>",
-            "ArrayType(FloatType,true)": "frozen<list<float>>",
+            "timestamptype": "timestamp",
+            "binarytype": "boolean",
+            "booleantype": "boolean",
+            "datetype": "timestamp",
+            "decimaltype": "decimal",
+            "doubletype": "double",
+            "floattype": "float",
+            "integertype": "int",
+            "longtype": "bigint",
+            "stringtype": "text",
+            "arraytype(longtype,true)": "frozen<list<bigint>>",
+            "arraytype(stringtype,true)": "frozen<list<text>>",
+            "arraytype(floattype,true)": "frozen<list<float>>",
         }
         cassandra_schema = []
         for features in schema:
             cassandra_schema.append(
                 {
                     "column_name": features["column_name"],
-                    "type": cassandra_mapping[str(features["type"]).replace("()", "")],
+                    "type": cassandra_mapping[
+                        str(features["type"]).replace("()", "").lower()
+                    ],
                     "primary_key": features["primary_key"],
                 }
             )
