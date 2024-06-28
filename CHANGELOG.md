@@ -5,6 +5,9 @@ Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each 
 
 ## [Unreleased]
 
+## [1.3.4](https://github.com/quintoandar/butterfree/releases/tag/1.3.4)
+* Fix Cassandra Config and tests ([#366](https://github.com/quintoandar/butterfree/pull/366))
+
 ## [1.3.3](https://github.com/quintoandar/butterfree/releases/tag/1.3.3)
 * Fix Cassandra Config and Numpy version ([#364](https://github.com/quintoandar/butterfree/pull/364))
 
