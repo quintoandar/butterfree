@@ -5,6 +5,9 @@ Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each 
 
 ## [Unreleased]
 
+## [1.3.5](https://github.com/quintoandar/butterfree/releases/tag/1.3.5)
+* Auto create feature sets ([#368](https://github.com/quintoandar/butterfree/pull/368))
+
 ## [1.3.4](https://github.com/quintoandar/butterfree/releases/tag/1.3.4)
 * Fix Cassandra Config and tests ([#366](https://github.com/quintoandar/butterfree/pull/366))
 
