@@ -13,6 +13,8 @@ Subpackages
 Submodules
 ----------
 
+butterfree.extract.source module
+--------------------------------
 
 .. automodule:: butterfree.extract.source
    :members:

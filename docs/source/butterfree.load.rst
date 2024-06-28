@@ -13,6 +13,8 @@ Subpackages
 Submodules
 ----------
 
+butterfree.load.sink module
+---------------------------
 
 .. automodule:: butterfree.load.sink
    :members:

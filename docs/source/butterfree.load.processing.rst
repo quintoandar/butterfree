@@ -4,6 +4,8 @@ butterfree.load.processing package
 Submodules
 ----------
 
+butterfree.load.processing.json\_transform module
+-------------------------------------------------
 
 .. automodule:: butterfree.load.processing.json_transform
    :members:

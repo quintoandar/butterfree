@@ -4,6 +4,8 @@ butterfree.reports package
 Submodules
 ----------
 
+butterfree.reports.metadata module
+----------------------------------
 
 .. automodule:: butterfree.reports.metadata
    :members:
