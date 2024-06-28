@@ -229,6 +229,7 @@ class CassandraConfig(AbstractWriteConfig):
         """
         cassandra_mapping = {
             "timestamptype": "timestamp",
+            "timestampntztype": "timestamp",
             "binarytype": "boolean",
             "booleantype": "boolean",
             "datetype": "timestamp",
