@@ -238,9 +238,9 @@ class CassandraConfig(AbstractWriteConfig):
             "integertype": "int",
             "longtype": "bigint",
             "stringtype": "text",
-            "arraytype(longtype,true)": "frozen<list<bigint>>",
-            "arraytype(stringtype,true)": "frozen<list<text>>",
-            "arraytype(floattype,true)": "frozen<list<float>>",
+            "arraytype(longtype, true)": "frozen<list<bigint>>",
+            "arraytype(stringtype, true)": "frozen<list<text>>",
+            "arraytype(floattype, true)": "frozen<list<float>>",
         }
         cassandra_schema = []
         for features in schema:

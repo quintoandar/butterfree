@@ -33,9 +33,11 @@ class TestCassandraMigration:
         expected_query = [
             "CREATE TABLE test.table_name "
             "(id LongType, timestamp TimestampType, new_feature FloatType, "
+            "array_feature ArrayType(StringType(), True), "
             "feature1__avg_over_1_week_rolling_windows FloatType, "
             "PRIMARY KEY (id, timestamp));"
         ]
+
         query = cassandra_migration.create_query(fs_schema, "table_name")
 
         assert query, expected_query

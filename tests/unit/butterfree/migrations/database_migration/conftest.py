@@ -1,4 +1,11 @@
-from pyspark.sql.types import DoubleType, FloatType, LongType, TimestampType
+from pyspark.sql.types import (
+    ArrayType,
+    DoubleType,
+    FloatType,
+    LongType,
+    StringType,
+    TimestampType,
+)
 from pytest import fixture
 
 from butterfree.constants import DataType
@@ -30,6 +37,11 @@ def fs_schema():
         {"column_name": "id", "type": LongType(), "primary_key": True},
         {"column_name": "timestamp", "type": TimestampType(), "primary_key": True},
         {"column_name": "new_feature", "type": FloatType(), "primary_key": False},
+        {
+            "column_name": "array_feature",
+            "type": ArrayType(StringType(), True),
+            "primary_key": False,
+        },
         {
             "column_name": "feature1__avg_over_1_week_rolling_windows",
             "type": FloatType(),
