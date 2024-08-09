@@ -3,6 +3,9 @@
 import json
 from typing import Any, Dict, List, Optional, Union
 
+import pyspark
+from delta import *
+from delta import configure_spark_with_delta_pip
 from pyspark.sql import DataFrame, DataFrameReader, SparkSession
 from pyspark.sql.streaming import DataStreamReader, StreamingQuery
 from pyspark.sql.types import StructType
@@ -29,7 +32,26 @@ class SparkClient(AbstractClient):
 
         """
         if not self._session:
-            self._session = SparkSession.builder.getOrCreate()
+            # self._session = SparkSession.builder.getOrCreate()
+
+            self._session = (
+                SparkSession.builder.config(
+                    "spark.jars.packages", "io.delta:delta-core_2.12:2.4.0"
+                )
+                .config(
+                    "spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension"
+                )
+                .config(
+                    "spark.sql.catalog.spark_catalog",
+                    "org.apache.spark.sql.delta.catalog.DeltaCatalog",
+                )
+                .config(
+                    "spark.delta.logStore.class",
+                    "org.apache.spark.sql.delta.storage.S3SingleDriverLogStore",
+                )
+                .getOrCreate()
+            )
+
         return self._session
 
     def read(

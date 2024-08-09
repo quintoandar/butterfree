@@ -145,6 +145,34 @@ class TestHistoricalFeatureStoreWriter:
         # then
         assert_dataframe_equality(historical_feature_set_dataframe, result_df)
 
+    def test_merge_from_historical_writer(
+        self, feature_set, feature_set_dataframe, mocker
+    ):
+        # given
+        spark_client = SparkClient()
+        spark_client.write_table = mocker.stub("write_table")
+        writer = HistoricalFeatureStoreWriter()
+        spark_client.conn.sql(
+            "CREATE TABLE test_delta_table_from_hist (id INT, feature STRING, ts_feature TIMESTAMP) USING DELTA "
+        )
+        spark_client.conn.sql(
+            "INSERT INTO test_delta_table_from_hist(id, feature, ts_feature) VALUES(1, 'test', TO_DATE('2024-03-01', 'YYYY-MM-DD')) "
+        )
+
+        # when
+        writer.write(
+            feature_set=feature_set,
+            dataframe=feature_set_dataframe,
+            spark_client=spark_client,
+            merge_on=["id"],
+        )
+
+        result_df = spark_client.conn.read.table("test_delta_table_from_hist")
+
+        assert result_df != None
+
+        spark_client.conn.sql("DROP TABLE test_delta_table_from_hist")
+
     def test_validate(self, historical_feature_set_dataframe, mocker, feature_set):
         # given
         spark_client = mocker.stub("spark_client")

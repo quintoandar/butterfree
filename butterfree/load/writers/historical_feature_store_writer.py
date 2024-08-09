@@ -14,6 +14,7 @@ from butterfree.constants.spark_constants import DEFAULT_NUM_PARTITIONS
 from butterfree.dataframe_service import repartition_df
 from butterfree.hooks import Hook
 from butterfree.hooks.schema_compatibility import SparkTableSchemaCompatibilityHook
+from butterfree.load.writers.delta_writer import DeltaWriter
 from butterfree.load.writers.writer import Writer
 from butterfree.transform import FeatureSet
 
@@ -134,6 +135,7 @@ class HistoricalFeatureStoreWriter(Writer):
         feature_set: FeatureSet,
         dataframe: DataFrame,
         spark_client: SparkClient,
+        merge_on: list = None,
     ) -> None:
         """Loads the data from a feature set into the Historical Feature Store.
 
@@ -174,13 +176,19 @@ class HistoricalFeatureStoreWriter(Writer):
 
         s3_key = os.path.join("historical", feature_set.entity, feature_set.name)
 
-        spark_client.write_table(
-            dataframe=dataframe,
-            database=self.database,
-            table_name=feature_set.name,
-            partition_by=self.PARTITION_BY,
-            **self.db_config.get_options(s3_key),
-        )
+        if merge_on:
+            path = self.db_config.get_options(s3_key)["path"]
+            DeltaWriter.merge(
+                spark_client, self.database, feature_set.name, path, merge_on, dataframe
+            )
+        else:
+            spark_client.write_table(
+                dataframe=dataframe,
+                database=self.database,
+                table_name=feature_set.name,
+                partition_by=self.PARTITION_BY,
+                **self.db_config.get_options(s3_key),
+            )
 
     def _assert_validation_count(
         self, table_name: str, written_count: int, dataframe_count: int

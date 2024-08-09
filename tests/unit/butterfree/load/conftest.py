@@ -1,3 +1,6 @@
+import os
+import tempfile
+
 from pyspark.sql import functions
 from pyspark.sql.types import StringType, StructField, StructType
 from pytest import fixture
@@ -11,6 +14,17 @@ from butterfree.transform.aggregated_feature_set import AggregatedFeatureSet
 from butterfree.transform.features import Feature, KeyFeature, TimestampFeature
 from butterfree.transform.transformations import AggregatedTransform
 from butterfree.transform.utils import Function
+
+
+@fixture
+def set_env():
+    os.environ["SPARK_LOCAL_IP"] = "127.0.0.1"
+
+
+@fixture
+def temp_file():
+    tempPath = tempfile.mkdtemp()
+    return os.path.join(tempPath, "tempFile")
 
 
 @fixture
