@@ -93,7 +93,9 @@ class TestDeltaWriter:
 
         client.conn.sql("DROP TABLE test_delta_table")
 
-    def test_merge_from_historical_writer(self, feature_set, feature_set_dataframe, client_fixture):
+    def test_merge_from_historical_writer(
+        self, feature_set, feature_set_dataframe, client_fixture
+    ):
         # given
         os.environ["SPARK_LOCAL_IP"] = "127.0.0.1"
         # spark_client = SparkClient()
