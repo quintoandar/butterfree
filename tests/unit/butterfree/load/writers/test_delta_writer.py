@@ -1,16 +1,8 @@
 import os
-from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
 
 import pytest
-from delta.tables import DeltaTable
-from pyspark.sql import DataFrame, DataFrameReader, SparkSession
-from pyspark.sql.functions import col
-from pyspark.sql.types import StructType
-from pyspark.testing import assertDataFrameEqual
 
 from butterfree.clients import SparkClient
-from butterfree.configs.db import MetastoreConfig
-from butterfree.constants.columns import TIMESTAMP_COLUMN
 from butterfree.load.writers import DeltaWriter, HistoricalFeatureStoreWriter
 
 DELTA_LOCATION = "spark-warehouse"
@@ -67,7 +59,7 @@ class TestDeltaWriter:
 
         df = client.conn.read.table("test_delta_table")
 
-        assert df != None
+        assert df is not None
         assert df.toPandas().feature[0] == "test2"
 
         # Step 2
@@ -88,7 +80,7 @@ class TestDeltaWriter:
 
         df = client.conn.read.table("test_delta_table")
 
-        assert df != None
+        assert df is not None
         assert df.toPandas().feature[0] == "test2"
 
         client.conn.sql("DROP TABLE test_delta_table")
@@ -101,10 +93,12 @@ class TestDeltaWriter:
         # spark_client = SparkClient()
         writer = HistoricalFeatureStoreWriter()
         client_fixture.conn.sql(
-            "CREATE TABLE test_delta_table_from_hist (id INT, feature STRING, ts_feature TIMESTAMP) USING DELTA "
+            """CREATE TABLE test_delta_table_from_hist
+            (id INT, feature STRING, ts_feature TIMESTAMP) USING DELTA """
         )
         client_fixture.conn.sql(
-            "INSERT INTO test_delta_table_from_hist(id, feature, ts_feature) VALUES(1, 'test', TO_DATE('2019-12-31', 'YYYY-MM-DD')) "
+            """INSERT INTO test_delta_table_from_hist(id, feature, ts_feature)
+            VALUES(1, 'test', TO_DATE('2019-12-31', 'YYYY-MM-DD')) """
         )
 
         # when
@@ -117,7 +111,7 @@ class TestDeltaWriter:
 
         result_df = client_fixture.conn.read.table("test_delta_table_from_hist")
 
-        assert result_df != None
+        assert result_df is not None
         assert result_df.toPandas().feature == 100
 
         client_fixture.conn.sql("DROP TABLE test_delta_table_from_hist")
@@ -167,6 +161,6 @@ class TestDeltaWriter:
 
         DeltaWriter().vacuum("test_delta_table_v", retention_hours, client)
 
-        assert self.__checkFileExists("test_delta_table_v") == True
+        assert self.__checkFileExists("test_delta_table_v") is True
 
         client.conn.sql("DROP TABLE test_delta_table_v")

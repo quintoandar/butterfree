@@ -3,9 +3,6 @@
 import json
 from typing import Any, Dict, List, Optional, Union
 
-import pyspark
-from delta import *
-from delta import configure_spark_with_delta_pip
 from pyspark.sql import DataFrame, DataFrameReader, SparkSession
 from pyspark.sql.streaming import DataStreamReader, StreamingQuery
 from pyspark.sql.types import StructType

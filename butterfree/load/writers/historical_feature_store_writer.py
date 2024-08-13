@@ -143,6 +143,7 @@ class HistoricalFeatureStoreWriter(Writer):
             feature_set: object processed with feature_set informations.
             dataframe: spark dataframe containing data from a feature set.
             spark_client: client for spark connections with external services.
+            merge_on: when filled, the writing is an upsert in a Delta table.
 
         If the debug_mode is set to True, a temporary table with a name in the format:
         historical_feature_store__{feature_set.name} will be created instead of writing

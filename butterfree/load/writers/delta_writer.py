@@ -9,6 +9,7 @@ logger = __logger("delta_writer", True)
 
 class DeltaWriter:
     """Control operations on Delta Tables.
+
     Resposible for merging and optimizing.
     """
 
@@ -38,15 +39,22 @@ class DeltaWriter:
         when_matched_delete_condition: str = None,
     ):
         """
-        Merge a source dataframe to a Delta table, using the list of columns in "merge_on" as merge keys.
-        By default, it will update when matched, and insert when not matched (simple upsert).
+        Merge a source dataframe to a Delta table.
+
+        By default, it will update when matched, and insert when
+        not matched (simple upsert).
 
         You can change this behavior by setting:
-        - when_not_matched_insert_condition: it will only insert when this specified condition is true
-        - when_matched_update_condition: it will only update when this specified condition is true. You can refer to the columns
-        in the source dataframe as source.<column_name>, and the columns in the target table as target.<column_name>.
-        - when_matched_delete_condition: it will add an operation to delete, but only if this condition is true. Again, source and
-        target dataframe columns can be referred to respectively as source.<column_name> and target.<column_name>
+        - when_not_matched_insert_condition: it will only insert
+            when this specified condition is true
+        - when_matched_update_condition: it will only update when this
+            specified condition is true. You can refer to the columns
+        in the source dataframe as source.<column_name>, and the columns
+            in the target table as target.<column_name>.
+        - when_matched_delete_condition: it will add an operation to delete,
+            but only if this condition is true. Again, source and
+            target dataframe columns can be referred to respectively as
+            source.<column_name> and target.<column_name>
         """
         try:
             full_table_name = DeltaWriter._get_full_table_name(table, database)
@@ -84,11 +92,16 @@ class DeltaWriter:
 
     @staticmethod
     def vacuum(table: str, retention_hours: int, client: SparkClient):
-        """Vacuum a Delta table
-        Vacuum remove unused files (files not managed by Delta + files that are not in the latest state).
-        After vacuum it's impossible to time travel to versions older than the `retention` time.
-        Default retention is 7 days. Lower retentions will be warned, unless it's set to false.
-        Set spark.databricks.delta.retentionDurationCheck.enabled to false for low retentions.
+        """Vacuum a Delta table.
+
+        Vacuum remove unused files (files not managed by Delta + files
+        that are not in the latest state).
+        After vacuum it's impossible to time travel to versions
+        older than the `retention` time.
+        Default retention is 7 days. Lower retentions will be warned,
+        unless it's set to false.
+        Set spark.databricks.delta.retentionDurationCheck.enabled
+        to false for low retentions.
         https://docs.databricks.com/en/sql/language-manual/delta-vacuum.html
         """
 
@@ -107,11 +120,15 @@ class DeltaWriter:
         auto_compact: bool = False,
         optimize_write: bool = False,
     ):
-        """Optimize a Delta table
-        For auto-compaction and optimize write DBR >= 14.3 LTS and Delta >= 3.1.0 are MANDATORY.
+        """Optimize a Delta table.
+
+        For auto-compaction and optimize write DBR >= 14.3 LTS
+        and Delta >= 3.1.0 are MANDATORY.
         For z-ordering DBR >= 13.3 LTS and Delta >= 2.0.0 are MANDATORY.
-        Auto-compaction (recommended) reduces the small file problem (overhead due to lots of metadata).
-        Z-order by columns that is commonly used in queries predicates and has a high cardinality.
+        Auto-compaction (recommended) reduces the small file problem
+        (overhead due to lots of metadata).
+        Z-order by columns that is commonly used in queries
+        predicates and has a high cardinality.
         https://docs.delta.io/latest/optimizations-oss.html
         """
 
