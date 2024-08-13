@@ -32,8 +32,6 @@ class SparkClient(AbstractClient):
 
         """
         if not self._session:
-            # self._session = SparkSession.builder.getOrCreate()
-
             self._session = (
                 SparkSession.builder.config(
                     "spark.jars.packages", "io.delta:delta-core_2.12:2.4.0"

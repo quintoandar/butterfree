@@ -153,10 +153,12 @@ class TestHistoricalFeatureStoreWriter:
         spark_client.write_table = mocker.stub("write_table")
         writer = HistoricalFeatureStoreWriter()
         spark_client.conn.sql(
-            "CREATE TABLE test_delta_table_from_hist (id INT, feature STRING, ts_feature TIMESTAMP) USING DELTA "
+            """CREATE TABLE test_delta_table_from_hist
+            (id INT, feature STRING, ts_feature TIMESTAMP) USING DELTA """
         )
         spark_client.conn.sql(
-            "INSERT INTO test_delta_table_from_hist(id, feature, ts_feature) VALUES(1, 'test', TO_DATE('2024-03-01', 'YYYY-MM-DD')) "
+            """INSERT INTO test_delta_table_from_hist(id, feature, ts_feature)
+            VALUES(1, 'test', TO_DATE('2024-03-01', 'YYYY-MM-DD')) """
         )
 
         # when
@@ -169,7 +171,7 @@ class TestHistoricalFeatureStoreWriter:
 
         result_df = spark_client.conn.read.table("test_delta_table_from_hist")
 
-        assert result_df != None
+        assert result_df is not None
 
         spark_client.conn.sql("DROP TABLE test_delta_table_from_hist")
 
