@@ -115,6 +115,7 @@ class HistoricalFeatureStoreWriter(Writer):
         interval_mode: bool = False,
         check_schema_hook: Optional[Hook] = None,
         row_count_validation: bool = True,
+        merge_on: list = None,
     ):
         super(HistoricalFeatureStoreWriter, self).__init__(
             db_config or MetastoreConfig(),
@@ -122,6 +123,7 @@ class HistoricalFeatureStoreWriter(Writer):
             interval_mode,
             False,
             row_count_validation,
+            merge_on,
         )
         self.database = database or environment.get_variable(
             "FEATURE_STORE_HISTORICAL_DATABASE"
@@ -135,7 +137,6 @@ class HistoricalFeatureStoreWriter(Writer):
         feature_set: FeatureSet,
         dataframe: DataFrame,
         spark_client: SparkClient,
-        merge_on: list = None,
     ) -> None:
         """Loads the data from a feature set into the Historical Feature Store.
 
@@ -177,10 +178,10 @@ class HistoricalFeatureStoreWriter(Writer):
 
         s3_key = os.path.join("historical", feature_set.entity, feature_set.name)
 
-        if merge_on:
+        if self.merge_on:
             path = self.db_config.get_options(s3_key)["path"]
             DeltaWriter.merge(
-                spark_client, self.database, feature_set.name, path, merge_on, dataframe
+                spark_client, self.database, feature_set.name, path, self.merge_on, dataframe
             )
         else:
             spark_client.write_table(

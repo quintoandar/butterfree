@@ -27,6 +27,7 @@ class Writer(ABC, HookableComponent):
         interval_mode: Optional[bool] = False,
         write_to_entity: Optional[bool] = False,
         row_count_validation: Optional[bool] = True,
+        merge_on: Optional[list] = None,
     ) -> None:
         super().__init__()
         self.db_config = db_config
@@ -35,6 +36,7 @@ class Writer(ABC, HookableComponent):
         self.interval_mode = interval_mode
         self.write_to_entity = write_to_entity
         self.row_count_validation = row_count_validation
+        self.merge_on = merge_on
 
     def with_(
         self, transformer: Callable[..., DataFrame], *args: Any, **kwargs: Any
