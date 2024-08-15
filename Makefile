@@ -47,7 +47,7 @@ ci-install:
 .PHONY: tests
 ## run all unit and integration tests with coverage report
 tests:
-	export SPARK_LOCAL_IP="127.0.0.1"
+	@export SPARK_LOCAL_IP="127.0.0.1"
 	@python -m pytest -W ignore::DeprecationWarning --cov-config=.coveragerc --cov=butterfree --cov-report term --cov-report html:htmlcov --cov-report xml:coverage.xml tests
 	@python -m coverage xml -i
 

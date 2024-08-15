@@ -7,42 +7,20 @@ from butterfree.load.writers import DeltaWriter, HistoricalFeatureStoreWriter
 
 DELTA_LOCATION = "spark-warehouse"
 
-
-@pytest.fixture
-def client_fixture():
-    os.environ["SPARK_MASTER_HOST"] = "127.0.0.1"
-    client = SparkClient()
-    yield client
-    client.conn.stop()
-
-
-# @pytest.fixture
-# def create_delta_table(client_fixture):
-
-#     client_fixture.conn.sql(
-#         "CREATE TABLE test_delta_table (id INT, feature STRING) USING DELTA "
-#     )
-#     client_fixture.conn.sql(
-#         "INSERT INTO test_delta_table(id, feature) VALUES(1, 'test') "
-#     )
-# yield "created"
-# client.conn.sql("DROP TABLE test_delta_table")
-
-
 class TestDeltaWriter:
 
     def __checkFileExists(self, file_name: str = "test_delta_table") -> bool:
         return os.path.exists(os.path.join(DELTA_LOCATION, file_name))
 
-    def test_merge(self, client_fixture):
+    def test_merge(self):
 
-        client = client_fixture
+        client = SparkClient()
 
         # create_delta_table(client)
-        client_fixture.conn.sql(
+        client.conn.sql(
             "CREATE TABLE test_delta_table (id INT, feature STRING) USING DELTA "
         )
-        client_fixture.conn.sql(
+        client.conn.sql(
             "INSERT INTO test_delta_table(id, feature) VALUES(1, 'test') "
         )
 
@@ -86,39 +64,42 @@ class TestDeltaWriter:
         client.conn.sql("DROP TABLE test_delta_table")
 
     def test_merge_from_historical_writer(
-        self, feature_set, feature_set_dataframe, client_fixture
+        self, feature_set, feature_set_dataframe
     ):
         # given
-        os.environ["SPARK_LOCAL_IP"] = "127.0.0.1"
-        # spark_client = SparkClient()
+        client = SparkClient()
         writer = HistoricalFeatureStoreWriter()
-        client_fixture.conn.sql(
-            """CREATE TABLE test_delta_table_from_hist
-            (id INT, feature STRING, ts_feature TIMESTAMP) USING DELTA """
+        client.conn.sql("CREATE SCHEMA test")
+        client.conn.sql(
+            """CREATE TABLE test.feature_set
+            (id INT, feature STRING, timestamp TIMESTAMP) USING DELTA """
         )
-        client_fixture.conn.sql(
-            """INSERT INTO test_delta_table_from_hist(id, feature, ts_feature)
-            VALUES(1, 'test', TO_DATE('2019-12-31', 'YYYY-MM-DD')) """
+        client.conn.sql(
+            """INSERT INTO test.feature_set(id, feature, timestamp)
+            VALUES(1, 'test', cast(date_format('2019-12-31', 'yyyy-MM-dd') as timestamp))"""
         )
 
         # when
         writer.write(
             feature_set=feature_set,
             dataframe=feature_set_dataframe,
-            spark_client=client_fixture,
+            spark_client=client,
             merge_on=["id", "timestamp"],
         )
 
-        result_df = client_fixture.conn.read.table("test_delta_table_from_hist")
+        result_df = client.conn.read.table("test.feature_set")
+        rpd = result_df.toPandas()
+        rpd_filtered = rpd.loc[(rpd['id']==1) & (rpd['timestamp'] == '2019-12-31')]
 
         assert result_df is not None
-        assert result_df.toPandas().feature == 100
+        assert str(rpd_filtered.feature.values[0]) == '100'
 
-        client_fixture.conn.sql("DROP TABLE test_delta_table_from_hist")
+        client.conn.sql("DROP TABLE test.feature_set")
+        client.conn.sql("DROP SCHEMA test")
 
-    def test_optimize(self, client_fixture):
+    def test_optimize(self):
 
-        client = client_fixture
+        client = SparkClient()
         temp_file = "test_delta"
 
         df = client.conn.createDataFrame(
@@ -142,14 +123,14 @@ class TestDeltaWriter:
         # assertions
         # dw.optimize.assert_called_once_with(spark_client_fixture)
 
-    def test_vacuum(self, client_fixture):
+    def test_vacuum(self):
 
-        client = client_fixture
+        client = SparkClient()
 
-        client_fixture.conn.sql(
+        client.conn.sql(
             "CREATE TABLE test_delta_table_v (id INT, feature STRING) USING DELTA "
         )
-        client_fixture.conn.sql(
+        client.conn.sql(
             "INSERT INTO test_delta_table_v(id, feature) VALUES(1, 'test') "
         )
 

@@ -17,11 +17,6 @@ from butterfree.transform.utils import Function
 
 
 @fixture
-def set_env():
-    os.environ["SPARK_LOCAL_IP"] = "127.0.0.1"
-
-
-@fixture
 def temp_file():
     tempPath = tempfile.mkdtemp()
     return os.path.join(tempPath, "tempFile")

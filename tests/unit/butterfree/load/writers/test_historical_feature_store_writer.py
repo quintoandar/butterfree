@@ -152,12 +152,13 @@ class TestHistoricalFeatureStoreWriter:
         spark_client = SparkClient()
         spark_client.write_table = mocker.stub("write_table")
         writer = HistoricalFeatureStoreWriter()
+        spark_client.conn.sql("CREATE schema IF NOT EXISTS test")
         spark_client.conn.sql(
-            """CREATE TABLE test_delta_table_from_hist
-            (id INT, feature STRING, ts_feature TIMESTAMP) USING DELTA """
+            """CREATE TABLE test.feature_set
+            (id INT, feature STRING, timestamp TIMESTAMP) USING DELTA """
         )
         spark_client.conn.sql(
-            """INSERT INTO test_delta_table_from_hist(id, feature, ts_feature)
+            """INSERT INTO test.feature_set(id, feature, timestamp)
             VALUES(1, 'test', TO_DATE('2024-03-01', 'YYYY-MM-DD')) """
         )
 
@@ -166,14 +167,15 @@ class TestHistoricalFeatureStoreWriter:
             feature_set=feature_set,
             dataframe=feature_set_dataframe,
             spark_client=spark_client,
-            merge_on=["id"],
+            merge_on=["id", "timestamp"],
         )
 
-        result_df = spark_client.conn.read.table("test_delta_table_from_hist")
+        result_df = spark_client.conn.read.table("feature_set")
 
         assert result_df is not None
 
-        spark_client.conn.sql("DROP TABLE test_delta_table_from_hist")
+        spark_client.conn.sql("DROP TABLE test.feature_set")
+        spark_client.conn.sql("DROP schema test")
 
     def test_validate(self, historical_feature_set_dataframe, mocker, feature_set):
         # given
