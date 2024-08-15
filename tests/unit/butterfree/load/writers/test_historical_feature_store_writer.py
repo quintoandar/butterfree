@@ -7,7 +7,7 @@ from pyspark.sql.functions import spark_partition_id
 
 from butterfree.clients import SparkClient
 from butterfree.load.processing import json_transform
-from butterfree.load.writers import DeltaWriter, HistoricalFeatureStoreWriter
+from butterfree.load.writers import HistoricalFeatureStoreWriter
 from butterfree.testing.dataframe import assert_dataframe_equality
 
 

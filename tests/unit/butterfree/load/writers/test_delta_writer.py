@@ -4,7 +4,7 @@ from unittest import mock
 import pytest
 
 from butterfree.clients import SparkClient
-from butterfree.load.writers import DeltaWriter, HistoricalFeatureStoreWriter
+from butterfree.load.writers import DeltaWriter
 
 DELTA_LOCATION = "spark-warehouse"
 
