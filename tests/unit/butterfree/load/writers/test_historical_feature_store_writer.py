@@ -1,15 +1,14 @@
 import datetime
 import random
 
-import pytest, pyspark
-from pyspark.sql import SparkSession
+import pytest
 from pyspark.sql.functions import spark_partition_id
 
 from butterfree.clients import SparkClient
 from butterfree.load.processing import json_transform
 from butterfree.load.writers import HistoricalFeatureStoreWriter
 from butterfree.testing.dataframe import assert_dataframe_equality
-from delta import *
+from unittest import mock
 
 
 class TestHistoricalFeatureStoreWriter:
@@ -147,39 +146,23 @@ class TestHistoricalFeatureStoreWriter:
         # then
         assert_dataframe_equality(historical_feature_set_dataframe, result_df)
 
+
+    @pytest.fixture
+    def merge_builder_mock(self):
+        builder = mock.MagicMock()
+        builder.whenMatchedDelete.return_value = builder
+        builder.whenMatchedUpdateAll.return_value = builder
+        builder.whenNotMatchedInsertAll.return_value = builder
+        return builder
+
     def test_merge_from_historical_writer(
-        self, feature_set, feature_set_dataframe, mocker
+        self, feature_set, feature_set_dataframe, mocker, merge_builder_mock
     ):
         # given
         spark_client = SparkClient()
 
-        # builder = pyspark.sql.SparkSession.builder \
-        #     .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension") \
-        #     .config("spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog")
-
-        # spark_client._session = configure_spark_with_delta_pip(builder).getOrCreate()
-
-        spark_client._session = (
-            SparkSession.builder.master("local[*]")
-            .config("spark.jars.packages", "io.delta:delta-spark_2.12:3.0.0")
-            .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension")
-            .config("spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog")
-            .config("spark.delta.logStore.class", "org.apache.spark.sql.delta.storage.S3SingleDriverLogStore")
-            .getOrCreate()
-        )
-
-
         spark_client.write_table = mocker.stub("write_table")
         writer = HistoricalFeatureStoreWriter()
-        spark_client.conn.sql("CREATE schema IF NOT EXISTS test")
-        spark_client.conn.sql(
-            """CREATE TABLE test.feature_set
-            (id INT, feature STRING, timestamp TIMESTAMP) USING DELTA """
-        )
-        spark_client.conn.sql(
-            """INSERT INTO test.feature_set(id, feature, timestamp)
-            VALUES(1, 'test', TO_DATE('2024-03-01', 'YYYY-MM-DD')) """
-        )
 
         # when
         writer.write(
@@ -189,12 +172,8 @@ class TestHistoricalFeatureStoreWriter:
             merge_on=["id", "timestamp"],
         )
 
-        result_df = spark_client.conn.read.table("feature_set")
+        merge_builder_mock.execute.assert_called_once()
 
-        assert result_df is not None
-
-        spark_client.conn.sql("DROP TABLE test.feature_set")
-        spark_client.conn.sql("DROP schema test")
 
     def test_validate(self, historical_feature_set_dataframe, mocker, feature_set):
         # given
