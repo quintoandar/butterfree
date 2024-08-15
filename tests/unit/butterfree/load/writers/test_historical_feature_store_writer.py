@@ -2,6 +2,7 @@ import datetime
 import random
 
 import pytest, pyspark
+from pyspark.sql import SparkSession
 from pyspark.sql.functions import spark_partition_id
 
 from butterfree.clients import SparkClient
