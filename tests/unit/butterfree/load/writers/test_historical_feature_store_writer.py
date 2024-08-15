@@ -147,7 +147,10 @@ class TestHistoricalFeatureStoreWriter:
         assert_dataframe_equality(historical_feature_set_dataframe, result_df)
 
     def test_merge_from_historical_writer(
-        self, feature_set, feature_set_dataframe, mocker,
+        self,
+        feature_set,
+        feature_set_dataframe,
+        mocker,
     ):
         # given
         spark_client = SparkClient()
@@ -159,7 +162,6 @@ class TestHistoricalFeatureStoreWriter:
             "butterfree.load.writers.DeltaWriter.merge", return_value=mock.Mock()
         )
 
-        # when
         writer.write(
             feature_set=feature_set,
             dataframe=feature_set_dataframe,
