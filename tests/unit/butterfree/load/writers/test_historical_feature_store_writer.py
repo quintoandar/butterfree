@@ -156,7 +156,7 @@ class TestHistoricalFeatureStoreWriter:
         spark_client = SparkClient()
 
         spark_client.write_table = mocker.stub("write_table")
-        writer = HistoricalFeatureStoreWriter()
+        writer = HistoricalFeatureStoreWriter(merge_on=["id", "timestamp"])
 
         static_mock = mocker.patch(
             "butterfree.load.writers.DeltaWriter.merge", return_value=mock.Mock()
@@ -166,7 +166,6 @@ class TestHistoricalFeatureStoreWriter:
             feature_set=feature_set,
             dataframe=feature_set_dataframe,
             spark_client=spark_client,
-            merge_on=["id", "timestamp"],
         )
 
         assert static_mock.call_count == 1
