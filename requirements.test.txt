@@ -1,5 +1,5 @@
-pytest==8.3.2
-pytest-cov==5.0.0
-pytest-xdist==3.6.1
-pytest-mock==3.14.0
+pytest==5.3.2
+pytest-cov==2.8.1
+pytest-xdist==1.31.0
+pytest-mock==2.0.0
 pytest-spark==0.6.0
