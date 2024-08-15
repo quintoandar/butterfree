@@ -9,8 +9,8 @@ VERSION := $(shell grep __version__ setup.py | head -1 | cut -d \" -f2 | cut -d 
 .PHONY: environment
 ## create virtual environment for butterfree
 environment:
-	@pyenv install -s 3.9.19
-	@pyenv virtualenv 3.9.19 butterfree
+	@pyenv install -s 3.10.14
+	@pyenv virtualenv 3.10.14 butterfree
 	@pyenv local butterfree
 	@PYTHONPATH=. python -m pip install --upgrade pip
 
@@ -47,7 +47,6 @@ ci-install:
 .PHONY: tests
 ## run all unit and integration tests with coverage report
 tests:
-	@export SPARK_LOCAL_IP="127.0.0.1"
 	@python -m pytest -W ignore::DeprecationWarning --cov-config=.coveragerc --cov=butterfree --cov-report term --cov-report html:htmlcov --cov-report xml:coverage.xml tests
 	@python -m coverage xml -i
 
