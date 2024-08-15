@@ -20,8 +20,9 @@ class SparkClient(AbstractClient):
 
     """
 
-    def __init__(self) -> None:
+    def __init__(self, with_delta: bool = False) -> None:
         self._session: Optional[SparkSession] = None
+        self.with_delta = with_delta
 
     @property
     def conn(self) -> SparkSession:
@@ -32,30 +33,15 @@ class SparkClient(AbstractClient):
 
         """
         if not self._session:
-            self._session = SparkSession.builder.getOrCreate()
 
-            # builder = pyspark.sql.SparkSession.builder \
-            #     .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension") \
-            #     .config("spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog")
+            if self.with_delta:
+                builder = pyspark.sql.SparkSession.builder \
+                .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension") \
+                .config("spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog")
 
-            # self._session = configure_spark_with_delta_pip(builder).getOrCreate()
-
-            # self._session = (
-            #     SparkSession.builder.config(
-            #         "spark.jars.packages", "io.delta:delta-core_2.12:2.4.0"
-            #     )
-            #     .config(
-            #         "spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension"
-            #     )
-            #     .config(
-            #         "spark.sql.catalog.spark_catalog",
-            #         "org.apache.spark.sql.delta.catalog.DeltaCatalog",
-            #     )
-            #     .config(
-            #         "spark.delta.logStore.class",
-            #         "org.apache.spark.sql.delta.storage.S3SingleDriverLogStore",
-            #     ).config('spark.master','local[*]').getOrCreate()
-            # )
+                self._session = configure_spark_with_delta_pip(builder).getOrCreate()
+            else:
+                self._session = SparkSession.builder.getOrCreate()
 
         return self._session
 

@@ -14,7 +14,7 @@ class TestDeltaWriter:
 
     def test_merge(self):
 
-        client = SparkClient()
+        client = SparkClient(with_delta=True)
 
         # create_delta_table(client)
         client.conn.sql(
@@ -67,7 +67,7 @@ class TestDeltaWriter:
         self, feature_set, feature_set_dataframe
     ):
         # given
-        client = SparkClient()
+        client = SparkClient(with_delta=True)
         writer = HistoricalFeatureStoreWriter()
         client.conn.sql("CREATE SCHEMA test")
         client.conn.sql(
@@ -99,7 +99,7 @@ class TestDeltaWriter:
 
     def test_optimize(self):
 
-        client = SparkClient()
+        client = SparkClient(with_delta=True)
         temp_file = "test_delta"
 
         df = client.conn.createDataFrame(
@@ -125,7 +125,7 @@ class TestDeltaWriter:
 
     def test_vacuum(self):
 
-        client = SparkClient()
+        client = SparkClient(with_delta=True)
 
         client.conn.sql(
             "CREATE TABLE test_delta_table_v (id INT, feature STRING) USING DELTA "
