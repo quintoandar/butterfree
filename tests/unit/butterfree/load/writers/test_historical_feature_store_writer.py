@@ -6,7 +6,7 @@ from pyspark.sql.functions import spark_partition_id
 
 from butterfree.clients import SparkClient
 from butterfree.load.processing import json_transform
-from butterfree.load.writers import HistoricalFeatureStoreWriter
+from butterfree.load.writers import HistoricalFeatureStoreWriter, DeltaWriter
 from butterfree.testing.dataframe import assert_dataframe_equality
 from unittest import mock
 
@@ -163,6 +163,10 @@ class TestHistoricalFeatureStoreWriter:
 
         spark_client.write_table = mocker.stub("write_table")
         writer = HistoricalFeatureStoreWriter()
+        deltaw = DeltaWriter()
+        deltaw.merge = mock.MagicMock())
+
+        static_mock = mocker.patch("butterfree.load.writers.DeltaWriter.merge", return_value=mock.Mock())
 
         # when
         writer.write(
@@ -172,7 +176,7 @@ class TestHistoricalFeatureStoreWriter:
             merge_on=["id", "timestamp"],
         )
 
-        merge_builder_mock.execute.assert_called_once()
+        assert static_mock.call_count == 1
 
 
     def test_validate(self, historical_feature_set_dataframe, mocker, feature_set):
