@@ -1,5 +1,6 @@
 from unittest.mock import Mock
 
+import pyspark.pandas as ps
 from pyspark.sql import functions
 from pytest import fixture
 
@@ -13,7 +14,6 @@ from butterfree.transform.transformations import (
     SparkFunctionTransform,
 )
 from butterfree.transform.utils import Function
-import pyspark.pandas as ps
 
 
 def make_dataframe(spark_context, spark_session):

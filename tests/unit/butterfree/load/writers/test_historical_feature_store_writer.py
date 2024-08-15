@@ -1,14 +1,14 @@
 import datetime
 import random
+from unittest import mock
 
 import pytest
 from pyspark.sql.functions import spark_partition_id
 
 from butterfree.clients import SparkClient
 from butterfree.load.processing import json_transform
-from butterfree.load.writers import HistoricalFeatureStoreWriter, DeltaWriter
+from butterfree.load.writers import DeltaWriter, HistoricalFeatureStoreWriter
 from butterfree.testing.dataframe import assert_dataframe_equality
-from unittest import mock
 
 
 class TestHistoricalFeatureStoreWriter:
@@ -146,15 +146,6 @@ class TestHistoricalFeatureStoreWriter:
         # then
         assert_dataframe_equality(historical_feature_set_dataframe, result_df)
 
-
-    @pytest.fixture
-    def merge_builder_mock(self):
-        builder = mock.MagicMock()
-        builder.whenMatchedDelete.return_value = builder
-        builder.whenMatchedUpdateAll.return_value = builder
-        builder.whenNotMatchedInsertAll.return_value = builder
-        return builder
-
     def test_merge_from_historical_writer(
         self, feature_set, feature_set_dataframe, mocker, merge_builder_mock
     ):
@@ -164,7 +155,9 @@ class TestHistoricalFeatureStoreWriter:
         spark_client.write_table = mocker.stub("write_table")
         writer = HistoricalFeatureStoreWriter()
 
-        static_mock = mocker.patch("butterfree.load.writers.DeltaWriter.merge", return_value=mock.Mock())
+        static_mock = mocker.patch(
+            "butterfree.load.writers.DeltaWriter.merge", return_value=mock.Mock()
+        )
 
         # when
         writer.write(
@@ -175,7 +168,6 @@ class TestHistoricalFeatureStoreWriter:
         )
 
         assert static_mock.call_count == 1
-
 
     def test_validate(self, historical_feature_set_dataframe, mocker, feature_set):
         # given

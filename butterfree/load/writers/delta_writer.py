@@ -62,11 +62,17 @@ class DeltaWriter:
             table_exists = client.conn.catalog.tableExists(full_table_name)
             # table_is_delta = DeltaTable.isDeltaTable(client.conn, path)
 
-
             if table_exists:
-                pd_df = client.conn.sql(f"DESCRIBE TABLE EXTENDED {full_table_name}").toPandas()
-                provider = pd_df.reset_index().groupby(['col_name'])['data_type'].aggregate('first').Provider
-                table_is_delta = (provider.lower() == "delta")
+                pd_df = client.conn.sql(
+                    f"DESCRIBE TABLE EXTENDED {full_table_name}"
+                ).toPandas()
+                provider = (
+                    pd_df.reset_index()
+                    .groupby(["col_name"])["data_type"]
+                    .aggregate("first")
+                    .Provider
+                )
+                table_is_delta = provider.lower() == "delta"
 
                 if not table_is_delta:
                     DeltaWriter()._convert_to_delta(client, full_table_name)

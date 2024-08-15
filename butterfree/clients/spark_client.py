@@ -3,14 +3,13 @@
 import json
 from typing import Any, Dict, List, Optional, Union
 
+import pyspark
+from delta import *
 from pyspark.sql import DataFrame, DataFrameReader, SparkSession
 from pyspark.sql.streaming import DataStreamReader, StreamingQuery
 from pyspark.sql.types import StructType
 
 from butterfree.clients import AbstractClient
-
-import pyspark
-from delta import *
 
 
 class SparkClient(AbstractClient):

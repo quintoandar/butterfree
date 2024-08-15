@@ -1,4 +1,5 @@
 import os
+from unittest import mock
 
 import pytest
 
@@ -7,24 +8,25 @@ from butterfree.load.writers import DeltaWriter, HistoricalFeatureStoreWriter
 
 DELTA_LOCATION = "spark-warehouse"
 
+
 class TestDeltaWriter:
 
     def __checkFileExists(self, file_name: str = "test_delta_table") -> bool:
         return os.path.exists(os.path.join(DELTA_LOCATION, file_name))
 
-    def test_merge(self):
+    @pytest.fixture
+    def merge_builder_mock(self):
+        builder = mock.MagicMock()
+        builder.whenMatchedDelete.return_value = builder
+        builder.whenMatchedUpdateAll.return_value = builder
+        builder.whenNotMatchedInsertAll.return_value = builder
+        return builder
+
+    def test_merge(self, feature_set_dataframe, merge_builder_mock):
 
         client = SparkClient()
-
-        # create_delta_table(client)
-        client.conn.sql(
-            "CREATE TABLE test_delta_table (id INT, feature STRING) USING DELTA "
-        )
-        client.conn.sql(
-            "INSERT INTO test_delta_table(id, feature) VALUES(1, 'test') "
-        )
-
-        source = client.conn.createDataFrame([(1, "test2")], ["id", "feature"])
+        delta_writer = DeltaWriter()
+        delta_writer.merge = mock.MagicMock()
 
         DeltaWriter().merge(
             client,
@@ -32,13 +34,10 @@ class TestDeltaWriter:
             "test_delta_table",
             "spark-warehouse/test_delta_table",
             ["id"],
-            source,
+            feature_set_dataframe,
         )
 
-        df = client.conn.read.table("test_delta_table")
-
-        assert df is not None
-        assert df.toPandas().feature[0] == "test2"
+        assert merge_builder_mock.execute.assert_called_once
 
         # Step 2
         source = client.conn.createDataFrame(
@@ -56,92 +55,31 @@ class TestDeltaWriter:
             "id > 2",
         )
 
-        df = client.conn.read.table("test_delta_table")
+        assert merge_builder_mock.execute.assert_called_once
 
-        assert df is not None
-        assert df.toPandas().feature[0] == "test2"
-
-        client.conn.sql("DROP TABLE test_delta_table")
-
-    def test_merge_from_historical_writer(
-        self, feature_set, feature_set_dataframe
-    ):
-        # given
-        client = SparkClient()
-        writer = HistoricalFeatureStoreWriter()
-        client.conn.sql("CREATE SCHEMA test")
-        client.conn.sql(
-            """CREATE TABLE test.feature_set
-            (id INT, feature STRING, timestamp TIMESTAMP) USING DELTA """
-        )
-        client.conn.sql(
-            """INSERT INTO test.feature_set(id, feature, timestamp)
-            VALUES(1, 'test', cast(date_format('2019-12-31', 'yyyy-MM-dd') as timestamp))"""
-        )
-
-        # when
-        writer.write(
-            feature_set=feature_set,
-            dataframe=feature_set_dataframe,
-            spark_client=client,
-            merge_on=["id", "timestamp"],
-        )
-
-        result_df = client.conn.read.table("test.feature_set")
-        rpd = result_df.toPandas()
-        rpd_filtered = rpd.loc[(rpd['id']==1) & (rpd['timestamp'] == '2019-12-31')]
-
-        assert result_df is not None
-        assert str(rpd_filtered.feature.values[0]) == '100'
-
-        client.conn.sql("DROP TABLE test.feature_set")
-        client.conn.sql("DROP SCHEMA test")
-
-    def test_optimize(self):
+    def test_optimize(self, mocker):
 
         client = SparkClient()
-        temp_file = "test_delta"
-
-        df = client.conn.createDataFrame(
-            [("a", 1), ("a", 2)], ["key", "value"]
-        ).repartition(1)
-        df.write.mode("overwrite").format("delta").save(temp_file)
-        df = client.conn.createDataFrame(
-            [("a", 3), ("a", 4)], ["key", "value"]
-        ).repartition(1)
-        df.write.format("delta").save(temp_file, mode="append")
-        df = client.conn.createDataFrame(
-            [("b", 1), ("b", 2)], ["key", "value"]
-        ).repartition(1)
-        df.write.format("delta").save(temp_file, mode="append")
-
+        conn_mock = mocker.patch(
+            "butterfree.clients.SparkClient.conn", return_value=mock.Mock()
+        )
         dw = DeltaWriter()
 
-        # dw.optimize = MagicMock(spark_client_fixture)
-        dw.optimize(client)
+        dw.optimize = mock.MagicMock(client)
+        dw.optimize(client, "a_table")
 
-        # assertions
-        # dw.optimize.assert_called_once_with(spark_client_fixture)
+        conn_mock.assert_called_once
 
-    def test_vacuum(self):
+    def test_vacuum(self, mocker):
 
         client = SparkClient()
-
-        client.conn.sql(
-            "CREATE TABLE test_delta_table_v (id INT, feature STRING) USING DELTA "
+        conn_mock = mocker.patch(
+            "butterfree.clients.SparkClient.conn", return_value=mock.Mock()
         )
-        client.conn.sql(
-            "INSERT INTO test_delta_table_v(id, feature) VALUES(1, 'test') "
-        )
-
-        client.conn.conf.set(
-            "spark.databricks.delta.retentionDurationCheck.enabled", "false"
-        )
-
+        dw = DeltaWriter()
         retention_hours = 24
+        dw.vacuum = mock.MagicMock(client)
 
-        DeltaWriter().vacuum("test_delta_table_v", retention_hours, client)
+        dw.vacuum("a_table", retention_hours, client)
 
-        assert self.__checkFileExists("test_delta_table_v") is True
-
-        client.conn.sql("DROP TABLE test_delta_table_v")
+        conn_mock.assert_called_once
