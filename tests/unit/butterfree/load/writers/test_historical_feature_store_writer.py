@@ -163,8 +163,6 @@ class TestHistoricalFeatureStoreWriter:
 
         spark_client.write_table = mocker.stub("write_table")
         writer = HistoricalFeatureStoreWriter()
-        deltaw = DeltaWriter()
-        deltaw.merge = mock.MagicMock())
 
         static_mock = mocker.patch("butterfree.load.writers.DeltaWriter.merge", return_value=mock.Mock())
 
