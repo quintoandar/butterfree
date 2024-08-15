@@ -1,13 +1,14 @@
 import datetime
 import random
 
-import pytest
+import pytest, pyspark
 from pyspark.sql.functions import spark_partition_id
 
 from butterfree.clients import SparkClient
 from butterfree.load.processing import json_transform
 from butterfree.load.writers import HistoricalFeatureStoreWriter
 from butterfree.testing.dataframe import assert_dataframe_equality
+from delta import *
 
 
 class TestHistoricalFeatureStoreWriter:
@@ -150,6 +151,14 @@ class TestHistoricalFeatureStoreWriter:
     ):
         # given
         spark_client = SparkClient()
+
+        builder = pyspark.sql.SparkSession.builder \
+            .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension") \
+            .config("spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog")
+
+        spark_client._session = configure_spark_with_delta_pip(builder).getOrCreate()
+
+
         spark_client.write_table = mocker.stub("write_table")
         writer = HistoricalFeatureStoreWriter()
         spark_client.conn.sql("CREATE schema IF NOT EXISTS test")
