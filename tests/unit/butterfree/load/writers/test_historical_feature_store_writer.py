@@ -149,7 +149,7 @@ class TestHistoricalFeatureStoreWriter:
         self, feature_set, feature_set_dataframe, mocker
     ):
         # given
-        spark_client = SparkClient(with_delta=True)
+        spark_client = SparkClient()
         spark_client.write_table = mocker.stub("write_table")
         writer = HistoricalFeatureStoreWriter()
         spark_client.conn.sql("CREATE schema IF NOT EXISTS test")
