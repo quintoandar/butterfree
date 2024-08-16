@@ -7,8 +7,7 @@ on:
 jobs:
   Pipeline:
     if: github.ref == 'refs/heads/staging'
-
-    runs-on: ubuntu-latest
+    runs-on: github-actions-developers-runner
 
     steps:
       - uses: actions/checkout@v2
