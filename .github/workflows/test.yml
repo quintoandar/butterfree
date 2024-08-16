@@ -9,7 +9,7 @@ on:
 
 jobs:
   Pipeline:
-    runs-on: github-actions-developers-runner
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
