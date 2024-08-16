@@ -29,12 +29,11 @@ class TestDeltaWriter:
         delta_writer.merge = mock.MagicMock()
 
         DeltaWriter().merge(
-            client,
-            None,
-            "test_delta_table",
-            "spark-warehouse/test_delta_table",
-            ["id"],
-            feature_set_dataframe,
+            client=client,
+            database=None,
+            table="test_delta_table",
+            merge_on=["id"],
+            source_df=feature_set_dataframe,
         )
 
         assert merge_builder_mock.execute.assert_called_once
@@ -45,14 +44,13 @@ class TestDeltaWriter:
         )
 
         DeltaWriter().merge(
-            client,
-            None,
-            "test_delta_table",
-            "spark-warehouse/test_delta_table",
-            ["id"],
-            source,
-            None,
-            "id > 2",
+            client=client,
+            database=None,
+            table="test_delta_table",
+            merge_on=["id"],
+            source_df=source,
+            when_not_matched_insert_condition=None,
+            when_matched_update_condition="id > 2",
         )
 
         assert merge_builder_mock.execute.assert_called_once

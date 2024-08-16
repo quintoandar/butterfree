@@ -179,14 +179,12 @@ class HistoricalFeatureStoreWriter(Writer):
         s3_key = os.path.join("historical", feature_set.entity, feature_set.name)
 
         if self.merge_on:
-            path = self.db_config.get_options(s3_key)["path"]
             DeltaWriter.merge(
-                spark_client,
-                self.database,
-                feature_set.name,
-                path,
-                self.merge_on,
-                dataframe,
+                client=spark_client,
+                database=self.database,
+                table=feature_set.name,
+                merge_on=self.merge_on,
+                source_df=dataframe,
             )
         else:
             spark_client.write_table(

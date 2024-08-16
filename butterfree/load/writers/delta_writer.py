@@ -31,7 +31,6 @@ class DeltaWriter:
         client: SparkClient,
         database: str,
         table: str,
-        path: str,
         merge_on: list,
         source_df: DataFrame,
         when_not_matched_insert_condition: str = None,
@@ -60,7 +59,6 @@ class DeltaWriter:
             full_table_name = DeltaWriter._get_full_table_name(table, database)
 
             table_exists = client.conn.catalog.tableExists(full_table_name)
-            # table_is_delta = DeltaTable.isDeltaTable(client.conn, path)
 
             if table_exists:
                 pd_df = client.conn.sql(
