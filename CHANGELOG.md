@@ -5,6 +5,28 @@ Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each 
 
 ## [Unreleased]
 
+## [1.3.5](https://github.com/quintoandar/butterfree/releases/tag/1.3.5)
+* Auto create feature sets ([#368](https://github.com/quintoandar/butterfree/pull/368))
+
+## [1.3.4](https://github.com/quintoandar/butterfree/releases/tag/1.3.4)
+* Fix Cassandra Config and tests ([#366](https://github.com/quintoandar/butterfree/pull/366))
+
+## [1.3.3](https://github.com/quintoandar/butterfree/releases/tag/1.3.3)
+* Fix Cassandra Config and Numpy version ([#364](https://github.com/quintoandar/butterfree/pull/364))
+
+## [1.3.2](https://github.com/quintoandar/butterfree/releases/tag/1.3.2)
+* Fix publish script ([#362](https://github.com/quintoandar/butterfree/pull/362))
+
+## [1.3.2](https://github.com/quintoandar/butterfree/releases/tag/1.3.2)
+* Fix publish script ([#360](https://github.com/quintoandar/butterfree/pull/362))
+
+## [1.3.1](https://github.com/quintoandar/butterfree/releases/tag/1.3.1)
+* Timestamp NTZ available ([#360](https://github.com/quintoandar/butterfree/pull/360))
+
+## [1.3.0](https://github.com/quintoandar/butterfree/releases/tag/1.3.0)
+* Bump versions  ([#355](https://github.com/quintoandar/butterfree/pull/355))
+* Sphinx version ([#356](https://github.com/quintoandar/butterfree/pull/356))
+
 ## [1.2.4](https://github.com/quintoandar/butterfree/releases/tag/1.2.4)
 * Auto create feature sets ([#351](https://github.com/quintoandar/butterfree/pull/351))
 

@@ -30,6 +30,7 @@ class SparkClient(AbstractClient):
         """
         if not self._session:
             self._session = SparkSession.builder.getOrCreate()
+
         return self._session
 
     def read(

@@ -1,6 +1,6 @@
-import json
 from unittest.mock import Mock
 
+import pyspark.pandas as ps
 from pyspark.sql import functions
 from pytest import fixture
 
@@ -54,7 +54,8 @@ def make_dataframe(spark_context, spark_session):
             "nonfeature": 0,
         },
     ]
-    df = spark_session.read.json(spark_context.parallelize(data, 1))
+    pdf = ps.DataFrame.from_dict(data)
+    df = pdf.to_spark()
     df = df.withColumn(TIMESTAMP_COLUMN, df.ts.cast(DataType.TIMESTAMP.spark))
 
     return df
@@ -70,9 +71,8 @@ def make_filtering_dataframe(spark_context, spark_session):
         {"id": 1, "ts": 6, "feature1": None, "feature2": None, "feature3": None},
         {"id": 1, "ts": 7, "feature1": None, "feature2": None, "feature3": None},
     ]
-    df = spark_session.read.json(
-        spark_context.parallelize(data).map(lambda x: json.dumps(x))
-    )
+    pdf = ps.DataFrame.from_dict(data)
+    df = pdf.to_spark()
     df = df.withColumn(TIMESTAMP_COLUMN, df.ts.cast(DataType.TIMESTAMP.spark))
 
     return df
@@ -86,9 +86,8 @@ def make_output_filtering_dataframe(spark_context, spark_session):
         {"id": 1, "ts": 4, "feature1": 0, "feature2": 1, "feature3": 1},
         {"id": 1, "ts": 6, "feature1": None, "feature2": None, "feature3": None},
     ]
-    df = spark_session.read.json(
-        spark_context.parallelize(data).map(lambda x: json.dumps(x))
-    )
+    pdf = ps.DataFrame.from_dict(data)
+    df = pdf.to_spark()
     df = df.withColumn(TIMESTAMP_COLUMN, df.ts.cast(DataType.TIMESTAMP.spark))
 
     return df
@@ -127,9 +126,8 @@ def make_rolling_windows_agg_dataframe(spark_context, spark_session):
             "feature2__avg_over_1_week_rolling_windows": None,
         },
     ]
-    df = spark_session.read.json(
-        spark_context.parallelize(data).map(lambda x: json.dumps(x))
-    )
+    pdf = ps.DataFrame.from_dict(data)
+    df = pdf.to_spark()
     df = df.withColumn("timestamp", df.timestamp.cast(DataType.TIMESTAMP.spark))
 
     return df
@@ -156,9 +154,8 @@ def make_rolling_windows_hour_slide_agg_dataframe(spark_context, spark_session):
             "feature2__avg_over_1_day_rolling_windows": 500.0,
         },
     ]
-    df = spark_session.read.json(
-        spark_context.parallelize(data).map(lambda x: json.dumps(x))
-    )
+    pdf = ps.DataFrame.from_dict(data)
+    df = pdf.to_spark()
     df = df.withColumn("timestamp", df.timestamp.cast(DataType.TIMESTAMP.spark))
 
     return df
@@ -205,9 +202,8 @@ def make_multiple_rolling_windows_hour_slide_agg_dataframe(
             "feature2__avg_over_3_days_rolling_windows": 500.0,
         },
     ]
-    df = spark_session.read.json(
-        spark_context.parallelize(data).map(lambda x: json.dumps(x))
-    )
+    pdf = ps.DataFrame.from_dict(data)
+    df = pdf.to_spark()
     df = df.withColumn("timestamp", df.timestamp.cast(DataType.TIMESTAMP.spark))
 
     return df
@@ -257,7 +253,8 @@ def make_fs_dataframe_with_distinct(spark_context, spark_session):
             "h3": "86a8100efffffff",
         },
     ]
-    df = spark_session.read.json(spark_context.parallelize(data, 1))
+    pdf = ps.DataFrame.from_dict(data)
+    df = pdf.to_spark()
     df = df.withColumn("timestamp", df.timestamp.cast(DataType.TIMESTAMP.spark))
 
     return df
@@ -286,9 +283,8 @@ def make_target_df_distinct(spark_context, spark_session):
             "feature__sum_over_3_days_rolling_windows": None,
         },
     ]
-    df = spark_session.read.json(
-        spark_context.parallelize(data).map(lambda x: json.dumps(x))
-    )
+    pdf = ps.DataFrame.from_dict(data)
+    df = pdf.to_spark()
     df = df.withColumn("timestamp", df.timestamp.cast(DataType.TIMESTAMP.spark))
 
     return df

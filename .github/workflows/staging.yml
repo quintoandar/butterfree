@@ -7,7 +7,6 @@ on:
 jobs:
   Pipeline:
     if: github.ref == 'refs/heads/staging'
-
     runs-on: ubuntu-latest
 
     steps:
@@ -18,7 +17,7 @@ jobs:
 
       - uses: actions/setup-java@v4
         with:
-          java-version: '11'
+          java-version: '17'
           distribution: microsoft
 
       - uses: vemonet/setup-spark@v1

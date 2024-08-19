@@ -36,7 +36,7 @@ minimum-requirements:
 
 .PHONY: requirements
 ## install all requirements
-requirements: requirements-test requirements-lint dev-requirements minimum-requirements
+requirements: minimum-requirements dev-requirements requirements-test requirements-lint
 
 .PHONY: ci-install
 ci-install:
@@ -146,6 +146,7 @@ package-name:
 .PHONY: package
 ## build butterfree package wheel
 package:
+	@PYTHONPATH=. pip3 install wheel
 	@PYTHONPATH=. python -m setup sdist bdist_wheel
 
 .PHONY: update-docs

@@ -14,6 +14,7 @@ from butterfree.constants.spark_constants import DEFAULT_NUM_PARTITIONS
 from butterfree.dataframe_service import repartition_df
 from butterfree.hooks import Hook
 from butterfree.hooks.schema_compatibility import SparkTableSchemaCompatibilityHook
+from butterfree.load.writers.delta_writer import DeltaWriter
 from butterfree.load.writers.writer import Writer
 from butterfree.transform import FeatureSet
 
@@ -114,6 +115,7 @@ class HistoricalFeatureStoreWriter(Writer):
         interval_mode: bool = False,
         check_schema_hook: Optional[Hook] = None,
         row_count_validation: bool = True,
+        merge_on: list = None,
     ):
         super(HistoricalFeatureStoreWriter, self).__init__(
             db_config or MetastoreConfig(),
@@ -121,6 +123,7 @@ class HistoricalFeatureStoreWriter(Writer):
             interval_mode,
             False,
             row_count_validation,
+            merge_on,
         )
         self.database = database or environment.get_variable(
             "FEATURE_STORE_HISTORICAL_DATABASE"
@@ -141,6 +144,7 @@ class HistoricalFeatureStoreWriter(Writer):
             feature_set: object processed with feature_set informations.
             dataframe: spark dataframe containing data from a feature set.
             spark_client: client for spark connections with external services.
+            merge_on: when filled, the writing is an upsert in a Delta table.
 
         If the debug_mode is set to True, a temporary table with a name in the format:
         historical_feature_store__{feature_set.name} will be created instead of writing
@@ -174,13 +178,22 @@ class HistoricalFeatureStoreWriter(Writer):
 
         s3_key = os.path.join("historical", feature_set.entity, feature_set.name)
 
-        spark_client.write_table(
-            dataframe=dataframe,
-            database=self.database,
-            table_name=feature_set.name,
-            partition_by=self.PARTITION_BY,
-            **self.db_config.get_options(s3_key),
-        )
+        if self.merge_on:
+            DeltaWriter.merge(
+                client=spark_client,
+                database=self.database,
+                table=feature_set.name,
+                merge_on=self.merge_on,
+                source_df=dataframe,
+            )
+        else:
+            spark_client.write_table(
+                dataframe=dataframe,
+                database=self.database,
+                table_name=feature_set.name,
+                partition_by=self.PARTITION_BY,
+                **self.db_config.get_options(s3_key),
+            )
 
     def _assert_validation_count(
         self, table_name: str, written_count: int, dataframe_count: int
