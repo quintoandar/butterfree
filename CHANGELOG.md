@@ -5,6 +5,9 @@ Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each 
 
 ## [Unreleased]
 
+## [1.4.0](https://github.com/quintoandar/butterfree/releases/tag/1.4.0)
+* Add Delta support ([#370](https://github.com/quintoandar/butterfree/pull/370))
+
 ## [1.3.5](https://github.com/quintoandar/butterfree/releases/tag/1.3.5)
 * Auto create feature sets ([#368](https://github.com/quintoandar/butterfree/pull/368))
 

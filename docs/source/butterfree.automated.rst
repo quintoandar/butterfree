@@ -4,6 +4,8 @@ butterfree.automated package
 Submodules
 ----------
 
+butterfree.automated.feature\_set\_creation module
+--------------------------------------------------
 
 .. automodule:: butterfree.automated.feature_set_creation
    :members:
