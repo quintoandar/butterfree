@@ -238,8 +238,7 @@ def make_fs_dataframe_with_distinct(spark_context, spark_session):
             "h3": "86a8100efffffff",
         },
     ]
-    df = get_spark_dataframe(data)
-    df = df.withColumn("timestamp", df.timestamp.cast(DataType.TIMESTAMP.spark))
+    df = create_dataframe(data, "timestamp")
 
     return df
 
@@ -267,8 +266,7 @@ def make_target_df_distinct(spark_context, spark_session):
             "feature__sum_over_3_days_rolling_windows": None,
         },
     ]
-    df = get_spark_dataframe(data)
-    df = df.withColumn("timestamp", df.timestamp.cast(DataType.TIMESTAMP.spark))
+    df = create_dataframe(data, "timestamp")
 
     return df
 
