@@ -93,6 +93,15 @@ class HistoricalFeatureStoreWriter(Writer):
         improve queries performance. The data is stored in partition folders in AWS S3
         based on time (per year, month and day).
 
+        >>> spark_client = SparkClient()
+        >>> writer = HistoricalFeatureStoreWriter()
+        >>> writer.write(feature_set=feature_set,
+        ...           dataframe=dataframe,
+        ...           spark_client=spark_client
+        ...           merge_on=["id", "timestamp"])
+
+        This procedure will skip dataframe write and will activate Delta Merge.
+        Use it when the table already exist.
     """
 
     PARTITION_BY = [
