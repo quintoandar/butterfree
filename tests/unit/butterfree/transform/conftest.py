@@ -209,6 +209,84 @@ def make_multiple_rolling_windows_hour_slide_agg_dataframe(
     return df
 
 
+def make_rolling_windows_hour_slide_agg_dataframe(spark_context, spark_session):
+    data = [
+        {
+            "id": 1,
+            "timestamp": "2016-04-11 12:00:00",
+            "feature1__avg_over_1_day_rolling_windows": 266.6666666666667,
+            "feature2__avg_over_1_day_rolling_windows": 300.0,
+        },
+        {
+            "id": 1,
+            "timestamp": "2016-04-12 00:00:00",
+            "feature1__avg_over_1_day_rolling_windows": 300.0,
+            "feature2__avg_over_1_day_rolling_windows": 350.0,
+        },
+        {
+            "id": 1,
+            "timestamp": "2016-04-12 12:00:00",
+            "feature1__avg_over_1_day_rolling_windows": 400.0,
+            "feature2__avg_over_1_day_rolling_windows": 500.0,
+        },
+    ]
+    df = spark_session.read.json(
+        spark_context.parallelize(data).map(lambda x: json.dumps(x))
+    )
+    df = df.withColumn("timestamp", df.timestamp.cast(DataType.TIMESTAMP.spark))
+
+    return df
+
+
+def make_multiple_rolling_windows_hour_slide_agg_dataframe(
+    spark_context, spark_session
+):
+    data = [
+        {
+            "id": 1,
+            "timestamp": "2016-04-11 12:00:00",
+            "feature1__avg_over_2_days_rolling_windows": 266.6666666666667,
+            "feature1__avg_over_3_days_rolling_windows": 266.6666666666667,
+            "feature2__avg_over_2_days_rolling_windows": 300.0,
+            "feature2__avg_over_3_days_rolling_windows": 300.0,
+        },
+        {
+            "id": 1,
+            "timestamp": "2016-04-12 00:00:00",
+            "feature1__avg_over_2_days_rolling_windows": 300.0,
+            "feature1__avg_over_3_days_rolling_windows": 300.0,
+            "feature2__avg_over_2_days_rolling_windows": 350.0,
+            "feature2__avg_over_3_days_rolling_windows": 350.0,
+        },
+        {
+            "id": 1,
+            "timestamp": "2016-04-13 12:00:00",
+            "feature1__avg_over_2_days_rolling_windows": 400.0,
+            "feature1__avg_over_3_days_rolling_windows": 300.0,
+            "feature2__avg_over_2_days_rolling_windows": 500.0,
+            "feature2__avg_over_3_days_rolling_windows": 350.0,
+        },
+        {
+            "id": 1,
+            "timestamp": "2016-04-14 00:00:00",
+            "feature1__avg_over_3_days_rolling_windows": 300.0,
+            "feature2__avg_over_3_days_rolling_windows": 350.0,
+        },
+        {
+            "id": 1,
+            "timestamp": "2016-04-14 12:00:00",
+            "feature1__avg_over_3_days_rolling_windows": 400.0,
+            "feature2__avg_over_3_days_rolling_windows": 500.0,
+        },
+    ]
+    df = spark_session.read.json(
+        spark_context.parallelize(data).map(lambda x: json.dumps(x))
+    )
+    df = df.withColumn("timestamp", df.timestamp.cast(DataType.TIMESTAMP.spark))
+
+    return df
+
+
 def make_fs(spark_context, spark_session):
     df = make_dataframe(spark_context, spark_session)
     df = (

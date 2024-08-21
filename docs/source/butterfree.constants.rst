@@ -31,6 +31,29 @@ butterfree.constants.migrations module
 butterfree.constants.spark\_constants module
 --------------------------------------------
 
+.. automodule:: butterfree.constants.migrations
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+.. automodule:: butterfree.constants.migrations
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+.. automodule:: butterfree.constants.migrations
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+.. automodule:: butterfree.constants.migrations
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 .. automodule:: butterfree.constants.spark_constants
    :members:
    :undoc-members:
@@ -38,6 +61,26 @@ butterfree.constants.spark\_constants module
 
 butterfree.constants.window\_definitions module
 -----------------------------------------------
+
+.. automodule:: butterfree.constants.window_definitions
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. automodule:: butterfree.constants.window_definitions
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. automodule:: butterfree.constants.window_definitions
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. automodule:: butterfree.constants.window_definitions
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 .. automodule:: butterfree.constants.window_definitions
    :members:
