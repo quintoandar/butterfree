@@ -16,6 +16,15 @@ from butterfree.transform.transformations import (
 from butterfree.transform.utils import Function
 
 
+def create_dataframe(data, timestamp_col="ts"):
+    pdf = ps.DataFrame.from_dict(data)
+    df = pdf.to_spark()
+    df = df.withColumn(
+        TIMESTAMP_COLUMN, df[timestamp_col].cast(DataType.TIMESTAMP.spark)
+    )
+    return df
+
+
 def make_dataframe(spark_context, spark_session):
     data = [
         {
@@ -54,11 +63,7 @@ def make_dataframe(spark_context, spark_session):
             "nonfeature": 0,
         },
     ]
-    pdf = ps.DataFrame.from_dict(data)
-    df = pdf.to_spark()
-    df = df.withColumn(TIMESTAMP_COLUMN, df.ts.cast(DataType.TIMESTAMP.spark))
-
-    return df
+    return create_dataframe(data)
 
 
 def make_filtering_dataframe(spark_context, spark_session):
@@ -71,11 +76,7 @@ def make_filtering_dataframe(spark_context, spark_session):
         {"id": 1, "ts": 6, "feature1": None, "feature2": None, "feature3": None},
         {"id": 1, "ts": 7, "feature1": None, "feature2": None, "feature3": None},
     ]
-    pdf = ps.DataFrame.from_dict(data)
-    df = pdf.to_spark()
-    df = df.withColumn(TIMESTAMP_COLUMN, df.ts.cast(DataType.TIMESTAMP.spark))
-
-    return df
+    return create_dataframe(data)
 
 
 def make_output_filtering_dataframe(spark_context, spark_session):
@@ -86,11 +87,7 @@ def make_output_filtering_dataframe(spark_context, spark_session):
         {"id": 1, "ts": 4, "feature1": 0, "feature2": 1, "feature3": 1},
         {"id": 1, "ts": 6, "feature1": None, "feature2": None, "feature3": None},
     ]
-    pdf = ps.DataFrame.from_dict(data)
-    df = pdf.to_spark()
-    df = df.withColumn(TIMESTAMP_COLUMN, df.ts.cast(DataType.TIMESTAMP.spark))
-
-    return df
+    return create_dataframe(data)
 
 
 def make_rolling_windows_agg_dataframe(spark_context, spark_session):
@@ -126,11 +123,7 @@ def make_rolling_windows_agg_dataframe(spark_context, spark_session):
             "feature2__avg_over_1_week_rolling_windows": None,
         },
     ]
-    pdf = ps.DataFrame.from_dict(data)
-    df = pdf.to_spark()
-    df = df.withColumn("timestamp", df.timestamp.cast(DataType.TIMESTAMP.spark))
-
-    return df
+    return create_dataframe(data, timestamp_col="timestamp")
 
 
 def make_rolling_windows_hour_slide_agg_dataframe(spark_context, spark_session):
@@ -154,11 +147,7 @@ def make_rolling_windows_hour_slide_agg_dataframe(spark_context, spark_session):
             "feature2__avg_over_1_day_rolling_windows": 500.0,
         },
     ]
-    pdf = ps.DataFrame.from_dict(data)
-    df = pdf.to_spark()
-    df = df.withColumn("timestamp", df.timestamp.cast(DataType.TIMESTAMP.spark))
-
-    return df
+    return create_dataframe(data, timestamp_col="timestamp")
 
 
 def make_multiple_rolling_windows_hour_slide_agg_dataframe(
@@ -202,11 +191,7 @@ def make_multiple_rolling_windows_hour_slide_agg_dataframe(
             "feature2__avg_over_3_days_rolling_windows": 500.0,
         },
     ]
-    pdf = ps.DataFrame.from_dict(data)
-    df = pdf.to_spark()
-    df = df.withColumn("timestamp", df.timestamp.cast(DataType.TIMESTAMP.spark))
-
-    return df
+    return create_dataframe(data, timestamp_col="timestamp")
 
 
 def make_fs(spark_context, spark_session):
@@ -253,8 +238,7 @@ def make_fs_dataframe_with_distinct(spark_context, spark_session):
             "h3": "86a8100efffffff",
         },
     ]
-    pdf = ps.DataFrame.from_dict(data)
-    df = pdf.to_spark()
+    df = get_spark_dataframe(data)
     df = df.withColumn("timestamp", df.timestamp.cast(DataType.TIMESTAMP.spark))
 
     return df
@@ -283,8 +267,7 @@ def make_target_df_distinct(spark_context, spark_session):
             "feature__sum_over_3_days_rolling_windows": None,
         },
     ]
-    pdf = ps.DataFrame.from_dict(data)
-    df = pdf.to_spark()
+    df = get_spark_dataframe(data)
     df = df.withColumn("timestamp", df.timestamp.cast(DataType.TIMESTAMP.spark))
 
     return df
