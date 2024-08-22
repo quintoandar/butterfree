@@ -54,7 +54,6 @@ butterfree.constants.spark\_constants module
    :undoc-members:
    :show-inheritance:
 
-
 .. automodule:: butterfree.constants.spark_constants
    :members:
    :undoc-members:

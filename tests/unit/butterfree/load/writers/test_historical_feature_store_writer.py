@@ -1,5 +1,6 @@
 import datetime
 import random
+from unittest import mock
 
 import pytest
 from pyspark.sql.functions import spark_partition_id
@@ -144,6 +145,30 @@ class TestHistoricalFeatureStoreWriter:
 
         # then
         assert_dataframe_equality(historical_feature_set_dataframe, result_df)
+
+    def test_merge_from_historical_writer(
+        self,
+        feature_set,
+        feature_set_dataframe,
+        mocker,
+    ):
+        # given
+        spark_client = SparkClient()
+
+        spark_client.write_table = mocker.stub("write_table")
+        writer = HistoricalFeatureStoreWriter(merge_on=["id", "timestamp"])
+
+        static_mock = mocker.patch(
+            "butterfree.load.writers.DeltaWriter.merge", return_value=mock.Mock()
+        )
+
+        writer.write(
+            feature_set=feature_set,
+            dataframe=feature_set_dataframe,
+            spark_client=spark_client,
+        )
+
+        assert static_mock.call_count == 1
 
     def test_validate(self, historical_feature_set_dataframe, mocker, feature_set):
         # given
