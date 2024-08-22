@@ -251,7 +251,7 @@ class HistoricalFeatureStoreWriter(Writer):
             if self.interval_mode and not self.debug_mode
             else spark_client.read_table(table_name).count()
         )
-        
+
         dataframe_count = dataframe.count()
 
         self._assert_validation_count(table_name, written_count, dataframe_count)
