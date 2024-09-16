@@ -91,7 +91,7 @@ def make_output_filtering_dataframe(spark_context, spark_session):
 
 
 def make_rolling_windows_agg_dataframe(spark_context, spark_session):
-    rows = [
+    data = [
         (1, "2016-04-11 00:00:00", [None, None], None),
         (1, "2016-04-12 00:00:00", [300.0, 350.0], None),
         (1, "2016-04-19 00:00:00", [None, None], None),
