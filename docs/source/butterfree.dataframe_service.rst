@@ -20,14 +20,6 @@ butterfree.dataframe\_service.partitioning module
    :undoc-members:
    :show-inheritance:
 
-butterfree.dataframe\_service.repartition module
-------------------------------------------------
-
-.. automodule:: butterfree.dataframe_service.repartition
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 .. automodule:: butterfree.dataframe_service.repartition
    :members:
    :undoc-members:

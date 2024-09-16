@@ -387,6 +387,7 @@ class AggregatedFeatureSet(FeatureSet):
         ]
 
         groupby = self.keys_columns.copy()
+
         if window is not None:
             dataframe = dataframe.withColumn("window", window.get())
             groupby.append("window")
@@ -410,19 +411,23 @@ class AggregatedFeatureSet(FeatureSet):
                 "keep_rn", functions.row_number().over(partition_window)
             ).filter("keep_rn = 1")
 
-        # repartition to have all rows for each group at the same partition
-        # by doing that, we won't have to shuffle data on grouping by id
-        dataframe = repartition_df(
-            dataframe,
-            partition_by=groupby,
-            num_processors=num_processors,
-        )
+        current_partitions = dataframe.rdd.getNumPartitions()
+        optimal_partitions = num_processors or current_partitions
+
+        if current_partitions != optimal_partitions:
+            dataframe = repartition_df(
+                dataframe,
+                partition_by=groupby,
+                num_processors=optimal_partitions,
+            )
+
         grouped_data = dataframe.groupby(*groupby)
 
-        if self._pivot_column:
+        if self._pivot_column and self._pivot_values:
             grouped_data = grouped_data.pivot(self._pivot_column, self._pivot_values)
 
         aggregated = grouped_data.agg(*aggregations)
+
         return self._with_renamed_columns(aggregated, features, window)
 
     def _with_renamed_columns(
@@ -637,12 +642,13 @@ class AggregatedFeatureSet(FeatureSet):
         output_df = output_df.select(*self.columns).replace(  # type: ignore
             float("nan"), None
         )
-        if not output_df.isStreaming:
-            if self.deduplicate_rows:
-                output_df = self._filter_duplicated_rows(output_df)
-            if self.eager_evaluation:
-                output_df.cache().count()
+
+        if not output_df.isStreaming and self.deduplicate_rows:
+            output_df = self._filter_duplicated_rows(output_df)
 
         post_hook_df = self.run_post_hooks(output_df)
+
+        if not output_df.isStreaming and self.eager_evaluation:
+            post_hook_df.cache().count()
 
         return post_hook_df

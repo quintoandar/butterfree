@@ -5,6 +5,9 @@ Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each 
 
 ## [Unreleased]
 
+## [1.4.1](https://github.com/quintoandar/butterfree/releases/tag/1.4.1)
+* Performance Improvements ([#374](https://github.com/quintoandar/butterfree/pull/374))
+
 ## [1.4.0](https://github.com/quintoandar/butterfree/releases/tag/1.4.0)
 * Add Delta support ([#370](https://github.com/quintoandar/butterfree/pull/370))
 
