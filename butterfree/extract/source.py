@@ -3,6 +3,7 @@
 from typing import List, Optional
 
 from pyspark.sql import DataFrame
+from pyspark.storagelevel import StorageLevel
 
 from butterfree.clients import SparkClient
 from butterfree.extract.readers.reader import Reader
@@ -95,16 +96,21 @@ class Source(HookableComponent):
             DataFrame with the query result against all readers.
 
         """
+        # Step 1: Build temporary views for each reader
         for reader in self.readers:
-            reader.build(
-                client=client, start_date=start_date, end_date=end_date
-            )  # create temporary views for each reader
+            reader.build(client=client, start_date=start_date, end_date=end_date)
 
+        # Step 2: Execute SQL query on the combined readers
         dataframe = client.sql(self.query)
 
+        # Step 3: Cache the dataframe if necessary, using memory and disk storage
         if not dataframe.isStreaming and self.eager_evaluation:
-            dataframe.cache().count()
+            # Persist to ensure the DataFrame is stored in mem and disk (if necessary)
+            dataframe.persist(StorageLevel.MEMORY_AND_DISK)
+            # Trigger the cache/persist operation by performing an action
+            dataframe.count()
 
+        # Step 4: Run post-processing hooks on the dataframe
         post_hook_df = self.run_post_hooks(dataframe)
 
         return post_hook_df
