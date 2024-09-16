@@ -220,7 +220,7 @@ class TestFeatureSet:
             + feature_divide.get_output_columns()
         )
         assert_dataframe_equality(result_df, feature_set_dataframe)
-        assert result_df.is_cached
+        assert not result_df.is_cached
 
     def test_construct_invalid_df(
         self, key_id, timestamp_c, feature_add, feature_divide

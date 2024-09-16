@@ -2,6 +2,8 @@
 
 from typing import List, Optional
 
+from pyspark.storagelevel import StorageLevel
+
 from butterfree.clients import SparkClient
 from butterfree.dataframe_service import repartition_sort_df
 from butterfree.extract import Source
@@ -209,19 +211,25 @@ class FeatureSetPipeline:
         soon. Use only if strictly necessary.
 
         """
+        # Step 1: Construct input dataframe from the source.
         dataframe = self.source.construct(
             client=self.spark_client,
             start_date=self.feature_set.define_start_date(start_date),
             end_date=end_date,
         )
 
+        # Step 2: Repartition and sort if required, avoid if not necessary.
         if partition_by:
             order_by = order_by or partition_by
-            dataframe = repartition_sort_df(
-                dataframe, partition_by, order_by, num_processors
-            )
+            current_partitions = dataframe.rdd.getNumPartitions()
+            optimal_partitions = num_processors or current_partitions
+            if current_partitions != optimal_partitions:
+                dataframe = repartition_sort_df(
+                    dataframe, partition_by, order_by, num_processors
+                )
 
-        dataframe = self.feature_set.construct(
+        # Step 3: Construct the feature set dataframe using defined transformations.
+        transformed_dataframe = self.feature_set.construct(
             dataframe=dataframe,
             client=self.spark_client,
             start_date=start_date,
@@ -229,15 +237,20 @@ class FeatureSetPipeline:
             num_processors=num_processors,
         )
 
+        if dataframe.storageLevel != StorageLevel.NONE:
+            dataframe.unpersist()  # Clear the data from the cache (disk and memory)
+
+        # Step 4: Load the data into the configured sink.
         self.sink.flush(
-            dataframe=dataframe,
+            dataframe=transformed_dataframe,
             feature_set=self.feature_set,
             spark_client=self.spark_client,
         )
 
-        if not dataframe.isStreaming:
+        # Step 5: Validate the output if not streaming and data volume is reasonable.
+        if not transformed_dataframe.isStreaming:
             self.sink.validate(
-                dataframe=dataframe,
+                dataframe=transformed_dataframe,
                 feature_set=self.feature_set,
                 spark_client=self.spark_client,
             )
