@@ -211,6 +211,7 @@ class FeatureSetPipeline:
         soon. Use only if strictly necessary.
 
         """
+
         # Step 1: Construct input dataframe from the source.
         dataframe = self.source.construct(
             client=self.spark_client,

@@ -31,6 +31,7 @@ butterfree.constants.migrations module
 butterfree.constants.spark\_constants module
 --------------------------------------------
 
+
 .. automodule:: butterfree.constants.spark_constants
    :members:
    :undoc-members:

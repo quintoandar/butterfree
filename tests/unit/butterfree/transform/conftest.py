@@ -91,37 +91,12 @@ def make_output_filtering_dataframe(spark_context, spark_session):
 
 
 def make_rolling_windows_agg_dataframe(spark_context, spark_session):
-    data = [
-        {
-            "id": 1,
-            "timestamp": "2016-04-11 00:00:00",
-            "feature1__avg_over_1_week_rolling_windows": None,
-            "feature2__avg_over_1_week_rolling_windows": None,
-        },
-        {
-            "id": 1,
-            "timestamp": "2016-04-12 00:00:00",
-            "feature1__avg_over_1_week_rolling_windows": 300.0,
-            "feature2__avg_over_1_week_rolling_windows": 350.0,
-        },
-        {
-            "id": 1,
-            "timestamp": "2016-04-19 00:00:00",
-            "feature1__avg_over_1_week_rolling_windows": None,
-            "feature2__avg_over_1_week_rolling_windows": None,
-        },
-        {
-            "id": 1,
-            "timestamp": "2016-04-23 00:00:00",
-            "feature1__avg_over_1_week_rolling_windows": 1000.0,
-            "feature2__avg_over_1_week_rolling_windows": 1100.0,
-        },
-        {
-            "id": 1,
-            "timestamp": "2016-04-30 00:00:00",
-            "feature1__avg_over_1_week_rolling_windows": None,
-            "feature2__avg_over_1_week_rolling_windows": None,
-        },
+    rows = [
+        (1, "2016-04-11 00:00:00", [None, None], None),
+        (1, "2016-04-12 00:00:00", [300.0, 350.0], None),
+        (1, "2016-04-19 00:00:00", [None, None], None),
+        (1, "2016-04-23 00:00:00", [1000.0, 1100.0], None),
+        (1, "2016-04-30 00:00:00", [None, None], None),
     ]
     return create_dataframe(data, timestamp_col="timestamp")
 
