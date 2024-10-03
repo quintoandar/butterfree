@@ -95,7 +95,7 @@ def __fs_objects(path: str) -> Set[FeatureSetPipeline]:
         parameters = sig.parameters
 
         if "run_date" in parameters:
-            run_date = datetime.datetime.today().strftime("%y-%m-%d")
+            run_date = datetime.datetime.today().strftime("%Y-%m-%d")
             return cls(run_date)
 
         return cls()
