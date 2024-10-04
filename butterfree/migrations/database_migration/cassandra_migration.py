@@ -86,11 +86,30 @@ class CassandraMigration(DatabaseMigration):
             Alter column type query.
 
         """
-        parsed_columns = self._get_parsed_columns([column])
+    def _get_alter_column_type_query(self, column: Diff, table_name: str) -> str:
+        """Creates CQL statement to alter columns' types.
+            In Cassandra 3.4.x to 3.11.x alter type is not allowed.
+            This method creates a temp column to comply.
 
-        return (
-            f"ALTER TABLE {table_name} ALTER {parsed_columns.replace(' ', ' TYPE ')};"
-        )
+        Args:
+            columns: list of Diff objects with ALTER_TYPE kind.
+            table_name: table name.
+
+        Returns:
+            Alter column type query.
+
+        """
+
+        temp_column_name = f"{column.column}_temp"
+
+        add_temp_column_query = f"ALTER TABLE {table_name} ADD {temp_column_name} {column.value};"
+        copy_data_to_temp_query = f"UPDATE {table_name} SET {temp_column_name} = {column.column};"
+
+        drop_old_column_query = f"ALTER TABLE {table_name} DROP {column.column};"
+        rename_temp_column_query = f"ALTER TABLE {table_name} RENAME {temp_column_name} TO {column.column};"
+
+        return f"{add_temp_column_query} {copy_data_to_temp_query} {drop_old_column_query} {rename_temp_column_query};"
+
 
     @staticmethod
     def _get_create_table_query(columns: List[Dict[str, Any]], table_name: str) -> str:
