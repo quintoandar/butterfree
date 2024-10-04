@@ -103,8 +103,10 @@ class CassandraMigration(DatabaseMigration):
             f"ALTER TABLE {table_name} RENAME {temp_column_name} TO {column.column};"
         )
 
-        return (f"{add_temp_column_query} {copy_data_to_temp_query} "
-                f"{drop_old_column_query} {rename_temp_column_query};")
+        return (
+            f"{add_temp_column_query} {copy_data_to_temp_query} "
+            f"{drop_old_column_query} {rename_temp_column_query};"
+        )
 
     @staticmethod
     def _get_create_table_query(columns: List[Dict[str, Any]], table_name: str) -> str:
