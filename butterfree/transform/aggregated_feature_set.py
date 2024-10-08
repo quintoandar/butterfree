@@ -576,14 +576,16 @@ class AggregatedFeatureSet(FeatureSet):
 
         pre_hook_df = self.run_pre_hooks(dataframe)
 
-        output_df = reduce(
-            lambda df, feature: feature.transform(df),
-            self.keys + [self.timestamp],
-            pre_hook_df,
+        output_df = pre_hook_df
+        for feature in self.keys + [self.timestamp]:
+            output_df = feature.transform(output_df)
+
+        output_df = self.incremental_strategy.filter_with_incremental_strategy(
+            dataframe=output_df, start_date=start_date, end_date=end_date
         )
 
         if self._windows and end_date is not None:
-            # run aggregations for each window
+            # Run aggregations for each window
             agg_list = [
                 self._aggregate(
                     dataframe=output_df,
@@ -609,7 +611,7 @@ class AggregatedFeatureSet(FeatureSet):
                     client=client, dataframe=output_df, end_date=end_date
                 )
 
-                # left join each aggregation result to our base dataframe
+                # Left join each aggregation result to our base dataframe
                 output_df = reduce(
                     lambda left, right: self._dataframe_join(
                         left,
@@ -648,7 +650,12 @@ class AggregatedFeatureSet(FeatureSet):
 
         post_hook_df = self.run_post_hooks(output_df)
 
+        # Eager evaluation, only if needed and managable
         if not output_df.isStreaming and self.eager_evaluation:
-            post_hook_df.cache().count()
+            # Small dataframes only
+            if output_df.count() < 1_000_000:
+                post_hook_df.cache().count()
+            else:
+                post_hook_df.cache()  # Cache without materialization for large volumes
 
         return post_hook_df

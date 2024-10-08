@@ -5,8 +5,11 @@ Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each 
 
 ## [Unreleased]
 
+## [1.4.3](https://github.com/quintoandar/butterfree/releases/tag/1.4.3)
+* Performance upgrade ([#378](https://github.com/quintoandar/butterfree/pull/378))
+
 ## [1.4.2](https://github.com/quintoandar/butterfree/releases/tag/1.4.2)
-* Minor fixes ([#374](https://github.com/quintoandar/butterfree/pull/376))
+* Minor fixes ([#376](https://github.com/quintoandar/butterfree/pull/376))
 
 ## [1.4.1](https://github.com/quintoandar/butterfree/releases/tag/1.4.1)
 * Performance Improvements ([#374](https://github.com/quintoandar/butterfree/pull/374))
