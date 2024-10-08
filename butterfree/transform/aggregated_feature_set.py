@@ -576,11 +576,10 @@ class AggregatedFeatureSet(FeatureSet):
 
         pre_hook_df = self.run_pre_hooks(dataframe)
 
-        # Apply transformations
+        output_df = pre_hook_df
         for feature in self.keys + [self.timestamp]:
-            output_df = feature.transform(pre_hook_df)
+            output_df = feature.transform(output_df)
 
-        # Early filter data
         output_df = self.incremental_strategy.filter_with_incremental_strategy(
             dataframe=output_df, start_date=start_date, end_date=end_date
         )
