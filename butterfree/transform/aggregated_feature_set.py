@@ -605,6 +605,7 @@ class AggregatedFeatureSet(FeatureSet):
 
             # keeping this logic to maintain the same behavior for already implemented
             # feature sets
+
             if self._windows[0].slide == "1 day":
                 base_df = self._get_base_dataframe(
                     client=client, dataframe=output_df, end_date=end_date
@@ -635,6 +636,10 @@ class AggregatedFeatureSet(FeatureSet):
                 )
         else:
             output_df = self._aggregate(output_df, features=self.features)
+
+        output_df = self.incremental_strategy.filter_with_incremental_strategy(
+            dataframe=output_df, start_date=start_date, end_date=end_date
+        )
 
         output_df = output_df.select(*self.columns).replace(  # type: ignore
             float("nan"), None
