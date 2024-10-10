@@ -1,8 +1,14 @@
 from typing import Any, Dict, List
 from unittest.mock import MagicMock
 
+import pytest
+
 from butterfree.clients import CassandraClient
-from butterfree.clients.cassandra_client import CassandraColumn
+from butterfree.clients.cassandra_client import (
+    EMPTY_STRING_HOST_ERROR,
+    GENERIC_INVALID_HOST_ERROR,
+    CassandraColumn,
+)
 
 
 def sanitize_string(query: str) -> str:
@@ -86,3 +92,49 @@ class TestCassandraClient:
         query = cassandra_client.sql.call_args[0][0]
 
         assert sanitize_string(query) == sanitize_string(expected_query)
+
+    def test_initialize_with_string_host(self):
+        client = CassandraClient(
+            host="192.168.1.1, 192.168.1.2", keyspace="dummy_keyspace"
+        )
+        assert client.host == ["192.168.1.1", "192.168.1.2"]
+
+    def test_initialize_with_list_host(self):
+        client = CassandraClient(
+            host=["192.168.1.1", "192.168.1.2"], keyspace="test_keyspace"
+        )
+        assert client.host == ["192.168.1.1", "192.168.1.2"]
+
+    def test_initialize_with_empty_string_host(self):
+        with pytest.raises(
+            ValueError,
+            match=EMPTY_STRING_HOST_ERROR,
+        ):
+            CassandraClient(host="", keyspace="test_keyspace")
+
+    def test_initialize_with_none_host(self):
+        with pytest.raises(
+            ValueError,
+            match=GENERIC_INVALID_HOST_ERROR,
+        ):
+            CassandraClient(host=None, keyspace="test_keyspace")
+
+    def test_initialize_with_invalid_host_type(self):
+        with pytest.raises(
+            ValueError,
+            match=GENERIC_INVALID_HOST_ERROR,
+        ):
+            CassandraClient(host=123, keyspace="test_keyspace")
+
+    def test_initialize_with_invalid_list_host(self):
+        with pytest.raises(
+            ValueError,
+            match=GENERIC_INVALID_HOST_ERROR,
+        ):
+            CassandraClient(host=["192.168.1.1", 123], keyspace="test_keyspace")
+
+    def test_initialize_with_list_of_string_hosts(self):
+        client = CassandraClient(
+            host=["192.168.1.1, 192.168.1.2"], keyspace="test_keyspace"
+        )
+        assert client.host == ["192.168.1.1", "192.168.1.2"]

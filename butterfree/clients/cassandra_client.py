@@ -1,7 +1,7 @@
 """CassandraClient entity."""
 
 from ssl import CERT_REQUIRED, PROTOCOL_TLSv1
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 
 from cassandra.auth import PlainTextAuthProvider
 from cassandra.cluster import (
@@ -16,6 +16,12 @@ from cassandra.query import ConsistencyLevel, dict_factory
 from typing_extensions import TypedDict
 
 from butterfree.clients import AbstractClient
+from butterfree.configs.logger import __logger
+
+logger = __logger("cassandra_client")
+
+EMPTY_STRING_HOST_ERROR = "The value of Cassandra host is empty. Please fill correctly with your endpoints"  # noqa: E501
+GENERIC_INVALID_HOST_ERROR = "The Cassandra host must be a valid string, a string that represents a list or list of strings"  # noqa: E501
 
 
 class CassandraColumn(TypedDict):
@@ -53,11 +59,47 @@ class CassandraClient(AbstractClient):
         user: Optional[str] = None,
         password: Optional[str] = None,
     ) -> None:
-        self.host = host
+        self.host = self._validate_and_format_cassandra_host(host)
+        logger.info(f"The host setted is {self.host}")
         self.keyspace = keyspace
         self.user = user
         self.password = password
         self._session: Optional[Session] = None
+
+    def _validate_and_format_cassandra_host(self, host: Union[List, str]):
+        """
+        Validate and format the provided Cassandra host input.
+
+        This method checks if the input `host` is either a string, a list of strings, or
+        a list containing a single string with comma-separated values. It splits the string
+        by commas and trims whitespace, returning a list of hosts. If the input is already
+        a list of strings, it returns that list. If the input is empty or invalid, a
+        ValueError is raised.
+
+        Args:
+            host (str | list): The Cassandra host input, which can be a comma-separated
+                            string or a list of string endpoints.
+
+        Returns:
+            list: A list of formatted Cassandra host strings.
+
+        Raises:
+            ValueError: If the input is an empty string or if it is not a string
+                        (or a representation of a list) or a list of strings.
+        """  # noqa: E501
+        if isinstance(host, str):
+            if host:
+                return [item.strip() for item in host.split(",")]
+            else:
+                raise ValueError(EMPTY_STRING_HOST_ERROR)
+
+        if isinstance(host, list):
+            if len(host) == 1 and isinstance(host[0], str):
+                return [item.strip() for item in host[0].split(",")]
+            elif all(isinstance(item, str) for item in host):
+                return host
+
+        raise ValueError(GENERIC_INVALID_HOST_ERROR)
 
     @property
     def conn(self, *, ssl_path: str = None) -> Session:  # type: ignore
