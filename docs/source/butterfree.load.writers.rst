@@ -4,6 +4,14 @@ butterfree.load.writers package
 Submodules
 ----------
 
+butterfree.load.writers.delta\_writer module
+--------------------------------------------
+
+.. automodule:: butterfree.load.writers.delta_writer
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 butterfree.load.writers.historical\_feature\_store\_writer module
 -----------------------------------------------------------------
 
