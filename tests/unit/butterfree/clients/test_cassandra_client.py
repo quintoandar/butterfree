@@ -95,15 +95,15 @@ class TestCassandraClient:
 
     def test_initialize_with_string_host(self):
         client = CassandraClient(
-            host="192.168.1.1, 192.168.1.2", keyspace="dummy_keyspace"
+            host="127.0.0.0, 127.0.0.1", keyspace="dummy_keyspace"
         )
-        assert client.host == ["192.168.1.1", "192.168.1.2"]
+        assert client.host == ["127.0.0.0", "127.0.0.1"]
 
     def test_initialize_with_list_host(self):
         client = CassandraClient(
-            host=["192.168.1.1", "192.168.1.2"], keyspace="test_keyspace"
+            host=["127.0.0.0", "127.0.0.1"], keyspace="test_keyspace"
         )
-        assert client.host == ["192.168.1.1", "192.168.1.2"]
+        assert client.host == ["127.0.0.0", "127.0.0.1"]
 
     def test_initialize_with_empty_string_host(self):
         with pytest.raises(
@@ -131,10 +131,10 @@ class TestCassandraClient:
             ValueError,
             match=GENERIC_INVALID_HOST_ERROR,
         ):
-            CassandraClient(host=["192.168.1.1", 123], keyspace="test_keyspace")
+            CassandraClient(host=["127.0.0.0", 123], keyspace="test_keyspace")
 
     def test_initialize_with_list_of_string_hosts(self):
         client = CassandraClient(
-            host=["192.168.1.1, 192.168.1.2"], keyspace="test_keyspace"
+            host=["127.0.0.0, 127.0.0.1"], keyspace="test_keyspace"
         )
-        assert client.host == ["192.168.1.1", "192.168.1.2"]
+        assert client.host == ["127.0.0.0", "127.0.0.1"]
