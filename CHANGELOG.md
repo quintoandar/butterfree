@@ -5,6 +5,9 @@ Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each 
 
 ## [Unreleased]
 
+## [1.4.4](https://github.com/quintoandar/butterfree/releases/tag/1.4.4)
+* Fix Storage Level ([#382](https://github.com/quintoandar/butterfree/pull/382))
+
 ## [1.4.3](https://github.com/quintoandar/butterfree/releases/tag/1.4.3)
 * Performance upgrade ([#378](https://github.com/quintoandar/butterfree/pull/378))
 

@@ -605,7 +605,6 @@ class AggregatedFeatureSet(FeatureSet):
 
             # keeping this logic to maintain the same behavior for already implemented
             # feature sets
-
             if self._windows[0].slide == "1 day":
                 base_df = self._get_base_dataframe(
                     client=client, dataframe=output_df, end_date=end_date

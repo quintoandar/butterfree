@@ -89,7 +89,6 @@ class CassandraMigration(DatabaseMigration):
             Alter column type query.
 
         """
-
         temp_column_name = f"{column.column}_temp"
 
         add_temp_column_query = (
