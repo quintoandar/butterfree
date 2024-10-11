@@ -85,7 +85,7 @@ quality-check:
 	@echo "Flake 8"
 	@echo "======="
 	@echo ""
-	@python -m flake8 --exclude="venv"  && echo "Success"
+	@python -m flake8 --exclude="build/|buck-out/|dist/|_build/|pip/|\.pip/|\.git/|\.hg/|\.mypy_cache/|\.tox/|\.venv/|venv/"  && echo "Success"
 	@echo ""
 
 .PHONY: type-check
@@ -95,7 +95,7 @@ type-check:
 	@echo "mypy"
 	@echo "===="
 	@echo ""
-	@python -m mypy --exclude="venv" butterfree
+	@python -m mypy --exclude="build/|buck-out/|dist/|_build/|pip/|\.pip/|\.git/|\.hg/|\.mypy_cache/|\.tox/|\.venv/|venv/" butterfree
 
 .PHONY: checks
 ## run all code checks
