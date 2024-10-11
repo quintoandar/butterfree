@@ -94,9 +94,7 @@ class TestCassandraClient:
         assert sanitize_string(query) == sanitize_string(expected_query)
 
     def test_initialize_with_string_host(self):
-        client = CassandraClient(
-            host="127.0.0.0, 127.0.0.1", keyspace="dummy_keyspace"
-        )
+        client = CassandraClient(host="127.0.0.0, 127.0.0.1", keyspace="dummy_keyspace")
         assert client.host == ["127.0.0.0", "127.0.0.1"]
 
     def test_initialize_with_list_host(self):
