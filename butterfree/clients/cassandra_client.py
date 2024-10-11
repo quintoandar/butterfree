@@ -84,7 +84,7 @@ class CassandraClient(AbstractClient):
             list: A list of formatted Cassandra host strings.
 
         Raises:
-            ValueError: If the input is an empty string or if it is not a string
+            ValueError: If the input is an empty list/string or if it is not a string
                         (or a representation of a list) or a list of strings.
         """  # noqa: E501
         if isinstance(host, str):
