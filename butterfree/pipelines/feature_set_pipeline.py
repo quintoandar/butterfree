@@ -234,7 +234,9 @@ class FeatureSetPipeline:
             num_processors=num_processors,
         )
 
-        if transformed_dataframe.storageLevel != StorageLevel(False, False, False, False, 1):
+        if transformed_dataframe.storageLevel != StorageLevel(
+            False, False, False, False, 1
+        ):
             dataframe.unpersist()  # Clear the data from the cache (disk and memory)
 
         # Step 4: Load the data into the configured sink.
