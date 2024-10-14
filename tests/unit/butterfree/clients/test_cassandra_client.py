@@ -1,6 +1,8 @@
 from typing import Any, Dict, List
 from unittest.mock import MagicMock
 
+import pytest
+
 from butterfree.clients import CassandraClient
 from butterfree.clients.cassandra_client import (
     EMPTY_STRING_HOST_ERROR,
