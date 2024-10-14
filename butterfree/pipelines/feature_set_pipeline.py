@@ -221,12 +221,9 @@ class FeatureSetPipeline:
         # Step 2: Repartition and sort if required, avoid if not necessary.
         if partition_by:
             order_by = order_by or partition_by
-            current_partitions = dataframe.rdd.getNumPartitions()
-            optimal_partitions = num_processors or current_partitions
-            if current_partitions != optimal_partitions:
-                dataframe = repartition_sort_df(
-                    dataframe, partition_by, order_by, num_processors
-                )
+            dataframe = repartition_sort_df(
+                dataframe, partition_by, order_by, num_processors
+            )
 
         # Step 3: Construct the feature set dataframe using defined transformations.
         transformed_dataframe = self.feature_set.construct(
@@ -237,7 +234,9 @@ class FeatureSetPipeline:
             num_processors=num_processors,
         )
 
-        if dataframe.storageLevel != StorageLevel(False, False, False, False, 1):
+        if transformed_dataframe.storageLevel != StorageLevel(
+            False, False, False, False, 1
+        ):
             dataframe.unpersist()  # Clear the data from the cache (disk and memory)
 
         # Step 4: Load the data into the configured sink.
