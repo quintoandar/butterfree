@@ -7,6 +7,7 @@ Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each 
 
 ## [1.4.5](https://github.com/quintoandar/butterfree/releases/tag/1.4.5)
 * Rollback repartitions ([#386](https://github.com/quintoandar/butterfree/pull/386))
+* Add protection to host setting on cassandra_client ([#385](https://github.com/quintoandar/butterfree/pull/385))
 
 ## [1.4.4](https://github.com/quintoandar/butterfree/releases/tag/1.4.4)
 * Fix Storage Level ([#382](https://github.com/quintoandar/butterfree/pull/382))
