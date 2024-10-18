@@ -24,9 +24,6 @@ butterfree.dataframe\_service.repartition module
 ------------------------------------------------
 
 .. automodule:: butterfree.dataframe_service.incremental_strategy
-   :members:
-   :undoc-members:
-   :show-inheritance:
 
 butterfree.dataframe\_service.partitioning module
 -------------------------------------------------

@@ -5,6 +5,9 @@ Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each 
 
 ## [Unreleased]
 
+## [1.4.6](https://github.com/quintoandar/butterfree/releases/tag/1.4.6)
+* Move incremental filter ([#388](https://github.com/quintoandar/butterfree/pull/388))
+
 ## [1.4.5](https://github.com/quintoandar/butterfree/releases/tag/1.4.5)
 * Rollback repartitions ([#386](https://github.com/quintoandar/butterfree/pull/386))
 * Add protection to host setting on cassandra_client ([#385](https://github.com/quintoandar/butterfree/pull/385))
