@@ -580,10 +580,6 @@ class AggregatedFeatureSet(FeatureSet):
         for feature in self.keys + [self.timestamp]:
             output_df = feature.transform(output_df)
 
-        output_df = self.incremental_strategy.filter_with_incremental_strategy(
-            dataframe=output_df, start_date=start_date, end_date=end_date
-        )
-
         if self._windows and end_date is not None:
             # Run aggregations for each window
             agg_list = [
@@ -635,6 +631,10 @@ class AggregatedFeatureSet(FeatureSet):
                 )
         else:
             output_df = self._aggregate(output_df, features=self.features)
+
+        output_df = self.incremental_strategy.filter_with_incremental_strategy(
+            dataframe=output_df, start_date=start_date, end_date=end_date
+        )
 
         output_df = output_df.select(*self.columns).replace(  # type: ignore
             float("nan"), None
