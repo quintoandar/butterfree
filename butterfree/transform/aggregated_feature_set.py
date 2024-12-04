@@ -576,16 +576,14 @@ class AggregatedFeatureSet(FeatureSet):
 
         pre_hook_df = self.run_pre_hooks(dataframe)
 
-        output_df = pre_hook_df
-        for feature in self.keys + [self.timestamp]:
-            output_df = feature.transform(output_df)
-
-        output_df = self.incremental_strategy.filter_with_incremental_strategy(
-            dataframe=output_df, start_date=start_date, end_date=end_date
+        output_df = reduce(
+            lambda df, feature: feature.transform(df),
+            self.keys + [self.timestamp],
+            pre_hook_df,
         )
 
         if self._windows and end_date is not None:
-            # Run aggregations for each window
+            # run aggregations for each window
             agg_list = [
                 self._aggregate(
                     dataframe=output_df,
@@ -605,12 +603,13 @@ class AggregatedFeatureSet(FeatureSet):
 
             # keeping this logic to maintain the same behavior for already implemented
             # feature sets
+
             if self._windows[0].slide == "1 day":
                 base_df = self._get_base_dataframe(
                     client=client, dataframe=output_df, end_date=end_date
                 )
 
-                # Left join each aggregation result to our base dataframe
+                # left join each aggregation result to our base dataframe
                 output_df = reduce(
                     lambda left, right: self._dataframe_join(
                         left,
@@ -636,21 +635,19 @@ class AggregatedFeatureSet(FeatureSet):
         else:
             output_df = self._aggregate(output_df, features=self.features)
 
+        output_df = self.incremental_strategy.filter_with_incremental_strategy(
+            dataframe=output_df, start_date=start_date, end_date=end_date
+        )
+
         output_df = output_df.select(*self.columns).replace(  # type: ignore
             float("nan"), None
         )
-
         if not output_df.isStreaming and self.deduplicate_rows:
             output_df = self._filter_duplicated_rows(output_df)
 
         post_hook_df = self.run_post_hooks(output_df)
 
-        # Eager evaluation, only if needed and managable
         if not output_df.isStreaming and self.eager_evaluation:
-            # Small dataframes only
-            if output_df.count() < 1_000_000:
-                post_hook_df.cache().count()
-            else:
-                post_hook_df.cache()  # Cache without materialization for large volumes
+            post_hook_df.cache().count()
 
         return post_hook_df
