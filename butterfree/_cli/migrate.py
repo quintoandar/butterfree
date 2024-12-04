@@ -4,7 +4,7 @@ import inspect
 import os
 import pkgutil
 import sys
-from typing import Set, Type
+from typing import Set
 
 import boto3
 import setuptools
@@ -90,18 +90,8 @@ def __fs_objects(path: str) -> Set[FeatureSetPipeline]:
 
             instances.add(value)
 
-    def create_instance(cls: Type[FeatureSetPipeline]) -> FeatureSetPipeline:
-        sig = inspect.signature(cls.__init__)
-        parameters = sig.parameters
-
-        if "run_date" in parameters:
-            run_date = datetime.datetime.today().strftime("%Y-%m-%d")
-            return cls(run_date)
-
-        return cls()
-
     logger.info("Creating instances...")
-    return set(create_instance(value) for value in instances)  # type: ignore
+    return set(value() for value in instances)  # type: ignore
 
 
 PATH = typer.Argument(

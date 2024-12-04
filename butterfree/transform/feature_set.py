@@ -436,8 +436,11 @@ class FeatureSet(HookableComponent):
             pre_hook_df,
         ).select(*self.columns)
 
-        if not output_df.isStreaming and self.deduplicate_rows:
-            output_df = self._filter_duplicated_rows(output_df)
+        if not output_df.isStreaming:
+            if self.deduplicate_rows:
+                output_df = self._filter_duplicated_rows(output_df)
+            if self.eager_evaluation:
+                output_df.cache().count()
 
         output_df = self.incremental_strategy.filter_with_incremental_strategy(
             dataframe=output_df, start_date=start_date, end_date=end_date
