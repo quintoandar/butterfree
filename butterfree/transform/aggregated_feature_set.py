@@ -387,7 +387,6 @@ class AggregatedFeatureSet(FeatureSet):
         ]
 
         groupby = self.keys_columns.copy()
-
         if window is not None:
             dataframe = dataframe.withColumn("window", window.get())
             groupby.append("window")
@@ -411,23 +410,19 @@ class AggregatedFeatureSet(FeatureSet):
                 "keep_rn", functions.row_number().over(partition_window)
             ).filter("keep_rn = 1")
 
-        current_partitions = dataframe.rdd.getNumPartitions()
-        optimal_partitions = num_processors or current_partitions
-
-        if current_partitions != optimal_partitions:
-            dataframe = repartition_df(
-                dataframe,
-                partition_by=groupby,
-                num_processors=optimal_partitions,
-            )
-
+        # repartition to have all rows for each group at the same partition
+        # by doing that, we won't have to shuffle data on grouping by id
+        dataframe = repartition_df(
+            dataframe,
+            partition_by=groupby,
+            num_processors=num_processors,
+        )
         grouped_data = dataframe.groupby(*groupby)
 
-        if self._pivot_column and self._pivot_values:
+        if self._pivot_column:
             grouped_data = grouped_data.pivot(self._pivot_column, self._pivot_values)
 
         aggregated = grouped_data.agg(*aggregations)
-
         return self._with_renamed_columns(aggregated, features, window)
 
     def _with_renamed_columns(
@@ -576,12 +571,14 @@ class AggregatedFeatureSet(FeatureSet):
 
         pre_hook_df = self.run_pre_hooks(dataframe)
 
-        output_df = pre_hook_df
-        for feature in self.keys + [self.timestamp]:
-            output_df = feature.transform(output_df)
+        output_df = reduce(
+            lambda df, feature: feature.transform(df),
+            self.keys + [self.timestamp],
+            pre_hook_df,
+        )
 
         if self._windows and end_date is not None:
-            # Run aggregations for each window
+            # run aggregations for each window
             agg_list = [
                 self._aggregate(
                     dataframe=output_df,
@@ -601,12 +598,13 @@ class AggregatedFeatureSet(FeatureSet):
 
             # keeping this logic to maintain the same behavior for already implemented
             # feature sets
+
             if self._windows[0].slide == "1 day":
                 base_df = self._get_base_dataframe(
                     client=client, dataframe=output_df, end_date=end_date
                 )
 
-                # Left join each aggregation result to our base dataframe
+                # left join each aggregation result to our base dataframe
                 output_df = reduce(
                     lambda left, right: self._dataframe_join(
                         left,
@@ -639,18 +637,12 @@ class AggregatedFeatureSet(FeatureSet):
         output_df = output_df.select(*self.columns).replace(  # type: ignore
             float("nan"), None
         )
-
-        if not output_df.isStreaming and self.deduplicate_rows:
-            output_df = self._filter_duplicated_rows(output_df)
+        if not output_df.isStreaming:
+            if self.deduplicate_rows:
+                output_df = self._filter_duplicated_rows(output_df)
+            if self.eager_evaluation:
+                output_df.cache().count()
 
         post_hook_df = self.run_post_hooks(output_df)
-
-        # Eager evaluation, only if needed and managable
-        if not output_df.isStreaming and self.eager_evaluation:
-            # Small dataframes only
-            if output_df.count() < 1_000_000:
-                post_hook_df.cache().count()
-            else:
-                post_hook_df.cache()  # Cache without materialization for large volumes
 
         return post_hook_df
