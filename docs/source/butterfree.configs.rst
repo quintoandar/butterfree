@@ -14,6 +14,8 @@ Submodules
 
 butterfree.configs.environment module
 -------------------------------------
+butterfree.configs.environment module
+-------------------------------------
 
 .. automodule:: butterfree.configs.environment
    :members:

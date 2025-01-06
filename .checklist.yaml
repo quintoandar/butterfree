@@ -1,0 +1,30 @@
+apiVersion: quintoandar.com.br/checklist/v2
+kind: ServiceChecklist
+metadata:
+  name: butterfree
+spec:
+  description: >-
+    A solution for Feature Stores.
+
+  costCenter: C055
+  department: engineering
+  lifecycle: production
+  docs: true
+
+  ownership:
+    team: data_products_mlops
+    line: tech_platform
+    owner: otavio.cals@quintoandar.com.br
+
+  libraries:
+    - name: butterfree
+      type: common-usage
+      path: https://quintoandar.github.io/python-package-server/
+      description: A lib to build Feature Stores.
+      registries:
+      - github-packages
+      tier: T0
+
+  channels:
+    squad: 'mlops'
+    alerts: 'data-products-reports'

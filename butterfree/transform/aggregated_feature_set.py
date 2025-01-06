@@ -387,6 +387,7 @@ class AggregatedFeatureSet(FeatureSet):
         ]
 
         groupby = self.keys_columns.copy()
+
         if window is not None:
             dataframe = dataframe.withColumn("window", window.get())
             groupby.append("window")
@@ -419,10 +420,11 @@ class AggregatedFeatureSet(FeatureSet):
         )
         grouped_data = dataframe.groupby(*groupby)
 
-        if self._pivot_column:
+        if self._pivot_column and self._pivot_values:
             grouped_data = grouped_data.pivot(self._pivot_column, self._pivot_values)
 
         aggregated = grouped_data.agg(*aggregations)
+
         return self._with_renamed_columns(aggregated, features, window)
 
     def _with_renamed_columns(
@@ -598,7 +600,6 @@ class AggregatedFeatureSet(FeatureSet):
 
             # keeping this logic to maintain the same behavior for already implemented
             # feature sets
-
             if self._windows[0].slide == "1 day":
                 base_df = self._get_base_dataframe(
                     client=client, dataframe=output_df, end_date=end_date
