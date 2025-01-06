@@ -1,10 +1,11 @@
+import logging
+
 from delta.tables import DeltaTable
 from pyspark.sql.dataframe import DataFrame
 
 from butterfree.clients import SparkClient
-from butterfree.configs.logger import __logger
 
-logger = __logger("delta_writer", True)
+logger = logging.getLogger(__name__)
 
 
 class DeltaWriter:

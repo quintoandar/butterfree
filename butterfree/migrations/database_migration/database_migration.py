@@ -1,16 +1,16 @@
 """Migration entity."""
 
+import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum, auto
 from typing import Any, Dict, List, Optional, Set
 
 from butterfree.clients import AbstractClient
-from butterfree.configs.logger import __logger
 from butterfree.load.writers.writer import Writer
 from butterfree.transform import FeatureSet
 
-logger = __logger("database_migrate", True)
+logger = logging.getLogger(__name__)
 
 
 @dataclass
