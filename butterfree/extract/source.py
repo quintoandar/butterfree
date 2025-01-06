@@ -3,7 +3,6 @@
 from typing import List, Optional
 
 from pyspark.sql import DataFrame
-from pyspark.storagelevel import StorageLevel
 
 from butterfree.clients import SparkClient
 from butterfree.extract.readers.reader import Reader
@@ -96,13 +95,11 @@ class Source(HookableComponent):
             DataFrame with the query result against all readers.
 
         """
-        # Step 1: Build temporary views for each reader
         for reader in self.readers:
             reader.build(
                 client=client, start_date=start_date, end_date=end_date
             )  # create temporary views for each reader
 
-        # Step 2: Execute SQL query on the combined readers
         dataframe = client.sql(self.query)
 
         if not dataframe.isStreaming and self.eager_evaluation:
