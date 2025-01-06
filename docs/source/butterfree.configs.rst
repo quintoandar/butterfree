@@ -14,10 +14,16 @@ Submodules
 
 butterfree.configs.environment module
 -------------------------------------
-butterfree.configs.environment module
--------------------------------------
 
 .. automodule:: butterfree.configs.environment
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+butterfree.configs.logger module
+--------------------------------
+
+.. automodule:: butterfree.configs.logger
    :members:
    :undoc-members:
    :show-inheritance:
