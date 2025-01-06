@@ -1,5 +1,6 @@
 """CassandraClient entity."""
 
+import logging
 from ssl import CERT_REQUIRED, PROTOCOL_TLSv1
 from typing import Dict, List, Optional, Union
 
@@ -16,9 +17,8 @@ from cassandra.query import ConsistencyLevel, dict_factory
 from typing_extensions import TypedDict
 
 from butterfree.clients import AbstractClient
-from butterfree.configs.logger import __logger
 
-logger = __logger("cassandra_client")
+logger = logging.getLogger(__name__)
 
 EMPTY_STRING_HOST_ERROR = "The value of Cassandra host is empty. Please fill correctly with your endpoints"  # noqa: E501
 GENERIC_INVALID_HOST_ERROR = "The Cassandra host must be a valid string, a string that represents a list or list of strings"  # noqa: E501

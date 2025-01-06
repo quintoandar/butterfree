@@ -1,6 +1,7 @@
 import datetime
 import importlib
 import inspect
+import logging
 import os
 import pkgutil
 import sys
@@ -12,7 +13,6 @@ import typer
 from botocore.exceptions import ClientError
 
 from butterfree.configs import environment
-from butterfree.configs.logger import __logger
 from butterfree.migrations.database_migration import ALLOWED_DATABASE
 from butterfree.pipelines import FeatureSetPipeline
 
@@ -20,7 +20,7 @@ app = typer.Typer(
     help="Apply the automatic migrations in a database.", no_args_is_help=True
 )
 
-logger = __logger("migrate", True)
+logger = logging.getLogger(__name__)
 
 
 def __find_modules(path: str) -> Set[str]:
