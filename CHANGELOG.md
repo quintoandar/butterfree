@@ -3,7 +3,11 @@ All notable changes to this project will be documented in this file.
 
 Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each release or unreleased log for a better organization.
 
-## [Unreleased]
+## [1.4.6](https://github.com/quintoandar/butterfree/releases/tag/1.4.6)
+
+### Fixed
+* [MLOP-2519] avoid configuring logger at lib level ([#393](https://github.com/quintoandar/butterfree/pull/393))
+* Rollback to latest stable release ([#391](https://github.com/quintoandar/butterfree/pull/391))
 
 ## [1.4.5](https://github.com/quintoandar/butterfree/releases/tag/1.4.5)
 * Rollback repartitions ([#386](https://github.com/quintoandar/butterfree/pull/386))

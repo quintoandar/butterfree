@@ -1,10 +1,11 @@
 import datetime
 import importlib
 import inspect
+import logging
 import os
 import pkgutil
 import sys
-from typing import Set, Type
+from typing import Set
 
 import boto3
 import setuptools
@@ -12,7 +13,6 @@ import typer
 from botocore.exceptions import ClientError
 
 from butterfree.configs import environment
-from butterfree.configs.logger import __logger
 from butterfree.migrations.database_migration import ALLOWED_DATABASE
 from butterfree.pipelines import FeatureSetPipeline
 
@@ -20,7 +20,7 @@ app = typer.Typer(
     help="Apply the automatic migrations in a database.", no_args_is_help=True
 )
 
-logger = __logger("migrate", True)
+logger = logging.getLogger(__name__)
 
 
 def __find_modules(path: str) -> Set[str]:
@@ -90,18 +90,8 @@ def __fs_objects(path: str) -> Set[FeatureSetPipeline]:
 
             instances.add(value)
 
-    def create_instance(cls: Type[FeatureSetPipeline]) -> FeatureSetPipeline:
-        sig = inspect.signature(cls.__init__)
-        parameters = sig.parameters
-
-        if "run_date" in parameters:
-            run_date = datetime.datetime.today().strftime("%Y-%m-%d")
-            return cls(run_date)
-
-        return cls()
-
     logger.info("Creating instances...")
-    return set(create_instance(value) for value in instances)  # type: ignore
+    return set(value() for value in instances)  # type: ignore
 
 
 PATH = typer.Argument(
