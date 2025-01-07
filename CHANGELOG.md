@@ -3,6 +3,9 @@ All notable changes to this project will be documented in this file.
 
 Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each release or unreleased log for a better organization.
 
+## [1.4.7](https://github.com/quintoandar/butterfree/releases/tag/1.4.7)
+* Build latest release on PyPI.
+
 ## [1.4.6](https://github.com/quintoandar/butterfree/releases/tag/1.4.6)
 
 ### Fixed
