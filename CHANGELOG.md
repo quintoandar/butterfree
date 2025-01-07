@@ -3,10 +3,30 @@ All notable changes to this project will be documented in this file.
 
 Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each release or unreleased log for a better organization.
 
-## [Unreleased]
 ## [1.4.6](https://github.com/quintoandar/butterfree/releases/tag/1.4.6)
-* Fix(MLOP-2519): avoid configuring logger at lib level ([#393](https://github.com/quintoandar/butterfree/pull/393))
-* Fix: Rollback to latest stable release ([#391](https://github.com/quintoandar/butterfree/pull/391))
+
+### Fixed
+* [MLOP-2519] avoid configuring logger at lib level ([#393](https://github.com/quintoandar/butterfree/pull/393))
+* Rollback to latest stable release ([#391](https://github.com/quintoandar/butterfree/pull/391))
+
+## [1.4.5](https://github.com/quintoandar/butterfree/releases/tag/1.4.5)
+* Rollback repartitions ([#386](https://github.com/quintoandar/butterfree/pull/386))
+* Add protection to host setting on cassandra_client ([#385](https://github.com/quintoandar/butterfree/pull/385))
+
+## [1.4.4](https://github.com/quintoandar/butterfree/releases/tag/1.4.4)
+* Fix Storage Level ([#382](https://github.com/quintoandar/butterfree/pull/382))
+
+## [1.4.3](https://github.com/quintoandar/butterfree/releases/tag/1.4.3)
+* Performance upgrade ([#378](https://github.com/quintoandar/butterfree/pull/378))
+
+## [1.4.2](https://github.com/quintoandar/butterfree/releases/tag/1.4.2)
+* Minor fixes ([#376](https://github.com/quintoandar/butterfree/pull/376))
+
+## [1.4.1](https://github.com/quintoandar/butterfree/releases/tag/1.4.1)
+* Performance Improvements ([#374](https://github.com/quintoandar/butterfree/pull/374))
+
+## [1.4.0](https://github.com/quintoandar/butterfree/releases/tag/1.4.0)
+* Add Delta support ([#370](https://github.com/quintoandar/butterfree/pull/370))
 
 ## [1.3.5](https://github.com/quintoandar/butterfree/releases/tag/1.3.5)
 * Auto create feature sets ([#368](https://github.com/quintoandar/butterfree/pull/368))
