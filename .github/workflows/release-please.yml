@@ -1,0 +1,21 @@
+on:
+  push:
+    branches:
+      - staging
+
+permissions:
+  contents: write
+  pull-requests: write
+
+name: release-please
+
+jobs:
+  release-please:
+    runs-on: github-actions-developers-runner
+    steps:
+      - uses: googleapis/release-please-action@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          default-branch: staging
+          release-type: python
+          pull-request-title-pattern: "chore${scope}: ${version}"
