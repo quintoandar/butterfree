@@ -7,7 +7,11 @@
       "bump-patch-for-minor-pre-major": false,
       "draft": true,
       "prerelease": true,
-      "include-component-in-tag": false
+      "include-component-in-tag": false,
+      "extra-files": [
+        "setup.py",
+        "butterfree/__init__.py"
+      ]
     }
   },
   "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json"
