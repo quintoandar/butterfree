@@ -242,9 +242,9 @@ class FeatureSetPipeline:
                 source_df=dataframe,
                 feature_set=self.feature_set if self.delta_config.deduplicate else None,
                 deduplicate=self.delta_config.deduplicate,
-                when_not_matched_insert_condition=self.delta_config.when_not_matched_insert_condition,
-                when_matched_update_condition=self.delta_config.when_matched_update_condition,
-                when_matched_delete_condition=self.delta_config.when_matched_delete_condition,
+                when_not_matched_insert=self.delta_config.when_not_matched_insert,
+                when_matched_update=self.delta_config.when_matched_update,
+                when_matched_delete=self.delta_config.when_matched_delete,
             )
         else:
             self.sink.flush(

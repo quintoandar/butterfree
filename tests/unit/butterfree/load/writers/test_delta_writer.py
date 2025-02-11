@@ -1,4 +1,3 @@
-import os
 from unittest import mock
 
 import pytest
@@ -12,14 +11,6 @@ DELTA_LOCATION = "spark-warehouse"
 
 
 class TestDeltaWriter:
-
-    @pytest.fixture
-    def merge_builder_mock(self):
-        builder = mock.MagicMock()
-        builder.whenMatchedDelete.return_value = builder
-        builder.whenMatchedUpdateAll.return_value = builder
-        builder.whenNotMatchedInsertAll.return_value = builder
-        return builder
 
     @pytest.fixture
     def merge_builder_mock(self):
@@ -77,8 +68,8 @@ class TestDeltaWriter:
             table="test_delta_table",
             merge_on=["id"],
             source_df=source,
-            when_not_matched_insert_condition=None,
-            when_matched_update_condition="id > 2",
+            when_not_matched_insert=None,
+            when_matched_update="id > 2",
         )
 
         assert merge_builder_mock.execute.assert_called_once

@@ -34,9 +34,9 @@ class DeltaWriter:
         table: str,
         merge_on: list,
         source_df: DataFrame,
-        when_not_matched_insert_condition: str = None,
-        when_matched_update_condition: str = None,
-        when_matched_delete_condition: str = None,
+        when_not_matched_insert: str = None,
+        when_matched_update: str = None,
+        when_matched_delete: str = None,
     ):
         """
         Merge a source dataframe to a Delta table.
@@ -88,16 +88,14 @@ class DeltaWriter:
             merge_builder = target_table.alias("target").merge(
                 source_df.alias("source"), join_condition
             )
-            if when_matched_delete_condition:
+            if when_matched_delete:
                 merge_builder = merge_builder.whenMatchedDelete(
-                    condition=when_matched_delete_condition
+                    condition=when_matched_delete
                 )
 
             merge_builder.whenMatchedUpdateAll(
-                condition=when_matched_update_condition
-            ).whenNotMatchedInsertAll(
-                condition=when_not_matched_insert_condition
-            ).execute()
+                condition=when_matched_update
+            ).whenNotMatchedInsertAll(condition=when_not_matched_insert).execute()
         except Exception as e:
             logger.error(f"Merge operation on {full_table_name} failed: {e}")
 

@@ -20,6 +20,6 @@ class DeltaConfig:
     table: str
     merge_on: List[str]
     deduplicate: bool = False
-    when_not_matched_insert_condition: Optional[str] = None
-    when_matched_update_condition: Optional[str] = None
-    when_matched_delete_condition: Optional[str] = None
+    when_not_matched_insert: Optional[str] = None
+    when_matched_update: Optional[str] = None
+    when_matched_delete: Optional[str] = None
