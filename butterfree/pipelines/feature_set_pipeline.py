@@ -260,7 +260,6 @@ class FeatureSetPipeline:
                     spark_client=self.spark_client,
                 )
 
-
     def run_for_date(
         self,
         execution_date: Optional[str] = None,
