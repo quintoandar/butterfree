@@ -5,14 +5,13 @@ import pytest
 
 from butterfree.clients import SparkClient
 from butterfree.load.writers import DeltaWriter
+from butterfree.pipelines import FeatureSetPipeline
+from butterfree.transform import FeatureSet
 
 DELTA_LOCATION = "spark-warehouse"
 
 
 class TestDeltaWriter:
-
-    def __checkFileExists(self, file_name: str = "test_delta_table") -> bool:
-        return os.path.exists(os.path.join(DELTA_LOCATION, file_name))
 
     @pytest.fixture
     def merge_builder_mock(self):
@@ -21,6 +20,35 @@ class TestDeltaWriter:
         builder.whenMatchedUpdateAll.return_value = builder
         builder.whenNotMatchedInsertAll.return_value = builder
         return builder
+
+    @pytest.fixture
+    def merge_builder_mock(self):
+        builder = mock.MagicMock()
+        builder.whenMatchedDelete.return_value = builder
+        builder.whenMatchedUpdateAll.return_value = builder
+        builder.whenNotMatchedInsertAll.return_value = builder
+        return builder
+
+    @pytest.fixture
+    def feature_set_pipeline_mock(self, mocker):
+        pipeline = mock.MagicMock(spec=FeatureSetPipeline)
+        pipeline.feature_set = mock.MagicMock(spec=FeatureSet)
+        pipeline.source.construct.return_value = mocker.MagicMock()
+        pipeline.feature_set.construct.return_value = mocker.MagicMock()
+        return pipeline
+
+    def test_merge_with_pipeline(self, feature_set_pipeline_mock, merge_builder_mock):
+        pipeline = feature_set_pipeline_mock
+
+        DeltaWriter().merge(
+            client=pipeline.spark_client,
+            database="test_db",
+            table="test_table",
+            merge_on=["id"],
+            source_df=pipeline.feature_set.construct.return_value,
+        )
+
+        assert merge_builder_mock.execute.assert_called_once
 
     def test_merge(self, feature_set_dataframe, merge_builder_mock):
 

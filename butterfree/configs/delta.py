@@ -1,10 +1,11 @@
 from dataclasses import dataclass
 from typing import List, Optional
 
+
 @dataclass
 class DeltaConfig:
     """Configuration for Delta merge operations.
-    
+
     Args:
         database: Target database name
         table: Target table name
@@ -14,6 +15,7 @@ class DeltaConfig:
         when_matched_update_condition: Optional condition for updates
         when_matched_delete_condition: Optional condition for deletes
     """
+
     database: str
     table: str
     merge_on: List[str]

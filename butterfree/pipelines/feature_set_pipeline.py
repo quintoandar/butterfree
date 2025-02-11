@@ -3,12 +3,12 @@
 from typing import List, Optional
 
 from butterfree.clients import SparkClient
+from butterfree.configs.delta import DeltaConfig
 from butterfree.dataframe_service import repartition_sort_df
 from butterfree.extract import Source
 from butterfree.load import Sink
-from butterfree.transform import FeatureSet
-from butterfree.configs.delta import DeltaConfig
 from butterfree.load.writers import DeltaWriter
+from butterfree.transform import FeatureSet
 
 
 class FeatureSetPipeline:
