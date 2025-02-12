@@ -1,9 +1,11 @@
 import logging
+from typing import Optional
 
 from delta.tables import DeltaTable
 from pyspark.sql.dataframe import DataFrame
 
 from butterfree.clients import SparkClient
+from butterfree.transform import FeatureSet
 
 logger = logging.getLogger(__name__)
 
@@ -34,6 +36,8 @@ class DeltaWriter:
         table: str,
         merge_on: list,
         source_df: DataFrame,
+        feature_set: Optional[FeatureSet] = None,
+        deduplicate: bool = False,
         when_not_matched_insert: str = None,
         when_matched_update: str = None,
         when_matched_delete: str = None,
@@ -57,6 +61,15 @@ class DeltaWriter:
             source.<column_name> and target.<column_name>
         """
         try:
+
+            df_to_merge = source_df
+            if deduplicate:
+                if feature_set is None:
+                    raise ValueError(
+                        "feature_set must be provided when deduplicate=True"
+                    )
+                df_to_merge = feature_set._filter_duplicated_rows(source_df)
+
             full_table_name = DeltaWriter._get_full_table_name(table, database)
 
             table_exists = client.conn.catalog.tableExists(full_table_name)
@@ -86,7 +99,7 @@ class DeltaWriter:
                 [f"source.{col} = target.{col}" for col in merge_on]
             )
             merge_builder = target_table.alias("target").merge(
-                source_df.alias("source"), join_condition
+                df_to_merge.alias("source"), join_condition
             )
             if when_matched_delete:
                 merge_builder = merge_builder.whenMatchedDelete(
@@ -98,6 +111,7 @@ class DeltaWriter:
             ).whenNotMatchedInsertAll(condition=when_not_matched_insert).execute()
         except Exception as e:
             logger.error(f"Merge operation on {full_table_name} failed: {e}")
+            raise
 
     @staticmethod
     def vacuum(table: str, retention_hours: int, client: SparkClient):
