@@ -1,11 +1,10 @@
 import logging
-from typing import Optional
+from typing import List, Optional
 
 from delta.tables import DeltaTable
 from pyspark.sql.dataframe import DataFrame
 
 from butterfree.clients import SparkClient
-from butterfree.transform import FeatureSet
 
 logger = logging.getLogger(__name__)
 
@@ -34,14 +33,12 @@ class DeltaWriter:
         client: SparkClient,
         database: str,
         table: str,
-        merge_on: list,
+        merge_on: List[str],
         source_df: DataFrame,
-        feature_set: Optional[FeatureSet] = None,
-        deduplicate: bool = False,
-        when_not_matched_insert: str = None,
-        when_matched_update: str = None,
-        when_matched_delete: str = None,
-    ):
+        when_not_matched_insert: Optional[str] = None,
+        when_matched_update: Optional[str] = None,
+        when_matched_delete: Optional[str] = None,
+    ) -> None:
         """
         Merge a source dataframe to a Delta table.
 
@@ -49,69 +46,56 @@ class DeltaWriter:
         not matched (simple upsert).
 
         You can change this behavior by setting:
-        - when_not_matched_insert_condition: it will only insert
+        - when_not_matched_insert: it will only insert
             when this specified condition is true
-        - when_matched_update_condition: it will only update when this
+        - when_matched_update: it will only update when this
             specified condition is true. You can refer to the columns
         in the source dataframe as source.<column_name>, and the columns
             in the target table as target.<column_name>.
-        - when_matched_delete_condition: it will add an operation to delete,
+        - when_matched_delete: it will add an operation to delete,
             but only if this condition is true. Again, source and
             target dataframe columns can be referred to respectively as
             source.<column_name> and target.<column_name>
         """
-        try:
+        """Merge a source dataframe to a Delta table."""
+        full_table_name = DeltaWriter._get_full_table_name(table, database)
 
-            df_to_merge = source_df
-            if deduplicate:
-                if feature_set is None:
-                    raise ValueError(
-                        "feature_set must be provided when deduplicate=True"
-                    )
-                df_to_merge = feature_set._filter_duplicated_rows(source_df)
+        table_exists = client.conn.catalog.tableExists(full_table_name)
 
-            full_table_name = DeltaWriter._get_full_table_name(table, database)
+        if table_exists:
+            pd_df = client.conn.sql(
+                f"DESCRIBE TABLE EXTENDED {full_table_name}"
+            ).toPandas()
+            provider = (
+                pd_df.reset_index()
+                .groupby(["col_name"])["data_type"]
+                .aggregate("first")
+                .Provider
+            )
+            table_is_delta = provider.lower() == "delta"
 
-            table_exists = client.conn.catalog.tableExists(full_table_name)
+            if not table_is_delta:
+                DeltaWriter()._convert_to_delta(client, full_table_name)
 
-            if table_exists:
-                pd_df = client.conn.sql(
-                    f"DESCRIBE TABLE EXTENDED {full_table_name}"
-                ).toPandas()
-                provider = (
-                    pd_df.reset_index()
-                    .groupby(["col_name"])["data_type"]
-                    .aggregate("first")
-                    .Provider
-                )
-                table_is_delta = provider.lower() == "delta"
+        # For schema evolution
+        client.conn.conf.set("spark.databricks.delta.schema.autoMerge.enabled", "true")
 
-                if not table_is_delta:
-                    DeltaWriter()._convert_to_delta(client, full_table_name)
+        target_table = DeltaTable.forName(client.conn, full_table_name)
+        join = " AND ".join(
+            [f"source.{col} = target.{col}" for col in merge_on]
+        )
+        merge_builder = target_table.alias("target").merge(
+            source_df.alias("source"), join
+        )
 
-            # For schema evolution
-            client.conn.conf.set(
-                "spark.databricks.delta.schema.autoMerge.enabled", "true"
+        if when_matched_delete:
+            merge_builder = merge_builder.whenMatchedDelete(
+                condition=when_matched_delete
             )
 
-            target_table = DeltaTable.forName(client.conn, full_table_name)
-            join_condition = " AND ".join(
-                [f"source.{col} = target.{col}" for col in merge_on]
-            )
-            merge_builder = target_table.alias("target").merge(
-                df_to_merge.alias("source"), join_condition
-            )
-            if when_matched_delete:
-                merge_builder = merge_builder.whenMatchedDelete(
-                    condition=when_matched_delete
-                )
-
-            merge_builder.whenMatchedUpdateAll(
-                condition=when_matched_update
-            ).whenNotMatchedInsertAll(condition=when_not_matched_insert).execute()
-        except Exception as e:
-            logger.error(f"Merge operation on {full_table_name} failed: {e}")
-            raise
+        merge_builder.whenMatchedUpdateAll(
+            condition=when_matched_update
+        ).whenNotMatchedInsertAll(condition=when_not_matched_insert).execute()
 
     @staticmethod
     def vacuum(table: str, retention_hours: int, client: SparkClient):

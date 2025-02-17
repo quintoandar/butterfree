@@ -1,56 +1,12 @@
-# butterfree/load/writers/delta_feature_store_writer.py
-from dataclasses import dataclass
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 
-from butterfree.load.writers import DeltaWriter
+from butterfree.configs.db import DeltaConfig
+from butterfree.load.writers.delta_writer import DeltaWriter
 from butterfree.load.writers.writer import Writer
+from pyspark.sql.dataframe import DataFrame
+from butterfree.transform import FeatureSet
 
-
-@dataclass
-class DeltaConfig:
-    """Delta merge configuration parameters.
-
-    Defines parameters for controlling Delta merge operations, including merge keys,
-    deduplication settings, and conditional merge behaviors.
-
-    Attributes:
-        database: Target database name for the Delta table.
-        table: Target table name for the Delta table.
-        merge_on: List of columns to use as merge keys. Values in these columns should
-            uniquely identify rows for merging.
-        deduplicate: Whether to deduplicate source data before merging based on feature
-            set keys. Defaults to False.
-        when_not_matched_insert: Control when new records
-            should be inserted. When provided, records will only be inserted when this
-            condition evaluates to true.
-        when_matched_update: Control when existing records
-            should be updated. When provided, matching records will only be updated when
-            this condition evaluates to true. Source columns can be referenced as
-            source.<column_name> and target columns as target.<column_name>.
-        when_matched_delete: Control when existing records
-            should be deleted. When provided, matching records will be deleted when this
-            condition evaluates to true. Source and target cols can be referenced as in
-            update conditions.
-
-    Example:
-        >>> config = DeltaConfig(
-        ...     database="feature_store",
-        ...     table="user_features",
-        ...     merge_on=["id", "timestamp"],
-        ...     deduplicate=True,
-        ...     when_matched_update="source.value > target.value",
-        ...     when_not_matched_insert="source.value > 0"
-        ... )
-    """
-
-    database: str
-    table: str
-    merge_on: List[str]
-    deduplicate: bool = False
-    when_not_matched_insert: Optional[str] = None
-    when_matched_update: Optional[str] = None
-    when_matched_delete: Optional[str] = None
-
+from butterfree.clients import SparkClient
 
 class DeltaFeatureStoreWriter(Writer):
     """Enable writing feature sets into Delta tables with merge capabilities.
@@ -123,7 +79,6 @@ class DeltaFeatureStoreWriter(Writer):
         database: str,
         table: str,
         merge_on: List[str],
-        deduplicate: bool = False,
         when_not_matched_insert: Optional[str] = None,
         when_matched_update: Optional[str] = None,
         when_matched_delete: Optional[str] = None,
@@ -132,13 +87,18 @@ class DeltaFeatureStoreWriter(Writer):
             database=database,
             table=table,
             merge_on=merge_on,
-            deduplicate=deduplicate,
             when_not_matched_insert=when_not_matched_insert,
             when_matched_update=when_matched_update,
             when_matched_delete=when_matched_delete,
         )
+        self.row_count_validation = False
 
-    def write(self, dataframe, spark_client, feature_set):
+    def write(
+        self,
+        dataframe: DataFrame,
+        spark_client: SparkClient,
+        feature_set: FeatureSet,
+    ) -> None:
         """Merges the input dataframe into a Delta table.
 
         Performs a Delta merge operation with the provided dataframe using the config
@@ -165,15 +125,45 @@ class DeltaFeatureStoreWriter(Writer):
             ...     feature_set=feature_set
             ... )
         """
+        options = self.config.get_options(self.config.table)
+
         DeltaWriter().merge(
             client=spark_client,
-            database=self.config.database,
-            table=self.config.table,
+            database=options["database"],
+            table=options["table"],
             merge_on=self.config.merge_on,
             source_df=dataframe,
-            feature_set=feature_set if self.config.deduplicate else None,
-            deduplicate=self.config.deduplicate,
             when_not_matched_insert=self.config.when_not_matched_insert,
             when_matched_update=self.config.when_matched_update,
             when_matched_delete=self.config.when_matched_delete,
         )
+
+    def validate(
+        self,
+        dataframe: DataFrame,
+        spark_client: SparkClient,
+        feature_set: FeatureSet,
+    ) -> None:
+        """Validates the dataframe written to Delta table.
+
+        In Delta tables, schema validation is handled by Delta's schema enforcement
+        and evolution. No additional validation is needed.
+
+        Args:
+            dataframe: Spark dataframe to be validated
+            spark_client: Client for Spark connection
+            feature_set: Feature set with the schema definition
+        """
+        pass
+
+    def check_schema(self, dataframe: DataFrame, schema: List[Dict[str, Any]]) -> None:
+        """Checks if the dataframe schema matches the feature set schema.
+
+        Schema validation in Delta tables is handled by Delta Lake's schema enforcement
+        and evolution capabilities.
+
+        Args:
+            dataframe: Spark dataframe to be validated
+            schema: Schema definition from the feature set
+        """
+        pass
