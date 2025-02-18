@@ -16,8 +16,6 @@ jobs:
       - uses: googleapis/release-please-action@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          default-branch: staging
-          release-type: python
-          pull-request-title-pattern: "chore${scope}: ${version}"
+          target-branch: staging
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
