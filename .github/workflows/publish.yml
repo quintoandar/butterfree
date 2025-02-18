@@ -1,12 +1,11 @@
 name: "Publish"
 on:
   push:
-    paths:
-      - 'setup.py'
+    tags:
+      - '*'
 
 jobs:
   Pipeline:
-    if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
 
     steps:
@@ -15,41 +14,11 @@ jobs:
       with:
         python-version: '3.9'
 
-    - uses: actions/setup-java@v4
-      with:
-        java-version: '17'
-        distribution: microsoft
-
-    - uses: vemonet/setup-spark@v1
-      with:
-        spark-version: '3.5.1'
-        hadoop-version: '3'
-
     - name: Install dependencies
       run: make ci-install
 
     - name: Build package
       run: make package
-
-    - name: Get version
-      run: echo "version=$(grep __version__ setup.py | head -1 | cut -d \" -f2 | cut -d \' -f2)" >> $GITHUB_ENV
-
-    - name: Get release notes
-      id: get_release_notes
-      uses: ffurrer2/extract-release-notes@v1
-
-    - name: Create release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ env.version }}
-        release_name: Release ${{ env.version }}
-        body: ${{ steps.get_release_notes.outputs.release_notes }}
-
-    - name: Release already exist
-      if: ${{ failure() }}
-      run: echo Release already exist
 
     - name: Publish release to pypi.org
       if: ${{ success() }}
