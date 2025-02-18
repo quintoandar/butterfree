@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each release or unreleased log for a better organization.
 
+## [1.4.8](https://github.com/quintoandar/butterfree/compare/1.4.6...v1.4.8) (2025-02-18)
+
+- Fixes: release process
+
 ## [Unreleased]
 ## [1.4.6](https://github.com/quintoandar/butterfree/releases/tag/1.4.6)
 * Fix(MLOP-2519): avoid configuring logger at lib level ([#393](https://github.com/quintoandar/butterfree/pull/393))
