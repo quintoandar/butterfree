@@ -19,3 +19,5 @@ jobs:
           default-branch: staging
           release-type: python
           pull-request-title-pattern: "chore${scope}: ${version}"
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
