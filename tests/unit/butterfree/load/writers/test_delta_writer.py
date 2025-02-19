@@ -2,7 +2,6 @@ import os
 from unittest import mock
 
 import pytest
-from pyspark.sql import DataFrame
 
 from butterfree.clients import SparkClient
 from butterfree.load.writers import DeltaWriter
@@ -45,7 +44,6 @@ class TestDeltaWriter:
         mock_reset_index = mock.MagicMock()
         mock_groupby = mock.MagicMock()
         mock_agg = mock.MagicMock()
-        mock_provider = mock.MagicMock()
 
         # Configurando o comportamento em cadeia
         mock_pandas_df.reset_index.return_value = mock_reset_index
@@ -76,10 +74,6 @@ class TestDeltaWriter:
         # Arrange
         client = SparkClient()
         client.conn.catalog.tableExists = mock.MagicMock(return_value=False)
-        mock_delta = mocker.patch(
-            "butterfree.load.writers.delta_writer.DeltaTable.forName",
-            side_effect=Exception("Table does not exist or is not a Delta table"),
-        )
 
         # Act & Assert
         with pytest.raises(

@@ -1,11 +1,8 @@
 from unittest import mock
 
 import pytest
-from pyspark.sql import DataFrame
 
 from butterfree.clients import SparkClient
-from butterfree.configs import environment
-from butterfree.constants.columns import TIMESTAMP_COLUMN
 from butterfree.constants.data_type import DataType
 from butterfree.extract import Source
 from butterfree.extract.readers import TableReader
