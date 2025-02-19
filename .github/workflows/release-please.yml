@@ -37,9 +37,9 @@ jobs:
         if: ${{ steps.release.outputs.release_created }}
         run: make package
 
-      # - name: Publish release to pypi.org
-      #   if: ${{ steps.release.outputs.release_created }}
-      #   env:
-      #     PYPI_USERNAME: ${{ secrets.PYPI_USERNAME }}
-      #     PYPI_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-      #   run:  PYTHONPATH=./pip/deps python -m twine upload -u $PYPI_USERNAME -p $PYPI_PASSWORD --verbose dist/*
+      - name: Publish release to pypi.org
+        if: ${{ steps.release.outputs.release_created }}
+        env:
+          PYPI_USERNAME: ${{ secrets.PYPI_USERNAME }}
+          PYPI_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+        run:  PYTHONPATH=./pip/deps python -m twine upload -u $PYPI_USERNAME -p $PYPI_PASSWORD --verbose dist/*
