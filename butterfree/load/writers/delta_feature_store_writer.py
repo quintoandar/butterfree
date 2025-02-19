@@ -1,12 +1,13 @@
-from typing import List, Optional, Dict, Any
+from typing import Any, Dict, List, Optional
 
+from pyspark.sql.dataframe import DataFrame
+
+from butterfree.clients import SparkClient
 from butterfree.configs.db import DeltaConfig
 from butterfree.load.writers.delta_writer import DeltaWriter
 from butterfree.load.writers.writer import Writer
-from pyspark.sql.dataframe import DataFrame
 from butterfree.transform import FeatureSet
 
-from butterfree.clients import SparkClient
 
 class DeltaFeatureStoreWriter(Writer):
     """Enable writing feature sets into Delta tables with merge capabilities.

@@ -81,9 +81,7 @@ class DeltaWriter:
         client.conn.conf.set("spark.databricks.delta.schema.autoMerge.enabled", "true")
 
         target_table = DeltaTable.forName(client.conn, full_table_name)
-        join = " AND ".join(
-            [f"source.{col} = target.{col}" for col in merge_on]
-        )
+        join = " AND ".join([f"source.{col} = target.{col}" for col in merge_on])
         merge_builder = target_table.alias("target").merge(
             source_df.alias("source"), join
         )

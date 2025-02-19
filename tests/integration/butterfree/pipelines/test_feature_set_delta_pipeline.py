@@ -1,28 +1,25 @@
 from unittest import mock
 
+import pytest
+from pyspark.sql import DataFrame
+
+from butterfree.clients import SparkClient
 from butterfree.configs import environment
 from butterfree.constants.columns import TIMESTAMP_COLUMN
+from butterfree.constants.data_type import DataType
 from butterfree.extract import Source
 from butterfree.extract.readers import TableReader
 from butterfree.load import Sink
 from butterfree.load.writers import DeltaFeatureStoreWriter
 from butterfree.pipelines import FeatureSetPipeline
 from butterfree.transform import FeatureSet
-from butterfree.transform.features import (
-    Feature,
-    KeyFeature,
-    TimestampFeature,
-)
-from butterfree.constants.data_type import DataType
-from pyspark.sql import DataFrame
+from butterfree.transform.features import Feature, KeyFeature, TimestampFeature
 
-import pytest
-
-from butterfree.clients import SparkClient
 
 @pytest.fixture
 def spark_client():
     return SparkClient()
+
 
 class TestFeatureSetPipeline:
     def test_feature_set_pipeline_with_delta_writer(self, spark_client):
@@ -30,8 +27,7 @@ class TestFeatureSetPipeline:
         # Criar DataFrame de exemplo usando o spark_client
         df_data = [(1, 1.0, "2021-01-01")]  # id, feature, timestamp
         dataframe = spark_client.conn.createDataFrame(
-            df_data,
-            ["id", "feature", "timestamp"]
+            df_data, ["id", "feature", "timestamp"]
         )
 
         pipeline = FeatureSetPipeline(
@@ -52,9 +48,7 @@ class TestFeatureSetPipeline:
                 features=[
                     Feature(name="feature", description="test", dtype=DataType.FLOAT)
                 ],
-                keys=[
-                    KeyFeature(name="id", description="id", dtype=DataType.INTEGER)
-                ],
+                keys=[KeyFeature(name="id", description="id", dtype=DataType.INTEGER)],
                 timestamp=TimestampFeature(),
                 deduplicate_rows=True,
             ),
@@ -75,7 +69,9 @@ class TestFeatureSetPipeline:
         pipeline.feature_set.construct = mock.Mock(return_value=dataframe)
 
         # Mock o DeltaWriter.merge
-        with mock.patch('butterfree.load.writers.delta_writer.DeltaWriter.merge') as mock_merge:
+        with mock.patch(
+            "butterfree.load.writers.delta_writer.DeltaWriter.merge"
+        ) as mock_merge:
             # when
             pipeline.run()
 

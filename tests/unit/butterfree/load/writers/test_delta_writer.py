@@ -1,10 +1,11 @@
 import os
 from unittest import mock
+
 import pytest
+from pyspark.sql import DataFrame
 
 from butterfree.clients import SparkClient
 from butterfree.load.writers import DeltaWriter
-from pyspark.sql import DataFrame
 
 DELTA_LOCATION = "spark-warehouse"
 
@@ -33,7 +34,7 @@ class TestDeltaWriter:
         client = SparkClient()
         mocker.patch(
             "butterfree.load.writers.delta_writer.DeltaTable.forName",
-            return_value=delta_table_mock
+            return_value=delta_table_mock,
         )
 
         # Mock catalog exists
@@ -45,7 +46,7 @@ class TestDeltaWriter:
         mock_groupby = mock.MagicMock()
         mock_agg = mock.MagicMock()
         mock_provider = mock.MagicMock()
-        
+
         # Configurando o comportamento em cadeia
         mock_pandas_df.reset_index.return_value = mock_reset_index
         mock_reset_index.groupby.return_value = mock_groupby
@@ -70,18 +71,20 @@ class TestDeltaWriter:
         # Assert
         delta_table_mock.alias.assert_called_once_with("target")
         delta_table_mock.alias.return_value.merge.assert_called_once()
-        
+
     def test_merge_table_not_found(self, feature_set_dataframe, mocker):
         # Arrange
         client = SparkClient()
         client.conn.catalog.tableExists = mock.MagicMock(return_value=False)
         mock_delta = mocker.patch(
             "butterfree.load.writers.delta_writer.DeltaTable.forName",
-            side_effect=Exception("Table does not exist or is not a Delta table")
+            side_effect=Exception("Table does not exist or is not a Delta table"),
         )
 
         # Act & Assert
-        with pytest.raises(Exception, match="Table does not exist or is not a Delta table"):
+        with pytest.raises(
+            Exception, match="Table does not exist or is not a Delta table"
+        ):
             DeltaWriter().merge(
                 client=client,
                 database=None,
