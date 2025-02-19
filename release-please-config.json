@@ -5,9 +5,8 @@
       "release-type": "python",
       "bump-minor-pre-major": false,
       "bump-patch-for-minor-pre-major": false,
-      "draft": true,
-      "prerelease": true,
       "include-component-in-tag": false,
+      "include-v-in-tag": false,
       "extra-files": [
         "setup.py",
         "butterfree/__init__.py"
