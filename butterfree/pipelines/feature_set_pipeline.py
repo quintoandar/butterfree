@@ -3,11 +3,9 @@
 from typing import List, Optional
 
 from butterfree.clients import SparkClient
-from butterfree.configs.delta import DeltaConfig
 from butterfree.dataframe_service import repartition_sort_df
 from butterfree.extract import Source
 from butterfree.load import Sink
-from butterfree.load.writers import DeltaWriter
 from butterfree.transform import FeatureSet
 
 
@@ -139,13 +137,11 @@ class FeatureSetPipeline:
         feature_set: FeatureSet,
         sink: Sink,
         spark_client: Optional[SparkClient] = None,
-        delta_config: Optional[DeltaConfig] = None,
     ):
         self.source = source
         self.feature_set = feature_set
         self.sink = sink
         self.spark_client = spark_client or SparkClient()
-        self.delta_config = delta_config
 
     @property
     def source(self) -> Source:
@@ -233,32 +229,18 @@ class FeatureSetPipeline:
             num_processors=num_processors,
         )
 
-        if self.delta_config:
-            DeltaWriter().merge(
-                client=self.spark_client,
-                database=self.delta_config.database,
-                table=self.delta_config.table,
-                merge_on=self.delta_config.merge_on,
-                source_df=dataframe,
-                feature_set=self.feature_set if self.delta_config.deduplicate else None,
-                deduplicate=self.delta_config.deduplicate,
-                when_not_matched_insert_condition=self.delta_config.when_not_matched_insert_condition,
-                when_matched_update_condition=self.delta_config.when_matched_update_condition,
-                when_matched_delete_condition=self.delta_config.when_matched_delete_condition,
-            )
-        else:
-            self.sink.flush(
+        self.sink.flush(
+            dataframe=dataframe,
+            feature_set=self.feature_set,
+            spark_client=self.spark_client,
+        )
+
+        if not dataframe.isStreaming:
+            self.sink.validate(
                 dataframe=dataframe,
                 feature_set=self.feature_set,
                 spark_client=self.spark_client,
             )
-
-            if not dataframe.isStreaming:
-                self.sink.validate(
-                    dataframe=dataframe,
-                    feature_set=self.feature_set,
-                    spark_client=self.spark_client,
-                )
 
     def run_for_date(
         self,
