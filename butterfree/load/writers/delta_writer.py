@@ -25,7 +25,10 @@ class DeltaWriter:
     @staticmethod
     def _convert_to_delta(client: SparkClient, table: str):
         logger.info(f"Converting {table} to Delta...")
-        client.conn.sql(f"CONVERT TO DELTA {table}")
+        client.conn.sql(
+            f"""ALTER TABLE {table} SET TBLPROPERTIES
+                ('delta.enableChangeDataFeed' = 'true')"""
+        )
         logger.info("Conversion done.")
 
     @staticmethod
