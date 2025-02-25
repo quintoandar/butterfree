@@ -24,26 +24,34 @@ class DeltaWriter:
 
     @staticmethod
     def _convert_to_delta(client: SparkClient, table: str):
+        """Ensures the table is a Delta table, converting if necessary."""
         try:
+            # Check if table is Delta
             provider = (
                 client.conn.sql(f"DESCRIBE DETAIL {table}")
                 .select("format")
                 .collect()[0][0]
             )
-        except Exception:
-            provider = None
+        except Exception as e:
+            logger.error(f"Error checking table format: {e}")
+            raise ValueError(f"Table {table} not found or inaccessible.")
 
         if provider == "delta":
             logger.info(f"{table} is already a Delta table. Skipping conversion.")
-        else:
+        elif provider == "parquet":
             logger.info(f"Converting {table} to Delta...")
             client.conn.sql(f"CONVERT TO DELTA {table}")
-            logger.info("Conversion completed.")
+            logger.info("Conversion complete.")
+        else:
+            raise ValueError(
+                f"Table {table} is of type {provider}. Cannot be converted to Delta."
+            )
 
-        logger.info(f"Enabling Change Data Feed on {table}...")
+        # Enable Change Data Feed
+        logger.info(f"Enabling Change Data Feed for {table}...")
         client.conn.sql(
-            f"""ALTER TABLE {table} SET TBLPROPERTIES
-                ('delta.enableChangeDataFeed' = 'true')"""
+            f"""ALTER TABLE {table}
+                SET TBLPROPERTIES ('delta.enableChangeDataFeed' = 'true')"""
         )
         logger.info("Change Data Feed enabled.")
 

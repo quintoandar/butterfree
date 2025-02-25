@@ -1,7 +1,6 @@
 from unittest import mock
 
 import pytest
-from pyspark.sql import SparkSession
 from pyspark.sql.types import IntegerType, StringType, StructField, StructType
 
 from butterfree.clients import SparkClient
@@ -17,13 +16,8 @@ from butterfree.transform import FeatureSet
 from butterfree.transform.features import Feature, KeyFeature, TimestampFeature
 
 
-@pytest.fixture(scope="module")
-def spark_session():
-    return SparkSession.builder.master("local[*]").appName("test").getOrCreate()
-
-
 @pytest.fixture
-def sample_dataframe(spark_session):
+def sample_dataframe(spark_client):
     schema = StructType(
         [
             StructField("id", IntegerType(), False),
@@ -32,7 +26,7 @@ def sample_dataframe(spark_session):
         ]
     )
     data = [(1, "value1", "2024-01-01"), (2, "value2", "2024-01-02")]
-    return spark_session.createDataFrame(data, schema=schema)
+    return spark_client.conn.createDataFrame(data, schema=schema)
 
 
 @pytest.fixture
@@ -67,13 +61,21 @@ class TestDeltaConfig:
 
 
 class TestDeltaWriter:
+
     def test_merge(self, spark_client, sample_dataframe):
-        with mock.patch(
-            "butterfree.load.writers.delta_writer.DeltaTable.forName"
-        ) as mock_delta_table:
+        """Test merge function with a mocked DeltaTable."""
+        with (
+            mock.patch(
+                "butterfree.load.writers.delta_writer.DeltaTable.forName"
+            ) as mock_delta_table,
+            mock.patch.object(DeltaWriter, "_convert_to_delta") as mock_convert,  # noqa
+        ):
+            # Mock table existence and describe
+            spark_client.conn.catalog.tableExists = mock.MagicMock(return_value=True)
             mock_table = mock.MagicMock()
             mock_delta_table.return_value = mock_table
 
+            # Run merge
             DeltaWriter().merge(
                 client=spark_client,
                 database="test_db",
@@ -82,20 +84,24 @@ class TestDeltaWriter:
                 source_df=sample_dataframe,
             )
 
+            # Ensure DeltaTable.merge() was called
             mock_table.alias.assert_called_once_with("target")
             mock_table.alias.return_value.merge.assert_called_once()
 
     def test_vacuum(self, spark_client):
+        """Test vacuum operation."""
         with mock.patch.object(spark_client.conn, "sql") as mock_sql:
             DeltaWriter().vacuum("test_table", 24, spark_client)
             mock_sql.assert_called_once_with("VACUUM test_table RETAIN 24 HOURS")
 
     def test_optimize(self, spark_client):
+        """Test optimize operation."""
         with mock.patch.object(spark_client.conn, "sql") as mock_sql:
             DeltaWriter().optimize(spark_client, table="test_table")
             mock_sql.assert_called_once_with("OPTIMIZE test_table")
 
     def test_convert_to_delta_already_delta(self, spark_client):
+        """Ensure no conversion happens if table is already Delta."""
         schema = StructType([StructField("format", StringType(), False)])
         mock_df = spark_client.conn.createDataFrame([("delta",)], schema=schema)
 
@@ -105,45 +111,31 @@ class TestDeltaWriter:
             DeltaWriter()._convert_to_delta(spark_client, "test_table")
 
             mock_sql.assert_any_call("DESCRIBE DETAIL test_table")
-
-            # It should NOT call `CONVERT TO DELTA test_table`
-            mock_sql.assert_called()
             calls = [call[0][0].strip() for call in mock_sql.call_args_list]
-            assert "CONVERT TO DELTA test_table" not in calls
+            assert "CONVERT TO DELTA test_table" not in calls  # Ensure no conversion
 
-    def test_convert_to_delta_not_delta(self):
-
-        spark_client = mock.MagicMock()
-        spark_client.conn = mock.MagicMock(spec=SparkSession)
-
+    def test_convert_to_delta_not_delta(self, spark_client):
+        """Ensure conversion happens if table is NOT Delta."""
         schema = StructType([StructField("format", StringType(), False)])
         mock_df = spark_client.conn.createDataFrame([("parquet",)], schema=schema)
 
-        spark_client.conn.sql.side_effect = [
-            mock_df,
-            None,
-            None,
-        ]
+        with mock.patch.object(
+            spark_client.conn, "sql", side_effect=[mock_df, None, None]
+        ) as mock_sql:
+            DeltaWriter()._convert_to_delta(spark_client, "test_table")
 
-        DeltaWriter()._convert_to_delta(spark_client, "test_table")
+            expected_calls = [
+                "DESCRIBE DETAIL test_table",
+                "CONVERT TO DELTA test_table",
+                """ALTER TABLE test_table
+                    SET TBLPROPERTIES ('delta.enableChangeDataFeed' = 'true')""",
+            ]
 
-        # Normalize query formatting (fix whitespace mismatch)
-        def normalize_query(query):
-            return " ".join(query.split())
-
-        actual_calls = [
-            normalize_query(call[0][0]) for call in spark_client.conn.sql.call_args_list
-        ]
-
-        expected_calls = [
-            "DESCRIBE DETAIL test_table",
-            "CONVERT TO DELTA test_table",
-            """ALTER TABLE test_table SET TBLPROPERTIES
-                ('delta.enableChangeDataFeed' = 'true')""",
-        ]
-
-        for expected in expected_calls:
-            assert expected in actual_calls, f"Missing expected SQL call: {expected}"
+            actual_calls = [call[0][0].strip() for call in mock_sql.call_args_list]
+            for expected in expected_calls:
+                assert (
+                    expected in actual_calls
+                ), f"Missing expected SQL call: {expected}"
 
 
 class TestDeltaFeatureStoreWriter:
