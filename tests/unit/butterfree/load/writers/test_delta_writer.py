@@ -127,8 +127,7 @@ class TestDeltaWriter:
             expected_calls = [
                 "DESCRIBE DETAIL test_table",
                 "CONVERT TO DELTA test_table",
-                """ALTER TABLE test_table
-                    SET TBLPROPERTIES ('delta.enableChangeDataFeed' = 'true')""",
+                "ALTER TABLE test_table SET TBLPROPERTIES ('delta.enableChangeDataFeed' = 'true')",  # noqa
             ]
 
             actual_calls = [call[0][0].strip() for call in mock_sql.call_args_list]

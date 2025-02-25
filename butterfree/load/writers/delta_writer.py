@@ -50,8 +50,7 @@ class DeltaWriter:
         # Enable Change Data Feed
         logger.info(f"Enabling Change Data Feed for {table}...")
         client.conn.sql(
-            f"""ALTER TABLE {table}
-                SET TBLPROPERTIES ('delta.enableChangeDataFeed' = 'true')"""
+            f"ALTER TABLE {table} SET TBLPROPERTIES ('delta.enableChangeDataFeed' = 'true')"  # noqa
         )
         logger.info("Change Data Feed enabled.")
 
