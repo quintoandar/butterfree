@@ -95,6 +95,56 @@ class TestDeltaWriter:
             DeltaWriter().optimize(spark_client, table="test_table")
             mock_sql.assert_called_once_with("OPTIMIZE test_table")
 
+    def test_convert_to_delta_already_delta(self, spark_client):
+        schema = StructType([StructField("format", StringType(), False)])
+        mock_df = spark_client.conn.createDataFrame([("delta",)], schema=schema)
+
+        with mock.patch.object(
+            spark_client.conn, "sql", return_value=mock_df
+        ) as mock_sql:
+            DeltaWriter()._convert_to_delta(spark_client, "test_table")
+
+            mock_sql.assert_any_call("DESCRIBE DETAIL test_table")
+
+            # It should NOT call `CONVERT TO DELTA test_table`
+            mock_sql.assert_called()
+            calls = [call[0][0].strip() for call in mock_sql.call_args_list]
+            assert "CONVERT TO DELTA test_table" not in calls
+
+    def test_convert_to_delta_not_delta(self):
+
+        spark_client = mock.MagicMock()
+        spark_client.conn = mock.MagicMock(spec=SparkSession)
+
+        schema = StructType([StructField("format", StringType(), False)])
+        mock_df = spark_client.conn.createDataFrame([("parquet",)], schema=schema)
+
+        spark_client.conn.sql.side_effect = [
+            mock_df,
+            None,
+            None,
+        ]
+
+        DeltaWriter()._convert_to_delta(spark_client, "test_table")
+
+        # Normalize query formatting (fix whitespace mismatch)
+        def normalize_query(query):
+            return " ".join(query.split())
+
+        actual_calls = [
+            normalize_query(call[0][0]) for call in spark_client.conn.sql.call_args_list
+        ]
+
+        expected_calls = [
+            "DESCRIBE DETAIL test_table",
+            "CONVERT TO DELTA test_table",
+            """ALTER TABLE test_table SET TBLPROPERTIES
+                ('delta.enableChangeDataFeed' = 'true')""",
+        ]
+
+        for expected in expected_calls:
+            assert expected in actual_calls, f"Missing expected SQL call: {expected}"
+
 
 class TestDeltaFeatureStoreWriter:
     def test_write(self, spark_client, sample_dataframe):

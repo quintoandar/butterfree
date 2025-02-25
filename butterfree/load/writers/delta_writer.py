@@ -24,12 +24,28 @@ class DeltaWriter:
 
     @staticmethod
     def _convert_to_delta(client: SparkClient, table: str):
-        logger.info(f"Converting {table} to Delta...")
+        try:
+            provider = (
+                client.conn.sql(f"DESCRIBE DETAIL {table}")
+                .select("format")
+                .collect()[0][0]
+            )
+        except Exception:
+            provider = None
+
+        if provider == "delta":
+            logger.info(f"{table} is already a Delta table. Skipping conversion.")
+        else:
+            logger.info(f"Converting {table} to Delta...")
+            client.conn.sql(f"CONVERT TO DELTA {table}")
+            logger.info("Conversion completed.")
+
+        logger.info(f"Enabling Change Data Feed on {table}...")
         client.conn.sql(
             f"""ALTER TABLE {table} SET TBLPROPERTIES
                 ('delta.enableChangeDataFeed' = 'true')"""
         )
-        logger.info("Conversion done.")
+        logger.info("Change Data Feed enabled.")
 
     @staticmethod
     def merge(
