@@ -70,12 +70,10 @@ class TestDeltaWriter:
             ) as mock_delta_table,
             mock.patch.object(DeltaWriter, "_convert_to_delta") as mock_convert,  # noqa
         ):
-            # Mock table existence and describe
             spark_client.conn.catalog.tableExists = mock.MagicMock(return_value=True)
             mock_table = mock.MagicMock()
             mock_delta_table.return_value = mock_table
 
-            # Run merge
             DeltaWriter().merge(
                 client=spark_client,
                 database="test_db",
@@ -84,7 +82,6 @@ class TestDeltaWriter:
                 source_df=sample_dataframe,
             )
 
-            # Ensure DeltaTable.merge() was called
             mock_table.alias.assert_called_once_with("target")
             mock_table.alias.return_value.merge.assert_called_once()
 
@@ -112,7 +109,7 @@ class TestDeltaWriter:
 
             mock_sql.assert_any_call("DESCRIBE DETAIL test_table")
             calls = [call[0][0].strip() for call in mock_sql.call_args_list]
-            assert "CONVERT TO DELTA test_table" not in calls  # Ensure no conversion
+            assert "CONVERT TO DELTA test_table" not in calls
 
     def test_convert_to_delta_not_delta(self, spark_client):
         """Ensure conversion happens if table is NOT Delta."""
