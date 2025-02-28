@@ -1,4 +1,5 @@
 import logging
+from typing import List, Optional
 
 from delta.tables import DeltaTable
 from pyspark.sql.dataframe import DataFrame
@@ -23,21 +24,47 @@ class DeltaWriter:
 
     @staticmethod
     def _convert_to_delta(client: SparkClient, table: str):
-        logger.info(f"Converting {table} to Delta...")
-        client.conn.sql(f"CONVERT TO DELTA {table}")
-        logger.info("Conversion done.")
+        """Ensures the table is a Delta table, converting if necessary."""
+        try:
+            # Check if table is Delta
+            provider = (
+                client.conn.sql(f"DESCRIBE DETAIL {table}")
+                .select("format")
+                .collect()[0][0]
+            )
+        except Exception as e:
+            logger.error(f"Error checking table format: {e}")
+            raise ValueError(f"Table {table} not found or inaccessible.")
+
+        if provider == "delta":
+            logger.info(f"{table} is already a Delta table. Skipping conversion.")
+        elif provider == "parquet":
+            logger.info(f"Converting {table} to Delta...")
+            client.conn.sql(f"CONVERT TO DELTA {table}")
+            logger.info("Conversion complete.")
+        else:
+            raise ValueError(
+                f"Table {table} is of type {provider}. Cannot be converted to Delta."
+            )
+
+        # Enable Change Data Feed
+        logger.info(f"Enabling Change Data Feed for {table}...")
+        client.conn.sql(
+            f"ALTER TABLE {table} SET TBLPROPERTIES ('delta.enableChangeDataFeed' = 'true')"  # noqa
+        )
+        logger.info("Change Data Feed enabled.")
 
     @staticmethod
     def merge(
         client: SparkClient,
         database: str,
         table: str,
-        merge_on: list,
+        merge_on: List[str],
         source_df: DataFrame,
-        when_not_matched_insert_condition: str = None,
-        when_matched_update_condition: str = None,
-        when_matched_delete_condition: str = None,
-    ):
+        when_not_matched_insert: Optional[str] = None,
+        when_matched_update: Optional[str] = None,
+        when_matched_delete: Optional[str] = None,
+    ) -> None:
         """
         Merge a source dataframe to a Delta table.
 
@@ -45,61 +72,54 @@ class DeltaWriter:
         not matched (simple upsert).
 
         You can change this behavior by setting:
-        - when_not_matched_insert_condition: it will only insert
+        - when_not_matched_insert: it will only insert
             when this specified condition is true
-        - when_matched_update_condition: it will only update when this
+        - when_matched_update: it will only update when this
             specified condition is true. You can refer to the columns
         in the source dataframe as source.<column_name>, and the columns
             in the target table as target.<column_name>.
-        - when_matched_delete_condition: it will add an operation to delete,
+        - when_matched_delete: it will add an operation to delete,
             but only if this condition is true. Again, source and
             target dataframe columns can be referred to respectively as
             source.<column_name> and target.<column_name>
         """
-        try:
-            full_table_name = DeltaWriter._get_full_table_name(table, database)
+        """Merge a source dataframe to a Delta table."""
+        full_table_name = DeltaWriter._get_full_table_name(table, database)
 
-            table_exists = client.conn.catalog.tableExists(full_table_name)
+        table_exists = client.conn.catalog.tableExists(full_table_name)
 
-            if table_exists:
-                pd_df = client.conn.sql(
-                    f"DESCRIBE TABLE EXTENDED {full_table_name}"
-                ).toPandas()
-                provider = (
-                    pd_df.reset_index()
-                    .groupby(["col_name"])["data_type"]
-                    .aggregate("first")
-                    .Provider
-                )
-                table_is_delta = provider.lower() == "delta"
+        if table_exists:
+            pd_df = client.conn.sql(
+                f"DESCRIBE TABLE EXTENDED {full_table_name}"
+            ).toPandas()
+            provider = (
+                pd_df.reset_index()
+                .groupby(["col_name"])["data_type"]
+                .aggregate("first")
+                .Provider
+            )
+            table_is_delta = provider.lower() == "delta"
 
-                if not table_is_delta:
-                    DeltaWriter()._convert_to_delta(client, full_table_name)
+            if not table_is_delta:
+                DeltaWriter()._convert_to_delta(client, full_table_name)
 
-            # For schema evolution
-            client.conn.conf.set(
-                "spark.databricks.delta.schema.autoMerge.enabled", "true"
+        # For schema evolution
+        client.conn.conf.set("spark.databricks.delta.schema.autoMerge.enabled", "true")
+
+        target_table = DeltaTable.forName(client.conn, full_table_name)
+        join = " AND ".join([f"source.{col} = target.{col}" for col in merge_on])
+        merge_builder = target_table.alias("target").merge(
+            source_df.alias("source"), join
+        )
+
+        if when_matched_delete:
+            merge_builder = merge_builder.whenMatchedDelete(
+                condition=when_matched_delete
             )
 
-            target_table = DeltaTable.forName(client.conn, full_table_name)
-            join_condition = " AND ".join(
-                [f"source.{col} = target.{col}" for col in merge_on]
-            )
-            merge_builder = target_table.alias("target").merge(
-                source_df.alias("source"), join_condition
-            )
-            if when_matched_delete_condition:
-                merge_builder = merge_builder.whenMatchedDelete(
-                    condition=when_matched_delete_condition
-                )
-
-            merge_builder.whenMatchedUpdateAll(
-                condition=when_matched_update_condition
-            ).whenNotMatchedInsertAll(
-                condition=when_not_matched_insert_condition
-            ).execute()
-        except Exception as e:
-            logger.error(f"Merge operation on {full_table_name} failed: {e}")
+        merge_builder.whenMatchedUpdateAll(
+            condition=when_matched_update
+        ).whenNotMatchedInsertAll(condition=when_not_matched_insert).execute()
 
     @staticmethod
     def vacuum(table: str, retention_hours: int, client: SparkClient):
