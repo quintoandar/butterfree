@@ -3,6 +3,18 @@ All notable changes to this project will be documented in this file.
 
 Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each release or unreleased log for a better organization.
 
+## [1.6.0](https://github.com/quintoandar/butterfree/compare/1.5.0...1.6.0) (2025-02-28)
+
+
+### Features
+
+* **MLOP-2604:** Create delta writer ([#410](https://github.com/quintoandar/butterfree/issues/410)) ([98c0878](https://github.com/quintoandar/butterfree/commit/98c08785e1d542e6038f381bae5681611e542a41))
+
+
+### Bug Fixes
+
+* testing ([cc1ad97](https://github.com/quintoandar/butterfree/commit/cc1ad971e42f2d0bd6df74b0b0da1bc61bc5b22c))
+
 ## [1.5.0](https://github.com/quintoandar/butterfree/releases/tag/1.5.0)
 * Fix releasing process
 
