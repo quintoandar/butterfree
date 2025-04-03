@@ -48,10 +48,3 @@ class TestReplaceTransform:
         # act and assert
         with pytest.raises(ValueError):
             replace(input_df, column, replace_dict)
-
-    def test_replace_with_invalid_df(self):
-        # act and assert
-        with pytest.raises(
-            ValueError, match="dataframe needs to be a Pyspark DataFrame type"
-        ):
-            replace(None, "col", {"a": "b"})

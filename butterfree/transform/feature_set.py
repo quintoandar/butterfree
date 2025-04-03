@@ -425,9 +425,6 @@ class FeatureSet(HookableComponent):
             Spark dataframe with all the feature columns.
 
         """
-        if not isinstance(dataframe, DataFrame):
-            raise ValueError("source_df must be a dataframe")
-
         pre_hook_df = self.run_pre_hooks(dataframe)
 
         output_df = reduce(
