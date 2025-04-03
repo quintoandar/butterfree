@@ -18,5 +18,6 @@ def extract_partition_values(
         distinct partition values.
     """
     return [
-        row.asDict() for row in dataframe.select(*partition_columns).distinct().collect()
+        row.asDict()
+        for row in dataframe.select(*partition_columns).distinct().collect()
     ]
