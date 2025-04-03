@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file.
 
 Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each release or unreleased log for a better organization.
 
+## [1.7.1](https://github.com/quintoandar/butterfree/compare/1.7.0...1.7.1) (2025-04-03)
+
+
+### Bug Fixes
+
+* **mlop-2726:** removing the last unecessary validation ([#413](https://github.com/quintoandar/butterfree/issues/413)) ([9646959](https://github.com/quintoandar/butterfree/commit/9646959e1dee3d213c457bc8896f6d7c0c5332b5))
+
 ## [1.7.0](https://github.com/quintoandar/butterfree/compare/1.6.0...1.7.0) (2025-04-03)
 
 
