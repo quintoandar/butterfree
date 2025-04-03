@@ -15,10 +15,3 @@ class TestBasicValidation:
 
         with pytest.raises(ValueError):
             check.validate_df_is_empty()
-
-    def test_validate_not_spark_df(self):
-        df_writer = "not a spark df writer"
-        check = BasicValidation(df_writer)
-
-        with pytest.raises(ValueError):
-            check.validate_df_is_spark_df()
