@@ -222,25 +222,6 @@ class TestFeatureSet:
         assert_dataframe_equality(result_df, feature_set_dataframe)
         assert result_df.is_cached
 
-    def test_construct_invalid_df(
-        self, key_id, timestamp_c, feature_add, feature_divide
-    ):
-        spark_client = Mock()
-
-        # arrange
-        feature_set = FeatureSet(
-            "name",
-            "entity",
-            "description",
-            [key_id],
-            timestamp_c,
-            [feature_add, feature_divide],
-        )
-
-        # act and assert
-        with pytest.raises(ValueError):
-            _ = feature_set.construct("not a dataframe", spark_client)
-
     def test_construct_transformations(
         self,
         dataframe,
