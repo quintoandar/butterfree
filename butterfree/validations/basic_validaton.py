@@ -26,7 +26,6 @@ class BasicValidation(Validation):
             ValueError: if any of the verifications fail
 
         """
-        self.validate_df_is_spark_df()
         self.validate_column_ts()
         self.validate_df_is_empty()
 
@@ -53,17 +52,3 @@ class BasicValidation(Validation):
             raise ValueError("DataFrame can't be None.")
         if (not self.dataframe.isStreaming) and self.dataframe.rdd.isEmpty():
             raise ValueError("DataFrame can't be empty.")
-
-    def validate_df_is_spark_df(self) -> None:
-        """Check type of dataframe object.
-
-        Raises:
-            ValueError: if dataframe is not instance of pyspark.sql.DataFrame.
-
-        """
-        if not self.dataframe:
-            raise ValueError("DataFrame can't be None.")
-        if not isinstance(self.dataframe, DataFrame):
-            raise ValueError(
-                "dataframe needs to be a instance of pyspark.sql.DataFrame"
-            )

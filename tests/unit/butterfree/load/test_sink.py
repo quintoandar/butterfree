@@ -90,28 +90,6 @@ class TestSink:
         for w in writer:
             w.write.assert_called_once()
 
-    def test_flush_with_invalid_df(self, not_feature_set_dataframe, mocker):
-        # given
-        spark_client = SparkClient()
-        writer = [
-            HistoricalFeatureStoreWriter(),
-            OnlineFeatureStoreWriter(),
-        ]
-        feature_set = mocker.stub("feature_set")
-        feature_set.entity = "house"
-        feature_set.name = "test"
-
-        # when
-        sink = Sink(writers=writer)
-
-        # then
-        with pytest.raises(ValueError):
-            sink.flush(
-                dataframe=not_feature_set_dataframe,
-                feature_set=feature_set,
-                spark_client=spark_client,
-            )
-
     def test_flush_with_writers_list_empty(self):
         # given
         writer = []
