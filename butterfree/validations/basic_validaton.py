@@ -48,7 +48,15 @@ class BasicValidation(Validation):
             ValueError: if dataframe is empty and is not streaming.
 
         """
+
+        def is_empty(dataframe):
+            if getattr(dataframe, "isEmpty"):
+                # pyspark >= 3.4
+                return dataframe.isEmpty()
+            # pyspark < 3.4
+            return dataframe.rdd.isEmpty()
+
         if not self.dataframe:
             raise ValueError("DataFrame can't be None.")
-        if (not self.dataframe.isStreaming) and self.dataframe.rdd.isEmpty():
+        if (not self.dataframe.isStreaming) and is_empty(self.dataframe):
             raise ValueError("DataFrame can't be empty.")
