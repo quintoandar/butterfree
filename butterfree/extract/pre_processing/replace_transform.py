@@ -46,8 +46,6 @@ def replace(
         Dataframe with column values replaced.
 
     """
-    if not isinstance(dataframe, DataFrame):
-        raise ValueError("dataframe needs to be a Pyspark DataFrame type")
     if (column not in dict(dataframe.dtypes)) or (
         dict(dataframe.dtypes)[column] != "string"
     ):

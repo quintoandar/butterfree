@@ -566,9 +566,6 @@ class AggregatedFeatureSet(FeatureSet):
                 "When using aggregate with windows, one must give end_date."
             )
 
-        if not isinstance(dataframe, DataFrame):
-            raise ValueError("source_df must be a dataframe")
-
         pre_hook_df = self.run_pre_hooks(dataframe)
 
         output_df = reduce(
