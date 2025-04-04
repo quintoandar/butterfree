@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file.
 
 Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each release or unreleased log for a better organization.
 
+## [1.7.2](https://github.com/quintoandar/butterfree/compare/1.7.1...1.7.2) (2025-04-04)
+
+
+### Bug Fixes
+
+* remove rdd dependency ([#415](https://github.com/quintoandar/butterfree/issues/415)) ([0c5a471](https://github.com/quintoandar/butterfree/commit/0c5a471a89ddaac57318d5da5bc0fc56b86c88ff))
+
 ## [1.7.1](https://github.com/quintoandar/butterfree/compare/1.7.0...1.7.1) (2025-04-03)
 
 
