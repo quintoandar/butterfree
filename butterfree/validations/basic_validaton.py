@@ -1,8 +1,10 @@
 """Validation implementing basic checks over the dataframe."""
 
-from typing import Optional, Union
+from typing import TYPE_CHECKING, Optional, Union
 
-from pyspark.sql.connect.dataframe import DataFrame as ConnectDataFrame
+if TYPE_CHECKING:
+    from pyspark.sql.connect.dataframe import DataFrame as ConnectDataFrame
+
 from pyspark.sql.dataframe import DataFrame
 
 from butterfree.constants.columns import TIMESTAMP_COLUMN
@@ -17,7 +19,9 @@ class BasicValidation(Validation):
 
     """
 
-    def __init__(self, dataframe: Optional[Union[ConnectDataFrame, DataFrame]] = None):
+    def __init__(
+        self, dataframe: Optional[Union["ConnectDataFrame", DataFrame]] = None
+    ):
         super().__init__(dataframe)
 
     def check(self) -> None:
