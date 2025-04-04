@@ -17,9 +17,7 @@ def extract_partition_values(
     Returns:
         distinct partition values.
     """
-    return (
-        dataframe.select(*partition_columns)
-        .distinct()
-        .rdd.map(lambda row: row.asDict(True))
-        .collect()
-    )
+    return [
+        row.asDict()
+        for row in dataframe.select(*partition_columns).distinct().collect()
+    ]

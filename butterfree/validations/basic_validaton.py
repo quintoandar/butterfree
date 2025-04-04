@@ -1,6 +1,9 @@
 """Validation implementing basic checks over the dataframe."""
 
-from typing import Optional
+from typing import TYPE_CHECKING, Optional, Union
+
+if TYPE_CHECKING:
+    from pyspark.sql.connect.dataframe import DataFrame as ConnectDataFrame
 
 from pyspark.sql.dataframe import DataFrame
 
@@ -16,7 +19,9 @@ class BasicValidation(Validation):
 
     """
 
-    def __init__(self, dataframe: Optional[DataFrame] = None):
+    def __init__(
+        self, dataframe: Optional[Union["ConnectDataFrame", DataFrame]] = None
+    ):
         super().__init__(dataframe)
 
     def check(self) -> None:
@@ -41,6 +46,13 @@ class BasicValidation(Validation):
         if TIMESTAMP_COLUMN not in self.dataframe.columns:
             raise ValueError(f"DataFrame must have a '{TIMESTAMP_COLUMN}' column.")
 
+    def _is_empty(self) -> bool:
+        if hasattr(self.dataframe, "isEmpty"):
+            # pyspark >= 3.4
+            return self.dataframe.isEmpty()
+        # pyspark < 3.4
+        return self.dataframe.rdd.isEmpty()
+
     def validate_df_is_empty(self) -> None:
         """Check dataframe emptiness.
 
@@ -48,7 +60,8 @@ class BasicValidation(Validation):
             ValueError: if dataframe is empty and is not streaming.
 
         """
+
         if not self.dataframe:
             raise ValueError("DataFrame can't be None.")
-        if (not self.dataframe.isStreaming) and self.dataframe.rdd.isEmpty():
+        if (not self.dataframe.isStreaming) and self._is_empty():
             raise ValueError("DataFrame can't be empty.")

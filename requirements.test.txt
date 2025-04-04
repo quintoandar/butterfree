@@ -3,3 +3,4 @@ pytest-cov==2.8.1
 pytest-xdist==1.31.0
 pytest-mock==2.0.0
 pytest-spark==0.6.0
+pyspark[connect]==3.5.1
