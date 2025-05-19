@@ -8,3 +8,4 @@ typing-extensions>3.7.4,<5
 boto3==1.35.*
 numpy==1.26.4
 delta-spark==3.2.0
+pydantic
