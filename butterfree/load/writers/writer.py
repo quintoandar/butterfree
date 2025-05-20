@@ -2,14 +2,38 @@
 
 from abc import ABC, abstractmethod
 from functools import reduce
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Literal, Optional
 
+from pydantic import BaseModel, Field
 from pyspark.sql.dataframe import DataFrame
 
 from butterfree.clients import SparkClient
 from butterfree.configs.db import AbstractWriteConfig
 from butterfree.hooks import HookableComponent
 from butterfree.transform import FeatureSet
+
+
+class BaseWriterMetadata(BaseModel):
+    """Base metadata model for Writer.
+
+    This model represents the base metadata for all writers,
+    including common configuration and settings.
+    """
+
+    type: Literal[
+        "OnlineFeatureStoreWriter",
+        "HistoricalFeatureStoreWriter",
+    ] = Field(..., description="Type of the writer")
+    interval_mode: bool = Field(
+        ..., description="Whether the writer operates in interval mode"
+    )
+    write_to_entity: bool = Field(
+        ..., description="Whether the writer writes to an entity table"
+    )
+    db_config: str = Field(
+        ..., description="Name of the database configuration class used"
+    )
+    database: Optional[str] = Field(None, description="The database name")
 
 
 class Writer(ABC, HookableComponent):
@@ -122,3 +146,23 @@ class Writer(ABC, HookableComponent):
             AssertionError: if validation fails.
 
         """
+
+    def get_metadata(self) -> BaseWriterMetadata:
+        """Get the writer's metadata as a Pydantic model.
+
+        This method creates a standardized representation of writer metadata
+        that can be used for documentation, validation, and serialization purposes.
+
+        Returns:
+            A BaseWriterMetadata model containing the writer's metadata
+        """
+
+        writer_metadata = {
+            "type": self.__class__.__name__,
+            "interval_mode": self.interval_mode,
+            "write_to_entity": self.write_to_entity,
+            "db_config": self.db_config.__class__.__name__,
+            "database": getattr(self, "database", None),
+        }
+
+        return BaseWriterMetadata(**writer_metadata)
