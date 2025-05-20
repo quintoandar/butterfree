@@ -117,3 +117,11 @@ class FileReader(Reader):
             path=self.path,
             **self.options,
         )
+
+    def _get_reader_specific_metadata(self) -> dict:
+        """Get FileReader specific metadata for @FileReaderMetadata class.
+
+        Returns:
+            A dictionary containing FileReader specific metadata
+        """
+        return {"path": self.path, "format": self.format}

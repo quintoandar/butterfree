@@ -182,3 +182,11 @@ class KafkaReader(Reader):
 
         # apply schema defined in self.value_schema
         return self._struct_df(raw_df)
+
+    def _get_reader_specific_metadata(self) -> dict:
+        """Get KafkaReader specific metadata for @KafkaReaderMetadata class.
+
+        Returns:
+            A dictionary containing KafkaReader specific metadata
+        """
+        return {"topic": self.topic}

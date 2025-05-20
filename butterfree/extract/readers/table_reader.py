@@ -66,3 +66,11 @@ class TableReader(Reader):
 
         """
         return client.read_table(self.table, self.database)
+
+    def _get_reader_specific_metadata(self) -> dict:
+        """Get TableReader specific metadata for @TableReaderMetadata class.
+
+        Returns:
+            A dictionary containing TableReader specific metadata
+        """
+        return {"table": self.table, "database": self.database}
