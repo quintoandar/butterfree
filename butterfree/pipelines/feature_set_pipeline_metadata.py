@@ -40,7 +40,7 @@ class Catalog(BaseModel):
     columns: List[Column] = Field(..., description="A list of column definitions")
 
 
-class FeatureSetPipelineMetadata(BaseModel):
+class Metadata(BaseModel):
     """Metadata model for a feature set pipeline.
 
     This model represents the complete metadata of a feature set pipeline,
@@ -156,9 +156,7 @@ class FeatureSetPipelineMetadata(BaseModel):
         ]
 
     @classmethod
-    def from_feature_set(
-        cls, feature_set_pipeline: FeatureSetPipeline
-    ) -> "FeatureSetPipelineMetadata":
+    def from_pipeline(cls, feature_set_pipeline: FeatureSetPipeline) -> "Metadata":
         """Create a FeatureSetPipelineMetadata from a FeatureSetPipeline.
 
         Args:

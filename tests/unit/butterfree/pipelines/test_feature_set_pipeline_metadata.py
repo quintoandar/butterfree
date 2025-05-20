@@ -9,11 +9,7 @@ from butterfree.load.writers.historical_feature_store_writer import (
 )
 from butterfree.load.writers.online_feature_store_writer import OnlineFeatureStoreWriter
 from butterfree.pipelines import FeatureSetPipeline
-from butterfree.pipelines.feature_set_pipeline_metadata import (
-    Catalog,
-    Column,
-    FeatureSetPipelineMetadata,
-)
+from butterfree.pipelines.feature_set_pipeline_metadata import Catalog, Column, Metadata
 from butterfree.transform.aggregated_feature_set import AggregatedFeatureSet
 from butterfree.transform.features.feature import Feature
 from butterfree.transform.features.key_feature import KeyFeature
@@ -32,9 +28,7 @@ class TestFeatureSetPipelineMetadata:
         feature_set_pipeline.feature_set = feature_set
 
         # When
-        result = FeatureSetPipelineMetadata._get_windows_definition(
-            feature_set_pipeline
-        )
+        result = Metadata._get_windows_definition(feature_set_pipeline)
 
         # Then
         assert result == ["30 days", "60 days"]
@@ -46,9 +40,7 @@ class TestFeatureSetPipelineMetadata:
         feature_set_pipeline.feature_set = feature_set
 
         # When
-        result = FeatureSetPipelineMetadata._get_windows_definition(
-            feature_set_pipeline
-        )
+        result = Metadata._get_windows_definition(feature_set_pipeline)
 
         # Then
         assert result is None
@@ -60,7 +52,7 @@ class TestFeatureSetPipelineMetadata:
         feature_set_pipeline.source.readers = [reader]
 
         # When
-        result = FeatureSetPipelineMetadata._is_incremental(feature_set_pipeline)
+        result = Metadata._is_incremental(feature_set_pipeline)
 
         # Then
         assert result is True
@@ -72,7 +64,7 @@ class TestFeatureSetPipelineMetadata:
         feature_set_pipeline.source.readers = [reader]
 
         # When
-        result = FeatureSetPipelineMetadata._is_incremental(feature_set_pipeline)
+        result = Metadata._is_incremental(feature_set_pipeline)
 
         # Then
         assert result is False
@@ -137,10 +129,10 @@ class TestFeatureSetPipelineMetadata:
         feature_set_pipeline.feature_set.description = description
 
         # When
-        metadata = FeatureSetPipelineMetadata.from_feature_set(feature_set_pipeline)
+        metadata = Metadata.from_pipeline(feature_set_pipeline)
 
         # Then
-        assert metadata == FeatureSetPipelineMetadata(
+        assert metadata == Metadata(
             feature_set_pipeline=feature_set_pipeline,
             is_incremental=True,
             readers=[
