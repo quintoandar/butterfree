@@ -190,6 +190,9 @@ class AggregatedFeatureSet(FeatureSet):
     timestamp column.
     """
 
+    # TODO: _windows must be a required field
+    # TODO: If one reader is incremental, the historical writer must be incremental
+
     def __init__(
         self,
         name: str,
