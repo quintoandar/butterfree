@@ -1,5 +1,7 @@
-"""Reader metadata entities. Created here to avoid circular imports since the
-readers are imported in the pipelines module (__init__.py).
+"""Reader metadata entities.
+
+Created here to avoid circular imports since the readers are imported in the
+pipelines module (__init__.py).
 """
 
 from pydantic import BaseModel, Field
