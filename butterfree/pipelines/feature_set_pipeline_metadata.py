@@ -2,7 +2,6 @@ from typing import List, Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field, field_serializer
 
-from butterfree.constants import DataType
 from butterfree.extract.readers.reader import BaseReaderMetadata
 from butterfree.load.writers.writer import BaseWriterMetadata
 from butterfree.pipelines import FeatureSetPipeline
@@ -19,17 +18,20 @@ class Column(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     name: str = Field(..., description="The name of the column")
-    data_type: DataType = Field(
-        ..., description="The data type of the column (e.g., string, integer)"
+    data_type: str = Field(
+        ...,
+        description=(
+            "The data type of the column (e.g., StringType, IntegerType) represented by pyspark.sql.types"  # noqa: E501
+        ),
+    )
+    description: str = Field(
+        ...,
+        description="The description of the column",
     )
     primary_key: bool = Field(
         ...,
         description="Whether the column is a primary (or partition if it's a Cassandra table) key",  # noqa: E501
     )
-
-    @field_serializer("data_type")
-    def serialize_data_type(self, data_type: DataType) -> str:
-        return data_type.name
 
 
 class Catalog(BaseModel):
@@ -68,9 +70,6 @@ class Metadata(BaseModel):
     )
     windows_definition: Optional[List[str]] = Field(
         None, description="The definition of the windows for the feature set"
-    )
-    key_features: List[Column] = Field(
-        ..., description="The key features of the feature set"
     )
     readers: List[BaseReaderMetadata] = Field(
         ..., description="A list of data sources required to generate the feature set"
@@ -117,19 +116,26 @@ class Metadata(BaseModel):
         Returns:
             A Catalog instance with feature set metadata.
         """
+
+        # This method already deals with the colums name transformation
+        catalog_schema = feature_set_pipeline.feature_set.get_schema()
+
+        columns = [
+            Column(
+                name=column["column_name"],
+                data_type=column[
+                    "type"
+                ].__class__.__name__,  # The get_schema method returns pyspark.sql.types
+                description=column["description"],
+                primary_key=column["primary_key"],
+            )
+            for column in catalog_schema
+        ]
+
         return Catalog(
             feature_set_name=feature_set_pipeline.feature_set.name,
             description=feature_set_pipeline.feature_set.description,
-            columns=[
-                Column(
-                    name=feature.name,
-                    data_type=feature.dtype,
-                    primary_key=(
-                        True if feature.__class__.__name__ == "KeyFeature" else False
-                    ),
-                )
-                for feature in feature_set_pipeline.feature_set.features
-            ],
+            columns=columns,
         )
 
     @classmethod
@@ -178,7 +184,6 @@ class Metadata(BaseModel):
         is_incremental = cls._is_incremental(feature_set_pipeline)
         windows_definition = cls._get_windows_definition(feature_set_pipeline)
         catalog = cls._create_catalog(feature_set_pipeline)
-        key_features = cls._get_key_features(feature_set_pipeline)
 
         return cls(
             feature_set_pipeline=feature_set_pipeline,
@@ -188,7 +193,6 @@ class Metadata(BaseModel):
             ],
             catalog=catalog,
             entity=feature_set_pipeline.feature_set.entity,
-            key_features=key_features,
             writers=[
                 writer.get_metadata() for writer in feature_set_pipeline.sink.writers
             ],

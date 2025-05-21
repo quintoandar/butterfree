@@ -271,6 +271,7 @@ class FeatureSet(HookableComponent):
                         "column_name": c,
                         "type": f.dtype.spark,
                         "primary_key": True if isinstance(f, KeyFeature) else False,
+                        "description": f.description,
                     }
                 )
 
@@ -286,8 +287,14 @@ class FeatureSet(HookableComponent):
                 type = [f.dtype.spark]
 
             for n, dt in zip(name, type):
-                schema.append({"column_name": n, "type": dt, "primary_key": False})
-
+                schema.append(
+                    {
+                        "column_name": n,
+                        "type": dt,
+                        "primary_key": False,
+                        "description": f.description,
+                    }
+                )
         return schema
 
     @staticmethod
