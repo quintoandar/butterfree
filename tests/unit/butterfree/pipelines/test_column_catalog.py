@@ -78,13 +78,13 @@ class TestCatalog:
 
         # When
         catalog = Catalog(
-            name=name,
+            feature_set_name=name,
             description=description,
             columns=columns,
         )
 
         # Then
-        assert catalog.name == name
+        assert catalog.feature_set_name == name
         assert catalog.description == description
         assert len(catalog.columns) == 3
         assert catalog.columns[0].name == "user_id"
@@ -108,7 +108,7 @@ class TestCatalog:
         # Test missing description
         with pytest.raises(ValidationError) as exc_info:
             Catalog(
-                name="user_features",
+                feature_set_name="user_features",
                 columns=[
                     Column(name="user_id", data_type=DataType.STRING, primary_key=True)
                 ],
@@ -118,7 +118,7 @@ class TestCatalog:
         # Test missing columns
         with pytest.raises(ValidationError) as exc_info:
             Catalog(
-                name="user_features",
+                feature_set_name="user_features",
                 description="User related features",
             )
         assert "columns" in str(exc_info.value)
@@ -139,7 +139,7 @@ class TestCatalog:
         # When/Then
         with pytest.raises(ValidationError) as exc_info:
             Catalog(
-                name=name,
+                feature_set_name=name,
                 description=description,
                 columns=columns,
             )

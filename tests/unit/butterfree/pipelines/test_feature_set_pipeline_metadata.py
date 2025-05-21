@@ -139,7 +139,7 @@ class TestFeatureSetPipelineMetadata:
                 reader.get_metadata() for reader in feature_set_pipeline.source.readers
             ],
             catalog=Catalog(
-                name=feature_set_pipeline.feature_set.name,
+                feature_set_name=feature_set_pipeline.feature_set.name,
                 description=feature_set_pipeline.feature_set.description,
                 columns=[
                     Column(

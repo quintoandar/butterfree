@@ -1,6 +1,6 @@
 from typing import List, Literal, Optional
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_serializer
 
 from butterfree.constants import DataType
 from butterfree.extract.readers.reader import BaseReaderMetadata
@@ -27,6 +27,10 @@ class Column(BaseModel):
         description="Whether the column is a primary (or partition if it's a Cassandra table) key",  # noqa: E501
     )
 
+    @field_serializer("data_type")
+    def serialize_data_type(self, data_type: DataType) -> str:
+        return data_type.name
+
 
 class Catalog(BaseModel):
     """Metadata model for a feature set catalog.
@@ -35,7 +39,7 @@ class Catalog(BaseModel):
     including its name, description, and column definitions.
     """
 
-    name: str = Field(..., description="The name of the Feature Set")
+    feature_set_name: str = Field(..., description="The name of the Feature Set")
     description: str = Field(..., description="The description of the Feature Set")
     columns: List[Column] = Field(..., description="A list of column definitions")
 
@@ -47,34 +51,39 @@ class Metadata(BaseModel):
     including its configuration, data sources, output schema, and processing details.
     """
 
+    # To accept arbitrary types like FeatureSetPipeline
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     feature_set_pipeline: FeatureSetPipeline = Field(
         ..., description="The feature set pipeline to create metadata from"
     )
-    is_incremental: bool = Field(
-        ..., description="The strategy for data generation (incremental or batch)"
-    )
-    readers: List[BaseReaderMetadata] = Field(
-        ..., description="A list of data sources required to generate the feature set"
-    )
-    catalog: Catalog = Field(..., description="Metadata about the feature set's output")
     entity: str = Field(
         ..., description="The entity type associated with the feature set"
     )
-    key_features: List[Column] = Field(
-        ..., description="The key features of the feature set"
+    is_incremental: bool = Field(
+        ..., description="The strategy for data generation (incremental or batch)"
     )
-    writers: List[BaseWriterMetadata] = Field(
-        ..., description="The writers to be used for the feature set"
-    )
-
     feature_set_type: Literal["FeatureSet", "AggregatedFeatureSet"] = Field(
         ..., description="The type of feature set"
     )
     windows_definition: Optional[List[str]] = Field(
         None, description="The definition of the windows for the feature set"
     )
+    key_features: List[Column] = Field(
+        ..., description="The key features of the feature set"
+    )
+    readers: List[BaseReaderMetadata] = Field(
+        ..., description="A list of data sources required to generate the feature set"
+    )
+    writers: List[BaseWriterMetadata] = Field(
+        ..., description="The writers to be used for the feature set"
+    )
+    catalog: Catalog = Field(..., description="Metadata about the feature set's output")
+
+    @field_serializer("feature_set_pipeline")
+    def serialize_feature_set_pipeline(self, pipeline: FeatureSetPipeline) -> str:
+        """Serialize feature_set_pipeline to its class name."""
+        return pipeline.__class__.__name__
 
     @classmethod
     def _get_windows_definition(
@@ -109,7 +118,7 @@ class Metadata(BaseModel):
             A Catalog instance with feature set metadata.
         """
         return Catalog(
-            name=feature_set_pipeline.feature_set.name,
+            feature_set_name=feature_set_pipeline.feature_set.name,
             description=feature_set_pipeline.feature_set.description,
             columns=[
                 Column(
