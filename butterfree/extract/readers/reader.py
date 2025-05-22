@@ -2,14 +2,13 @@
 
 from abc import ABC, abstractmethod
 from functools import reduce
-from typing import Any, Callable, Dict, List, Optional, Type
+from typing import Any, Callable, Dict, List, Optional, Union
 
 from pyspark.sql import DataFrame
 
 from butterfree.clients import SparkClient
 from butterfree.dataframe_service import IncrementalStrategy
 from butterfree.extract.readers.reader_metadata import (
-    BaseReaderMetadata,
     FileReaderMetadata,
     KafkaReaderMetadata,
     TableReaderMetadata,
@@ -146,7 +145,9 @@ class Reader(ABC, HookableComponent):
             df,
         )
 
-    def get_metadata(self) -> BaseReaderMetadata:
+    def build_metadata(
+        self,
+    ) -> Union[FileReaderMetadata, KafkaReaderMetadata, TableReaderMetadata]:
         """Get the reader's metadata as a Pydantic model.
 
         This method creates a standardized representation of reader metadata
@@ -157,36 +158,25 @@ class Reader(ABC, HookableComponent):
         Returns:
             A BaseReaderMetadata model containing the reader's metadata
         """
-        reader_type_map: Dict[str, Type[BaseReaderMetadata]] = {
+        reader_type_map = {
             "FileReader": FileReaderMetadata,
             "KafkaReader": KafkaReaderMetadata,
             "TableReader": TableReaderMetadata,
         }
 
-        reader_type = self._get_reader_type()
+        reader_type = self.__class__.__name__
 
         reader_metadata = {
-            "id": self.id,
             "type": reader_type,
             "incremental_strategy": self.incremental_strategy is not None,
-            "stream": getattr(self, "stream", False),
             **self._get_reader_specific_metadata(),
         }
 
-        config_model = reader_type_map.get(reader_type)
-        if not config_model:
-            raise ValueError(f"No metadata model found for reader type: {reader_type}")
+        config_model = reader_type_map[reader_type]
 
         return config_model(**reader_metadata)
 
-    def _get_reader_type(self) -> str:
-        """Get the standardized reader type name.
-
-        Returns:
-            A string representing the reader type (FileReader, KafkaReader, or TableReader)  # noqa: E501
-        """
-        return self.__class__.__name__
-
+    @abstractmethod
     def _get_reader_specific_metadata(self) -> dict:
         """Get reader-specific metadata.
 
@@ -196,4 +186,3 @@ class Reader(ABC, HookableComponent):
         Returns:
             A dictionary containing reader-specific metadata
         """
-        return {}
