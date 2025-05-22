@@ -105,27 +105,41 @@ class TestAggregatedFeatureSet:
 
     def test_get_schema(self, agg_feature_set):
         expected_schema = [
-            {"column_name": "id", "type": LongType(), "primary_key": True},
-            {"column_name": "timestamp", "type": TimestampType(), "primary_key": False},
+            {
+                "column_name": "id",
+                "type": LongType(),
+                "primary_key": True,
+                "description": "description",
+            },
+            {
+                "column_name": "timestamp",
+                "type": TimestampType(),
+                "primary_key": False,
+                "description": "Time tag for the state of all features.",
+            },
             {
                 "column_name": "feature1__avg_over_1_week_rolling_windows",
                 "type": DoubleType(),
                 "primary_key": False,
+                "description": "test",
             },
             {
                 "column_name": "feature1__avg_over_2_days_rolling_windows",
                 "type": DoubleType(),
                 "primary_key": False,
+                "description": "test",
             },
             {
                 "column_name": "feature2__avg_over_1_week_rolling_windows",
                 "type": DoubleType(),
                 "primary_key": False,
+                "description": "test",
             },
             {
                 "column_name": "feature2__avg_over_2_days_rolling_windows",
                 "type": DoubleType(),
                 "primary_key": False,
+                "description": "test",
             },
         ]
 
