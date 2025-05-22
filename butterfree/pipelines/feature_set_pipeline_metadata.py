@@ -1,9 +1,14 @@
-from typing import List, Literal, Optional
+from typing import List, Literal, Optional, Union
 
 from pydantic import BaseModel, ConfigDict, Field, field_serializer
+from typing_extensions import Annotated
 
-from butterfree.extract.readers.reader import BaseReaderMetadata
-from butterfree.load.writers.writer import BaseWriterMetadata
+from butterfree.extract.readers.reader import (
+    FileReaderMetadata,
+    KafkaReaderMetadata,
+    TableReaderMetadata,
+)
+from butterfree.load.writers.writer import WriterMetadata
 from butterfree.pipelines import FeatureSetPipeline
 from butterfree.transform.aggregated_feature_set import AggregatedFeatureSet
 
@@ -71,10 +76,19 @@ class Metadata(BaseModel):
     windows_definition: Optional[List[str]] = Field(
         None, description="The definition of the windows for the feature set"
     )
-    readers: List[BaseReaderMetadata] = Field(
-        ..., description="A list of data sources required to generate the feature set"
+
+    # Required for correct serialization using Union
+    readers: List[
+        Annotated[
+            Union[FileReaderMetadata, KafkaReaderMetadata, TableReaderMetadata],
+            Field(discriminator="type"),
+        ]
+    ] = Field(
+        ...,
+        description="A list of data sources required to generate the feature set",
     )
-    writers: List[BaseWriterMetadata] = Field(
+
+    writers: List[WriterMetadata] = Field(
         ..., description="The writers to be used for the feature set"
     )
     catalog: Catalog = Field(..., description="Metadata about the feature set's output")
@@ -190,12 +204,14 @@ class Metadata(BaseModel):
             for writer in feature_set_pipeline.sink.writers
         ]
 
+        readers = [
+            reader.build_metadata() for reader in feature_set_pipeline.source.readers
+        ]
+
         return cls(
             feature_set_pipeline=feature_set_pipeline,
             is_incremental=is_incremental,
-            readers=[
-                reader.get_metadata() for reader in feature_set_pipeline.source.readers
-            ],
+            readers=readers,
             catalog=catalog,
             entity=feature_set_pipeline.feature_set.entity,
             writers=writers,
