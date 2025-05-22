@@ -10,6 +10,7 @@ from pyspark.sql.dataframe import DataFrame
 from butterfree.clients import SparkClient
 from butterfree.configs.db import AbstractWriteConfig
 from butterfree.hooks import HookableComponent
+from butterfree.pipelines.feature_set_pipeline import FeatureSetPipeline
 from butterfree.transform import FeatureSet
 
 
@@ -33,7 +34,7 @@ class BaseWriterMetadata(BaseModel):
     db_config: str = Field(
         ..., description="Name of the database configuration class used"
     )
-    database: Optional[str] = Field(None, description="The database name")
+    write_destination: str = Field(..., description="Where the writer writes to")
 
 
 class Writer(ABC, HookableComponent):
@@ -147,7 +148,9 @@ class Writer(ABC, HookableComponent):
 
         """
 
-    def get_metadata(self) -> BaseWriterMetadata:
+    def build_metadata(
+        self, feature_set_pipeline: FeatureSetPipeline
+    ) -> BaseWriterMetadata:
         """Get the writer's metadata as a Pydantic model.
 
         This method creates a standardized representation of writer metadata
@@ -162,7 +165,28 @@ class Writer(ABC, HookableComponent):
             "interval_mode": self.interval_mode,
             "write_to_entity": self.write_to_entity,
             "db_config": self.db_config.__class__.__name__,
-            "database": getattr(self, "database", None),
+            "write_destination": self._get_writer_destination(feature_set_pipeline),
         }
 
         return BaseWriterMetadata(**writer_metadata)
+
+    def _get_writer_destination(self, feature_set_pipeline: FeatureSetPipeline) -> str:
+        """Determine the destination for a given writer based on the feature set pipeline."""
+
+        feature_set = feature_set_pipeline.feature_set
+
+        if self.__class__.__name__ == "HistoricalFeatureStoreWriter":
+            return f"wonka.{feature_set.name}"
+
+        database = self.db_config.database
+
+        if database == "kafka":
+            return self.db_config.kafka_topic
+
+        if database == "cassandra":
+            if self.write_to_entity:
+                return f"wonka.{feature_set.entity}"
+            return f"wonka.{feature_set.name}"
+
+        # Default fallback
+        return f"wonka.{feature_set.name}"

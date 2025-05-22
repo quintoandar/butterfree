@@ -185,6 +185,11 @@ class Metadata(BaseModel):
         windows_definition = cls._get_windows_definition(feature_set_pipeline)
         catalog = cls._create_catalog(feature_set_pipeline)
 
+        writers = [
+            writer.build_metadata(feature_set_pipeline=feature_set_pipeline)
+            for writer in feature_set_pipeline.sink.writers
+        ]
+
         return cls(
             feature_set_pipeline=feature_set_pipeline,
             is_incremental=is_incremental,
@@ -193,9 +198,7 @@ class Metadata(BaseModel):
             ],
             catalog=catalog,
             entity=feature_set_pipeline.feature_set.entity,
-            writers=[
-                writer.get_metadata() for writer in feature_set_pipeline.sink.writers
-            ],
+            writers=writers,
             feature_set_type=feature_set_type,
             windows_definition=windows_definition,
         )
