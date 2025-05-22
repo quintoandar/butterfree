@@ -16,7 +16,7 @@ from butterfree.hooks import HookableComponent
 from butterfree.transform import FeatureSet
 
 
-class BaseWriterMetadata(BaseModel):
+class WriterMetadata(BaseModel):
     """Base metadata model for Writer.
 
     This model represents the base metadata for all writers,
@@ -152,7 +152,7 @@ class Writer(ABC, HookableComponent):
 
     def build_metadata(
         self, feature_set_pipeline: "FeatureSetPipeline"
-    ) -> BaseWriterMetadata:
+    ) -> WriterMetadata:
         """Get the writer's metadata as a Pydantic model.
 
         This method creates a standardized representation of writer metadata
@@ -170,12 +170,12 @@ class Writer(ABC, HookableComponent):
             "write_destination": self._get_writer_destination(feature_set_pipeline),
         }
 
-        return BaseWriterMetadata(**writer_metadata)
+        return WriterMetadata(**writer_metadata)
 
     def _get_writer_destination(
         self, feature_set_pipeline: "FeatureSetPipeline"
     ) -> str:
-        """Determine the destination for a given writer based on the feature set pipeline."""
+        """Determine the destination for a given writer based on the feature set pipeline."""  # noqa: E501
 
         feature_set = feature_set_pipeline.feature_set
 
