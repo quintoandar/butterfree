@@ -2,7 +2,10 @@
 
 from abc import ABC, abstractmethod
 from functools import reduce
-from typing import Any, Callable, Dict, List, Literal, Optional
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Literal, Optional
+
+if TYPE_CHECKING:  # Avoid circular import
+    from butterfree.pipelines.feature_set_pipeline import FeatureSetPipeline
 
 from pydantic import BaseModel, Field
 from pyspark.sql.dataframe import DataFrame
@@ -10,7 +13,6 @@ from pyspark.sql.dataframe import DataFrame
 from butterfree.clients import SparkClient
 from butterfree.configs.db import AbstractWriteConfig
 from butterfree.hooks import HookableComponent
-from butterfree.pipelines.feature_set_pipeline import FeatureSetPipeline
 from butterfree.transform import FeatureSet
 
 
@@ -149,7 +151,7 @@ class Writer(ABC, HookableComponent):
         """
 
     def build_metadata(
-        self, feature_set_pipeline: FeatureSetPipeline
+        self, feature_set_pipeline: "FeatureSetPipeline"
     ) -> BaseWriterMetadata:
         """Get the writer's metadata as a Pydantic model.
 
@@ -170,7 +172,9 @@ class Writer(ABC, HookableComponent):
 
         return BaseWriterMetadata(**writer_metadata)
 
-    def _get_writer_destination(self, feature_set_pipeline: FeatureSetPipeline) -> str:
+    def _get_writer_destination(
+        self, feature_set_pipeline: "FeatureSetPipeline"
+    ) -> str:
         """Determine the destination for a given writer based on the feature set pipeline."""
 
         feature_set = feature_set_pipeline.feature_set
