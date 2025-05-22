@@ -2,6 +2,7 @@
 
 from typing import List, Optional
 
+from jinja2 import Template
 from pyspark.sql import DataFrame
 
 from butterfree.clients import SparkClient
@@ -21,7 +22,10 @@ class Source(HookableComponent):
 
     Attributes:
         readers: list of readers from where the source will get data.
-        query: Spark SQL query to run against the readers.
+        query: Spark SQL query to run against the readers. This query can be
+        templated with Jinja2. Available template variables are:
+        - start_date: start date for filtering.
+        - end_date: end date for filtering.
 
     Example:
         Simple example regarding Source class instantiation.
@@ -100,7 +104,13 @@ class Source(HookableComponent):
                 client=client, start_date=start_date, end_date=end_date
             )  # create temporary views for each reader
 
-        dataframe = client.sql(self.query)
+        template = Template(self.query)
+        rendered_query = template.render(
+            start_date=start_date,
+            end_date=end_date
+        )
+
+        dataframe = client.sql(rendered_query)
 
         if not dataframe.isStreaming and self.eager_evaluation:
             dataframe.cache().count()
