@@ -121,3 +121,5 @@ init/
 
 # integration tests artifacts
 metastore_db/
+
+.DS_Store

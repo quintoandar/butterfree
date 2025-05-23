@@ -3,7 +3,7 @@ from typing import List, Literal, Optional, Union
 from pydantic import BaseModel, ConfigDict, Field, field_serializer
 from typing_extensions import Annotated
 
-from butterfree.extract.readers.reader import (
+from butterfree.extract.readers.reader_metadata import (
     FileReaderMetadata,
     KafkaReaderMetadata,
     TableReaderMetadata,
@@ -13,7 +13,7 @@ from butterfree.pipelines import FeatureSetPipeline
 from butterfree.transform.aggregated_feature_set import AggregatedFeatureSet
 
 
-class Column(BaseModel):
+class FeatureMetadata(BaseModel):
     """Metadata model for a column in a feature set.
 
     This model represents the metadata of a single column in a feature set,
@@ -39,7 +39,7 @@ class Column(BaseModel):
     )
 
 
-class Catalog(BaseModel):
+class FeatureSetMetadata(BaseModel):
     """Metadata model for a feature set catalog.
 
     This model represents the catalog information of a feature set,
@@ -48,7 +48,9 @@ class Catalog(BaseModel):
 
     feature_set_name: str = Field(..., description="The name of the Feature Set")
     description: str = Field(..., description="The description of the Feature Set")
-    columns: List[Column] = Field(..., description="A list of column definitions")
+    columns: List[FeatureMetadata] = Field(
+        ..., description="A list of column definitions"
+    )
 
 
 class Metadata(BaseModel):
@@ -91,7 +93,9 @@ class Metadata(BaseModel):
     writers: List[WriterMetadata] = Field(
         ..., description="The writers to be used for the feature set"
     )
-    catalog: Catalog = Field(..., description="Metadata about the feature set's output")
+    catalog: FeatureSetMetadata = Field(
+        ..., description="Metadata about the feature set's output"
+    )
 
     @field_serializer("feature_set_pipeline")
     def serialize_feature_set_pipeline(self, pipeline: FeatureSetPipeline) -> str:
@@ -121,7 +125,9 @@ class Metadata(BaseModel):
         return None
 
     @classmethod
-    def _create_catalog(cls, feature_set_pipeline: FeatureSetPipeline) -> Catalog:
+    def _create_catalog(
+        cls, feature_set_pipeline: FeatureSetPipeline
+    ) -> FeatureSetMetadata:
         """Create a Catalog object from the feature set pipeline.
 
         Args:
@@ -135,7 +141,7 @@ class Metadata(BaseModel):
         catalog_schema = feature_set_pipeline.feature_set.get_schema()
 
         columns = [
-            Column(
+            FeatureMetadata(
                 name=column["column_name"],
                 data_type=column[
                     "type"
@@ -146,7 +152,7 @@ class Metadata(BaseModel):
             for column in catalog_schema
         ]
 
-        return Catalog(
+        return FeatureSetMetadata(
             feature_set_name=feature_set_pipeline.feature_set.name,
             description=feature_set_pipeline.feature_set.description,
             columns=columns,
@@ -166,7 +172,7 @@ class Metadata(BaseModel):
     @classmethod
     def _get_key_features(
         cls, feature_set_pipeline: FeatureSetPipeline
-    ) -> List[Column]:
+    ) -> List[FeatureMetadata]:
         """Get the key features of the feature set.
 
         Args:
@@ -176,7 +182,7 @@ class Metadata(BaseModel):
             A list of Column instances representing the key features.
         """
         return [
-            Column(
+            FeatureMetadata(
                 name=key.name,
                 data_type=key.dtype,
                 primary_key=True,

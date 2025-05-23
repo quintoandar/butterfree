@@ -2,7 +2,7 @@ import pytest
 from pydantic import ValidationError
 
 from butterfree.constants import DataType
-from butterfree.pipelines.feature_set_pipeline_metadata import Catalog, Column
+from butterfree.pipelines.metadata import FeatureMetadata, FeatureSetMetadata
 
 
 class TestColumn:
@@ -13,7 +13,7 @@ class TestColumn:
         primary_key = True
         description = "test"
         # When
-        column = Column(
+        column = FeatureMetadata(
             name=name,
             data_type=data_type,
             primary_key=primary_key,
@@ -29,7 +29,7 @@ class TestColumn:
     def test_create_column_with_missing_required_fields(self):
         # Test missing name
         with pytest.raises(ValidationError) as exc_info:
-            Column(
+            FeatureMetadata(
                 data_type=DataType.STRING,
                 primary_key=True,
             )
@@ -37,7 +37,7 @@ class TestColumn:
 
         # Test missing data_type
         with pytest.raises(ValidationError) as exc_info:
-            Column(
+            FeatureMetadata(
                 name="user_id",
                 primary_key=True,
             )
@@ -45,7 +45,7 @@ class TestColumn:
 
         # Test missing primary_key
         with pytest.raises(ValidationError) as exc_info:
-            Column(
+            FeatureMetadata(
                 name="user_id",
                 data_type=DataType.STRING,
             )
@@ -53,7 +53,7 @@ class TestColumn:
 
         # Test missing description
         with pytest.raises(ValidationError) as exc_info:
-            Column(
+            FeatureMetadata(
                 name="user_id",
                 data_type=DataType.STRING,
                 primary_key=True,
@@ -69,7 +69,7 @@ class TestColumn:
 
         # When/Then
         with pytest.raises(ValidationError) as exc_info:
-            Column(
+            FeatureMetadata(
                 name=name,
                 data_type=data_type,
                 primary_key=primary_key,
@@ -84,19 +84,19 @@ class TestCatalog:
         name = "user_features"
         description = "User related features"
         columns = [
-            Column(
+            FeatureMetadata(
                 name="user_id",
                 data_type=DataType.STRING.name,
                 primary_key=True,
                 description="test",
             ),
-            Column(
+            FeatureMetadata(
                 name="age",
                 data_type=DataType.INTEGER.name,
                 primary_key=False,
                 description="test",
             ),
-            Column(
+            FeatureMetadata(
                 name="name",
                 data_type=DataType.STRING.name,
                 primary_key=False,
@@ -105,7 +105,7 @@ class TestCatalog:
         ]
 
         # When
-        catalog = Catalog(
+        catalog = FeatureSetMetadata(
             feature_set_name=name,
             description=description,
             columns=columns,
@@ -130,10 +130,10 @@ class TestCatalog:
     def test_create_catalog_with_missing_required_fields(self):
         # Test missing name
         with pytest.raises(ValidationError) as exc_info:
-            Catalog(
+            FeatureSetMetadata(
                 description="User related features",
                 columns=[
-                    Column(
+                    FeatureMetadata(
                         name="user_id",
                         data_type=DataType.STRING,
                         primary_key=True,
@@ -145,10 +145,10 @@ class TestCatalog:
 
         # Test missing description
         with pytest.raises(ValidationError) as exc_info:
-            Catalog(
+            FeatureSetMetadata(
                 feature_set_name="user_features",
                 columns=[
-                    Column(
+                    FeatureMetadata(
                         name="user_id",
                         data_type=DataType.STRING,
                         primary_key=True,
@@ -160,7 +160,7 @@ class TestCatalog:
 
         # Test missing columns
         with pytest.raises(ValidationError) as exc_info:
-            Catalog(
+            FeatureSetMetadata(
                 feature_set_name="user_features",
                 description="User related features",
             )
@@ -171,7 +171,7 @@ class TestCatalog:
         name = "user_features"
         description = "User related features"
         columns = [
-            Column(
+            FeatureMetadata(
                 name="user_id",
                 data_type=DataType.STRING,
                 primary_key=True,
@@ -186,7 +186,7 @@ class TestCatalog:
 
         # When/Then
         with pytest.raises(ValidationError) as exc_info:
-            Catalog(
+            FeatureSetMetadata(
                 feature_set_name=name,
                 description=description,
                 columns=columns,

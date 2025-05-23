@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock
 
 from butterfree.pipelines import FeatureSetPipeline
-from butterfree.pipelines.feature_set_pipeline_metadata import Metadata
+from butterfree.pipelines.metadata import Metadata
 from butterfree.transform.aggregated_feature_set import AggregatedFeatureSet
 
 
