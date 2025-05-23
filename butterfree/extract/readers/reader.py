@@ -145,44 +145,9 @@ class Reader(ABC, HookableComponent):
             df,
         )
 
+    @abstractmethod
     def build_metadata(
         self,
     ) -> Union[FileReaderMetadata, KafkaReaderMetadata, TableReaderMetadata]:
-        """Get the reader's metadata as a Pydantic model.
-
-        This method creates a standardized representation of reader metadata
-        that can be used for documentation, validation, and serialization purposes.
-        Each reader type (File, Kafka, Table) has its own specific metadata
-        while sharing common base attributes.
-
-        Returns:
-            A BaseReaderMetadata model containing the reader's metadata
-        """
-        reader_type_map = {
-            "FileReader": FileReaderMetadata,
-            "KafkaReader": KafkaReaderMetadata,
-            "TableReader": TableReaderMetadata,
-        }
-
-        reader_type = self.__class__.__name__
-
-        reader_metadata = {
-            "type": reader_type,
-            "incremental_strategy": self.incremental_strategy is not None,
-            **self._get_reader_specific_metadata(),
-        }
-
-        config_model = reader_type_map[reader_type]
-
-        return config_model(**reader_metadata)
-
-    @abstractmethod
-    def _get_reader_specific_metadata(self) -> dict:
-        """Get reader-specific metadata.
-
-        This method should be overridden by specific reader implementations
-        to provide their unique metadata.
-
-        Returns:
-            A dictionary containing reader-specific metadata
-        """
+        """Abstract method to build the metadata for reader type."""
+        pass

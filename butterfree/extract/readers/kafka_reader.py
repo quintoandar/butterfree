@@ -9,6 +9,7 @@ from butterfree.clients import SparkClient
 from butterfree.configs import environment
 from butterfree.extract.pre_processing import explode_json_column
 from butterfree.extract.readers.reader import Reader
+from butterfree.extract.readers.reader_metadata import KafkaReaderMetadata
 
 
 class KafkaReader(Reader):
@@ -183,10 +184,8 @@ class KafkaReader(Reader):
         # apply schema defined in self.value_schema
         return self._struct_df(raw_df)
 
-    def _get_reader_specific_metadata(self) -> dict:
-        """Get KafkaReader specific metadata for @KafkaReaderMetadata class.
-
-        Returns:
-            A dictionary containing KafkaReader specific metadata
-        """
-        return {"topic": self.topic}
+    def build_metadata(self) -> KafkaReaderMetadata:
+        """Build the metadata for the kafka reader."""
+        return KafkaReaderMetadata(
+            topic=self.topic,
+        )

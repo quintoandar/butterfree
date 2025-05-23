@@ -6,6 +6,7 @@ from pyspark.sql import DataFrame
 
 from butterfree.clients import SparkClient
 from butterfree.extract.readers.reader import Reader
+from butterfree.extract.readers.reader_metadata import TableReaderMetadata
 
 
 class TableReader(Reader):
@@ -67,10 +68,10 @@ class TableReader(Reader):
         """
         return client.read_table(self.table, self.database)
 
-    def _get_reader_specific_metadata(self) -> dict:
-        """Get TableReader specific metadata for @TableReaderMetadata class.
-
-        Returns:
-            A dictionary containing TableReader specific metadata
-        """
-        return {"table": self.table, "database": self.database}
+    def build_metadata(self) -> TableReaderMetadata:
+        """Build the metadata for the table reader."""
+        return TableReaderMetadata(
+            table=self.table,
+            database=self.database,
+            incremental_strategy=self.incremental_strategy is not None,
+        )
