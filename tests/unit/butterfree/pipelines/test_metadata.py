@@ -2,7 +2,10 @@ import pytest
 from pydantic import ValidationError
 
 from butterfree.constants import DataType
-from butterfree.pipelines.metadata import FeatureMetadata, FeatureSetMetadata
+from butterfree.pipelines.feature_set_pipeline_metadata import (
+    FeatureMetadata,
+    FeatureSetMetadata,
+)
 
 
 class TestColumn:

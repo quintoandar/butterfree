@@ -53,7 +53,7 @@ class FeatureSetMetadata(BaseModel):
     )
 
 
-class Metadata(BaseModel):
+class FeatureSetPipelineMetadata(BaseModel):
     """Metadata model for a feature set pipeline.
 
     This model represents the complete metadata of a feature set pipeline,
@@ -191,7 +191,9 @@ class Metadata(BaseModel):
         ]
 
     @classmethod
-    def from_pipeline(cls, feature_set_pipeline: FeatureSetPipeline) -> "Metadata":
+    def from_pipeline(
+        cls, feature_set_pipeline: FeatureSetPipeline
+    ) -> "FeatureSetPipelineMetadata":
         """Create a FeatureSetPipelineMetadata from a FeatureSetPipeline.
 
         Args:

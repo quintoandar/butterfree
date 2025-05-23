@@ -1,7 +1,9 @@
 from unittest.mock import MagicMock
 
 from butterfree.pipelines import FeatureSetPipeline
-from butterfree.pipelines.metadata import Metadata
+from butterfree.pipelines.feature_set_pipeline_metadata import (
+    FeatureSetPipelineMetadata,
+)
 from butterfree.transform.aggregated_feature_set import AggregatedFeatureSet
 
 
@@ -17,7 +19,9 @@ class TestFeatureSetPipelineMetadata:
         feature_set_pipeline.feature_set = feature_set
 
         # When
-        result = Metadata._get_windows_definition(feature_set_pipeline)
+        result = FeatureSetPipelineMetadata._get_windows_definition(
+            feature_set_pipeline
+        )
 
         # Then
         assert result == ["30 days", "60 days"]
@@ -29,7 +33,9 @@ class TestFeatureSetPipelineMetadata:
         feature_set_pipeline.feature_set = feature_set
 
         # When
-        result = Metadata._get_windows_definition(feature_set_pipeline)
+        result = FeatureSetPipelineMetadata._get_windows_definition(
+            feature_set_pipeline
+        )
 
         # Then
         assert result is None
@@ -41,7 +47,7 @@ class TestFeatureSetPipelineMetadata:
         feature_set_pipeline.source.readers = [reader]
 
         # When
-        result = Metadata._is_incremental(feature_set_pipeline)
+        result = FeatureSetPipelineMetadata._is_incremental(feature_set_pipeline)
 
         # Then
         assert result is True
@@ -53,7 +59,7 @@ class TestFeatureSetPipelineMetadata:
         feature_set_pipeline.source.readers = [reader]
 
         # When
-        result = Metadata._is_incremental(feature_set_pipeline)
+        result = FeatureSetPipelineMetadata._is_incremental(feature_set_pipeline)
 
         # Then
         assert result is False
