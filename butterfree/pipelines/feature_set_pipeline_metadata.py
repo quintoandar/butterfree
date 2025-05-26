@@ -1,4 +1,6 @@
-from typing import List, Literal, Optional, Union
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, List, Literal, Optional, Union
 
 from pydantic import BaseModel, ConfigDict, Field, field_serializer
 from typing_extensions import Annotated
@@ -9,8 +11,9 @@ from butterfree.extract.readers.reader_metadata import (
     TableReaderMetadata,
 )
 from butterfree.load.writers.writer import WriterMetadata
-from butterfree.pipelines import FeatureSetPipeline
-from butterfree.transform.aggregated_feature_set import AggregatedFeatureSet
+
+if TYPE_CHECKING:
+    from butterfree.pipelines import FeatureSetPipeline
 
 
 class FeatureMetadata(BaseModel):
