@@ -11,6 +11,8 @@ from pyspark.sql import DataFrame, functions
 from butterfree.clients import SparkClient
 from butterfree.constants.window_definitions import ALLOWED_WINDOWS
 from butterfree.dataframe_service import repartition_df
+from butterfree.metadata.feature_metadata import FeatureMetadata
+from butterfree.metadata.feature_set_metadata import FeatureSetMetadata
 from butterfree.transform import FeatureSet
 from butterfree.transform.features import Feature, KeyFeature, TimestampFeature
 from butterfree.transform.transformations import AggregatedTransform
@@ -658,3 +660,60 @@ class AggregatedFeatureSet(FeatureSet):
         post_hook_df = self.run_post_hooks(output_df)
 
         return post_hook_df
+
+    def _build_feature_metadata(self) -> List[FeatureMetadata]:
+        """Excerpt taken from _get_schema method.
+
+        Returns:
+            List[FeatureMetadata]: _description_
+        """
+
+        features_metadata = []
+
+        pivot_values = self._pivot_values or [None]
+        windows = self._windows or [None]
+
+        for feature in self.features:
+            combination = itertools.product(
+                pivot_values, self._get_features_columns(feature), windows
+            )
+
+            feature_names = [
+                self._build_feature_column_name(
+                    function, pivot_value=pivot_value, window=window
+                )
+                for pivot_value, function, window in combination
+            ]
+
+            data_types = [
+                function.data_type.name
+                for function in feature.transformation.functions  # noqa: E501. TODO: fragile protection (_has_aggregated_transform_only on setter)
+                for _ in range(len(pivot_values) * len(windows))
+            ]
+
+            for feature_name, data_type in zip(feature_names, data_types):
+                features_metadata.append(
+                    FeatureMetadata(
+                        name=feature_name,
+                        data_type=data_type,
+                        description=feature.description,
+                        primary_key=False,
+                    )
+                )
+
+        return features_metadata
+
+    def build_metadata(self) -> FeatureSetMetadata:
+        """Build the metadata for the feature set."""
+        timestamp_metadata = [self.timestamp.build_metadata()]
+        keys_metadata = [key_feature.build_metadata() for key_feature in self.keys]
+
+        # The name of the feature depends on the transformation, window and pivot value.
+        # These are characteristics of the feature set, not the feature itself.
+        features_metadata = self._build_feature_metadata()
+
+        return FeatureSetMetadata(
+            name=self.name,
+            description=self.description,
+            columns=keys_metadata + timestamp_metadata + features_metadata,
+        )

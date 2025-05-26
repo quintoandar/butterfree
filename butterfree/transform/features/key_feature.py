@@ -3,6 +3,7 @@
 from typing import Optional
 
 from butterfree.constants.data_type import DataType
+from butterfree.metadata.feature_metadata import FeatureMetadata
 from butterfree.transform.features.feature import Feature
 from butterfree.transform.transformations import TransformComponent
 
@@ -42,4 +43,13 @@ class KeyFeature(Feature):
             dtype=dtype,
             from_column=from_column,
             transformation=transformation,
+        )
+
+    def build_metadata(self) -> FeatureMetadata:
+        """Build the metadata for the key feature."""
+        return FeatureMetadata(
+            name=self.name,
+            data_type=self.dtype.name,
+            primary_key=True,
+            description=self.description,
         )

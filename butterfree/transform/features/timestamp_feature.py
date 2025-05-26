@@ -7,6 +7,7 @@ from pyspark.sql.functions import to_timestamp
 
 from butterfree.constants import DataType
 from butterfree.constants.columns import TIMESTAMP_COLUMN
+from butterfree.metadata.feature_metadata import FeatureMetadata
 from butterfree.transform.features import Feature
 from butterfree.transform.transformations import TransformComponent
 
@@ -74,7 +75,17 @@ class TimestampFeature(Feature):
             ts_column = ts_column / 1000
 
         dataframe = dataframe.withColumn(
-            column_name, to_timestamp(ts_column, self.mask)  # type: ignore
+            column_name,
+            to_timestamp(ts_column, self.mask),  # type: ignore
         )
 
         return super().transform(dataframe)
+
+    def build_metadata(self) -> FeatureMetadata:
+        """Build the metadata for the feature."""
+        return FeatureMetadata(
+            name=self.name,
+            data_type=self.dtype.name,
+            description=self.description,
+            primary_key=False,
+        )

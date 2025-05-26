@@ -7,6 +7,7 @@ from pyspark.sql import DataFrame
 from pyspark.sql.functions import col
 
 from butterfree.constants import DataType
+from butterfree.metadata.feature_metadata import FeatureMetadata
 from butterfree.transform.transformations import (
     AggregatedTransform,
     CustomTransform,
@@ -53,9 +54,9 @@ class Feature:
         self.from_column = from_column
 
     @property
-    def dtype(self) -> Any:
+    def dtype(self) -> DataType:
         """Attribute dtype getter."""
-        return self.__dtype  # type: ignore
+        return self.__dtype
 
     @dtype.setter
     def dtype(self, value: DataType) -> None:
@@ -101,7 +102,7 @@ class Feature:
         self.__from_column = value
 
     @property
-    def transformation(self) -> Any:
+    def transformation(self) -> TransformComponent:
         """Attribute transformation getter."""
         return self.__transformation
 
@@ -149,3 +150,6 @@ class Feature:
                 self.name, col(self.name).cast(self.dtype.spark)
             )
         return dataframe
+
+    def build_metadata(self) -> FeatureMetadata:
+        pass

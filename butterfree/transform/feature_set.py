@@ -12,6 +12,8 @@ from butterfree.clients import SparkClient
 from butterfree.constants.columns import TIMESTAMP_COLUMN
 from butterfree.dataframe_service import IncrementalStrategy
 from butterfree.hooks import HookableComponent
+from butterfree.metadata.feature_metadata import FeatureMetadata
+from butterfree.metadata.feature_set_metadata import FeatureSetMetadata
 from butterfree.transform.features import Feature, KeyFeature, TimestampFeature
 from butterfree.transform.transformations import (
     AggregatedTransform,
@@ -463,3 +465,46 @@ class FeatureSet(HookableComponent):
         post_hook_df = self.run_post_hooks(output_df)
 
         return post_hook_df
+
+    def _build_features_metadata(self) -> List[FeatureMetadata]:
+        """Build the metadata for the features."""
+        features_metadata = []
+
+        for feature in self.features:
+            column_name = self._get_features_columns(feature)
+
+            if isinstance(feature.transformation, SparkFunctionTransform):
+                data_types = [
+                    function.data_type.name
+                    for function in feature.transformation.functions
+                    for _ in range(len(feature.transformation._windows or [None]))
+                ]
+            else:
+                data_types = [feature.dtype.name]
+
+            for column_name, data_type in zip(column_name, data_types):
+                features_metadata.append(
+                    FeatureMetadata(
+                        name=column_name,
+                        data_type=data_type,
+                        primary_key=False,
+                        description=feature.description,
+                    )
+                )
+
+        return features_metadata
+
+    def build_metadata(self) -> FeatureSetMetadata:
+        """Build the metadata for the feature set."""
+        timestamp_metadata = [self.timestamp.build_metadata()]
+        keys_metadata = [key_feature.build_metadata() for key_feature in self.keys]
+
+        # The name of the feature depends on the transformation, window and pivot value.
+        # These are characteristics of the feature set, not the feature itself.
+        features_metadata = self._build_features_metadata()
+
+        return FeatureSetMetadata(
+            name=self.name,
+            description=self.description,
+            columns=keys_metadata + timestamp_metadata + features_metadata,
+        )
