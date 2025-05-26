@@ -333,37 +333,31 @@ class TestFeatureSet:
                 "column_name": "id",
                 "type": LongType(),
                 "primary_key": True,
-                "description": "The user's Main ID or device ID",
             },
             {
                 "column_name": "timestamp",
                 "type": TimestampType(),
                 "primary_key": False,
-                "description": "Time tag for the state of all features.",
             },
             {
                 "column_name": "feature1__avg_over_2_minutes_fixed_windows",
                 "type": FloatType(),
                 "primary_key": False,
-                "description": "test",
             },
             {
                 "column_name": "feature1__avg_over_15_minutes_fixed_windows",
                 "type": FloatType(),
                 "primary_key": False,
-                "description": "test",
             },
             {
                 "column_name": "feature1__stddev_pop_over_2_minutes_fixed_windows",
                 "type": DoubleType(),
                 "primary_key": False,
-                "description": "test",
             },
             {
                 "column_name": "feature1__stddev_pop_over_15_minutes_fixed_windows",
                 "type": DoubleType(),
                 "primary_key": False,
-                "description": "test",
             },
         ]
 

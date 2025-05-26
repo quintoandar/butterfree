@@ -483,7 +483,6 @@ class AggregatedFeatureSet(FeatureSet):
                         "column_name": c,
                         "type": f.dtype.spark,
                         "primary_key": True if isinstance(f, KeyFeature) else False,
-                        "description": f.description,
                     }
                 )
         pivot_values = self._pivot_values or [None]
@@ -509,7 +508,6 @@ class AggregatedFeatureSet(FeatureSet):
                         "column_name": n,
                         "type": dt,
                         "primary_key": False,
-                        "description": f.description,
                     }
                 )
         return schema

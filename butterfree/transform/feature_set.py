@@ -271,7 +271,6 @@ class FeatureSet(HookableComponent):
                         "column_name": c,
                         "type": f.dtype.spark,
                         "primary_key": True if isinstance(f, KeyFeature) else False,
-                        "description": f.description,
                     }
                 )
 
@@ -292,7 +291,6 @@ class FeatureSet(HookableComponent):
                         "column_name": n,
                         "type": dt,
                         "primary_key": False,
-                        "description": f.description,
                     }
                 )
         return schema
