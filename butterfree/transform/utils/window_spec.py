@@ -106,3 +106,7 @@ class Window:
                 self.order_by
             )
         return self.frame_boundaries.get(w)
+
+    def build_metadata(self) -> str:
+        """Build the metadata for the window."""
+        return f"{self.frame_boundaries.window_definition}"
