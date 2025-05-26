@@ -153,4 +153,9 @@ class Feature:
 
     def build_metadata(self) -> FeatureMetadata:
         """Build the metadata for the feature."""
-        pass
+        raise NotImplementedError(
+            "Subclasses of Feature must implement build_metadata()."
+            "If you need metadata from a base Feature class, "
+            "you must use FeatureSet#_build_features_metadata() or "
+            "AggregatedFeatureSet#_build_features_metadata()."
+        )
