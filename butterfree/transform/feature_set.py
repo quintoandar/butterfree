@@ -274,32 +274,34 @@ class FeatureSet(HookableComponent):
         """
         schema = []
 
-        for f in self.keys + [self.timestamp]:
-            for c in self._get_features_columns(f):
+        for feature in self.keys + [self.timestamp]:
+            for column_name in self._get_features_columns(feature):
                 schema.append(
                     {
-                        "column_name": c,
-                        "type": f.dtype.spark,
-                        "primary_key": True if isinstance(f, KeyFeature) else False,
+                        "column_name": column_name,
+                        "type": feature.dtype.spark,
+                        "primary_key": (
+                            True if isinstance(feature, KeyFeature) else False
+                        ),
                     }
                 )
 
-        for f in self.features:  # type: ignore
-            name = self._get_features_columns(f)
-            if isinstance(f.transformation, SparkFunctionTransform):
-                type = [
-                    fc.data_type.spark
-                    for fc in f.transformation.functions
-                    for _ in range(len(f.transformation._windows or [None]))
+        for feature in self.features:
+            name = self._get_features_columns(feature)
+            if isinstance(feature.transformation, SparkFunctionTransform):
+                types = [
+                    function.data_type.spark
+                    for function in feature.transformation.functions
+                    for _ in range(len(feature.transformation._windows or [None]))
                 ]
             else:
-                type = [f.dtype.spark]
+                types = [feature.dtype.spark]
 
-            for n, dt in zip(name, type):
+            for name, date_type in zip(name, types):
                 schema.append(
                     {
-                        "column_name": n,
-                        "type": dt,
+                        "column_name": name,
+                        "type": date_type,
                         "primary_key": False,
                     }
                 )
