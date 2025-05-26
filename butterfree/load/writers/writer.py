@@ -2,41 +2,15 @@
 
 from abc import ABC, abstractmethod
 from functools import reduce
-from typing import TYPE_CHECKING, Any, Callable, Dict, List, Literal, Optional
+from typing import Any, Callable, Dict, List, Optional
 
-if TYPE_CHECKING:  # Avoid circular import
-    from butterfree.pipelines.feature_set_pipeline import FeatureSetPipeline
-
-from pydantic import BaseModel, Field
 from pyspark.sql.dataframe import DataFrame
 
 from butterfree.clients import SparkClient
 from butterfree.configs.db import AbstractWriteConfig
 from butterfree.hooks import HookableComponent
+from butterfree.metadata.writer_metadata import WriterMetadata
 from butterfree.transform import FeatureSet
-
-
-class WriterMetadata(BaseModel):
-    """Base metadata model for Writer.
-
-    This model represents the base metadata for all writers,
-    including common configuration and settings.
-    """
-
-    type: Literal[
-        "OnlineFeatureStoreWriter",
-        "HistoricalFeatureStoreWriter",
-    ] = Field(..., description="Type of the writer")
-    interval_mode: bool = Field(
-        ..., description="Whether the writer operates in interval mode"
-    )
-    write_to_entity: bool = Field(
-        ..., description="Whether the writer writes to an entity table"
-    )
-    db_config: str = Field(
-        ..., description="Name of the database configuration class used"
-    )
-    write_destination: str = Field(..., description="Where the writer writes to")
 
 
 class Writer(ABC, HookableComponent):
@@ -150,9 +124,7 @@ class Writer(ABC, HookableComponent):
 
         """
 
-    def build_metadata(
-        self, feature_set_pipeline: "FeatureSetPipeline"
-    ) -> WriterMetadata:
+    def build_metadata(self) -> WriterMetadata:
         """Get the writer's metadata as a Pydantic model.
 
         This method creates a standardized representation of writer metadata
@@ -162,35 +134,11 @@ class Writer(ABC, HookableComponent):
             A BaseWriterMetadata model containing the writer's metadata
         """
 
-        writer_metadata = {
-            "type": self.__class__.__name__,
-            "interval_mode": self.interval_mode,
-            "write_to_entity": self.write_to_entity,
-            "db_config": self.db_config.__class__.__name__,
-            "write_destination": self._get_writer_destination(feature_set_pipeline),
-        }
+        writer_metadata = WriterMetadata(
+            type=self.__class__.__name__,
+            interval_mode=self.interval_mode,
+            write_to_entity=self.write_to_entity,
+            db_config=self.db_config.__class__.__name__,
+        )
 
-        return WriterMetadata(**writer_metadata)
-
-    def _get_writer_destination(
-        self, feature_set_pipeline: "FeatureSetPipeline"
-    ) -> str:
-        """Determine the destination for a given writer based on the feature set pipeline."""  # noqa: E501
-
-        feature_set = feature_set_pipeline.feature_set
-
-        if self.__class__.__name__ == "HistoricalFeatureStoreWriter":
-            return f"wonka.{feature_set.name}"
-
-        database = self.db_config.database
-
-        if database == "kafka":
-            return self.db_config.kafka_topic
-
-        if database == "cassandra":
-            if self.write_to_entity:
-                return f"wonka.{feature_set.entity}"
-            return f"wonka.{feature_set.name}"
-
-        # Default fallback
-        return f"wonka.{feature_set.name}"
+        return writer_metadata
