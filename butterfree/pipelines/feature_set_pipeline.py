@@ -7,7 +7,6 @@ from butterfree.dataframe_service import repartition_sort_df
 from butterfree.extract import Source
 from butterfree.load import Sink
 from butterfree.metadata.feature_set_pipeline_metadata import FeatureSetPipelineMetadata
-from butterfree.transform.aggregated_feature_set import AggregatedFeatureSet
 from butterfree.transform.feature_set import FeatureSet
 
 
@@ -272,28 +271,14 @@ class FeatureSetPipeline:
 
     def build_metadata(self) -> FeatureSetPipelineMetadata:
         """Build the metadata for the feature set pipeline."""
-        feature_set = self.feature_set
-        feature_set_type = type(feature_set).__name__
-
-        windows_definition = None
-        if isinstance(feature_set, AggregatedFeatureSet) and feature_set._windows:
-            windows_definition = [
-                window.build_metadata() for window in feature_set._windows
-            ]
+        feature_set_metadata = self.feature_set.build_metadata()
 
         readers_metadata = [reader.build_metadata() for reader in self.source.readers]
 
-        writers_metadata = [
-            writer.build_metadata(feature_set_pipeline=self)
-            for writer in self.sink.writers
-        ]
+        writers_metadata = [writer.build_metadata() for writer in self.sink.writers]
 
         return FeatureSetPipelineMetadata(
-            feature_set_pipeline=self,
-            entity=feature_set.entity,
-            feature_set_type=feature_set_type,
-            windows_definition=windows_definition,
             readers=readers_metadata,
             writers=writers_metadata,
-            catalog=feature_set.build_metadata(),
+            feature_set=feature_set_metadata,
         )

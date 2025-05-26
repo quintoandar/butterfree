@@ -152,4 +152,5 @@ class Feature:
         return dataframe
 
     def build_metadata(self) -> FeatureMetadata:
+        """Build the metadata for the feature."""
         pass

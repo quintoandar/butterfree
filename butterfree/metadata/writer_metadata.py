@@ -23,4 +23,3 @@ class WriterMetadata(BaseModel):
     db_config: str = Field(
         ..., description="Name of the database configuration class used"
     )
-    write_destination: str = Field(..., description="Where the writer writes to")

@@ -504,7 +504,10 @@ class FeatureSet(HookableComponent):
         features_metadata = self._build_features_metadata()
 
         return FeatureSetMetadata(
+            entity=self.entity,
             name=self.name,
+            type="FeatureSet",
             description=self.description,
-            columns=keys_metadata + timestamp_metadata + features_metadata,
+            windows_definition=None,
+            features=keys_metadata + timestamp_metadata + features_metadata,
         )

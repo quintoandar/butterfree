@@ -33,34 +33,34 @@ class TestFeatureSetMetadata:
         ]
 
         # When
-        catalog = FeatureSetMetadata(
-            feature_set_name=name,
+        feature_set_metadata = FeatureSetMetadata(
+            name=name,
             description=description,
-            columns=columns,
+            features=columns,
         )
 
         # Then
-        assert catalog.feature_set_name == name
-        assert catalog.description == description
-        assert len(catalog.columns) == 3
-        assert catalog.columns[0].name == "user_id"
-        assert catalog.columns[0].data_type == DataType.STRING.name
-        assert catalog.columns[0].primary_key is True
-        assert catalog.columns[1].name == "age"
-        assert catalog.columns[1].data_type == DataType.INTEGER.name
-        assert catalog.columns[1].primary_key is False
-        assert catalog.columns[1].description == "test"
-        assert catalog.columns[2].name == "name"
-        assert catalog.columns[2].data_type == DataType.STRING.name
-        assert catalog.columns[2].primary_key is False
-        assert catalog.columns[2].description == "test"
+        assert feature_set_metadata.name == name
+        assert feature_set_metadata.description == description
+        assert len(feature_set_metadata.features) == 3
+        assert feature_set_metadata.features[0].name == "user_id"
+        assert feature_set_metadata.features[0].data_type == DataType.STRING.name
+        assert feature_set_metadata.features[0].primary_key is True
+        assert feature_set_metadata.features[1].name == "age"
+        assert feature_set_metadata.features[1].data_type == DataType.INTEGER.name
+        assert feature_set_metadata.features[1].primary_key is False
+        assert feature_set_metadata.features[1].description == "test"
+        assert feature_set_metadata.features[2].name == "name"
+        assert feature_set_metadata.features[2].data_type == DataType.STRING.name
+        assert feature_set_metadata.features[2].primary_key is False
+        assert feature_set_metadata.features[2].description == "test"
 
     def test_create_catalog_with_missing_required_fields(self):
         # Test missing name
         with pytest.raises(ValidationError) as exc_info:
             FeatureSetMetadata(
                 description="User related features",
-                columns=[
+                features=[
                     FeatureMetadata(
                         name="user_id",
                         data_type=DataType.STRING,
@@ -74,8 +74,8 @@ class TestFeatureSetMetadata:
         # Test missing description
         with pytest.raises(ValidationError) as exc_info:
             FeatureSetMetadata(
-                feature_set_name="user_features",
-                columns=[
+                name="user_features",
+                features=[
                     FeatureMetadata(
                         name="user_id",
                         data_type=DataType.STRING,
@@ -89,7 +89,7 @@ class TestFeatureSetMetadata:
         # Test missing columns
         with pytest.raises(ValidationError) as exc_info:
             FeatureSetMetadata(
-                feature_set_name="user_features",
+                name="user_features",
                 description="User related features",
             )
         assert "columns" in str(exc_info.value)
@@ -115,8 +115,8 @@ class TestFeatureSetMetadata:
         # When/Then
         with pytest.raises(ValidationError) as exc_info:
             FeatureSetMetadata(
-                feature_set_name=name,
+                name=name,
                 description=description,
-                columns=columns,
+                features=columns,
             )
         assert "columns" in str(exc_info.value)

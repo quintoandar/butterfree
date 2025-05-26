@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from typing import List, Literal, Optional, Union
+from typing import List, Union
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, Field
 from typing_extensions import Annotated
 
 from butterfree.load.writers.writer import WriterMetadata
@@ -21,17 +21,8 @@ class FeatureSetPipelineMetadata(BaseModel):
     including its configuration, data sources, output schema, and processing details.
     """
 
-    # To accept arbitrary types like FeatureSetPipeline
-    model_config = ConfigDict(arbitrary_types_allowed=True)
-
-    entity: str = Field(
-        ..., description="The entity type associated with the feature set"
-    )
-    feature_set_type: Literal["FeatureSet", "AggregatedFeatureSet"] = Field(
-        ..., description="The type of feature set"
-    )
-    windows_definition: Optional[List[str]] = Field(
-        None, description="The definition of the windows for the feature set"
+    feature_set: FeatureSetMetadata = Field(
+        ..., description="Metadata about the feature set's output"
     )
 
     # Required for correct serialization using Union
@@ -47,7 +38,4 @@ class FeatureSetPipelineMetadata(BaseModel):
 
     writers: List[WriterMetadata] = Field(
         ..., description="The writers to be used for the feature set"
-    )
-    catalog: FeatureSetMetadata = Field(
-        ..., description="Metadata about the feature set's output"
     )

@@ -712,8 +712,13 @@ class AggregatedFeatureSet(FeatureSet):
         # These are characteristics of the feature set, not the feature itself.
         features_metadata = self._build_feature_metadata()
 
+        windows_definition = [window.build_metadata() for window in self._windows]
+
         return FeatureSetMetadata(
+            entity=self.entity,
             name=self.name,
+            type="AggregatedFeatureSet",
             description=self.description,
-            columns=keys_metadata + timestamp_metadata + features_metadata,
+            windows_definition=windows_definition,
+            features=keys_metadata + timestamp_metadata + features_metadata,
         )
