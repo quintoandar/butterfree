@@ -167,7 +167,14 @@ class FeatureSet(HookableComponent):
 
     @staticmethod
     def _get_features_columns(*features: Feature) -> List[str]:
-        return list(itertools.chain(*[k.get_output_columns() for k in features]))
+        """Get the columns names of the features.
+
+        Returns:
+            List[str]: List of column names.
+        """
+        return list(
+            itertools.chain(*[feature.get_output_columns() for feature in features])
+        )
 
     @property
     def keys(self) -> List[KeyFeature]:
@@ -257,6 +264,9 @@ class FeatureSet(HookableComponent):
 
     def get_schema(self) -> List[Dict[str, Any]]:
         """Get feature set schema.
+
+        This method is used for database migration purposes and the deprecated
+        butterfree.reports.metadata file.
 
         Returns:
             List of dicts regarding cassandra feature set schema.
