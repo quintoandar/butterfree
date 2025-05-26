@@ -33,9 +33,6 @@ class KafkaReaderMetadata(BaseModel):
     """
 
     type: Literal["KafkaReader"] = Field("KafkaReader", frozen=True)
-    incremental_strategy: bool = Field(
-        ..., description="Whether the reader has an incremental strategy"
-    )
     topic: str = Field(..., description="Kafka topic to read from")
 
 

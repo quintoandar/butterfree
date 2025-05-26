@@ -72,9 +72,6 @@ class FeatureSetPipelineMetadata(BaseModel):
     entity: str = Field(
         ..., description="The entity type associated with the feature set"
     )
-    is_incremental: bool = Field(
-        ..., description="The strategy for data generation (incremental or batch)"
-    )
     feature_set_type: Literal["FeatureSet", "AggregatedFeatureSet"] = Field(
         ..., description="The type of feature set"
     )
