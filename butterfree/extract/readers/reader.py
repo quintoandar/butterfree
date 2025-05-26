@@ -8,12 +8,12 @@ from pyspark.sql import DataFrame
 
 from butterfree.clients import SparkClient
 from butterfree.dataframe_service import IncrementalStrategy
-from butterfree.extract.readers.reader_metadata import (
+from butterfree.hooks import HookableComponent
+from butterfree.metadata.reader_metadata import (
     FileReaderMetadata,
     KafkaReaderMetadata,
     TableReaderMetadata,
 )
-from butterfree.hooks import HookableComponent
 
 
 class Reader(ABC, HookableComponent):

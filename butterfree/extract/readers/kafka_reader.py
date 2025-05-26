@@ -9,7 +9,7 @@ from butterfree.clients import SparkClient
 from butterfree.configs import environment
 from butterfree.extract.pre_processing import explode_json_column
 from butterfree.extract.readers.reader import Reader
-from butterfree.extract.readers.reader_metadata import KafkaReaderMetadata
+from butterfree.metadata.reader_metadata import KafkaReaderMetadata
 
 
 class KafkaReader(Reader):

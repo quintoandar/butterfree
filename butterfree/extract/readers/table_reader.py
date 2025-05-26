@@ -6,7 +6,7 @@ from pyspark.sql import DataFrame
 
 from butterfree.clients import SparkClient
 from butterfree.extract.readers.reader import Reader
-from butterfree.extract.readers.reader_metadata import TableReaderMetadata
+from butterfree.metadata.reader_metadata import TableReaderMetadata
 
 
 class TableReader(Reader):

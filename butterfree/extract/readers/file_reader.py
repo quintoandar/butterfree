@@ -7,7 +7,7 @@ from pyspark.sql.types import StructType
 
 from butterfree.clients import SparkClient
 from butterfree.extract.readers.reader import Reader
-from butterfree.extract.readers.reader_metadata import FileReaderMetadata
+from butterfree.metadata.reader_metadata import FileReaderMetadata
 
 
 class FileReader(Reader):
