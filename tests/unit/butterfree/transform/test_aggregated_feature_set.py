@@ -4,6 +4,7 @@ from pyspark.sql.types import DoubleType, LongType, TimestampType
 
 from butterfree.clients import SparkClient
 from butterfree.constants import DataType
+from butterfree.metadata.feature_metadata import FeatureMetadata
 from butterfree.testing.dataframe import (
     assert_dataframe_equality,
     create_df_from_collection,
@@ -405,3 +406,285 @@ class TestAggregatedFeatureSet:
         start_date = fs.define_start_date("2016-04-14")
 
         assert start_date == "2016-01-14"
+
+    def test_build_feature_metadata_no_windows_no_pivot(self):
+        # arrange
+        feature_set = AggregatedFeatureSet(
+            name="name",
+            entity="entity",
+            description="description",
+            keys=[
+                KeyFeature(name="id", description="key_desc", dtype=DataType.INTEGER)
+            ],
+            timestamp=TimestampFeature(),
+            features=[
+                Feature(
+                    name="feature1",
+                    description="feature_desc1",
+                    transformation=AggregatedTransform(
+                        functions=[
+                            Function(functions.avg, DataType.FLOAT),
+                            Function(functions.sum, DataType.INTEGER),
+                        ]
+                    ),
+                ),
+            ],
+        )
+        expected_metadata = [
+            FeatureMetadata(
+                name="feature1__avg",
+                data_type="FLOAT",
+                description="feature_desc1",
+                primary_key=False,
+            ),
+            FeatureMetadata(
+                name="feature1__sum",
+                data_type="INTEGER",
+                description="feature_desc1",
+                primary_key=False,
+            ),
+        ]
+
+        # act
+        metadata = feature_set._build_feature_metadata()
+
+        # assert
+        assert metadata == expected_metadata
+
+    def test_build_feature_metadata_with_windows_no_pivot(self):
+        # arrange
+        feature_set = AggregatedFeatureSet(
+            name="name",
+            entity="entity",
+            description="description",
+            keys=[
+                KeyFeature(name="id", description="key_desc", dtype=DataType.INTEGER)
+            ],
+            timestamp=TimestampFeature(),
+            features=[
+                Feature(
+                    name="feature1",
+                    description="feature_desc1",
+                    transformation=AggregatedTransform(
+                        functions=[Function(functions.avg, DataType.FLOAT)]
+                    ),
+                ),
+            ],
+        ).with_windows(definitions=["1 day", "7 days"])
+        expected_metadata = [
+            FeatureMetadata(
+                name="feature1__avg_over_1_day_rolling_windows",
+                data_type="FLOAT",
+                description="feature_desc1",
+                primary_key=False,
+            ),
+            FeatureMetadata(
+                name="feature1__avg_over_7_days_rolling_windows",
+                data_type="FLOAT",
+                description="feature_desc1",
+                primary_key=False,
+            ),
+        ]
+
+        # act
+        metadata = feature_set._build_feature_metadata()
+
+        # assert
+        assert metadata == expected_metadata
+
+    def test_build_feature_metadata_no_windows_with_pivot(self):
+        # arrange
+        feature_set = AggregatedFeatureSet(
+            name="name",
+            entity="entity",
+            description="description",
+            keys=[
+                KeyFeature(name="id", description="key_desc", dtype=DataType.INTEGER)
+            ],
+            timestamp=TimestampFeature(),
+            features=[
+                Feature(
+                    name="feature1",
+                    description="feature_desc1",
+                    transformation=AggregatedTransform(
+                        functions=[Function(functions.avg, DataType.FLOAT)]
+                    ),
+                ),
+            ],
+        ).with_pivot(column="type", values=["a", "b"])
+        expected_metadata = [
+            FeatureMetadata(
+                name="a_feature1__avg",
+                data_type="FLOAT",
+                description="feature_desc1",
+                primary_key=False,
+            ),
+            FeatureMetadata(
+                name="b_feature1__avg",
+                data_type="FLOAT",
+                description="feature_desc1",
+                primary_key=False,
+            ),
+        ]
+
+        # act
+        metadata = feature_set._build_feature_metadata()
+
+        # assert
+        assert metadata == expected_metadata
+
+    def test_build_feature_metadata_with_windows_with_pivot(self):
+        # arrange
+        feature_set = (
+            AggregatedFeatureSet(
+                name="name",
+                entity="entity",
+                description="description",
+                keys=[
+                    KeyFeature(
+                        name="id", description="key_desc", dtype=DataType.INTEGER
+                    )
+                ],
+                timestamp=TimestampFeature(),
+                features=[
+                    Feature(
+                        name="feature1",
+                        description="feature_desc1",
+                        transformation=AggregatedTransform(
+                            functions=[Function(functions.avg, DataType.FLOAT)]
+                        ),
+                    ),
+                ],
+            )
+            .with_windows(definitions=["3 hours"])
+            .with_pivot(column="type", values=["a", "b"])
+        )
+        expected_metadata = [
+            FeatureMetadata(
+                name="a_feature1__avg_over_3_hours_rolling_windows",
+                data_type="FLOAT",
+                description="feature_desc1",
+                primary_key=False,
+            ),
+            FeatureMetadata(
+                name="b_feature1__avg_over_3_hours_rolling_windows",
+                data_type="FLOAT",
+                description="feature_desc1",
+                primary_key=False,
+            ),
+        ]
+
+        # act
+        metadata = feature_set._build_feature_metadata()
+
+        # assert
+        assert metadata == expected_metadata
+
+    def test_build_feature_metadata_multiple_features(self):
+        # arrange
+        feature_set = (
+            AggregatedFeatureSet(
+                name="name",
+                entity="entity",
+                description="description",
+                keys=[
+                    KeyFeature(
+                        name="id", description="key_desc", dtype=DataType.INTEGER
+                    )
+                ],
+                timestamp=TimestampFeature(),
+                features=[
+                    Feature(
+                        name="feature1",
+                        description="feature_desc1",
+                        transformation=AggregatedTransform(
+                            functions=[Function(functions.avg, DataType.FLOAT)]
+                        ),
+                    ),
+                    Feature(
+                        name="feature2",
+                        description="feature_desc2",
+                        transformation=AggregatedTransform(
+                            functions=[Function(functions.sum, DataType.INTEGER)]
+                        ),
+                    ),
+                ],
+            )
+            .with_windows(definitions=["1 day"])
+            .with_pivot(column="type", values=["a"])
+        )
+        expected_metadata = [
+            FeatureMetadata(
+                name="a_feature1__avg_over_1_day_rolling_windows",
+                data_type="FLOAT",
+                description="feature_desc1",
+                primary_key=False,
+            ),
+            FeatureMetadata(
+                name="a_feature2__sum_over_1_day_rolling_windows",
+                data_type="INTEGER",
+                description="feature_desc2",
+                primary_key=False,
+            ),
+        ]
+
+        # act
+        metadata = feature_set._build_feature_metadata()
+
+        # assert
+        # Sort by name to ensure consistent order for comparison
+        assert sorted(metadata, key=lambda x: x.name) == sorted(
+            expected_metadata, key=lambda x: x.name
+        )
+
+    def test_build_feature_metadata_feature_with_multiple_functions(self):
+        # arrange
+        feature_set = (
+            AggregatedFeatureSet(
+                name="name",
+                entity="entity",
+                description="description",
+                keys=[
+                    KeyFeature(
+                        name="id", description="key_desc", dtype=DataType.INTEGER
+                    )
+                ],
+                timestamp=TimestampFeature(),
+                features=[
+                    Feature(
+                        name="feature1",
+                        description="feature_desc1",
+                        transformation=AggregatedTransform(
+                            functions=[
+                                Function(functions.avg, DataType.FLOAT),
+                                Function(functions.min, DataType.FLOAT),
+                            ]
+                        ),
+                    ),
+                ],
+            )
+            .with_windows(definitions=["1 day"])
+            .with_pivot(column="type", values=["a"])
+        )
+        expected_metadata = [
+            FeatureMetadata(
+                name="a_feature1__avg_over_1_day_rolling_windows",
+                data_type="FLOAT",
+                description="feature_desc1",
+                primary_key=False,
+            ),
+            FeatureMetadata(
+                name="a_feature1__min_over_1_day_rolling_windows",
+                data_type="FLOAT",
+                description="feature_desc1",
+                primary_key=False,
+            ),
+        ]
+
+        # act
+        metadata = feature_set._build_feature_metadata()
+
+        # assert
+        assert sorted(metadata, key=lambda x: x.name) == sorted(
+            expected_metadata, key=lambda x: x.name
+        )

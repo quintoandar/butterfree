@@ -199,12 +199,12 @@ class TestFeatureSet:
 
         # arrange
         feature_set = FeatureSet(
-            "name",
-            "entity",
-            "description",
-            [key_id],
-            timestamp_c,
-            [feature_add, feature_divide],
+            name="name",
+            entity="entity",
+            description="description",
+            keys=[key_id],
+            timestamp=timestamp_c,
+            features=[feature_add, feature_divide],
         )
 
         # act
@@ -235,12 +235,12 @@ class TestFeatureSet:
 
         # arrange
         feature_set = FeatureSet(
-            "name",
-            "entity",
-            "description",
-            [key_id],
-            timestamp_c,
-            [feature_add, feature_divide],
+            name="name",
+            entity="entity",
+            description="description",
+            keys=[key_id],
+            timestamp=timestamp_c,
+            features=[feature_add, feature_divide],
         )
 
         # act
@@ -284,12 +284,12 @@ class TestFeatureSet:
 
         # arrange
         feature_set = FeatureSet(
-            "name",
-            "entity",
-            "description",
-            [key_id],
-            timestamp_c,
-            [feature1, feature2, feature3],
+            name="name",
+            entity="entity",
+            description="description",
+            keys=[key_id],
+            timestamp=timestamp_c,
+            features=[feature1, feature2, feature3],
         )
 
         # act
@@ -390,3 +390,157 @@ class TestFeatureSet:
 
         assert isinstance(start_date, str)
         assert start_date == "2020-08-04"
+
+    def test_build_features_metadata_simple_feature(self, key_id, timestamp_c):
+        feature = Mock(spec=Feature)
+        feature.name = "simple"
+        feature.description = "dummy"
+        feature.get_output_columns = Mock(return_value=["simple"])
+        feature.dtype = DataType.DOUBLE
+
+        # arrange
+        feature_set = FeatureSet(
+            name="name",
+            entity="entity",
+            description="description",
+            keys=[key_id],
+            timestamp=timestamp_c,
+            features=[feature],
+        )
+
+        # act
+        metadata = feature_set._build_features_metadata()
+
+        # assert
+        assert len(metadata) == 1
+        assert metadata[0].name == "simple"
+        assert metadata[0].data_type == "DOUBLE"
+        assert metadata[0].primary_key is False
+        assert metadata[0].description == "dummy"
+
+    def test_build_features_metadata_spark_function_feature_no_window(
+        self, key_id, timestamp_c
+    ):
+        # arrange
+        feature_spark_function = Feature(
+            name="feature_spark",
+            description="spark function feature",
+            transformation=SQLExpressionTransform(expression="avg(feature_a)"),
+            dtype=DataType.DOUBLE,
+        )
+        feature_set = FeatureSet(
+            name="name",
+            entity="entity",
+            description="description",
+            keys=[key_id],
+            timestamp=timestamp_c,
+            features=[feature_spark_function],
+        )
+
+        # act
+        metadata = feature_set._build_features_metadata()
+
+        # assert
+        assert len(metadata) == 1
+        assert metadata[0].name == "feature_spark"
+        assert metadata[0].data_type == "DOUBLE"
+        assert metadata[0].primary_key is False
+        assert metadata[0].description == "spark function feature"
+
+    def test_build_features_metadata_spark_function_feature_with_window(
+        self, key_id, timestamp_c
+    ):
+        """
+        Using a dictionary with names as keys allows direct access to each metadata entry # noqa: E501
+        without making assumptions about their position in the list, which could change
+        between runs because of spark parallel processing.
+        """
+        # arrange
+        from butterfree.transform.transformations import SparkFunctionTransform
+
+        feature_spark_window = Feature(
+            name="feature_spark_window",
+            description="spark function window feature",
+            transformation=SparkFunctionTransform(
+                functions=[
+                    Function(func=F.avg, data_type=DataType.DOUBLE),
+                    Function(func=F.stddev_pop, data_type=DataType.DOUBLE),
+                ]
+            ).with_window(
+                partition_by="id",
+                window_definition=["5 events", "15 events"],
+                mode="row_windows",
+            ),
+        )
+
+        feature_set = FeatureSet(
+            name="name",
+            entity="entity",
+            description="description",
+            keys=[key_id],
+            timestamp=timestamp_c,
+            features=[feature_spark_window],
+        )
+
+        # act
+        metadata = feature_set._build_features_metadata()
+
+        # assert
+        assert len(metadata) == 4  # 2 functions * 2 window definitions
+
+        # Convert to a dictionary for easier lookup by name
+        metadata_dict = {m.name: m for m in metadata}
+
+        # Get each entry directly from the dictionary
+        avg_5_events = metadata_dict.get(
+            "feature_spark_window__avg_over_5_events_row_windows"
+        )
+        stddev_5_events = metadata_dict.get(
+            "feature_spark_window__stddev_pop_over_5_events_row_windows"
+        )
+        avg_15_events = metadata_dict.get(
+            "feature_spark_window__avg_over_15_events_row_windows"
+        )
+        stddev_15_events = metadata_dict.get(
+            "feature_spark_window__stddev_pop_over_15_events_row_windows"
+        )
+
+        # Verify all entries exist
+        assert avg_5_events is not None, "Missing avg_5_events metadata"
+        assert stddev_5_events is not None, "Missing stddev_5_events metadata"
+        assert avg_15_events is not None, "Missing avg_15_events metadata"
+        assert stddev_15_events is not None, "Missing stddev_15_events metadata"
+
+        # Assertions for F.avg over "5 events"
+        assert (
+            avg_5_events.name == "feature_spark_window__avg_over_5_events_row_windows"
+        )
+        assert avg_5_events.data_type == "DOUBLE"
+        assert avg_5_events.primary_key is False
+        assert avg_5_events.description == "spark function window feature"
+
+        # Assertions for F.stddev_pop over "5 events"
+        assert (
+            stddev_5_events.name
+            == "feature_spark_window__stddev_pop_over_5_events_row_windows"
+        )
+        assert stddev_5_events.data_type == "DOUBLE"
+        assert stddev_5_events.primary_key is False
+        assert stddev_5_events.description == "spark function window feature"
+
+        # Assertions for F.avg over "15 events"
+        assert (
+            avg_15_events.name == "feature_spark_window__avg_over_15_events_row_windows"
+        )
+        assert avg_15_events.data_type == "DOUBLE"
+        assert avg_15_events.primary_key is False
+        assert avg_15_events.description == "spark function window feature"
+
+        # Assertions for F.stddev_pop over "15 events"
+        assert (
+            stddev_15_events.name
+            == "feature_spark_window__stddev_pop_over_15_events_row_windows"
+        )
+        assert stddev_15_events.data_type == "DOUBLE"
+        assert stddev_15_events.primary_key is False
+        assert stddev_15_events.description == "spark function window feature"
