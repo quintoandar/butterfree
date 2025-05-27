@@ -229,12 +229,13 @@ class Feature:
                     col_name, pivot_value, window
                 )
                 if self.dtype is None:
-                    # This case should ideally be prevented by the dtype setter validation,
-                    # but raising an error here provides an explicit check during metadata build.
-                    raise ValueError(
-                        f"Feature '{self.name}' (column: '{col_name}') must have a dtype defined "
+                    # This case should ideally be prevented by the dtype setter validation, # noqa: E501
+                    # but raising an error here provides an explicit check during metadata build. # noqa: E501
+                    error_message = (
+                        f"Feature '{self.name}' (column: '{col_name}') must have a dtype defined "  # noqa: E501
                         "when not using AggregatedTransform or SparkFunctionTransform."
                     )
+                    raise ValueError(error_message)
                 data_type = self.dtype.name
                 metadata_list.append(
                     FeatureMetadata(
