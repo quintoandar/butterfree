@@ -469,29 +469,12 @@ class FeatureSet(HookableComponent):
     def _build_features_metadata(self) -> List[FeatureMetadata]:
         """Build the metadata for the features."""
         features_metadata = []
-
         for feature in self.features:
-            column_name = self._get_features_columns(feature)
-
-            if isinstance(feature.transformation, SparkFunctionTransform):
-                data_types = [
-                    function.data_type.name
-                    for function in feature.transformation.functions
-                    for _ in range(len(feature.transformation._windows or [None]))
-                ]
-            else:
-                data_types = [feature.dtype.name]
-
-            for column_name, data_type in zip(column_name, data_types):
-                features_metadata.append(
-                    FeatureMetadata(
-                        name=column_name,
-                        data_type=data_type,
-                        primary_key=False,
-                        description=feature.description,
-                    )
-                )
-
+            # For FeatureSet, we don't pass pivot_value or window,
+            # as these are specific to AggregatedFeatureSet's top-level aggregations
+            # or handled internally by transformations like SparkFunctionTransform.
+            metadata_list = feature.build_metadata()
+            features_metadata.extend(metadata_list)
         return features_metadata
 
     def build_metadata(self) -> FeatureSetMetadata:

@@ -17,6 +17,7 @@ from butterfree.transform.transformations import (
     TransformComponent,
 )
 from butterfree.transform.transformations.h3_transform import H3HashTransform
+from butterfree.transform.utils import Window
 
 
 class Feature:
@@ -151,11 +152,96 @@ class Feature:
             )
         return dataframe
 
-    def build_metadata(self) -> FeatureMetadata:
-        """Build the metadata for the feature."""
-        raise NotImplementedError(
-            "Subclasses of Feature must implement build_metadata()."
-            "If you need metadata from a base Feature class, "
-            "you must use FeatureSet#_build_features_metadata() or "
-            "AggregatedFeatureSet#_build_features_metadata()."
-        )
+    def _build_feature_column_name(
+        self,
+        base_name: str,
+        pivot_value: Optional[Any] = None,
+        window: Optional[Window] = None,
+    ) -> str:
+        """Helper to build the feature column name based on pivot and window."""
+        name = base_name
+        if pivot_value is not None:
+            name = f"{pivot_value}_{name}"
+        if window is not None:
+            name = f"{name}_{window.get_name()}"
+        return name
+
+    def build_metadata(
+        self,
+        pivot_value: Optional[Any] = None,
+        window: Optional[Window] = None,
+    ) -> List[FeatureMetadata]:
+        """Build the metadata for the feature.
+
+        Args:
+            pivot_value: Optional pivot value for naming.
+            window: Optional window for naming.
+
+        Returns:
+            A list of FeatureMetadata objects.
+        """
+        metadata_list = []
+        output_columns = self.get_output_columns()
+
+        if isinstance(
+            self.transformation, (AggregatedTransform, SparkFunctionTransform)
+        ):
+            # For these transformations, data types come from the
+            # transformation's functions and names are based on the function
+            # names combined with feature name.
+            for func_idx, function_obj in enumerate(self.transformation.functions):
+                # output_columns from get_output_columns already includes
+                # the function name part e.g., feature_name__avg,
+                # feature_name__sum. We need to reconstruct the name with
+                # pivot and window if they exist.
+                base_output_name = output_columns[func_idx]
+
+                # Check if the base_output_name already contains self.name
+                # to avoid duplication like feature_name_feature_name__avg
+                if self.name in base_output_name:
+                    # This typically happens when transformation.output_columns
+                    # are like ["feature_name__avg"]. We want the part after
+                    # the feature name and double underscore.
+                    func_specific_suffix = base_output_name.split(f"{self.name}__")[-1]
+                    constructed_name_base = f"{self.name}__{func_specific_suffix}"
+                else:
+                    # This case might occur if get_output_columns returns
+                    # just function names like ["avg"] or if the feature name
+                    # is not part of the transformation output by default.
+                    constructed_name_base = f"{self.name}__{base_output_name}"
+
+                final_name = self._build_feature_column_name(
+                    constructed_name_base, pivot_value, window
+                )
+                data_type = function_obj.data_type.name
+                metadata_list.append(
+                    FeatureMetadata(
+                        name=final_name,
+                        data_type=data_type,
+                        description=self.description,
+                        primary_key=False,
+                    )
+                )
+        else:
+            # For other features or features without complex transformations
+            for col_name in output_columns:
+                final_name = self._build_feature_column_name(
+                    col_name, pivot_value, window
+                )
+                if self.dtype is None:
+                    # This case should ideally be prevented by the dtype setter validation,
+                    # but raising an error here provides an explicit check during metadata build.
+                    raise ValueError(
+                        f"Feature '{self.name}' (column: '{col_name}') must have a dtype defined "
+                        "when not using AggregatedTransform or SparkFunctionTransform."
+                    )
+                data_type = self.dtype.name
+                metadata_list.append(
+                    FeatureMetadata(
+                        name=final_name,
+                        data_type=data_type,
+                        description=self.description,
+                        primary_key=False,
+                    )
+                )
+        return metadata_list

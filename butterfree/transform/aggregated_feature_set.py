@@ -662,44 +662,20 @@ class AggregatedFeatureSet(FeatureSet):
         return post_hook_df
 
     def _build_feature_metadata(self) -> List[FeatureMetadata]:
-        """Excerpt taken from _get_schema method.
-
-        Returns:
-            List[FeatureMetadata]: _description_
-        """
-
+        """Build the metadata for the features in the aggregated feature set."""
         features_metadata = []
 
-        pivot_values = self._pivot_values or [None]
-        windows = self._windows or [None]
+        # Use [None] if _pivot_values or _windows are empty/None to ensure one iteration
+        pivot_values_to_iterate = self._pivot_values if self._pivot_values else [None]
+        windows_to_iterate = self._windows if self._windows else [None]
 
         for feature in self.features:
-            combination = itertools.product(
-                pivot_values, self._get_features_columns(feature), windows
-            )
-
-            feature_names = [
-                self._build_feature_column_name(
-                    function, pivot_value=pivot_value, window=window
-                )
-                for pivot_value, function, window in combination
-            ]
-
-            data_types = [
-                function.data_type.name
-                for function in feature.transformation.functions  # noqa: E501. TODO: fragile protection (_has_aggregated_transform_only on setter)
-                for _ in range(len(pivot_values) * len(windows))
-            ]
-
-            for feature_name, data_type in zip(feature_names, data_types):
-                features_metadata.append(
-                    FeatureMetadata(
-                        name=feature_name,
-                        data_type=data_type,
-                        description=feature.description,
-                        primary_key=False,
-                    )
-                )
+            # We just need to call it for each pivot/window combination.
+            for pv in pivot_values_to_iterate:
+                for w in windows_to_iterate:
+                    # Pass pivot_value and window to the feature's metadata builder.
+                    metadata_list = feature.build_metadata(pivot_value=pv, window=w)
+                    features_metadata.extend(metadata_list)
 
         return features_metadata
 
