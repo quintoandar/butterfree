@@ -471,8 +471,7 @@ class FeatureSet(HookableComponent):
         features_metadata = []
         for feature in self.features:
             # For FeatureSet, we don't pass pivot_value or window,
-            # as these are specific to AggregatedFeatureSet's top-level aggregations
-            # or handled internally by transformations like SparkFunctionTransform.
+            # as these are specific to AggregatedFeatureSet's
             metadata_list = feature.build_metadata()
             features_metadata.extend(metadata_list)
         return features_metadata

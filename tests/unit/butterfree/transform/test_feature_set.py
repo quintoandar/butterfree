@@ -11,6 +11,7 @@ from butterfree.transform import FeatureSet
 from butterfree.transform.features import Feature
 from butterfree.transform.transformations import (
     AggregatedTransform,
+    SparkFunctionTransform,
     SQLExpressionTransform,
 )
 from butterfree.transform.utils import Function
@@ -392,11 +393,11 @@ class TestFeatureSet:
         assert start_date == "2020-08-04"
 
     def test_build_features_metadata_simple_feature(self, key_id, timestamp_c):
-        feature = Mock(spec=Feature)
-        feature.name = "simple"
-        feature.description = "dummy"
-        feature.get_output_columns = Mock(return_value=["simple"])
-        feature.dtype = DataType.DOUBLE
+        feature = Feature(
+            name="simple",
+            description="dummy",
+            dtype=DataType.DOUBLE,
+        )
 
         # arrange
         feature_set = FeatureSet(
@@ -425,9 +426,11 @@ class TestFeatureSet:
         feature_spark_function = Feature(
             name="feature_spark",
             description="spark function feature",
-            transformation=SQLExpressionTransform(expression="avg(feature_a)"),
-            dtype=DataType.DOUBLE,
+            transformation=SparkFunctionTransform(
+                functions=[Function(F.avg, DataType.DOUBLE)]
+            ),
         )
+
         feature_set = FeatureSet(
             name="name",
             entity="entity",
@@ -442,10 +445,40 @@ class TestFeatureSet:
 
         # assert
         assert len(metadata) == 1
-        assert metadata[0].name == "feature_spark"
+        assert metadata[0].name == "feature_spark__avg"
         assert metadata[0].data_type == "DOUBLE"
         assert metadata[0].primary_key is False
         assert metadata[0].description == "spark function feature"
+
+    def test_build_features_metadata_no_spark_function_feature_no_window(
+        self, key_id, timestamp_c
+    ):
+        # arrange
+        feature_sql_expression = Feature(
+            name="feature_sql_expr",
+            description="sql expression feature",
+            transformation=SQLExpressionTransform(expression="avg(feature_a)"),
+            dtype=DataType.DOUBLE,
+        )
+
+        feature_set = FeatureSet(
+            name="name",
+            entity="entity",
+            description="description",
+            keys=[key_id],
+            timestamp=timestamp_c,
+            features=[feature_sql_expression],
+        )
+
+        # act
+        metadata = feature_set._build_features_metadata()
+
+        # assert
+        assert len(metadata) == 1
+        assert metadata[0].name == "feature_sql_expr"
+        assert metadata[0].data_type == "DOUBLE"
+        assert metadata[0].primary_key is False
+        assert metadata[0].description == "sql expression feature"
 
     def test_build_features_metadata_spark_function_feature_with_window(
         self, key_id, timestamp_c
@@ -456,8 +489,6 @@ class TestFeatureSet:
         between runs because of spark parallel processing.
         """
         # arrange
-        from butterfree.transform.transformations import SparkFunctionTransform
-
         feature_spark_window = Feature(
             name="feature_spark_window",
             description="spark function window feature",
