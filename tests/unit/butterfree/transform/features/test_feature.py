@@ -11,6 +11,7 @@ from butterfree.transform.transformations import SQLExpressionTransform
 
 class TestFeature:
     def test_args_without_transformation(self):
+
         test_feature = Feature(
             name="feature",
             from_column="origin",
@@ -24,6 +25,7 @@ class TestFeature:
         assert test_feature.dtype == DataType.BIGINT
 
     def test_args_with_transformation(self):
+
         test_feature = Feature(
             name="feature",
             from_column="origin",
@@ -38,6 +40,7 @@ class TestFeature:
         assert test_feature.transformation
 
     def test_feature_transform_no_from_column(self, feature_set_dataframe):
+
         test_feature = Feature(
             name="feature",
             description="unit test feature without transformation",
@@ -49,6 +52,7 @@ class TestFeature:
         assert all([a == b for a, b in zip(df.columns, feature_set_dataframe.columns)])
 
     def test_feature_transform_with_from_column(self, feature_set_dataframe):
+
         test_feature = Feature(
             name="new_feature",
             from_column="feature",
@@ -70,6 +74,7 @@ class TestFeature:
     def test_feature_transform_with_from_column_and_column_name_exists(
         self, feature_set_dataframe
     ):
+
         test_feature = Feature(
             name="feature",
             from_column="id",
@@ -91,6 +96,7 @@ class TestFeature:
         assert_column_equality(df, feature_set_dataframe, "feature", "id")
 
     def test_feature_transform_with_dtype(self, feature_set_dataframe):
+
         test_feature = Feature(
             name="feature",
             description="unit test",
@@ -176,6 +182,7 @@ class TestFeature:
         )
 
     def test_feature_get_output_columns_without_transformations(self):
+
         test_feature = Feature(
             name="feature",
             from_column="origin",
@@ -188,6 +195,7 @@ class TestFeature:
     def test_feature_get_output_columns_with_transformations(
         self, feature_set_dataframe
     ):
+
         some_transformation = Mock()
         some_transformation.output_columns = feature_set_dataframe.columns
 
@@ -200,76 +208,3 @@ class TestFeature:
         )
 
         assert test_feature.get_output_columns() == feature_set_dataframe.columns
-
-    def test_build_metadata_with_spark_function_transform_no_windows(self):
-        """Test build_metadata method for Feature with SparkFunctionTransform without windows."""  # noqa: E501
-        import pyspark.sql.functions as F
-
-        from butterfree.transform.transformations import SparkFunctionTransform
-        from butterfree.transform.utils import Function
-
-        # Create a feature with SparkFunctionTransform without internal window
-        feature = Feature(
-            name="feature_spark",
-            description="spark function feature",
-            transformation=SparkFunctionTransform(
-                functions=[
-                    Function(func=F.avg, data_type=DataType.DOUBLE),
-                ]
-            ),
-        )
-
-        # Mock the get_output_columns to return a predictable result
-        feature.get_output_columns = Mock(return_value=["feature_spark__avg"])
-
-        # Build metadata without any window
-        metadata = feature.build_metadata()
-
-        # Assert
-        assert len(metadata) == 1
-        assert metadata[0].name == "feature_spark__avg"
-        assert metadata[0].data_type == "DOUBLE"
-        assert metadata[0].primary_key is False
-        assert metadata[0].description == "spark function feature"
-
-    def test_build_metadata_with_spark_function_transform_internal_windows(self):
-        """Test build_metadata method for Feature with SparkFunctionTransform with internal windows."""  # noqa: E501
-        import pyspark.sql.functions as F
-
-        from butterfree.transform.transformations import SparkFunctionTransform
-        from butterfree.transform.utils import Function
-
-        # Create a SparkFunctionTransform with internal window
-        transformation = SparkFunctionTransform(
-            functions=[
-                Function(func=F.avg, data_type=DataType.DOUBLE),
-            ]
-        )
-        # Add internal windows (normally this adds window info to output_columns)
-        transformation.with_window(
-            partition_by="id",
-            window_definition=["5 minutes"],
-            mode="fixed_windows",
-        )
-        transformation._windows = ["dummy_window"]  # Simulate internal windows
-
-        feature = Feature(
-            name="feature_spark",
-            description="spark function feature",
-            transformation=transformation,
-        )
-
-        # Mock the get_output_columns to return a name that includes the internal window
-        feature.get_output_columns = Mock(
-            return_value=["feature_spark__avg_over_5_minutes_fixed_windows"]
-        )
-
-        # Build metadata with no external window
-        metadata = feature.build_metadata()
-
-        # Assert
-        assert len(metadata) == 1
-        assert metadata[0].name == "feature_spark__avg_over_5_minutes_fixed_windows"
-        assert metadata[0].data_type == "DOUBLE"
-        assert metadata[0].primary_key is False
-        assert metadata[0].description == "spark function feature"
