@@ -8,6 +8,7 @@ from butterfree.clients import SparkClient
 from butterfree.configs.db import CassandraConfig, KafkaConfig
 from butterfree.load.processing import json_transform
 from butterfree.load.writers import OnlineFeatureStoreWriter
+from butterfree.metadata.writer_metadata import WriterMetadata
 from butterfree.testing.dataframe import assert_dataframe_equality
 
 
@@ -301,3 +302,17 @@ class TestOnlineFeatureStoreWriter:
                 topic="custom_topic"
             ).items()
         )
+
+    def test_build_metadata(self):
+        # given
+        writer = OnlineFeatureStoreWriter()
+
+        # when
+        metadata = writer.build_metadata()
+
+        # then
+        assert isinstance(metadata, WriterMetadata)
+        assert metadata.type == "OnlineFeatureStoreWriter"
+        assert metadata.interval_mode == writer.interval_mode
+        assert metadata.write_to_entity == writer.write_to_entity
+        assert metadata.db_config == writer.db_config.__class__.__name__
