@@ -3,6 +3,7 @@ from pyspark.sql.types import LongType, StringType, StructField, StructType
 
 from butterfree.configs.environment import specification
 from butterfree.extract.readers import KafkaReader
+from butterfree.metadata.reader_metadata import KafkaReaderMetadata
 from butterfree.testing.dataframe import (
     assert_dataframe_equality,
     create_df_from_collection,
@@ -10,7 +11,6 @@ from butterfree.testing.dataframe import (
 
 
 class TestKafkaReader:
-
     RAW_DATA = [
         {
             "key": "123",
@@ -125,3 +125,19 @@ class TestKafkaReader:
 
         # arrange
         assert_dataframe_equality(target_df, output_df)
+
+    def test_build_metadata(self):
+        # given
+        value_schema = StructType([StructField("id", LongType())])
+        kafka_reader = KafkaReader(
+            id="kafka_reader",
+            topic="topic",
+            value_schema=value_schema,
+        )
+
+        # when
+        metadata = kafka_reader.build_metadata()
+
+        # then
+        assert isinstance(metadata, KafkaReaderMetadata)
+        assert metadata.topic == kafka_reader.topic
