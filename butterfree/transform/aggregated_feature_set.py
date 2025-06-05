@@ -11,7 +11,6 @@ from pyspark.sql import DataFrame, functions
 from butterfree.clients import SparkClient
 from butterfree.constants.window_definitions import ALLOWED_WINDOWS
 from butterfree.dataframe_service import repartition_df
-from butterfree.metadata.feature_metadata import FeatureMetadata
 from butterfree.metadata.feature_set_metadata import FeatureSetMetadata
 from butterfree.transform import FeatureSet
 from butterfree.transform.features import Feature, KeyFeature, TimestampFeature
@@ -661,34 +660,22 @@ class AggregatedFeatureSet(FeatureSet):
 
         return post_hook_df
 
-    def _build_feature_metadata(self) -> List[FeatureMetadata]:
-        """Build the metadata for the features in the aggregated feature set."""
-        features_metadata = []
-
-        # Use [None] if _pivot_values or _windows are empty/None to ensure one iteration
-        pivot_values_to_iterate = self._pivot_values if self._pivot_values else [None]
-        windows_to_iterate = self._windows if self._windows else [None]
-
-        for feature in self.features:
-            # We just need to call it for each pivot/window combination.
-            for pv in pivot_values_to_iterate:
-                for w in windows_to_iterate:
-                    # Pass pivot_value and window to the feature's metadata builder.
-                    metadata_list = feature.build_metadata(pivot_value=pv, window=w)
-                    features_metadata.extend(metadata_list)
-
-        return features_metadata
-
     def build_metadata(self) -> FeatureSetMetadata:
         """Build the metadata for the feature set."""
-        timestamp_metadata = [self.timestamp.build_metadata()]
-        keys_metadata = [key_feature.build_metadata() for key_feature in self.keys]
-
-        # The name of the feature depends on the transformation, window and pivot value.
-        # These are characteristics of the feature set, not the feature itself.
-        features_metadata = self._build_feature_metadata()
-
         windows_definition = [window.build_metadata() for window in self._windows]
+
+        keys_metadata = [key_feature.build_metadata() for key_feature in self.keys]
+        timestamp_metadata = [self.timestamp.build_metadata()]
+        features_metadata = list(
+            itertools.chain(
+                *[
+                    feature.build_aggregated_feature_metadata(
+                        pivot_values=self._pivot_values, windows=self._windows
+                    )
+                    for feature in self.features
+                ]
+            )
+        )
 
         return FeatureSetMetadata(
             entity=self.entity,

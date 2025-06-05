@@ -478,12 +478,13 @@ class FeatureSet(HookableComponent):
 
     def build_metadata(self) -> FeatureSetMetadata:
         """Build the metadata for the feature set."""
-        timestamp_metadata = [self.timestamp.build_metadata()]
         keys_metadata = [key_feature.build_metadata() for key_feature in self.keys]
 
-        # The name of the feature depends on the transformation, window and pivot value.
-        # These are characteristics of the feature set, not the feature itself.
-        features_metadata = self._build_features_metadata()
+        timestamp_metadata = [self.timestamp.build_metadata()]
+
+        features_metadata = list(
+            itertools.chain(*[feature.build_metadata() for feature in self.features])
+        )
 
         return FeatureSetMetadata(
             entity=self.entity,
