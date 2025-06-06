@@ -5,13 +5,14 @@ from butterfree.constants import DataType
 from butterfree.metadata.feature_metadata import FeatureMetadata
 from butterfree.transform.features import Feature
 from butterfree.transform.transformations import (
+    AggregatedTransform,
     CustomTransform,
     SparkFunctionTransform,
     SQLExpressionTransform,
     StackTransform,
 )
 from butterfree.transform.transformations.h3_transform import H3HashTransform
-from butterfree.transform.utils import Function
+from butterfree.transform.utils import Function, Window
 
 
 def divide(df, parent_feature, column1, column2):
@@ -105,3 +106,109 @@ class TestFeatureMetadata:
         assert metadata[0].data_type == "BIGINT"
         assert metadata[0].primary_key is False
         assert metadata[0].description == "unit test"
+
+    def test_build_aggregated_feature_metadata(self):
+        # arrange
+        transformation = AggregatedTransform(
+            functions=[
+                Function(F.avg, DataType.DOUBLE),
+                Function(F.stddev_pop, DataType.DOUBLE),
+            ],
+        )
+        feature = Feature(
+            name="feature",
+            description="unit test",
+            transformation=transformation,
+        )
+
+        pivot_values = ["a", "b"]
+        windows = [
+            Window(window_definition="2 days", mode="fixed_windows"),
+            Window(window_definition="7 days", mode="fixed_windows"),
+        ]
+
+        expected_metadata = [
+            {
+                "name": "a_feature__avg_over_2_days_fixed_windows",
+                "data_type": "DOUBLE",
+            },
+            {
+                "name": "a_feature__avg_over_7_days_fixed_windows",
+                "data_type": "DOUBLE",
+            },
+            {
+                "name": "a_feature__stddev_pop_over_2_days_fixed_windows",
+                "data_type": "DOUBLE",
+            },
+            {
+                "name": "a_feature__stddev_pop_over_7_days_fixed_windows",
+                "data_type": "DOUBLE",
+            },
+            {
+                "name": "b_feature__avg_over_2_days_fixed_windows",
+                "data_type": "DOUBLE",
+            },
+            {
+                "name": "b_feature__avg_over_7_days_fixed_windows",
+                "data_type": "DOUBLE",
+            },
+            {
+                "name": "b_feature__stddev_pop_over_2_days_fixed_windows",
+                "data_type": "DOUBLE",
+            },
+            {
+                "name": "b_feature__stddev_pop_over_7_days_fixed_windows",
+                "data_type": "DOUBLE",
+            },
+        ]
+
+        # act
+        metadata = feature.build_aggregated_feature_metadata(
+            pivot_values=pivot_values,
+            windows=windows,
+        )
+
+        # assert
+        assert isinstance(metadata, list)
+        assert len(metadata) == len(expected_metadata)
+        for i, meta in enumerate(metadata):
+            assert isinstance(meta, FeatureMetadata)
+            assert meta.name == expected_metadata[i]["name"]
+            assert meta.data_type == expected_metadata[i]["data_type"]
+            assert meta.primary_key is False
+            assert meta.description == "unit test"
+
+    def test_build_aggregated_feature_metadata_without_pivot_or_window(self):
+        # arrange
+        transformation = AggregatedTransform(
+            functions=[
+                Function(F.avg, DataType.DOUBLE),
+                Function(F.stddev_pop, DataType.DOUBLE),
+            ],
+        )
+        feature = Feature(
+            name="feature",
+            description="unit test",
+            transformation=transformation,
+        )
+
+        expected_metadata = [
+            {"name": "feature__avg", "data_type": "DOUBLE"},
+            {"name": "feature__stddev_pop", "data_type": "DOUBLE"},
+        ]
+
+        # act
+        metadata = feature.build_aggregated_feature_metadata(
+            pivot_values=None,
+            windows=None,
+        )
+
+        # assert
+        assert isinstance(metadata, list)
+        assert len(metadata) == len(expected_metadata)
+        for i, meta in enumerate(metadata):
+            assert isinstance(meta, FeatureMetadata)
+            assert meta.name == expected_metadata[i]["name"]
+            assert meta.data_type == expected_metadata[i]["data_type"]
+            assert meta.primary_key is False
+            assert meta.description == "unit test"
