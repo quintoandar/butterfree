@@ -6,14 +6,12 @@ from pyspark.sql.types import StringType, StructField, StructType
 from butterfree.clients import SparkClient
 from butterfree.constants import DataType
 from butterfree.constants.columns import TIMESTAMP_COLUMN
+from butterfree.metadata.feature_metadata import FeatureMetadata
 from butterfree.transform.features import TimestampFeature
-
-# from pyspark.sql.types import *
 
 
 class TestTimestampFeature:
     def test_args_without_transformation(self):
-
         test_key = TimestampFeature(from_column="ts")
         test_key_ntz = TimestampFeature(dtype=DataType.TIMESTAMP_NTZ, from_column="ts")
 
@@ -23,7 +21,6 @@ class TestTimestampFeature:
         assert test_key_ntz.dtype == DataType.TIMESTAMP_NTZ
 
     def test_transform(self, feature_set_dataframe):
-
         test_key = TimestampFeature()
 
         df = test_key.transform(feature_set_dataframe)
@@ -31,7 +28,6 @@ class TestTimestampFeature:
         assert df.schema[TIMESTAMP_COLUMN].dataType == DataType.TIMESTAMP.spark
 
     def test_transform_ms_from_column(self, feature_set_dataframe_ms_from_column):
-
         test_key = TimestampFeature(from_column="ts", from_ms=True)
 
         df = test_key.transform(feature_set_dataframe_ms_from_column).orderBy(
@@ -44,7 +40,6 @@ class TestTimestampFeature:
         assert df[1]["timestamp"] == "2020-02-12 21:18:42.223"
 
     def test_transform_ms(self, feature_set_dataframe_ms):
-
         test_key = TimestampFeature(from_ms=True)
 
         df = test_key.transform(feature_set_dataframe_ms).orderBy("timestamp")
@@ -57,7 +52,6 @@ class TestTimestampFeature:
     def test_transform_ms_from_column_small_time_diff(
         self, feature_set_dataframe_small_time_diff
     ):
-
         test_key = TimestampFeature(from_ms=True)
 
         df = test_key.transform(feature_set_dataframe_small_time_diff).orderBy(
@@ -69,7 +63,6 @@ class TestTimestampFeature:
         assert df[0]["timestamp"] != df[1]["timestamp"]
 
     def test_transform_mask(self, feature_set_dataframe_date):
-
         test_key = TimestampFeature(mask="yyyy-MM-dd")
 
         df = test_key.transform(feature_set_dataframe_date).orderBy("timestamp")
@@ -80,7 +73,6 @@ class TestTimestampFeature:
         assert df[1]["timestamp"] == "2020-02-08 00:00:00"
 
     def test_timezone_configs(self):
-
         spark = SparkClient()
         now = datetime.now()
 
@@ -120,7 +112,6 @@ class TestTimestampFeature:
         assert df4_vals.ts_ntz == df2_vals.ts_ntz
 
     def test_timezone(self):
-
         spark = SparkClient()
 
         my_date = datetime.now(pytz.timezone("US/Pacific"))
@@ -148,3 +139,17 @@ class TestTimestampFeature:
             df_different_timezone.collect()[0].ts.strftime(datetime_mask) != time_value
         )
         assert df_no_timezone.collect()[0].ts.strftime(datetime_mask) == time_value
+
+    def test_build_metadata(self):
+        # arrange
+        ts_feature = TimestampFeature()
+
+        # act
+        metadata = ts_feature.build_metadata()
+
+        # assert
+        assert isinstance(metadata, FeatureMetadata)
+        assert metadata.name == TIMESTAMP_COLUMN
+        assert metadata.data_type == DataType.TIMESTAMP.name
+        assert metadata.primary_key is False
+        assert metadata.description == "Time tag for the state of all features."
