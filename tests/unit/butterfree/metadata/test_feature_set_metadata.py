@@ -1,6 +1,10 @@
-from unittest.mock import Mock
+import pyspark.sql.functions as F
 
+from butterfree.constants import DataType
 from butterfree.transform import FeatureSet
+from butterfree.transform.features import Feature, KeyFeature, TimestampFeature
+from butterfree.transform.transformations import SparkFunctionTransform
+from butterfree.transform.utils import Function
 
 
 class TestFeatureSetMetadata:
@@ -8,22 +12,21 @@ class TestFeatureSetMetadata:
         self,
     ):
         # arrange
-        key_id = Mock()
-        key_id.build_metadata.return_value = "key"
-        timestamp_c = Mock()
-        timestamp_c.build_metadata.return_value = "timestamp"
-        feature_add = Mock()
-        feature_add.build_metadata.return_value = ["feature_add"]
-        feature_divide = Mock()
-        feature_divide.build_metadata.return_value = ["feature_divide"]
-
         feature_set = FeatureSet(
             name="name",
             entity="entity",
             description="description",
-            keys=[key_id],
-            timestamp=timestamp_c,
-            features=[feature_add, feature_divide],
+            keys=[KeyFeature(name="key", description="d", dtype=DataType.STRING)],
+            timestamp=TimestampFeature(),
+            features=[
+                Feature(
+                    name="feature",
+                    description="d",
+                    transformation=SparkFunctionTransform(
+                        functions=[Function(F.avg, DataType.DOUBLE)]
+                    ),
+                ),
+            ],
         )
 
         # act
@@ -32,5 +35,16 @@ class TestFeatureSetMetadata:
         # assert
         assert result.name == "name"
         assert result.entity == "entity"
+        assert result.type == "FeatureSet"
         assert result.description == "description"
-        assert result.features == ["key", "timestamp", "feature_add", "feature_divide"]
+
+        assert len(result.features) == 3
+
+        assert result.features[0].name == "key"
+        assert result.features[0].primary_key is True
+
+        assert result.features[1].name == "timestamp"
+        assert result.features[1].primary_key is False
+
+        assert result.features[2].name == "feature__avg"
+        assert result.features[2].primary_key is False

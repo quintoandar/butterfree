@@ -1,53 +1,60 @@
-from unittest.mock import Mock, patch
+import pyspark.sql.functions as F
 
+from butterfree.constants import DataType
 from butterfree.transform.aggregated_feature_set import AggregatedFeatureSet
+from butterfree.transform.features import Feature, KeyFeature, TimestampFeature
+from butterfree.transform.transformations import AggregatedTransform
+from butterfree.transform.utils import Function
 
 
 class TestAggregatedFeatureSetMetadata:
     def test_build_metadata(self):
         # arrange
-        with patch.object(AggregatedFeatureSet, "__init__", lambda s, *a, **k: None):
-            feature_set = AggregatedFeatureSet()
+        feature_set = AggregatedFeatureSet(
+            name="name",
+            entity="entity",
+            description="description",
+            keys=[KeyFeature(name="key", description="d", dtype=DataType.STRING)],
+            timestamp=TimestampFeature(from_column="timestamp"),
+            features=[
+                Feature(
+                    name="feature",
+                    description="d",
+                    from_column="value",
+                    transformation=AggregatedTransform(
+                        functions=[Function(F.avg, DataType.DOUBLE)]
+                    ),
+                )
+            ],
+        )
+        feature_set = feature_set.with_windows(["3 days"]).with_pivot(
+            column="pivot_column", values=["a"]
+        )
 
-            # manually set attributes needed for the test
-            feature_set.name = "name"
-            feature_set.entity = "entity"
-            feature_set.description = "description"
+        # act
+        result = feature_set.build_metadata()
 
-            window_mock = Mock()
-            window_mock.build_metadata.return_value = "window_metadata"
-            feature_set._windows = [window_mock]
+        # assert
+        assert result.name == "name"
+        assert result.entity == "entity"
+        assert result.type == "AggregatedFeatureSet"
+        assert result.description == "description"
 
-            feature_set._pivot_values = ["pivot_value"]
+        assert len(result.windows_definition) == 1
+        assert result.windows_definition[0] == "3 days"
 
-            key_feature_mock = Mock()
-            key_feature_mock.build_metadata.return_value = "key_metadata"
-            feature_set.keys = [key_feature_mock]
+        assert len(result.features) == 3
 
-            timestamp_feature_mock = Mock()
-            timestamp_feature_mock.build_metadata.return_value = "timestamp_metadata"
-            feature_set.timestamp = timestamp_feature_mock
+        assert result.features[0].name == "key"
+        assert result.features[0].description == "d"
+        assert result.features[0].primary_key is True
 
-            feature_mock = Mock()
-            feature_mock.build_aggregated_feature_metadata.return_value = [
-                "feature_metadata"
-            ]
-            feature_set.features = [feature_mock]
+        assert result.features[1].name == "timestamp"
+        assert (
+            result.features[1].description == "Time tag for the state of all features."
+        )
+        assert result.features[1].primary_key is False
 
-            # act
-            result = feature_set.build_metadata()
-
-            # assert
-            feature_mock.build_aggregated_feature_metadata.assert_called_with(
-                pivot_values=["pivot_value"], windows=[window_mock]
-            )
-            assert result.name == "name"
-            assert result.entity == "entity"
-            assert result.type == "AggregatedFeatureSet"
-            assert result.description == "description"
-            assert result.windows_definition == ["window_metadata"]
-            assert result.features == [
-                "key_metadata",
-                "timestamp_metadata",
-                "feature_metadata",
-            ]
+        assert result.features[2].name == "a_feature__avg_over_3_days_rolling_windows"
+        assert result.features[2].description == "d"
+        assert result.features[2].primary_key is False
