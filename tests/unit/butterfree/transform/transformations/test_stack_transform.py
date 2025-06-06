@@ -10,7 +10,6 @@ from butterfree.transform.transformations import StackTransform
 
 
 class TestSQLExpressionTransform:
-
     input_data = [
         {"feature": 100, "id_a": 1, "id_b": 2},
         {"feature": 120, "id_a": 3, "id_b": 4},
@@ -80,3 +79,17 @@ class TestSQLExpressionTransform:
 
         # assert
         assert result
+
+    def test_get_names_and_types(self, spark_context, spark_session):
+        # arrange
+        feature = Feature(
+            name="id",
+            description="stack transformation",
+            dtype=DataType.STRING,
+            transformation=StackTransform("id_a", "id_d"),
+        )
+        # act
+        names_and_types = feature.transformation.get_names_and_types()
+
+        # assert
+        assert names_and_types == [("id", "STRING")]

@@ -135,3 +135,47 @@ class TestSparkFunctionTransform:
         output_df = test_feature.transform(feature_set_dataframe)
 
         assert_dataframe_equality(output_df, target_df_rows_agg_2)
+
+    def test_get_names_and_types(self):
+        # arrange
+        feature = Feature(
+            name="feature",
+            description="unit test",
+            transformation=SparkFunctionTransform(
+                functions=[
+                    Function(functions.cos, DataType.DOUBLE),
+                    Function(functions.sin, DataType.DOUBLE),
+                ],
+            ),
+            from_column="feature1",
+        )
+        # act
+        names_and_types = feature.transformation.get_names_and_types()
+
+        # assert
+        assert names_and_types == [
+            ("feature__cos", "DOUBLE"),
+            ("feature__sin", "DOUBLE"),
+        ]
+
+    def test_get_names_and_types_with_window(self):
+        # arrange
+        feature = Feature(
+            name="feature1",
+            description="unit test",
+            transformation=SparkFunctionTransform(
+                functions=[Function(functions.avg, DataType.DOUBLE)],
+            ).with_window(
+                partition_by="id",
+                mode="fixed_windows",
+                window_definition=["7 days", "2 weeks"],
+            ),
+        )
+        # act
+        names_and_types = feature.transformation.get_names_and_types()
+
+        # assert
+        assert names_and_types == [
+            ("feature1__avg_over_7_days_fixed_windows", "DOUBLE"),
+            ("feature1__avg_over_2_weeks_fixed_windows", "DOUBLE"),
+        ]
