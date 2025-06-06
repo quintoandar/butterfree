@@ -6,7 +6,8 @@ from butterfree.clients import SparkClient
 from butterfree.dataframe_service import repartition_sort_df
 from butterfree.extract import Source
 from butterfree.load import Sink
-from butterfree.transform import FeatureSet
+from butterfree.metadata.feature_set_pipeline_metadata import FeatureSetPipelineMetadata
+from butterfree.transform.feature_set import FeatureSet
 
 
 class FeatureSetPipeline:
@@ -183,7 +184,6 @@ class FeatureSetPipeline:
 
     @spark_client.setter
     def spark_client(self, spark_client: SparkClient) -> None:
-
         if not isinstance(spark_client, SparkClient):
             raise ValueError("spark_client must be a SparkClient instance")
 
@@ -267,4 +267,18 @@ class FeatureSetPipeline:
             partition_by=partition_by,
             order_by=order_by,
             num_processors=num_processors,
+        )
+
+    def build_metadata(self) -> FeatureSetPipelineMetadata:
+        """Build the metadata for the feature set pipeline."""
+        feature_set_metadata = self.feature_set.build_metadata()
+
+        readers_metadata = [reader.build_metadata() for reader in self.source.readers]
+
+        writers_metadata = [writer.build_metadata() for writer in self.sink.writers]
+
+        return FeatureSetPipelineMetadata(
+            readers=readers_metadata,
+            writers=writers_metadata,
+            feature_set=feature_set_metadata,
         )

@@ -95,3 +95,17 @@ class TestSQLExpressionTransform:
 
         # assert
         assert_dataframe_equality(output_df, target_df)
+
+    def test_get_names_and_types(self):
+        # arrange
+        feature = Feature(
+            name="feature",
+            description="description",
+            dtype=DataType.INTEGER,
+            transformation=SQLExpressionTransform(expression="feature + 1"),
+        )
+        # act
+        names_and_types = feature.transformation.get_names_and_types()
+
+        # assert
+        assert names_and_types == [("feature", "INTEGER")]

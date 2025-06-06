@@ -12,6 +12,7 @@ from butterfree.clients import SparkClient
 from butterfree.constants.columns import TIMESTAMP_COLUMN
 from butterfree.dataframe_service import IncrementalStrategy
 from butterfree.hooks import HookableComponent
+from butterfree.metadata.feature_set_metadata import FeatureSetMetadata
 from butterfree.transform.features import Feature, KeyFeature, TimestampFeature
 from butterfree.transform.transformations import (
     AggregatedTransform,
@@ -167,7 +168,14 @@ class FeatureSet(HookableComponent):
 
     @staticmethod
     def _get_features_columns(*features: Feature) -> List[str]:
-        return list(itertools.chain(*[k.get_output_columns() for k in features]))
+        """Get the columns names of the features.
+
+        Returns:
+            List[str]: List of column names.
+        """
+        return list(
+            itertools.chain(*[feature.get_output_columns() for feature in features])
+        )
 
     @property
     def keys(self) -> List[KeyFeature]:
@@ -258,36 +266,46 @@ class FeatureSet(HookableComponent):
     def get_schema(self) -> List[Dict[str, Any]]:
         """Get feature set schema.
 
+        This method is used for database migration purposes and the deprecated
+        butterfree.reports.metadata file.
+
         Returns:
             List of dicts regarding cassandra feature set schema.
 
         """
         schema = []
 
-        for f in self.keys + [self.timestamp]:
-            for c in self._get_features_columns(f):
+        for feature in self.keys + [self.timestamp]:
+            for column_name in self._get_features_columns(feature):
                 schema.append(
                     {
-                        "column_name": c,
-                        "type": f.dtype.spark,
-                        "primary_key": True if isinstance(f, KeyFeature) else False,
+                        "column_name": column_name,
+                        "type": feature.dtype.spark,
+                        "primary_key": (
+                            True if isinstance(feature, KeyFeature) else False
+                        ),
                     }
                 )
 
-        for f in self.features:  # type: ignore
-            name = self._get_features_columns(f)
-            if isinstance(f.transformation, SparkFunctionTransform):
-                type = [
-                    fc.data_type.spark
-                    for fc in f.transformation.functions
-                    for _ in range(len(f.transformation._windows or [None]))
+        for feature in self.features:
+            name = self._get_features_columns(feature)
+            if isinstance(feature.transformation, SparkFunctionTransform):
+                types = [
+                    function.data_type.spark
+                    for function in feature.transformation.functions
+                    for _ in range(len(feature.transformation._windows or [None]))
                 ]
             else:
-                type = [f.dtype.spark]
+                types = [feature.dtype.spark]
 
-            for n, dt in zip(name, type):
-                schema.append({"column_name": n, "type": dt, "primary_key": False})
-
+            for name, date_type in zip(name, types):
+                schema.append(
+                    {
+                        "column_name": name,
+                        "type": date_type,
+                        "primary_key": False,
+                    }
+                )
         return schema
 
     @staticmethod
@@ -446,3 +464,22 @@ class FeatureSet(HookableComponent):
         post_hook_df = self.run_post_hooks(output_df)
 
         return post_hook_df
+
+    def build_metadata(self) -> FeatureSetMetadata:
+        """Build the metadata for the feature set."""
+        keys_metadata = [key_feature.build_metadata() for key_feature in self.keys]
+
+        timestamp_metadata = [self.timestamp.build_metadata()]
+
+        features_metadata = list(
+            itertools.chain(*[feature.build_metadata() for feature in self.features])
+        )
+
+        return FeatureSetMetadata(
+            entity=self.entity,
+            name=self.name,
+            type="FeatureSet",
+            description=self.description,
+            windows_definition=None,
+            features=keys_metadata + timestamp_metadata + features_metadata,
+        )

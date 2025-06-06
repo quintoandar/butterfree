@@ -15,7 +15,6 @@ def divide(df, parent_feature, column1, column2):
 
 class TestCustomTransform:
     def test_feature_transform(self, feature_set_dataframe):
-
         test_feature = Feature(
             name="feature",
             description="unit test",
@@ -40,7 +39,6 @@ class TestCustomTransform:
         )
 
     def test_output_columns(self, feature_set_dataframe):
-
         test_feature = Feature(
             name="feature",
             description="unit test",
@@ -84,3 +82,22 @@ class TestCustomTransform:
                 dtype=DataType.BIGINT,
                 transformation=CustomTransform(transformer=None),
             )
+
+    def test_get_names_and_types(self):
+        # arrange
+        feature = Feature(
+            name="feature",
+            description="unit test",
+            dtype=DataType.BIGINT,
+            transformation=CustomTransform(
+                transformer=divide,
+                column1="feature1",
+                column2="feature2",
+            ),
+        )
+
+        # act
+        names_and_types = feature.transformation.get_names_and_types()
+
+        # assert
+        assert names_and_types == [("feature", "BIGINT")]

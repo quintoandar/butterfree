@@ -11,6 +11,7 @@ from pyspark.sql import DataFrame, functions
 from butterfree.clients import SparkClient
 from butterfree.constants.window_definitions import ALLOWED_WINDOWS
 from butterfree.dataframe_service import repartition_df
+from butterfree.metadata.feature_set_metadata import FeatureSetMetadata
 from butterfree.transform import FeatureSet
 from butterfree.transform.features import Feature, KeyFeature, TimestampFeature
 from butterfree.transform.transformations import AggregatedTransform
@@ -190,6 +191,9 @@ class AggregatedFeatureSet(FeatureSet):
     timestamp column.
     """
 
+    # TODO: _windows must be a required field
+    # TODO: If one reader is incremental, the historical writer must be incremental
+
     def __init__(
         self,
         name: str,
@@ -201,7 +205,7 @@ class AggregatedFeatureSet(FeatureSet):
         deduplicate_rows: bool = True,
         eager_evaluation: bool = True,
     ):
-        self._windows: List[Any] = []
+        self._windows: List[Window] = []
         self._pivot_column: Optional[str] = None
         self._pivot_values: Optional[List[Union[bool, float, int, str]]] = []
         self._distinct_subset: List[Any] = []
@@ -468,40 +472,52 @@ class AggregatedFeatureSet(FeatureSet):
     def get_schema(self) -> List[Dict[str, Any]]:
         """Get feature set schema.
 
+        This method is used for database migration purposes and the deprecated
+        butterfree.reports.metadata file.
+
         Returns:
             List of dicts with the feature set schema.
 
         """
         schema = []
-        for f in self.keys + [self.timestamp]:
-            for c in self._get_features_columns(f):
+        for feature in self.keys + [self.timestamp]:
+            for column_name in self._get_features_columns(feature):
                 schema.append(
                     {
-                        "column_name": c,
-                        "type": f.dtype.spark,
-                        "primary_key": True if isinstance(f, KeyFeature) else False,
+                        "column_name": column_name,
+                        "type": feature.dtype.spark,
+                        "primary_key": (
+                            True if isinstance(feature, KeyFeature) else False
+                        ),
                     }
                 )
         pivot_values = self._pivot_values or [None]
         windows = self._windows or [None]
 
-        for f in self.features:  # type: ignore
+        for feature in self.features:
             combination = itertools.product(
-                pivot_values, self._get_features_columns(f), windows
+                pivot_values, self._get_features_columns(feature), windows
             )
             name = [
-                self._build_feature_column_name(fc, pivot_value=pv, window=w)
-                for pv, fc, w in combination
+                self._build_feature_column_name(
+                    function, pivot_value=pivot_value, window=window
+                )
+                for pivot_value, function, window in combination
             ]
             type = [
-                fc.data_type.spark
-                for fc in f.transformation.functions
+                function.data_type.spark
+                for function in feature.transformation.functions  # noqa: E501. TODO: fragile protection (_has_aggregated_transform_only on setter)
                 for _ in range(len(pivot_values) * len(windows))
             ]
 
-            for n, dt in zip(name, type):
-                schema.append({"column_name": n, "type": dt, "primary_key": False})
-
+            for name, data_type in zip(name, type):
+                schema.append(
+                    {
+                        "column_name": name,
+                        "type": data_type,
+                        "primary_key": False,
+                    }
+                )
         return schema
 
     @staticmethod
@@ -643,3 +659,29 @@ class AggregatedFeatureSet(FeatureSet):
         post_hook_df = self.run_post_hooks(output_df)
 
         return post_hook_df
+
+    def build_metadata(self) -> FeatureSetMetadata:
+        """Build the metadata for the feature set."""
+        windows_definition = [window.build_metadata() for window in self._windows]
+
+        keys_metadata = [key_feature.build_metadata() for key_feature in self.keys]
+        timestamp_metadata = [self.timestamp.build_metadata()]
+        features_metadata = list(
+            itertools.chain(
+                *[
+                    feature.build_aggregated_feature_metadata(
+                        pivot_values=self._pivot_values, windows=self._windows
+                    )
+                    for feature in self.features
+                ]
+            )
+        )
+
+        return FeatureSetMetadata(
+            entity=self.entity,
+            name=self.name,
+            type="AggregatedFeatureSet",
+            description=self.description,
+            windows_definition=windows_definition,
+            features=keys_metadata + timestamp_metadata + features_metadata,
+        )

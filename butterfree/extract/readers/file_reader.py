@@ -7,6 +7,7 @@ from pyspark.sql.types import StructType
 
 from butterfree.clients import SparkClient
 from butterfree.extract.readers.reader import Reader
+from butterfree.metadata.reader_metadata import FileReaderMetadata
 
 
 class FileReader(Reader):
@@ -116,4 +117,12 @@ class FileReader(Reader):
             stream=self.stream,
             path=self.path,
             **self.options,
+        )
+
+    def build_metadata(self) -> FileReaderMetadata:
+        """Build the metadata for the file reader."""
+        return FileReaderMetadata(
+            path=self.path,
+            format=self.format,
+            incremental_strategy=self.incremental_strategy is not None,
         )

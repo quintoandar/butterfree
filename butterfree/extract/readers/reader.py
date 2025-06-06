@@ -2,20 +2,25 @@
 
 from abc import ABC, abstractmethod
 from functools import reduce
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional, Union
 
 from pyspark.sql import DataFrame
 
 from butterfree.clients import SparkClient
 from butterfree.dataframe_service import IncrementalStrategy
 from butterfree.hooks import HookableComponent
+from butterfree.metadata.reader_metadata import (
+    FileReaderMetadata,
+    KafkaReaderMetadata,
+    TableReaderMetadata,
+)
 
 
 class Reader(ABC, HookableComponent):
     """Abstract base class for Readers.
 
     Attributes:
-        id: unique string id for register the reader as a view on the metastore.
+        id: unique string id for register the reader as a view.
         transformations: list os methods that will be applied over the dataframe
             after the raw data is extracted.
 
@@ -139,3 +144,10 @@ class Reader(ABC, HookableComponent):
             self.transformations,
             df,
         )
+
+    @abstractmethod
+    def build_metadata(
+        self,
+    ) -> Union[FileReaderMetadata, KafkaReaderMetadata, TableReaderMetadata]:
+        """Abstract method to build the metadata for reader type."""
+        pass

@@ -1,12 +1,13 @@
 """Feature entity."""
 
 import warnings
-from typing import Any, List, Optional
+from typing import Any, List, Optional, Union
 
 from pyspark.sql import DataFrame
 from pyspark.sql.functions import col
 
 from butterfree.constants import DataType
+from butterfree.metadata.feature_metadata import FeatureMetadata
 from butterfree.transform.transformations import (
     AggregatedTransform,
     CustomTransform,
@@ -16,6 +17,7 @@ from butterfree.transform.transformations import (
     TransformComponent,
 )
 from butterfree.transform.transformations.h3_transform import H3HashTransform
+from butterfree.transform.utils.window_spec import Window
 
 
 class Feature:
@@ -53,9 +55,9 @@ class Feature:
         self.from_column = from_column
 
     @property
-    def dtype(self) -> Any:
+    def dtype(self) -> DataType:
         """Attribute dtype getter."""
-        return self.__dtype  # type: ignore
+        return self.__dtype
 
     @dtype.setter
     def dtype(self, value: DataType) -> None:
@@ -101,7 +103,7 @@ class Feature:
         self.__from_column = value
 
     @property
-    def transformation(self) -> Any:
+    def transformation(self) -> TransformComponent:
         """Attribute transformation getter."""
         return self.__transformation
 
@@ -149,3 +151,58 @@ class Feature:
                 self.name, col(self.name).cast(self.dtype.spark)
             )
         return dataframe
+
+    def build_metadata(self) -> List[FeatureMetadata]:
+        """Build the metadata for the feature."""
+        if self.transformation is None:
+            return [
+                FeatureMetadata(
+                    name=self.name,
+                    data_type=self.dtype.name,
+                    description=self.description,
+                    primary_key=False,
+                )
+            ]
+
+        feature_metadata_list = [
+            FeatureMetadata(
+                name=name,
+                data_type=dtype_str,
+                description=self.description,
+                primary_key=False,
+            )
+            for name, dtype_str in self.transformation.get_names_and_types()
+        ]
+        return feature_metadata_list
+
+    def build_aggregated_feature_metadata(
+        self,
+        pivot_values: Optional[List[Union[bool, float, int, str]]] = None,
+        windows: Optional[List[Window]] = None,
+    ) -> List[FeatureMetadata]:
+        """Build the metadata for the feature.
+
+        REQUIRES:
+            - One AggregatedFeatureSet must own this feature.
+            - The transformation must be an AggregatedTransform.
+
+        Args:
+            pivot_values: Pivot values for the feature.
+            windows: Windows for the feature.
+
+        Returns:
+            List of FeatureMetadata.
+        """
+
+        feature_metadata_list = [
+            FeatureMetadata(
+                name=name,
+                data_type=dtype_str,
+                description=self.description,
+                primary_key=False,
+            )
+            for name, dtype_str in self.transformation.get_names_and_types(
+                pivot_values=pivot_values, windows=windows
+            )
+        ]
+        return feature_metadata_list

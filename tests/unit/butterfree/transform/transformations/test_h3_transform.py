@@ -64,7 +64,7 @@ class TestH3Transform:
             for m in modules:
                 del sys.modules[m]
             with pytest.raises(ModuleNotFoundError, match="you must install"):
-                from butterfree.transform.transformations.h3_transform import (  # noqa; noqa
+                from butterfree.transform.transformations.h3_transform import (  # noqa
                     H3HashTransform,
                 )
 
@@ -86,3 +86,51 @@ class TestH3Transform:
 
         # assert
         assert_dataframe_equality(h3_with_stack_target_df, output_df)
+
+    def test_get_names_and_types(self):
+        # arrange
+        feature = Feature(
+            name="new_feature",
+            description="unit test",
+            dtype=DataType.STRING,
+            transformation=H3HashTransform(
+                h3_resolutions=[6, 7, 8, 9, 10, 11, 12],
+                lat_column="lat",
+                lng_column="lng",
+            ),
+        )
+
+        # act
+        names_and_types = feature.transformation.get_names_and_types()
+
+        # assert
+        assert names_and_types == [
+            ("lat_lng__h3_hash__6", "STRING"),
+            ("lat_lng__h3_hash__7", "STRING"),
+            ("lat_lng__h3_hash__8", "STRING"),
+            ("lat_lng__h3_hash__9", "STRING"),
+            ("lat_lng__h3_hash__10", "STRING"),
+            ("lat_lng__h3_hash__11", "STRING"),
+            ("lat_lng__h3_hash__12", "STRING"),
+        ]
+
+    def test_get_names_and_types_with_stack(self):
+        # arrange
+        feature = KeyFeature(
+            name="id",
+            description="unit test",
+            dtype=DataType.STRING,
+            transformation=H3HashTransform(
+                h3_resolutions=[6, 7],
+                lat_column="lat",
+                lng_column="lng",
+            ).with_stack(),
+        )
+
+        # act
+        names_and_types = feature.transformation.get_names_and_types()
+
+        # assert
+        assert names_and_types == [
+            ("id", "STRING"),
+        ]

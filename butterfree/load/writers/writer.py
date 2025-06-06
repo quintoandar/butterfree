@@ -9,6 +9,7 @@ from pyspark.sql.dataframe import DataFrame
 from butterfree.clients import SparkClient
 from butterfree.configs.db import AbstractWriteConfig
 from butterfree.hooks import HookableComponent
+from butterfree.metadata.writer_metadata import WriterMetadata
 from butterfree.transform import FeatureSet
 
 
@@ -122,3 +123,22 @@ class Writer(ABC, HookableComponent):
             AssertionError: if validation fails.
 
         """
+
+    def build_metadata(self) -> WriterMetadata:
+        """Get the writer's metadata as a Pydantic model.
+
+        This method creates a standardized representation of writer metadata
+        that can be used for documentation, validation, and serialization purposes.
+
+        Returns:
+            A BaseWriterMetadata model containing the writer's metadata
+        """
+
+        writer_metadata = WriterMetadata(
+            type=self.__class__.__name__,
+            interval_mode=self.interval_mode,
+            write_to_entity=self.write_to_entity,
+            db_config=self.db_config.__class__.__name__,
+        )
+
+        return writer_metadata
