@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file.
 
 Preferably use **Added**, **Changed**, **Removed** and **Fixed** topics in each release or unreleased log for a better organization.
 
+## [1.8.0](https://github.com/quintoandar/butterfree/compare/1.7.2...1.8.0) (2025-06-06)
+
+
+### Features
+
+* **mlop-2760:** Create metadata module (feature, feature_set, reader, writer and pipeline) ([#418](https://github.com/quintoandar/butterfree/issues/418)) ([f5c12f1](https://github.com/quintoandar/butterfree/commit/f5c12f190ec79330b280e7856593548b60597063))
+
 ## [1.7.2](https://github.com/quintoandar/butterfree/compare/1.7.1...1.7.2) (2025-04-04)
 
 
