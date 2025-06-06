@@ -12,7 +12,6 @@ from butterfree.clients import SparkClient
 from butterfree.constants.columns import TIMESTAMP_COLUMN
 from butterfree.dataframe_service import IncrementalStrategy
 from butterfree.hooks import HookableComponent
-from butterfree.metadata.feature_metadata import FeatureMetadata
 from butterfree.metadata.feature_set_metadata import FeatureSetMetadata
 from butterfree.transform.features import Feature, KeyFeature, TimestampFeature
 from butterfree.transform.transformations import (
@@ -465,16 +464,6 @@ class FeatureSet(HookableComponent):
         post_hook_df = self.run_post_hooks(output_df)
 
         return post_hook_df
-
-    def _build_features_metadata(self) -> List[FeatureMetadata]:
-        """Build the metadata for the features."""
-        features_metadata = []
-        for feature in self.features:
-            # For FeatureSet, we don't pass pivot_value or window,
-            # as these are specific to AggregatedFeatureSet's
-            metadata_list = feature.build_metadata()
-            features_metadata.extend(metadata_list)
-        return features_metadata
 
     def build_metadata(self) -> FeatureSetMetadata:
         """Build the metadata for the feature set."""
