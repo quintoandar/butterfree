@@ -10,6 +10,7 @@ from butterfree.testing.dataframe import (
 
 
 class TestKafkaReader:
+
     RAW_DATA = [
         {
             "key": "123",

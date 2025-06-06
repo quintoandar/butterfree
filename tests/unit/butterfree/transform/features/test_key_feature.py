@@ -6,6 +6,7 @@ from butterfree.transform.features import KeyFeature
 
 class TestKeyFeature:
     def test_args_without_transformation(self):
+
         test_key = KeyFeature(
             name="id",
             from_column="origin",
@@ -18,6 +19,7 @@ class TestKeyFeature:
         assert test_key.description == "unit test"
 
     def test_args_with_transformation(self):
+
         test_key = KeyFeature(
             name="id",
             from_column="origin",
