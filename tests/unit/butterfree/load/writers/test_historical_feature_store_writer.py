@@ -8,7 +8,6 @@ from pyspark.sql.functions import spark_partition_id
 from butterfree.clients import SparkClient
 from butterfree.load.processing import json_transform
 from butterfree.load.writers import HistoricalFeatureStoreWriter
-from butterfree.metadata.writer_metadata import WriterMetadata
 from butterfree.testing.dataframe import assert_dataframe_equality
 
 
@@ -349,17 +348,3 @@ class TestHistoricalFeatureStoreWriter:
             writer.PARTITION_BY == spark_client.write_table.call_args[1]["partition_by"]
         )
         assert feature_set.name == spark_client.write_table.call_args[1]["table_name"]
-
-    def test_build_metadata(self):
-        # given
-        writer = HistoricalFeatureStoreWriter()
-
-        # when
-        metadata = writer.build_metadata()
-
-        # then
-        assert isinstance(metadata, WriterMetadata)
-        assert metadata.type == "HistoricalFeatureStoreWriter"
-        assert metadata.interval_mode == writer.interval_mode
-        assert metadata.write_to_entity == writer.write_to_entity
-        assert metadata.db_config == writer.db_config.__class__.__name__

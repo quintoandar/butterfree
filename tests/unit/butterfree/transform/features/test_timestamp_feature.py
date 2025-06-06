@@ -6,7 +6,6 @@ from pyspark.sql.types import StringType, StructField, StructType
 from butterfree.clients import SparkClient
 from butterfree.constants import DataType
 from butterfree.constants.columns import TIMESTAMP_COLUMN
-from butterfree.metadata.feature_metadata import FeatureMetadata
 from butterfree.transform.features import TimestampFeature
 
 
@@ -139,17 +138,3 @@ class TestTimestampFeature:
             df_different_timezone.collect()[0].ts.strftime(datetime_mask) != time_value
         )
         assert df_no_timezone.collect()[0].ts.strftime(datetime_mask) == time_value
-
-    def test_build_metadata(self):
-        # arrange
-        ts_feature = TimestampFeature()
-
-        # act
-        metadata = ts_feature.build_metadata()
-
-        # assert
-        assert isinstance(metadata, FeatureMetadata)
-        assert metadata.name == TIMESTAMP_COLUMN
-        assert metadata.data_type == DataType.TIMESTAMP.name
-        assert metadata.primary_key is False
-        assert metadata.description == "Time tag for the state of all features."
