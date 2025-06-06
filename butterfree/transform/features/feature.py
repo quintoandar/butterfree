@@ -180,7 +180,19 @@ class Feature:
         pivot_values: Optional[List[Union[bool, float, int, str]]] = None,
         windows: Optional[List[Window]] = None,
     ) -> List[FeatureMetadata]:
-        """Build the metadata for the feature."""
+        """Build the metadata for the feature.
+
+        REQUIRES:
+            - One AggregatedFeatureSet must own this feature.
+            - The transformation must be an AggregatedTransform.
+
+        Args:
+            pivot_values: Pivot values for the feature.
+            windows: Windows for the feature.
+
+        Returns:
+            List of FeatureMetadata.
+        """
 
         feature_metadata_list = [
             FeatureMetadata(
