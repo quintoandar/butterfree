@@ -18,7 +18,7 @@ try:
     from cassandra.policies import DCAwareRoundRobinPolicy
     from cassandra.query import ConsistencyLevel, dict_factory
 except ModuleNotFoundError as e:
-    e.msg = "Cassandra not found. To be able to use this module,you must install butterfree[cassandra] or install cassandra-driver manually."
+    e.msg = "Cassandra not found. To be able to use this module,you must install butterfree[cassandra] or install cassandra-driver manually."  # noqa: E501
     raise
 
 
@@ -26,9 +26,7 @@ from butterfree.clients import AbstractClient
 
 logger = logging.getLogger(__name__)
 
-EMPTY_STRING_HOST_ERROR = (
-    "The value of Cassandra host is empty. Please fill correctly with your endpoints"  # noqa: E501
-)
+EMPTY_STRING_HOST_ERROR = "The value of Cassandra host is empty. Please fill correctly with your endpoints"  # noqa: E501
 GENERIC_INVALID_HOST_ERROR = "The Cassandra host must be a valid string, a string that represents a list or list of strings"  # noqa: E501
 
 
