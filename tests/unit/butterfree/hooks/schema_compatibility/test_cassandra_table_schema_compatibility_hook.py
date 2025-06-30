@@ -3,7 +3,9 @@ from unittest.mock import MagicMock
 import pytest
 
 from butterfree.clients import CassandraClient
-from butterfree.hooks.schema_compatibility import CassandraTableSchemaCompatibilityHook
+from butterfree.hooks.schema_compatibility.cassandra_table_schema_compatibility_hook import (  # noqa: E501
+    CassandraTableSchemaCompatibilityHook,
+)
 
 
 class TestCassandraTableSchemaCompatibilityHook:

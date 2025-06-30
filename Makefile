@@ -41,7 +41,7 @@ requirements: minimum-requirements dev-requirements requirements-test requiremen
 .PHONY: ci-install
 ci-install:
 	@pip install --upgrade pip
-	@pip install cmake
+	@pip install "cassandra-driver==3.24.0"
 	@python -m pip install -U -r requirements.test.txt -r requirements.lint.txt -r requirements.dev.txt -r requirements.txt -t ./pip/deps --cache-dir ./pip/cache
 
 .PHONY: tests

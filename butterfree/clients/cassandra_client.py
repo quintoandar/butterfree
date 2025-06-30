@@ -4,17 +4,23 @@ import logging
 from ssl import CERT_REQUIRED, PROTOCOL_TLSv1
 from typing import Dict, List, Optional, Union
 
-from cassandra.auth import PlainTextAuthProvider
-from cassandra.cluster import (
-    EXEC_PROFILE_DEFAULT,
-    Cluster,
-    ExecutionProfile,
-    ResponseFuture,
-    Session,
-)
-from cassandra.policies import DCAwareRoundRobinPolicy
-from cassandra.query import ConsistencyLevel, dict_factory
 from typing_extensions import TypedDict
+
+try:
+    from cassandra.auth import PlainTextAuthProvider
+    from cassandra.cluster import (
+        EXEC_PROFILE_DEFAULT,
+        Cluster,
+        ExecutionProfile,
+        ResponseFuture,
+        Session,
+    )
+    from cassandra.policies import DCAwareRoundRobinPolicy
+    from cassandra.query import ConsistencyLevel, dict_factory
+except ModuleNotFoundError as e:
+    e.msg = "Cassandra not found. To be able to use this module,you must install butterfree[cassandra] or install cassandra-driver manually."  # noqa: E501
+    raise
+
 
 from butterfree.clients import AbstractClient
 
@@ -168,7 +174,7 @@ class CassandraClient(AbstractClient):
 
         if not response:
             raise RuntimeError(
-                f"No columns found for table: {table}" f"in key space: {self.keyspace}"
+                f"No columns found for table: {table}in key space: {self.keyspace}"
             )
 
         return response
@@ -198,7 +204,7 @@ class CassandraClient(AbstractClient):
         else:
             columns_str = joined_parsed_columns
 
-        query = f"CREATE TABLE {self.keyspace}.{table} " f"({columns_str}); "
+        query = f"CREATE TABLE {self.keyspace}.{table} ({columns_str}); "
 
         return query
 

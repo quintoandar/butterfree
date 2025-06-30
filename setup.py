@@ -34,7 +34,10 @@ setup(
     license="Copyright",
     author="QuintoAndar",
     install_requires=requirements,
-    extras_require={"h3": ["h3>=3.7.4,<4"]},
+    extras_require={
+        "h3": ["h3>=3.7.4,<4"],
+        "cassandra": ["cassandra-driver==3.24.0"],
+    },
     python_requires=">=3.9, <4",
     entry_points={"console_scripts": ["butterfree=butterfree._cli.main:app"]},
     include_package_data=True,
