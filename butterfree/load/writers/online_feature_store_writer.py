@@ -11,7 +11,6 @@ from butterfree.clients import SparkClient
 from butterfree.configs.db import AbstractWriteConfig, CassandraConfig
 from butterfree.constants.columns import TIMESTAMP_COLUMN
 from butterfree.hooks import Hook
-from butterfree.hooks.schema_compatibility import CassandraTableSchemaCompatibilityHook
 from butterfree.load.writers.writer import Writer
 from butterfree.transform import FeatureSet
 
@@ -270,9 +269,9 @@ class OnlineFeatureStoreWriter(Writer):
             table_name: table name where the dataframe will be saved.
             database: database name where the dataframe will be saved.
         """
-        if not self.check_schema_hook:
-            self.check_schema_hook = CassandraTableSchemaCompatibilityHook(
-                client, table_name
-            )
+        if self.check_schema_hook:
+            return self.check_schema_hook.run(dataframe)
 
-        return self.check_schema_hook.run(dataframe)
+        raise NotImplementedError(
+            "Schema check hook not implemented for Online Feature Store Writer"
+        )
