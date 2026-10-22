@@ -9,3 +9,4 @@ boto3==1.35.*
 numpy==1.26.4
 delta-spark==3.2.0
 pydantic
+certifi>=2026.10.19
